@@ -4,13 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Logistic Map 1D Box-Counting Dimension Explorer</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.min.js"></script>
   <style>
     body { font-family: sans-serif; background: #f4f4f4; }
     #controls { margin: 1em 0; }
     label { margin-right: 1em; }
     canvas { border: 1px solid #999; display: block; margin-bottom: 1em; }
-    #loglog { background: #fff; }
     .container { display: flex; flex-wrap: wrap; gap: 2em;}
   </style>
 </head>
@@ -143,7 +141,145 @@
       points.forEach(x => {
         let px = left + x * width;
         ctx.beginPath();
-        ctx.moveTo(px, boxBaseY - 1
+        ctx.moveTo(px, boxBaseY - 15);
+        ctx.lineTo(px, boxBaseY);
+        ctx.stroke();
+      });
+
+      // Draw axis and labels
+      ctx.fillStyle="#222";
+      ctx.font="13px sans-serif";
+      ctx.fillText("0",left-8,boxBaseY+boxHeight+16);
+      ctx.fillText("1",left+width-7,boxBaseY+boxHeight+16);
+      ctx.fillText("x",left+width/2-5,boxBaseY+boxHeight+34);
+      ctx.font="15px sans-serif";
+      ctx.fillText(`1D Box Counting for Logistic Map (r = ${r.toFixed(3)})`,left+width/2-120,32);
+
+      // Legend
+      ctx.font="12px sans-serif";
+      ctx.fillStyle="#d32f2f";
+      ctx.fillRect(left+width-140,boxBaseY-12,16,16);
+      ctx.strokeStyle = "#d32f2f";
+      ctx.strokeRect(left+width-140,boxBaseY-12,16,16);
+      ctx.fillStyle="#222";
+      ctx.fillText("Occupied box",left+width-120,boxBaseY);
+    }
+
+    function drawLogLogPlot() {
+      const c = document.getElementById('loglog');
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0,0,c.width,c.height);
+
+      // Margins
+      let left = 50, right = 20, top = 30, bottom = 40;
+      let width = c.width - left - right;
+      let height = c.height - top - bottom;
+
+      // Axes
+      ctx.strokeStyle = "#bbb";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(left, top);
+      ctx.lineTo(left, top+height);
+      ctx.lineTo(left+width, top+height);
+      ctx.stroke();
+
+      // Axis labels & title
+      ctx.fillStyle="#222";
+      ctx.font="13px sans-serif";
+      ctx.fillText("log(1/ε)",left+width/2-35,top+height+32);
+      ctx.save();
+      ctx.translate(left-38,top+height/2+25);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillText("log N(ε)",0,0);
+      ctx.restore();
+      ctx.font="15px sans-serif";
+      ctx.fillText("Log-Log Plot: Box-Counting Dimension",left+30,top-10);
+
+      // Draw points
+      if (boxData.length > 0) {
+        let logs = boxData.map(d => ({
+          x: Math.log(1/d.eps),
+          y: Math.log(d.nOccupied)
+        }));
+        let xs = logs.map(p=>p.x), ys = logs.map(p=>p.y);
+        let minx=Math.min(...xs),maxx=Math.max(...xs);
+        let miny=Math.min(...ys),maxy=Math.max(...ys);
+        let pad = 0.1;
+
+        // Function to map log values to canvas coordinates
+        function xMap(x) {
+          return left + ((x - minx) / (maxx - minx + 1e-6) + pad) * (width*(1-2*pad));
+        }
+        function yMap(y) {
+          return top+height - ((y - miny) / (maxy - miny + 1e-6) + pad) * (height*(1-2*pad));
+        }
+
+        // Draw lines connecting points
+        ctx.strokeStyle="#388e3c";
+        ctx.beginPath();
+        logs.forEach((p,i) => {
+          let px = xMap(p.x), py = yMap(p.y);
+          if(i===0) ctx.moveTo(px,py);
+          else ctx.lineTo(px,py);
+        });
+        ctx.stroke();
+
+        // Draw data points
+        logs.forEach(p => {
+          let px = xMap(p.x), py = yMap(p.y);
+          ctx.beginPath();
+          ctx.arc(px, py, 7, 0, 2 * Math.PI);
+          ctx.fillStyle = "#d32f2f";
+          ctx.fill();
+          ctx.strokeStyle = "#555";
+          ctx.lineWidth=1.5;
+          ctx.stroke();
+        });
+
+        // Fit line (fractal dimension estimate)
+        if (boxData.length >= 2) {
+          let n = logs.length;
+          let sumx = logs.reduce((a,b)=>a+b.x,0), sumy=logs.reduce((a,b)=>a+b.y,0);
+          let sumxx = logs.reduce((a,b)=>a+b.x*b.x,0), sumxy=logs.reduce((a,b)=>a+b.x*b.y,0);
+          let m = (n*sumxy - sumx*sumy) / (n*sumxx - sumx*sumx);
+          let b = (sumy - m*sumx)/n;
+
+          // Draw fitted line
+          let x1 = minx, x2 = maxx;
+          let y1 = m*x1 + b, y2 = m*x2 + b;
+          let px1 = xMap(x1), py1 = yMap(y1);
+          let px2 = xMap(x2), py2 = yMap(y2);
+          ctx.beginPath();
+          ctx.moveTo(px1,py1);
+          ctx.lineTo(px2,py2);
+          ctx.strokeStyle="#1565c0";
+          ctx.lineWidth=2.5;
+          ctx.setLineDash([5,5]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Slope label
+          ctx.fillStyle="#1565c0";
+          ctx.font="15px sans-serif";
+          ctx.fillText("Estimated Dimension ≈ "+(-m).toFixed(3), left+width-210, top+25);
+        }
+      }
+    }
+
+    // --- Main ---
+    function setupPage() {
+      generateLogisticMap();
+      redrawMain();
+    }
+    setupPage();
+  </script>
+</body>
+</html>
+
+   
+      
+    
 
 
 
