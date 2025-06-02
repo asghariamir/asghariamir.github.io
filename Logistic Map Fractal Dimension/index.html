@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Logistic Map Fractal Dimension Explorer (Improved)</title>
+  <title>Logistic Map 1D Box-Counting Dimension Explorer</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.min.js"></script>
   <style>
     body { font-family: sans-serif; background: #f4f4f4; }
@@ -11,33 +11,32 @@
     label { margin-right: 1em; }
     canvas { border: 1px solid #999; display: block; margin-bottom: 1em; }
     #loglog { background: #fff; }
+    .container { display: flex; flex-wrap: wrap; gap: 2em;}
   </style>
 </head>
 <body>
-  <h2>Logistic Map Fractal Dimension Explorer (Box-Counting)</h2>
+  <h2>Logistic Map Fractal Dimension Explorer (1D Box-Counting)</h2>
   <div id="controls">
-    <label>r: <input type="range" id="rSlider" min="3.5" max="4" step="0.001" value="3.9"/> <span id="rValue">3.900</span></label>
+    <label>r: <input type="range" id="rSlider" min="3.5" max="4" step="0.001" value="3.900"/> <span id="rValue">3.900</span></label>
     <label>Boxes (N): <input type="range" id="boxSlider" min="10" max="200" step="1" value="50"/> <span id="boxValue">50</span></label>
     <button id="addPoint">Add Data Point</button>
     <button id="clearData">Clear Data</button>
   </div>
-  <main>
-    <div>
-      <canvas id="logmap"></canvas>
-      <canvas id="loglog" width="400" height="300"></canvas>
-    </div>
-  </main>
+  <div class="container">
+    <canvas id="logmap"></canvas>
+    <canvas id="loglog" width="400" height="300"></canvas>
+  </div>
   <p>
-    <b>Instructions:</b> Adjust <code>r</code> for the logistic map. Change the box size (N), then press <b>Add Data Point</b> to collect (<code>N</code>, <code>Number of occupied boxes</code>). As you collect data for different box sizes, the lower plot shows the log-log plot and the estimated fractal dimension as the slope.
+    <b>Instructions:</b> Adjust <code>r</code> for the logistic map. Change the box count <code>N</code>, then press <b>Add Data Point</b> to add (<code>N</code>, <code>Number of occupied boxes</code>) to the log-log plot. The log-log plot slope estimates the box-counting dimension.
   </p>
   <script>
     // Parameters
     let r = 3.9;
     let x0 = 0.2;
-    let iterations = 2000, skip = 200;
+    let iterations = 2500, skip = 500;
     let points = [];
     let boxCount = 50;
-    let boxData = []; // stores {N, occupied, eps}
+    let boxData = []; // {N, nOccupied, eps}
 
     // --- Setup Controls ---
     const rSlider = document.getElementById('rSlider');
@@ -60,7 +59,6 @@
     document.getElementById('addPoint').onclick = function() {
       let N = boxCount;
       let {nOccupied, eps} = countBoxes(N);
-      // Prevent duplicate box size entries:
       if (!boxData.some(d => d.N === N)) {
         boxData.push({N, nOccupied, eps});
         drawLogLogPlot();
@@ -100,23 +98,52 @@
       drawLogLogPlot();
     }
 
+    // 1D correct visualization
     function drawMap() {
       const c = document.getElementById('logmap');
-      c.width = 600; c.height = 250;
+      c.width = 700; c.height = 140;
       const ctx = c.getContext('2d');
       ctx.clearRect(0,0,c.width,c.height);
 
       // Margins
-      let left = 60, right = 20, top = 20, bottom = 40;
+      let left = 60, right = 30, bottom = 40;
       let width = c.width - left - right;
-      let height = c.height - top - bottom;
+      let boxBaseY = c.height - bottom;
+      let boxHeight = 30;
 
-      // Axes
-      ctx.strokeStyle = "#bbb";
+      // Draw grid (1D row of boxes)
+      let N = boxCount;
+      let boxW = width / N;
+      ctx.font = "12px sans-serif";
+
+      // Draw all boxes (light gray)
+      for (let i = 0; i < N; i++) {
+        ctx.beginPath();
+        ctx.rect(left + i * boxW, boxBaseY, boxW, boxHeight);
+        ctx.strokeStyle = "#bbb";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Occupied boxes: highlight
+      let {occupied} = countBoxes(N);
+      for (let i = 0; i < N; i++) {
+        if (occupied[i]) {
+          ctx.fillStyle = "rgba(255,85,85,0.42)";
+          ctx.fillRect(left + i * boxW, boxBaseY, boxW, boxHeight);
+          ctx.strokeStyle = "#d32f2f";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(left + i * boxW, boxBaseY, boxW, boxHeight);
+        }
+      }
+
+      // Draw logistic map points (just above the boxes, as vertical lines)
+      ctx.strokeStyle = "#1976d2";
       ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(left, top);
-      ctx.lineTo(lef
+      points.forEach(x => {
+        let px = left + x * width;
+        ctx.beginPath();
+        ctx.moveTo(px, boxBaseY - 1
 
 
 
