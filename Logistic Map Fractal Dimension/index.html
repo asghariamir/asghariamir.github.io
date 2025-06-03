@@ -1,281 +1,215 @@
-<!DOCTYPE html>
+' + <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Logistic Map 1D Box-Counting Dimension Explorer</title>
-  <style>
-    body { font-family: sans-serif; background: #f4f4f4; }
-    #controls { margin: 1em 0; }
-    label { margin-right: 1em; }
-    canvas { border: 1px solid #999; display: block; margin-bottom: 1em; }
-    .container { display: flex; flex-wrap: wrap; gap: 2em;}
-  </style>
+<meta charset="utf-8">
+<title>Logistic Map – ε-table below the attractor band</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script>
+<style>
+ body{font-family:Arial,sans-serif;margin:1rem;background:#fafafa;}
+ #plots{display:flex;flex-direction:column;gap:1.6rem;}
+ #bifPlot,#slicePlot{width:100%;height:400px;}
+ #controls{display:flex;flex-wrap:wrap;align-items:center;
+           gap:.6rem;margin-top:-1rem;}
+ #controls input[type=range]{flex:1 1 220px;}
+ table{border-collapse:collapse;margin-top:.5rem}
+ th,td{border:1px solid #999;padding:.25rem .7rem;text-align:right;}
+ th{background:#f3f3f3}
+ button{cursor:pointer}
+ .disabled{opacity:.35;cursor:default}
+</style>
 </head>
 <body>
-  <h2>Logistic Map Fractal Dimension Explorer (1D Box-Counting)</h2>
+
+<h2>Logistic-Map Explorer (ε-table → graphs)</h2>
+
+<div id="plots">
+  <!-- 1) bifurcation diagram -->
+  <div id="bifPlot"></div>
+
+  <!-- 2) parameter controls -->
   <div id="controls">
-    <label>r: <input type="range" id="rSlider" min="3.5" max="4" step="0.001" value="3.900"/> <span id="rValue">3.900</span></label>
-    <label>Boxes (N): <input type="range" id="boxSlider" min="10" max="200" step="1" value="50"/> <span id="boxValue">50</span></label>
-    <button id="addPoint">Add Data Point</button>
-    <button id="clearData">Clear Data</button>
+      r&nbsp;=<span id="rVal">3.8000</span>
+      <input type="range" id="rSlider" min="2.5" max="4"
+             step="0.0001" value="3.8">
+
+      x₀&nbsp;=<span id="x0Val">0.5000</span>
+      <input type="range" id="x0Slider" min="0.01" max="0.99"
+             step="0.0001" value="0.5">
+
+      points&nbsp;
+      <input type="number" id="keepInput" value="10000"
+             min="1" max="20000" step="1" style="width:5rem">
+
+      k&nbsp;=<span id="kVal">8</span>
+      <input type="range" id="kSlider" min="4" max="12"
+             step="1" value="8" style="flex:1 1 160px">
+
+      ε&nbsp;=<span id="epsVal">1/256</span>
+      N(ε)&nbsp;=<span id="nVal">-</span>
   </div>
-  <div class="container">
-    <canvas id="logmap"></canvas>
-    <canvas id="loglog" width="400" height="300"></canvas>
-  </div>
-  <p>
-    <b>Instructions:</b> Adjust <code>r</code> for the logistic map. Change the box count <code>N</code>, then press <b>Add Data Point</b> to add (<code>N</code>, <code>Number of occupied boxes</code>) to the log-log plot. The log-log plot slope estimates the box-counting dimension.
-  </p>
-  <script>
-    // Parameters
-    let r = 3.9;
-    let x0 = 0.2;
-    let iterations = 2500, skip = 500;
-    let points = [];
-    let boxCount = 50;
-    let boxData = []; // {N, nOccupied, eps}
 
-    // --- Setup Controls ---
-    const rSlider = document.getElementById('rSlider');
-    const rValue = document.getElementById('rValue');
-    rSlider.oninput = function() {
-      r = parseFloat(rSlider.value);
-      rValue.textContent = r.toFixed(3);
-      generateLogisticMap();
-      redrawMain();
-    };
+  <!-- 3) slice panel (band with ε-boxes) -->
+  <h3 id="sliceTitle">Attractor &amp; ε-boxes (post-transient)</h3>
+  <div id="slicePlot"></div>
+</div>
 
-    const boxSlider = document.getElementById('boxSlider');
-    const boxValue = document.getElementById('boxValue');
-    boxSlider.oninput = function() {
-      boxCount = parseInt(boxSlider.value);
-      boxValue.textContent = boxCount;
-      redrawMain();
-    };
+<!-- 4) ε-table and its buttons, now *below* the band -->
+<h3>Build your ε-table</h3>
+<button id="addBtn">Add row</button>
+<button id="clrBtn">Clear</button>
+<button id="plotBtn" class="disabled">Plot table</button>
 
-    document.getElementById('addPoint').onclick = function() {
-      let N = boxCount;
-      let {nOccupied, eps} = countBoxes(N);
-      if (!boxData.some(d => d.N === N)) {
-        boxData.push({N, nOccupied, eps});
-        drawLogLogPlot();
-      }
-    };
+<table id="epsTable">
+  <thead><tr><th>#</th><th>k</th><th>ε = 2<sup>−k</sup></th><th>N(ε)</th></tr></thead>
+  <tbody></tbody>
+</table>
 
-    document.getElementById('clearData').onclick = function() {
-      boxData = [];
-      drawLogLogPlot();
-    };
+<script>
+/* -------- numeric parameters ----------------------------------- */
+const SKIP_SLICE = 2000;      // burn-in for slice panel
+const SKIP_DIM   = 8192;      // burn-in for N(ε)
+const KEEP_DIM   = 65536;     // length used when counting boxes
 
-    // --- Logistic Map Data Generation ---
-    function generateLogisticMap() {
-      let x = x0;
-      points = [];
-      for (let i = 0; i < iterations + skip; i++) {
-        x = r * x * (1 - x);
-        if (i >= skip) points.push(x);
-      }
-    }
+/* -------- logistic helpers ------------------------------------- */
+function step(r,x){return r*x*(1-x);}
+function makeSeries(r,keep,skip,x0){
+  let x=x0, arr=[];
+  for(let i=0;i<skip+keep;i++){x=step(r,x); if(i>=skip) arr.push(x);}
+  return arr;
+}
 
-    // --- Box Counting Logic ---
-    function countBoxes(N) {
-      let occupied = new Array(N).fill(false);
-      points.forEach(x => {
-        let box = Math.floor(x * N);
-        if (box >= 0 && box < N) occupied[box] = true;
-      });
-      let nOccupied = occupied.filter(b => b).length;
-      let eps = 1.0 / N;
-      return {nOccupied, eps, occupied};
-    }
+/* -------- bifurcation background ------------------------------- */
+const R_MIN=2.5,R_MAX=4,R_STEP=0.0015;
+const bifX=[], bifR=[];
+for(let rr=R_MIN; rr<=R_MAX+1e-8; rr+=R_STEP){
+    makeSeries(rr,800,200,Math.random()*0.8+0.1)
+      .forEach(x=>{bifR.push(rr); bifX.push(x);});
+}
+Plotly.newPlot('bifPlot',[{x:bifR,y:bifX,mode:'markers',type:'scattergl',
+                           marker:{size:1,color:'#888'}}],
+   {xaxis:{title:'r',range:[R_MIN,R_MAX]},
+    yaxis:{title:'x',range:[0,1]},
+    margin:{l:50,r:5,t:10,b:40},dragmode:false})
+   .then(()=>Plotly.addTraces('bifPlot',
+        {x:[3.8,3.8],y:[0,1],mode:'lines',
+         line:{color:'crimson',width:3}}));
 
-    // --- Drawing Functions ---
-    function redrawMain() {
-      drawMap();
-      drawLogLogPlot();
-    }
+/* -------- interactive state ------------------------------------ */
+let r=3.8, x0=0.5, keepVis=10000, k=8;
 
-    // 1D correct visualization
-    function drawMap() {
-      const c = document.getElementById('logmap');
-      c.width = 700; c.height = 140;
-      const ctx = c.getContext('2d');
-      ctx.clearRect(0,0,c.width,c.height);
+/* -------- helpers for ε and N(ε) ------------------------------ */
+const lg2 = Math.log2 ? x=>Math.log2(x) : x=>Math.log(x)/Math.LN2;
+function fmtE(e){return e<.01?e.toExponential(1):`1/${1/e}`;}
+function calcN(eps){
+  const xs=makeSeries(r,KEEP_DIM,SKIP_DIM,x0);
+  return new Set(xs.map(x=>Math.floor(x/eps))).size;
+}
 
-      // Margins
-      let left = 60, right = 30, bottom = 40;
-      let width = c.width - left - right;
-      let boxBaseY = c.height - bottom;
-      let boxHeight = 30;
+/* -------- draw slice panel with ε-boxes ----------------------- */
+function drawSlice(){
+  const xs = makeSeries(r,keepVis,SKIP_SLICE,x0);
+  const eps=1/(1<<k);
+  const filled=new Set(xs.map(x=>Math.floor(x/eps)));
+  epsVal.textContent=fmtE(eps);
+  nVal .textContent=filled.size;
 
-      // Draw grid (1D row of boxes)
-      let N = boxCount;
-      let boxW = width / N;
-      ctx.font = "12px sans-serif";
+  /* stripes */
+  const stripes=[];
+  for(let b=0;b<1/eps;b++){
+    stripes.push({type:'rect',xref:'paper',yref:'y',x0:0,x1:1,
+                  y0:b*eps,y1:(b+1)*eps,
+                  fillcolor:filled.has(b)?
+                            'rgba(255,165,0,.25)':'rgba(150,150,150,.05)',
+                  line:{width:0}});
+  }
+  const idx = xs.map((_,i)=>i);
+  Plotly.newPlot('slicePlot',
+    [{x:idx,y:xs,mode:'markers',
+      marker:{size:3,color:'royalblue'}}],
+    {xaxis:{title:'n',range:[0,keepVis]},
+     yaxis:{title:'x',range:[0,1]},
+     margin:{l:60,r:5,t:30,b:40},
+     shapes:stripes,dragmode:false});
+}
+drawSlice();
 
-      // Draw all boxes (light gray)
-      for (let i = 0; i < N; i++) {
-        ctx.beginPath();
-        ctx.rect(left + i * boxW, boxBaseY, boxW, boxHeight);
-        ctx.strokeStyle = "#bbb";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
+/* -------- slider handlers ------------------------------------- */
+rSlider.oninput=e=>{r=+e.value;rVal.textContent=r.toFixed(4);
+                    Plotly.restyle('bifPlot',{'x':[[r,r]]},[1]);
+                    drawSlice();};
+x0Slider.oninput=e=>{x0=+e.value;x0Val.textContent=x0.toFixed(4);drawSlice();}
+keepInput.oninput=e=>{keepVis=Math.max(1,+e.value|0);drawSlice();}
+kSlider.oninput=e=>{k=+e.value;kVal.textContent=k;drawSlice();}
 
-      // Occupied boxes: highlight
-      let {occupied} = countBoxes(N);
-      for (let i = 0; i < N; i++) {
-        if (occupied[i]) {
-          ctx.fillStyle = "rgba(255,85,85,0.42)";
-          ctx.fillRect(left + i * boxW, boxBaseY, boxW, boxHeight);
-          ctx.strokeStyle = "#d32f2f";
-          ctx.lineWidth = 2;
-          ctx.strokeRect(left + i * boxW, boxBaseY, boxW, boxHeight);
-        }
-      }
+/* -------- ε-table management ---------------------------------- */
+const rows=[];                        // objects {k, eps, N}
+const tbody=document.querySelector('#epsTable tbody');
+function refreshTable(){
+  tbody.innerHTML='';
+  rows.forEach((row,i)=>{
+     const tr=tbody.insertRow();
+     tr.insertCell().textContent=i+1;
+     tr.insertCell().textContent=row.k;
+     tr.insertCell().textContent=fmtE(row.eps);
+     tr.insertCell().textContent=row.N;
+  });
+  plotBtn.classList.toggle('disabled',rows.length<2);
+}
 
-      // Draw logistic map points (just above the boxes, as vertical lines)
-      ctx.strokeStyle = "#1976d2";
-      ctx.lineWidth = 1;
-      points.forEach(x => {
-        let px = left + x * width;
-        ctx.beginPath();
-        ctx.moveTo(px, boxBaseY - 15);
-        ctx.lineTo(px, boxBaseY);
-        ctx.stroke();
-      });
+/* ADD ROW */
+addBtn.onclick=()=>{
+  const eps=1/(1<<k);
+  const N  =calcN(eps);
+  rows.push({k,eps,N}); refreshTable();
+};
 
-      // Draw axis and labels
-      ctx.fillStyle="#222";
-      ctx.font="13px sans-serif";
-      ctx.fillText("0",left-8,boxBaseY+boxHeight+16);
-      ctx.fillText("1",left+width-7,boxBaseY+boxHeight+16);
-      ctx.fillText("x",left+width/2-5,boxBaseY+boxHeight+34);
-      ctx.font="15px sans-serif";
-      ctx.fillText(`1D Box Counting for Logistic Map (r = ${r.toFixed(3)})`,left+width/2-120,32);
+/* CLEAR table */
+clrBtn.onclick=()=>{rows.length=0; refreshTable();};
 
-      // Legend
-      ctx.font="12px sans-serif";
-      ctx.fillStyle="#d32f2f";
-      ctx.fillRect(left+width-140,boxBaseY-12,16,16);
-      ctx.strokeStyle = "#d32f2f";
-      ctx.strokeRect(left+width-140,boxBaseY-12,16,16);
-      ctx.fillStyle="#222";
-      ctx.fillText("Occupied box",left+width-120,boxBaseY);
-    }
+/* -------- plot button ---------------------------------------- */
+plotBtn.onclick=()=>{
+  if(rows.length<2) return;
+  const eps=rows.map(r=>r.eps), N=rows.map(r=>r.N);
 
-    function drawLogLogPlot() {
-      const c = document.getElementById('loglog');
-      const ctx = c.getContext('2d');
-      ctx.clearRect(0,0,c.width,c.height);
+  /* linear trace */
+  const trLin={x:eps,y:N,mode:'markers+lines',
+               marker:{color:'royalblue'},name:'N(ε)'};
 
-      // Margins
-      let left = 50, right = 20, top = 30, bottom = 40;
-      let width = c.width - left - right;
-      let height = c.height - top - bottom;
+  /* log–log fit */
+  const logX=eps.map(e=>Math.log10(1/e));
+  const logY=N  .map(n=>Math.log10(n));
+  const n=logX.length,sx=logX.reduce((a,b)=>a+b),
+        sy=logY.reduce((a,b)=>a+b),
+        sxy=logX.reduce((s,x,i)=>s+x*logY[i],0),
+        sx2=logX.reduce((s,x)=>s+x*x,0);
+  const m=(n*sxy-sx*sy)/(n*sx2-sx*sx),
+        b=(sy-m*sx)/n, D=m.toFixed(3);
+  const fitY=eps.map(e=>10**(b+m*Math.log10(1/e)));
 
-      // Axes
-      ctx.strokeStyle = "#bbb";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(left, top);
-      ctx.lineTo(left, top+height);
-      ctx.lineTo(left+width, top+height);
-      ctx.stroke();
+  const trLog={x:eps,y:N,mode:'markers',
+               marker:{size:6,color:'seagreen'},name:'N(ε)'},
+        trFit={x:eps,y:fitY,mode:'lines',
+               line:{dash:'dot',color:'crimson'},
+               name:`fit, slope≈${D}`};
 
-      // Axis labels & title
-      ctx.fillStyle="#222";
-      ctx.font="13px sans-serif";
-      ctx.fillText("log(1/ε)",left+width/2-35,top+height+32);
-      ctx.save();
-      ctx.translate(left-38,top+height/2+25);
-      ctx.rotate(-Math.PI/2);
-      ctx.fillText("log N(ε)",0,0);
-      ctx.restore();
-      ctx.font="15px sans-serif";
-      ctx.fillText("Log-Log Plot: Box-Counting Dimension",left+30,top-10);
-
-      // Draw points
-      if (boxData.length > 0) {
-        let logs = boxData.map(d => ({
-          x: Math.log(1/d.eps),
-          y: Math.log(d.nOccupied)
-        }));
-        let xs = logs.map(p=>p.x), ys = logs.map(p=>p.y);
-        let minx=Math.min(...xs),maxx=Math.max(...xs);
-        let miny=Math.min(...ys),maxy=Math.max(...ys);
-        let pad = 0.1;
-
-        // Function to map log values to canvas coordinates
-        function xMap(x) {
-          return left + ((x - minx) / (maxx - minx + 1e-6) + pad) * (width*(1-2*pad));
-        }
-        function yMap(y) {
-          return top+height - ((y - miny) / (maxy - miny + 1e-6) + pad) * (height*(1-2*pad));
-        }
-
-        // Draw lines connecting points
-        ctx.strokeStyle="#388e3c";
-        ctx.beginPath();
-        logs.forEach((p,i) => {
-          let px = xMap(p.x), py = yMap(p.y);
-          if(i===0) ctx.moveTo(px,py);
-          else ctx.lineTo(px,py);
-        });
-        ctx.stroke();
-
-        // Draw data points
-        logs.forEach(p => {
-          let px = xMap(p.x), py = yMap(p.y);
-          ctx.beginPath();
-          ctx.arc(px, py, 7, 0, 2 * Math.PI);
-          ctx.fillStyle = "#d32f2f";
-          ctx.fill();
-          ctx.strokeStyle = "#555";
-          ctx.lineWidth=1.5;
-          ctx.stroke();
-        });
-
-        // Fit line (fractal dimension estimate)
-        if (boxData.length >= 2) {
-          let n = logs.length;
-          let sumx = logs.reduce((a,b)=>a+b.x,0), sumy=logs.reduce((a,b)=>a+b.y,0);
-          let sumxx = logs.reduce((a,b)=>a+b.x*b.x,0), sumxy=logs.reduce((a,b)=>a+b.x*b.y,0);
-          let m = (n*sumxy - sumx*sumy) / (n*sumxx - sumx*sumx);
-          let b = (sumy - m*sumx)/n;
-
-          // Draw fitted line
-          let x1 = minx, x2 = maxx;
-          let y1 = m*x1 + b, y2 = m*x2 + b;
-          let px1 = xMap(x1), py1 = yMap(y1);
-          let px2 = xMap(x2), py2 = yMap(y2);
-          ctx.beginPath();
-          ctx.moveTo(px1,py1);
-          ctx.lineTo(px2,py2);
-          ctx.strokeStyle="#1565c0";
-          ctx.lineWidth=2.5;
-          ctx.setLineDash([5,5]);
-          ctx.stroke();
-          ctx.setLineDash([]);
-
-          // Slope label
-          ctx.fillStyle="#1565c0";
-          ctx.font="15px sans-serif";
-          ctx.fillText("Estimated Dimension ≈ "+(-m).toFixed(3), left+width-210, top+25);
-        }
-      }
-    }
-
-    // --- Main ---
-    function setupPage() {
-      generateLogisticMap();
-      redrawMain();
-    }
-    setupPage();
-  </script>
+  Plotly.newPlot('slicePlot',
+    [{...trLin,xaxis:'x', yaxis:'y'},
+     {...trLog,xaxis:'x2',yaxis:'y2'},
+     {...trFit,xaxis:'x2',yaxis:'y2'}],
+    {grid:{rows:1,columns:2,pattern:'independent'},
+     xaxis :{title:'ε'},
+     yaxis :{title:'N(ε)'},
+     xaxis2:{title:'ε',type:'log'},
+     yaxis2:{title:'N(ε)',type:'log'},
+     margin:{l:60,r:20,t:30,b:50},showlegend:true});
+  sliceTitle.textContent=
+     `ε-table plotted  —  dimension ≈ ${D}`;
+};
+</script>
 </body>
 </html>
+ + '
 
    
       
