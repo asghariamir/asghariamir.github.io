@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cantor-Set Explorer</title>
+
+<style>
+  /* ====== Layout & basics ====== */
+  body          {font-family: system-ui, sans-serif; margin: 20px; background:#fff; color:#000;}
+  h1            {margin-top: 0;}
+  #main         {display:flex; gap:20px; align-items:flex-start;}
+  #controls     {display:flex; flex-direction:column; gap:12px; margin-top:20px;}
+  .ctrl-group   {display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  input[type=range]{width:220px;}
+  button,label  {cursor:pointer;}
+  canvas        {border:1px solid #ccc;}
+
+  /* ====== Data panel ====== */
+  #data-panel   {min-width:200px;}
+  #data-panel p {margin:4px 0;}
+</style>
+</head>
+<body>
+
+<h1>Cantor-Set Explorer</h1>
+
+<!-- ====== Visual + data ====== -->
+<div id="main">
+  <canvas id="cantorCanvas" width="900" height="500"></canvas>
+
+  <div id="data-panel">
+    <h3>Live data</h3>
+    <p id="depthDisplay"></p>
+    <p id="segmentsDisplay"></p>
+    <p id="lengthDisplay"></p>
+    <p>Hausdorff dim ≈ 0.6309</p>
+  </div>
+</div>
+
+<!-- ====== Controls ====== -->
+<div id="controls">
+
+  <div class="ctrl-group">
+    <label for="depthRange">Depth</label>
+    <input type="range" id="depthRange" min="0" max="8" step="1" value="5">
+    <span id="depthLabel">5</span>
+  </div>
+
+  <div class="ctrl-group">
+    <button id="animateBtn">Animate</button>
+    <label><input type="checkbox" id="toggleGaps" checked> Toggle gaps</label>
+  </div>
+
+  <!-- Nice-to-have extras -->
+  <div class="ctrl-group">
+    <label><input type="checkbox" id="randomColours"> Random colours</label>
+    <label for="ratioRange">Removal ratio</label>
+    <input type="range" id="ratioRange" min="0.10" max="0.90" step="0.05" value="0.33">
+    <span id="ratioLabel">1/3</span>
+  </div>
+
+  <button id="downloadBtn">Download PNG</button>
+</div>
+
+<script>
+/* =========================================
+   Cantor-Set Explorer - single-file app
+   (c) 2025 – public domain
+   ======================================= */
+
+/* ---------- Canvas & context ---------- */
+const canvas = document.getElementById('cantorCanvas');
+const ctx     = canvas.getContext('2d');
+
+/* ---------- UI elements ---------- */
+const depthRange    = document.getElementById('depthRange');
+const depthLabel    = document.getElementById('depthLabel');
+const depthDisplay  = document.getElementById('depthDisplay');
+const segmentsDisp  = document.getElementById('segmentsDisplay');
+const lengthDisp    = document.getElementById('lengthDisplay');
+const animateBtn    = document.getElementById('animateBtn');
+const toggleGapsEl  = document.getElementById('toggleGaps');
+const ratioRange    = document.getElementById('ratioRange');
+const ratioLabel    = document.getElementById('ratioLabel');
+const randomColours = document.getElementById('randomColours');
+const downloadBtn   = document.getElementById('downloadBtn');
+
+/* ---------- State ---------- */
+let animTimer = null;           // holds interval id when animating
+let pingDir   = 1;              // 1 => increasing depth, -1 => decreasing
+
+/* ---------- Utility: pastel colour ---------- */
+const pastel = () => {
+  const h = Math.floor(Math.random()*360);
+  return `hsl(${h}, 60%, 70%)`;
+};
+
+/* ---------- Generate filled segments & gaps ----------
+   depth  = integer ≥ 0
+   ratio  = middle portion removed each step (0<r<1)
+   returns {levels: [ [filled segments] ... ], gapsByLevel: [ [gaps] ... ]}
+------------------------------------------------------ */
+function buildLevels(depth, ratio){
+  const levels = [];              // filled segments for each level
+  const gaps   = [];              // gaps for outlines
+  let current  = [[0,1]];
+
+  for(let d=0; d<=depth; d++){
+    levels.push(current.map(c=>c.slice()));   // clone
+    if(d === depth) break;
+
+    const next = [];
+    const gNow = [];
+    current.forEach(([s,e])=>{
+      const len = e-s;
+      const gS  = s + (1-ratio)/2 * len;
+      const gE  = e - (1-ratio)/2 * len;
+      next.push([s,gS], [gE,e]);  // keep side thirds
+      gNow.push([gS,gE]);         // removed middle
+    });
+    gaps.push(gNow);
+    current = next;
+  }
+  return {levels, gapsByLevel:gaps};
+}
+
+/* ---------- Drawing routine ---------- */
+function draw(){
+  const depth = +depthRange.value;
+  const ratio = +ratioRange.value;
+  const showGaps   = toggleGapsEl.checked;
+  const useColours = randomColours.checked;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const {levels,gapsByLevel} = buildLevels(depth, ratio);
+  const rowH = canvas.height / (depth+1);
+
+  levels.forEach((segs, lvl)=>{
+    // choose fill style
+    ctx.fillStyle = useColours ? pastel() : '#000';
+    const y = lvl * rowH + rowH*0.1;
+    const h = rowH * 0.8;
+
+    segs.forEach(([s,e])=>{
+      const x = s*canvas.width;
+      const w = (e-s)*canvas.width;
+      ctx.fillRect(x, y, w, h);
+    });
+
+    // grey outlines for gaps of this level
+    if(showGaps && lvl < depth){
+      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+      gapsByLevel[lvl].forEach(([s,e])=>{
+        const x = s*canvas.width;
+        const w = (e-s)*canvas.width;
+        ctx.strokeRect(x, y, w, h);
+      });
+    }
+  });
+}
+
+/* ---------- Data panel ---------- */
+function updateData(){
+  const n = +depthRange.value;
+  const segs   = 2 ** n;
+  const length = (2/3) ** n;
+
+  depthLabel.textContent   = n;
+  depthDisplay.textContent = `Depth n = ${n}`;
+  segmentsDisp.textContent = `Segments: 2ⁿ = ${segs.toLocaleString()}`;
+  lengthDisp.textContent   = `Total length: ${(length).toFixed(5)}`;
+}
+
+/* ---------- Master update ---------- */
+function refresh(){
+  updateData();
+  draw();
+}
+
+/* ---------- Animation ---------- */
+function startAnim(){
+  animateBtn.textContent = 'Stop';
+  animTimer = setInterval(()=>{
+    let d = +depthRange.value;
+    if(d >= +depthRange.max) pingDir = -1;
+    if(d <= +depthRange.min) pingDir =  1;
+    depthRange.value = d + pingDir;
+    refresh();
+  }, 600);
+}
+function stopAnim(){
+  clearInterval(animTimer);
+  animTimer = null;
+  animateBtn.textContent = 'Animate';
+}
+
+/* ---------- Event wiring ---------- */
+depthRange .addEventListener('input', ()=>{stopAnim(); refresh();});
+ratioRange .addEventListener('input', ()=>{
+  ratioLabel.textContent = (+ratioRange.value).toFixed(2);
+  stopAnim(); refresh();
+});
+toggleGapsEl  .addEventListener('change', refresh);
+randomColours .addEventListener('change', refresh);
+
+animateBtn.addEventListener('click', ()=>{
+  animTimer ? stopAnim() : startAnim();
+});
+
+downloadBtn.addEventListener('click', ()=>{
+  const link = document.createElement('a');
+  link.download = 'cantor.png';
+  link.href     = canvas.toDataURL('image/png');
+  link.click();
+});
+
+/* ---------- First paint ---------- */
+refresh();
+</script>
+</body>
+</html>
