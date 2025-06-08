@@ -93,12 +93,13 @@
 
 <h2>Logistic Map Explorer</h2>
 <div id="description">
-  <p><strong>Purpose:</strong> This interactive tool visualizes the behavior of the logistic map and estimates its fractal dimension using the <code>&epsilon;</code>-box counting method. The logistic map is a classic example in chaos theory and mathematical biology.</p>
+  <p><strong>Purpose:</strong> This interactive tool visualizes the behavior of the logistic map and estimates its fractal dimension using the <code>ε</code>-box counting method. The logistic map is a classic example in chaos theory and mathematical biology.</p>
   <p><strong>How to use:</strong></p>
   <ol>
-    <li>Use the sliders to set the parameters: <code>r</code> (growth rate), <code>x₀</code> (initial condition), <code>k</code> (controls <code>&epsilon; = 2⁻ᵏ</code>).</li>
-    <li>Visualize the attractor and ε-box coverage below.</li>
-    <li>Add ε-table rows to estimate <code>N(ε)</code> and fit a line in log-log space to approximate the fractal dimension.</li>
+    <li>Use the sliders to set parameters: <code>r</code> (growth rate), <code>x₀</code> (initial condition), and <code>k</code> (which determines <code>ε = 2⁻ᵏ</code>).</li>
+    <li>Observe the attractor and box coverage in the plots.</li>
+    <li>Click “Add Row” to collect <code>N(ε)</code> values for different <code>ε</code> into a table.</li>
+    <li>Click “Plot Table” to generate the log-log plot and estimate the fractal dimension.</li>
   </ol>
 </div>
 
@@ -139,7 +140,7 @@
 </div>
 
 <script>
-/* Tab logic */
+// Tab logic
 document.querySelectorAll('.tab').forEach(tab => {
   tab.onclick = () => {
     document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
@@ -147,110 +148,147 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.getElementById(tab.dataset.tab).classList.add('active');
   };
 });
-</script>
 
-<script>
-const SKIP_SLICE = 2000;
-const SKIP_DIM   = 8192;
-const KEEP_DIM   = 65536;
-function step(r,x){ return r*x*(1-x); }
-function series(r,len,skip,x0){
-  let x=x0, arr=[];
-  for(let i=0;i<skip+len;i++){ x=step(r,x); if(i>=skip) arr.push(x);}
+// Globals
+const SKIP_SLICE = 2000, SKIP_DIM = 8192, KEEP_DIM = 65536;
+function step(r, x) { return r * x * (1 - x); }
+function series(r, len, skip, x0) {
+  let x = x0, arr = [];
+  for (let i = 0; i < skip + len; i++) { x = step(r, x); if (i >= skip) arr.push(x); }
   return arr;
 }
-const R_MIN=2.5, R_MAX=4, R_STEP=0.0015;
-const bifX=[], bifR=[];
-for(let rr=R_MIN; rr<=R_MAX+1e-8; rr+=R_STEP){
-  series(rr,800,200,Math.random()*0.8+0.1)
-      .forEach(x=>{bifR.push(rr); bifX.push(x);});
+const R_MIN = 2.5, R_MAX = 4, R_STEP = 0.0015;
+const bifX = [], bifR = [];
+for (let rr = R_MIN; rr <= R_MAX + 1e-8; rr += R_STEP) {
+  series(rr, 800, 200, Math.random() * 0.8 + 0.1).forEach(x => {
+    bifR.push(rr); bifX.push(x);
+  });
 }
-Plotly.newPlot('bifPlot',[{
-        x:bifR, y:bifX, mode:'markers', type:'scattergl',
-        marker:{size:1, color:'#888'}
-}], {xaxis:{title:'r', range:[R_MIN,R_MAX]},
-     yaxis:{title:'x', range:[0,1]},
-     margin:{l:50,r:5,t:10,b:40}, dragmode:false})
-.then(()=>Plotly.addTraces('bifPlot',{
-     x:[3.8,3.8], y:[0,1], mode:'lines',
-     line:{color:'crimson', width:3}}));
-let r=3.8, x0=0.5, keepVis=10000, k=8;
-const rows=[],   tbody=document.querySelector('#epsTable tbody');
-function epsFromK(k){ return 1/(1<<k); }
-function NofEps(eps){
+Plotly.newPlot('bifPlot', [{
+  x: bifR, y: bifX, mode: 'markers', type: 'scattergl',
+  marker: { size: 1, color: '#888' }
+}], {
+  xaxis: { title: 'r', range: [R_MIN, R_MAX] },
+  yaxis: { title: 'x', range: [0, 1] },
+  margin: { l: 50, r: 5, t: 10, b: 40 }, dragmode: false
+}).then(() => Plotly.addTraces('bifPlot', {
+  x: [3.8, 3.8], y: [0, 1], mode: 'lines',
+  line: { color: 'crimson', width: 3 }
+}));
+
+let r = 3.8, x0 = 0.5, keepVis = 10000, k = 8;
+const rows = [], tbody = document.querySelector('#epsTable tbody');
+
+function epsFromK(k) { return 1 / (1 << k); }
+function NofEps(eps) {
   const xs = series(r, KEEP_DIM, SKIP_DIM, x0);
-  return new Set(xs.map(x=>Math.floor(x/eps))).size;
+  return new Set(xs.map(x => Math.floor(x / eps))).size;
 }
-function updateENreadout(){
+function updateENreadout() {
   const eps = epsFromK(k);
   document.getElementById('epsVal').textContent = `2⁻${k}`;
-  document.getElementById('nVal').textContent  = NofEps(eps);
+  document.getElementById('nVal').textContent = NofEps(eps);
 }
-function drawSlice(){
-  const xs  = series(r, keepVis, SKIP_SLICE, x0);
+function drawSlice() {
+  const xs = series(r, keepVis, SKIP_SLICE, x0);
   const eps = epsFromK(k);
-  const filled = new Set(xs.map(x=>Math.floor(x/eps)));
+  const filled = new Set(xs.map(x => Math.floor(x / eps)));
   updateENreadout();
-  const shapes=[], nBoxes=1/eps;
-  for(let b=0;b<nBoxes;b++){
-     shapes.push({type:'rect', xref:'paper', yref:'y',
-                  x0:0, x1:1, y0:b*eps, y1:(b+1)*eps,
-                  fillcolor: filled.has(b)
-                       ? 'rgba(255,165,0,0.25)'
-                       : 'rgba(150,150,150,0.05)',
-                  line:{width:0}});
+  const shapes = [], nBoxes = 1 / eps;
+  for (let b = 0; b < nBoxes; b++) {
+    shapes.push({
+      type: 'rect', xref: 'paper', yref: 'y',
+      x0: 0, x1: 1, y0: b * eps, y1: (b + 1) * eps,
+      fillcolor: filled.has(b) ? 'rgba(255,165,0,0.25)' : 'rgba(150,150,150,0.05)',
+      line: { width: 0 }
+    });
   }
-  const idx = xs.map((_,i)=>i);
-  Plotly.newPlot('slicePlot',[{x:idx,y:xs,mode:'markers',
-                               marker:{size:3,color:'royalblue'}}],
-     {xaxis:{title:'n',range:[0,keepVis]},
-      yaxis:{title:'x',range:[0,1]},
-      margin:{l:60,r:5,t:30,b:40}, dragmode:false, shapes});
+  Plotly.newPlot('slicePlot', [{
+    x: xs.map((_, i) => i), y: xs, mode: 'markers',
+    marker: { size: 3, color: 'royalblue' }
+  }], {
+    xaxis: { title: 'n', range: [0, keepVis] },
+    yaxis: { title: 'x', range: [0, 1] },
+    margin: { l: 60, r: 5, t: 30, b: 40 }, dragmode: false, shapes
+  });
 }
 drawSlice();
-document.getElementById('rSlider').oninput = e=>{r=+e.value; document.getElementById('rVal').textContent=r.toFixed(4);
-                      Plotly.restyle('bifPlot',{'x':[[r,r]]},[1]); drawSlice();}
-document.getElementById('x0Slider').oninput= e=>{x0=+e.value; document.getElementById('x0Val').textContent=x0.toFixed(4); drawSlice();}
-document.getElementById('keepInput').oninput=e=>{keepVis=Math.max(1,+e.value|0); drawSlice();}
-document.getElementById('kSlider').oninput  = e=>{k=+e.value; document.getElementById('kVal').textContent=k; drawSlice();}
-function refreshTable(){
-  tbody.innerHTML='';
-  rows.forEach((row,i)=>{
-     const tr=tbody.insertRow();
-     tr.insertCell().textContent = i+1;
-     tr.insertCell().textContent = row.k;
-     tr.insertCell().textContent = `2⁻${row.k}`;
-     tr.insertCell().textContent = row.N;
-  });
-  document.getElementById('plotBtn').classList.toggle('disabled', rows.length<2);
-}
-document.getElementById('addBtn').onclick = ()=>{
-  const eps = epsFromK(k);
-  const N   = NofEps(eps);
-  rows.push({k, N}); refreshTable();
+
+document.getElementById('rSlider').oninput = e => {
+  r = +e.value;
+  document.getElementById('rVal').textContent = r.toFixed(4);
+  Plotly.restyle('bifPlot', { 'x': [[r, r]] }, [1]);
+  drawSlice();
 };
-document.getElementById('clrBtn').onclick = ()=>{ rows.length=0; refreshTable(); Plotly.purge('logPlot'); };
-document.getElementById('plotBtn').onclick = ()=>{
-  if(rows.length<2) return;
-  const eps = rows.map(r=>epsFromK(r.k)),
-        N   = rows.map(r=>r.N);
-  const logX=eps.map(e=>Math.log10(1/e)),
-        logY=N  .map(n=>Math.log10(n));
-  const n=logX.length, sx=logX.reduce((a,b)=>a+b),
-        sy=logY.reduce((a,b)=>a+b),
-        sxy=logX.reduce((s,x,i)=>s+x*logY[i],0),
-        sx2=logX.reduce((s,x)=>s+x*x,0);
-  const m=(n*sxy-sx*sy)/(n*sx2-sx*sx),
-        b=(sy-m*sx)/n, D=m.toFixed(3);
-  const fitY=eps.map(e=>10**(b+m*Math.log10(1/e)));
-  const trLog={x:eps,y:N,mode:'markers',marker:{size:6,color:'seagreen'},name:'N(ε)'},
-        trFit={x:eps,y:fitY,mode:'lines',line:{dash:'dot',color:'crimson'},name:`fit, slope ≈ ${D}`};
-  Plotly.newPlot('logPlot',[trLog,trFit],{
-    xaxis:{title:'ε',type:'log'},
-    yaxis:{title:'N(ε)',type:'log'},
-    margin:{l:60,r:20,t:30,b:50},
-    showlegend:true });
+document.getElementById('x0Slider').oninput = e => {
+  x0 = +e.value;
+  document.getElementById('x0Val').textContent = x0.toFixed(4);
+  drawSlice();
+};
+document.getElementById('keepInput').oninput = e => {
+  keepVis = Math.max(1, +e.value | 0);
+  drawSlice();
+};
+document.getElementById('kSlider').oninput = e => {
+  k = +e.value;
+  document.getElementById('kVal').textContent = k;
+  drawSlice();
+};
+
+function refreshTable() {
+  tbody.innerHTML = '';
+  rows.forEach((row, i) => {
+    const tr = tbody.insertRow();
+    tr.insertCell().textContent = i + 1;
+    tr.insertCell().textContent = row.k;
+    tr.insertCell().textContent = `2⁻${row.k}`;
+    tr.insertCell().textContent = row.N;
+  });
+  document.getElementById('plotBtn').classList.toggle('disabled', rows.length < 2);
+}
+
+document.getElementById('addBtn').onclick = () => {
+  const currentK = parseInt(document.getElementById('kVal').textContent);
+  if (isNaN(currentK)) {
+    alert("Error: k value is invalid.");
+    return;
+  }
+  const eps = epsFromK(currentK);
+  const N = NofEps(eps);
+  rows.push({ k: currentK, N });
+  refreshTable();
+};
+
+document.getElementById('clrBtn').onclick = () => {
+  rows.length = 0;
+  refreshTable();
+  Plotly.purge('logPlot');
+};
+
+document.getElementById('plotBtn').onclick = () => {
+  if (rows.length < 2) return;
+  const eps = rows.map(r => epsFromK(r.k));
+  const N = rows.map(r => r.N);
+  const logX = eps.map(e => Math.log10(1 / e));
+  const logY = N.map(n => Math.log10(n));
+  const n = logX.length, sx = logX.reduce((a, b) => a + b),
+        sy = logY.reduce((a, b) => a + b),
+        sxy = logX.reduce((s, x, i) => s + x * logY[i], 0),
+        sx2 = logX.reduce((s, x) => s + x * x, 0);
+  const m = (n * sxy - sx * sy) / (n * sx2 - sx * sx),
+        b = (sy - m * sx) / n, D = m.toFixed(3);
+  const fitY = eps.map(e => 10 ** (b + m * Math.log10(1 / e)));
+  Plotly.newPlot('logPlot', [
+    { x: eps, y: N, mode: 'markers', marker: { size: 6, color: 'seagreen' }, name: 'N(ε)' },
+    { x: eps, y: fitY, mode: 'lines', line: { dash: 'dot', color: 'crimson' }, name: `fit, slope ≈ ${D}` }
+  ], {
+    xaxis: { title: 'ε', type: 'log' },
+    yaxis: { title: 'N(ε)', type: 'log' },
+    margin: { l: 60, r: 20, t: 30, b: 50 },
+    showlegend: true
+  });
 };
 </script>
 </body>
 </html>
+
