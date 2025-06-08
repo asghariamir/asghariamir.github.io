@@ -6,59 +6,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 1rem; background: #f8f9fa; }
-    h2 { text-align: center; margin-bottom: 1rem; }
-    #plots > div { width: 100%; height: 400px; margin-bottom: 2rem; }
-    #controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-    #controls label { font-weight: bold; margin-right: 0.5rem; }
-    #controls input { max-width: 6rem; }
-    table {
-      margin: 2rem auto;
-      border-collapse: collapse;
-      width: 80%;
-      max-width: 600px;
-    }
-    table, th, td { border: 1px solid #ccc; }
-    th, td { padding: 0.4rem 0.8rem; text-align: center; }
-    tbody tr:nth-child(odd) { background: #f9f9f9; }
-    #tableControls {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    #tableControls button {
-      margin: 0.5rem;
-      padding: 0.4rem 1rem;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 0.25rem;
-      cursor: pointer;
-    }
+    body{font-family:Arial,Helvetica,sans-serif;margin:1rem;background:#f8f9fa}
+    h2{text-align:center;margin-bottom:1.2rem}
+    #plots>div{width:100%;height:400px;margin-bottom:1.2rem}
+    /* controls below bifurcation */
+    #bifControls{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin-bottom:1.5rem}
+    #bifControls label{font-weight:bold}
+    #bifControls input{max-width:6rem}
+    /* explanation paragraph */
+    #sliceDesc{max-width:750px;margin:1.8rem auto;font-size:0.95rem;line-height:1.4;color:#333;text-align:center}
+    /* controls for slice/epsilon */
+    #sliceControls{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:1rem;margin-bottom:1rem}
+    #sliceControls label{font-weight:bold}
+    #sliceControls input{max-width:6rem}
+    table{margin:2rem auto;border-collapse:collapse;width:85%;max-width:680px}
+    table,th,td{border:1px solid #aaa}
+    th,td{padding:.4rem .8rem;text-align:center}
+    tbody tr:nth-child(odd){background:#f3f3f3}
+    #tableControls{text-align:center;margin-top:1rem}
+    #tableControls button{margin:.4rem;padding:.4rem 1rem;background:#007bff;color:#fff;border:none;border-radius:.25rem;cursor:pointer}
+    #tableControls button.disabled{opacity:.5;cursor:default}
   </style>
 </head>
 <body>
-
 <h2>Logistic Map Explorer: Fractal Dimension</h2>
+
 <div id="plots">
   <div id="bifPlot"></div>
-  <div id="slicePlot"></div>
-</div>
+  <!-- r & x0 controls directly under bifurcation plot -->
+  <div id="bifControls">
+    <label>r = <input type="number" id="rInput" min="2.5" max="4" step="0.0001" value="3.8"></label>
+    <label>x₀ = <input type="number" id="x0Input" min="0.01" max="0.99" step="0.0001" value="0.5"></label>
+  </div>
 
-<div id="controls">
-  <label>r = <input type="number" id="rSlider" min="2.5" max="4" step="0.0001" value="3.8"></label>
-  <label>x₀ = <input type="number" id="x0Slider" min="0.01" max="0.99" step="0.0001" value="0.5"></label>
-  <label>Points = <input type="number" id="keepInput" value="10000" min="100" max="50000"></label>
-  <label>k = <input type="number" id="kSlider" min="4" max="12" step="1" value="8"></label>
-  <span>ε = <span id="epsVal">2⁻⁸</span></span>
-  <span>N(ε) = <span id="nVal">-</span></span>
-  <button id="toggleBtn">Toggle ε-boxes</button>
+  <!-- explanation before slice plot -->
+  <p id="sliceDesc">
+    The graph below shows the logistic-map orbit sampled after discarding an initial transient. You can
+    choose how many points are plotted (<em>Points</em>) and set the resolution of the ε‑boxes via the
+    integer <em>k</em> (where ε = 2<sup>‑k</sup>). Adjust these to explore how the attractor fills the
+    unit interval and how the box‑count <strong>N(ε)</strong> changes.
+  </p>
+
+  <!-- controls relevant to slice & ε-table -->
+  <div id="sliceControls">
+    <label>Points = <input type="number" id="pointsInput" value="10000" min="100" max="50000"></label>
+    <label>k = <input type="number" id="kInput" min="4" max="12" step="1" value="8"></label>
+    <span>ε = <span id="epsVal">2⁻8</span></span>
+    <span>N(ε) = <span id="nVal">-</span></span>
+    <button id="toggleBtn">Toggle ε‑boxes</button>
+  </div>
+
+  <div id="slicePlot"></div>
 </div>
 
 <div id="tableControls">
@@ -68,20 +66,88 @@
 </div>
 
 <table id="epsTable">
-  <thead>
-    <tr><th>#</th><th>k</th><th>ε</th><th>N(ε)</th></tr>
-  </thead>
+  <thead><tr><th>#</th><th>k</th><th>ε</th><th>N(ε)</th></tr></thead>
   <tbody></tbody>
 </table>
 
-<div id="logPlot" style="width: 90%; height: 400px; margin: 2rem auto"></div>
+<div id="logPlot" style="width:90%;height:400px;margin:2rem auto"></div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // === JS Logic Goes Here (same as previous version, wrapped in this block) ===
-  // COPY-PASTED script from earlier answer, no change needed here.
-});
-</script>
+document.addEventListener('DOMContentLoaded',()=>{
+  /* ---------- parameters & state ---------- */
+  const SKIP_SLICE=2000,SKIP_DIM=8192,KEEP_DIM_MAX=65536;
+  let r=3.8,x0=0.5,keepVis=10000,k=8,showBoxes=true;
+  const rows=[];
 
-</body>
-</html>
+  /* ---------- helpers ---------- */
+  const step=(r,x)=>r*x*(1-x);
+  function series(r,len,skip,x0){let x=x0,arr=[];for(let i=0;i<skip+len;i++){x=step(r,x);if(i>=skip)arr.push(x);}return arr;}
+  const epsFromK=k=>1/(1<<k);
+  const NofEps=eps=>new Set(series(r,KEEP_DIM_MAX,SKIP_DIM,x0).map(x=>Math.floor(x/eps))).size;
+
+  /* ---------- DOM refs ---------- */
+  const bifPlotEl=document.getElementById('bifPlot');
+  const slicePlotEl=document.getElementById('slicePlot');
+  const rInput=document.getElementById('rInput');
+  const x0Input=document.getElementById('x0Input');
+  const pointsInput=document.getElementById('pointsInput');
+  const kInput=document.getElementById('kInput');
+  const epsValEl=document.getElementById('epsVal');
+  const nValEl=document.getElementById('nVal');
+  const toggleBtn=document.getElementById('toggleBtn');
+  const addBtn=document.getElementById('addBtn');
+  const clrBtn=document.getElementById('clrBtn');
+  const plotBtn=document.getElementById('plotBtn');
+  const tbody=document.querySelector('#epsTable tbody');
+
+  /* ---------- update displays ---------- */
+  function updateEandN(){const eps=epsFromK(k);epsValEl.textContent=`2⁻${k}`;nValEl.textContent=NofEps(eps);}  
+
+  /* ---------- draw bifurcation ---------- */
+  function drawBifurcation(){
+    const R_MIN=2.5,R_MAX=4,R_STEP=0.005;
+    const xs=[],rs=[];
+    for(let rr=R_MIN;rr<=R_MAX+1e-8;rr+=R_STEP){series(rr,300,200,Math.random()*0.8+0.1).forEach(x=>{xs.push(x);rs.push(rr);});}
+    Plotly.newPlot(bifPlotEl,[
+      {x:rs,y:xs,mode:'markers',type:'scattergl',name:'Attractor',marker:{size:1,color:'#888'}},
+      {x:[r,r],y:[0,1],mode:'lines',name:'Selected r',line:{color:'crimson',width:3}}
+    ],{xaxis:{title:'r',range:[R_MIN,R_MAX]},yaxis:{title:'x',range:[0,1]},margin:{l:50,r:5,t:10,b:40},dragmode:false,legend:{x:1.05,y:1}});
+  }
+
+  /* ---------- draw slice ---------- */
+  function drawSlice(){
+    const xs=series(r,keepVis,SKIP_SLICE,x0);
+    const eps=epsFromK(k);
+    const filled=new Set(xs.map(x=>Math.floor(x/eps)));
+    updateEandN();
+    const shapes=[];
+    if(showBoxes){
+      for(let b=0;b<1/eps;b++){
+        const y0=b*eps,y1=(b+1)*eps;
+        const lineClr='rgba(120,120,120,0.4)';
+        shapes.push({type:'rect',xref:'x',yref:'y',x0:0,x1:keepVis,y0,y1,fillcolor:filled.has(b)?'rgba(255,165,0,0.15)':'rgba(0,0,0,0)',line:{width:0.6,color:lineClr},layer:'below'});
+      }
+    }
+    Plotly.newPlot(slicePlotEl,[{x:xs.map((_,i)=>i),y:xs,mode:'markers',marker:{size:3,color:'royalblue'},name:'Orbit'}],{xaxis:{title:'n',range:[0,keepVis]},yaxis:{title:'x',range:[0,1]},margin:{l:60,r:5,t:30,b:40},dragmode:false,shapes,legend:{x:1.05,y:1}});
+  }
+
+  /* ---------- table helpers ---------- */
+  function refreshTable(){
+    tbody.innerHTML='';
+    rows.forEach((row,i)=>{const tr=tbody.insertRow();tr.insertCell().textContent=i+1;tr.insertCell().textContent=row.k;tr.insertCell().textContent=`2⁻${row.k}`;tr.insertCell().textContent=row.N;});
+    plotBtn.classList.toggle('disabled',rows.length<2);
+  }
+
+  /* ---------- draw log plot ---------- */
+  function drawLogPlot(){
+    if(rows.length<2)return;
+    const epsArr=rows.map(r=>epsFromK(r.k));
+    const NArr=rows.map(r=>r.N);
+    const logX=epsArr.map(e=>Math.log10(1/e));
+    const logY=NArr.map(n=>Math.log10(n));
+    const n=logX.length,sx=logX.reduce((a,b)=>a+b),sy=logY.reduce((a,b)=>a+b),sxy=logX.reduce((s,x,i)=>s+x*logY[i],0),sx2=logX.reduce((s,x)=>s+x*x,0);
+    const m=(n*sxy-sx*sy)/(n*sx2-sx*sx),b=(sy-m*sx)/n;
+    const fitY=epsArr.map(e=>10**(b+m*Math.log10(1/e)));
+    Plotly.newPlot('logPlot',[
+      {x:epsArr,y:NArr,mode:'markers',marker:{color:'seagreen'},name:'N(ε)'},
+      {x:eps
