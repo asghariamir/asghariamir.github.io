@@ -1,95 +1,164 @@
-' + <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Logistic Map – ε-table underneath the attractor band</title>
+<title>Logistic Map Explorer: Fractal Dimension Analysis</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script>
 <style>
- body{font-family:Arial,Helvetica,sans-serif; margin:1rem; background:#fafafa;}
-
- /* plots */
- #plots      {display:flex; flex-direction:column; gap:1.6rem;}
- #bifPlot,
- #slicePlot  {width:100%; height:400px;}
-
- /* sliders */
- #controls   {display:flex; flex-wrap:wrap; align-items:center; gap:.7rem;
-              margin-top:-1rem;}
- #controls input[type=range]{flex:1 1 220px;}
-
- /* table looks nicer & centred */
- table        {border-collapse:collapse; margin:0 auto; max-width:26rem;}
- thead th     {background:#eaeaea; padding:.4rem .8rem;}
- tbody td     {padding:.35rem .8rem; border:1px solid #bbb; text-align:center;}
- tbody tr:nth-child(odd){background:#f9f9f9;}
- tbody tr:hover{background:#fff6d0;}
- button       {cursor:pointer; padding:.3rem .8rem; margin-right:.4rem;}
- .disabled    {opacity:.35; cursor:default}
- code{background:#f0f0f0; padding:.1rem .3rem; border-radius:.25rem;}
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f8f9fa;
+    margin: 0;
+    padding: 1rem;
+  }
+  h2, h3 {
+    text-align: center;
+    color: #333;
+  }
+  #tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .tab {
+    padding: 0.5rem 1rem;
+    background: #e0e0e0;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: #007bff;
+    color: white;
+  }
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: block;
+  }
+  #plots { display: flex; flex-direction: column; gap: 1.6rem; }
+  #bifPlot, #slicePlot { width: 100%; height: 400px; }
+  #controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.7rem;
+    justify-content: center;
+  }
+  #controls input[type=range] { flex: 1 1 220px; }
+  table {
+    border-collapse: collapse;
+    margin: 0 auto;
+    max-width: 28rem;
+  }
+  thead th { background: #eaeaea; padding: .4rem .8rem; }
+  tbody td {
+    padding: .35rem .8rem;
+    border: 1px solid #bbb;
+    text-align: center;
+  }
+  tbody tr:nth-child(odd) { background: #f9f9f9; }
+  tbody tr:hover { background: #fff6d0; }
+  button {
+    cursor: pointer;
+    padding: .3rem .8rem;
+    margin: 0.2rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 0.3rem;
+  }
+  button.disabled {
+    background-color: #aaa;
+    cursor: default;
+  }
+  code {
+    background: #f0f0f0;
+    padding: .1rem .3rem;
+    border-radius: .25rem;
+  }
+  #description {
+    max-width: 700px;
+    margin: 1rem auto;
+    background: #fff;
+    border-left: 5px solid #007bff;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
 </style>
 </head>
 <body>
 
-<h2>Logistic-Map Explorer (build ε-table → graphs)</h2>
+<h2>Logistic Map Explorer</h2>
+<div id="description">
+  <p><strong>Purpose:</strong> This interactive tool visualizes the behavior of the logistic map and estimates its fractal dimension using the <code>&epsilon;</code>-box counting method. The logistic map is a classic example in chaos theory and mathematical biology.</p>
+  <p><strong>How to use:</strong></p>
+  <ol>
+    <li>Use the sliders to set the parameters: <code>r</code> (growth rate), <code>x₀</code> (initial condition), <code>k</code> (controls <code>&epsilon; = 2⁻ᵏ</code>).</li>
+    <li>Visualize the attractor and ε-box coverage below.</li>
+    <li>Add ε-table rows to estimate <code>N(ε)</code> and fit a line in log-log space to approximate the fractal dimension.</li>
+  </ol>
+</div>
 
-<div id="plots">
-  <!-- 1 – BIFURCATION -->
+<div id="tabs">
+  <div class="tab active" data-tab="plots">Plots</div>
+  <div class="tab" data-tab="etable">ε-table</div>
+</div>
+
+<div id="plots" class="tab-content active">
   <div id="bifPlot"></div>
-
-  <!-- 2 – CONTROLS -->
   <div id="controls">
-      r =<span id="rVal">3.8000</span>
-      <input type="range" id="rSlider" min="2.5" max="4" step="0.0001" value="3.8">
-
-      x₀ =<span id="x0Val">0.5000</span>
-      <input type="range" id="x0Slider" min="0.01" max="0.99" step="0.0001" value="0.5">
-
-      points
-      <input type="number" id="keepInput" value="10000" min="1" max="20000" step="1" style="width:5rem">
-
-      k =<span id="kVal">8</span>
-      <input type="range" id="kSlider" min="4" max="12" step="1" value="8" style="flex:1 1 160px">
-
-      ε =<span id="epsVal">2⁻⁸</span>
-      N(ε) =<span id="nVal">-</span>
+    r = <span id="rVal">3.8000</span>
+    <input type="range" id="rSlider" min="2.5" max="4" step="0.0001" value="3.8">
+    x₀ = <span id="x0Val">0.5000</span>
+    <input type="range" id="x0Slider" min="0.01" max="0.99" step="0.0001" value="0.5">
+    Points <input type="number" id="keepInput" value="10000" min="1" max="20000" step="1" style="width:5rem">
+    k = <span id="kVal">8</span>
+    <input type="range" id="kSlider" min="4" max="12" step="1" value="8">
+    ε = <span id="epsVal">2⁻⁸</span>
+    N(ε) = <span id="nVal">-</span>
   </div>
-
-  <!-- 3 – BAND -->
   <h3 id="sliceTitle">Attractor & ε-boxes (post-transient)</h3>
   <div id="slicePlot"></div>
 </div>
 
-<!-- 4 – ε-TABLE  -->
-<h3 style="text-align:center">Build your ε-table</h3>
-<div style="text-align:center; margin-bottom:.4rem">
-   <button id="addBtn">Add row</button>
-   <button id="clrBtn">Clear</button>
-   <button id="plotBtn" class="disabled">Plot table</button>
+<div id="etable" class="tab-content">
+  <h3>ε-table for Fractal Dimension</h3>
+  <div style="text-align:center;">
+    <button id="addBtn">Add Row</button>
+    <button id="clrBtn">Clear</button>
+    <button id="plotBtn" class="disabled">Plot Table</button>
+  </div>
+  <table id="epsTable">
+    <thead><tr><th>#</th><th>k</th><th>ε</th><th>N(ε)</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div id="logPlot" style="width:80%; height:400px; margin:2rem auto"></div>
 </div>
 
-<table id="epsTable">
-  <thead>
-    <tr><th>#</th><th>k</th><th>ε</th><th>N(ε)</th></tr>
-  </thead>
-  <tbody></tbody>
-</table>
+<script>
+/* Tab logic */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  };
+});
+</script>
 
 <script>
-/* ------------- numerical parameters ------------------------------- */
-const SKIP_SLICE = 2000;          // discard for slice plot
-const SKIP_DIM   = 8192;          // discard for N(ε)
-const KEEP_DIM   = 65536;         // length for N(ε)
-
-/* ------------- logistic helpers ----------------------------------- */
+const SKIP_SLICE = 2000;
+const SKIP_DIM   = 8192;
+const KEEP_DIM   = 65536;
 function step(r,x){ return r*x*(1-x); }
 function series(r,len,skip,x0){
-    let x=x0, arr=[];
-    for(let i=0;i<skip+len;i++){ x=step(r,x); if(i>=skip) arr.push(x);}
-    return arr;
+  let x=x0, arr=[];
+  for(let i=0;i<skip+len;i++){ x=step(r,x); if(i>=skip) arr.push(x);}
+  return arr;
 }
-
-/* ------------- bifurcation background ----------------------------- */
 const R_MIN=2.5, R_MAX=4, R_STEP=0.0015;
 const bifX=[], bifR=[];
 for(let rr=R_MIN; rr<=R_MAX+1e-8; rr+=R_STEP){
@@ -105,13 +174,8 @@ Plotly.newPlot('bifPlot',[{
 .then(()=>Plotly.addTraces('bifPlot',{
      x:[3.8,3.8], y:[0,1], mode:'lines',
      line:{color:'crimson', width:3}}));
-
-/* ------------- interactive state ---------------------------------- */
 let r=3.8, x0=0.5, keepVis=10000, k=8;
-
-/* ------------- useful helpers ------------------------------------- */
 const rows=[],   tbody=document.querySelector('#epsTable tbody');
-const lg2 = Math.log2 ? Math.log2 : x=>Math.log(x)/Math.LN2;
 function epsFromK(k){ return 1/(1<<k); }
 function NofEps(eps){
   const xs = series(r, KEEP_DIM, SKIP_DIM, x0);
@@ -119,18 +183,14 @@ function NofEps(eps){
 }
 function updateENreadout(){
   const eps = epsFromK(k);
-  epsVal.textContent = `2⁻${k}`;
-  nVal .textContent  = NofEps(eps);
+  document.getElementById('epsVal').textContent = `2⁻${k}`;
+  document.getElementById('nVal').textContent  = NofEps(eps);
 }
-
-/* ------------- draw slice (band) ---------------------------------- */
 function drawSlice(){
   const xs  = series(r, keepVis, SKIP_SLICE, x0);
   const eps = epsFromK(k);
   const filled = new Set(xs.map(x=>Math.floor(x/eps)));
-
   updateENreadout();
-
   const shapes=[], nBoxes=1/eps;
   for(let b=0;b<nBoxes;b++){
      shapes.push({type:'rect', xref:'paper', yref:'y',
@@ -148,15 +208,11 @@ function drawSlice(){
       margin:{l:60,r:5,t:30,b:40}, dragmode:false, shapes});
 }
 drawSlice();
-
-/* ------------- slider / input handlers ---------------------------- */
-rSlider.oninput = e=>{r=+e.value; rVal.textContent=r.toFixed(4);
+document.getElementById('rSlider').oninput = e=>{r=+e.value; document.getElementById('rVal').textContent=r.toFixed(4);
                       Plotly.restyle('bifPlot',{'x':[[r,r]]},[1]); drawSlice();}
-x0Slider.oninput= e=>{x0=+e.value; x0Val.textContent=x0.toFixed(4); drawSlice();}
-keepInput.oninput=e=>{keepVis=Math.max(1,+e.value|0); drawSlice();}
-kSlider.oninput  = e=>{k=+e.value; kVal.textContent=k; drawSlice();}
-
-/* ------------- ε-table helpers ------------------------------------ */
+document.getElementById('x0Slider').oninput= e=>{x0=+e.value; document.getElementById('x0Val').textContent=x0.toFixed(4); drawSlice();}
+document.getElementById('keepInput').oninput=e=>{keepVis=Math.max(1,+e.value|0); drawSlice();}
+document.getElementById('kSlider').oninput  = e=>{k=+e.value; document.getElementById('kVal').textContent=k; drawSlice();}
 function refreshTable(){
   tbody.innerHTML='';
   rows.forEach((row,i)=>{
@@ -166,31 +222,18 @@ function refreshTable(){
      tr.insertCell().textContent = `2⁻${row.k}`;
      tr.insertCell().textContent = row.N;
   });
-  plotBtn.classList.toggle('disabled', rows.length<2);
+  document.getElementById('plotBtn').classList.toggle('disabled', rows.length<2);
 }
-
-/* ADD row */
-addBtn.onclick = ()=>{
+document.getElementById('addBtn').onclick = ()=>{
   const eps = epsFromK(k);
   const N   = NofEps(eps);
   rows.push({k, N}); refreshTable();
 };
-
-/* CLEAR table */
-clrBtn.onclick = ()=>{ rows.length=0; refreshTable(); };
-
-/* ------------- plot from table ------------------------------------ */
-plotBtn.onclick = ()=>{
+document.getElementById('clrBtn').onclick = ()=>{ rows.length=0; refreshTable(); Plotly.purge('logPlot'); };
+document.getElementById('plotBtn').onclick = ()=>{
   if(rows.length<2) return;
-
   const eps = rows.map(r=>epsFromK(r.k)),
         N   = rows.map(r=>r.N);
-
-  /* linear trace */
-  const trLin={x:eps, y:N, mode:'markers+lines',
-               marker:{color:'royalblue'}, name:'N(ε)'};
-
-  /* log–log fit */
   const logX=eps.map(e=>Math.log10(1/e)),
         logY=N  .map(n=>Math.log10(n));
   const n=logX.length, sx=logX.reduce((a,b)=>a+b),
@@ -200,35 +243,14 @@ plotBtn.onclick = ()=>{
   const m=(n*sxy-sx*sy)/(n*sx2-sx*sx),
         b=(sy-m*sx)/n, D=m.toFixed(3);
   const fitY=eps.map(e=>10**(b+m*Math.log10(1/e)));
-
-  const trLog={x:eps,y:N,mode:'markers',
-               marker:{size:6,color:'seagreen'}, name:'N(ε)'},
-        trFit={x:eps,y:fitY,mode:'lines',
-               line:{dash:'dot',color:'crimson'},
-               name:`fit, slope≈${D}`};
-
-  Plotly.newPlot('slicePlot',
-    [{...trLin,xaxis:'x', yaxis:'y'},
-     {...trLog,xaxis:'x2',yaxis:'y2'},
-     {...trFit,xaxis:'x2',yaxis:'y2'}],
-    {grid:{rows:1,columns:2,pattern:'independent'},
-     xaxis :{title:'ε'},
-     yaxis :{title:'N(ε)'},
-     xaxis2:{title:'ε',type:'log'},
-     yaxis2:{title:'N(ε)',type:'log'},
-     margin:{l:60,r:20,t:30,b:50},
-     showlegend:true});
-  sliceTitle.textContent=`ε-table plotted  —  dimension ≈ ${D}`;
+  const trLog={x:eps,y:N,mode:'markers',marker:{size:6,color:'seagreen'},name:'N(ε)'},
+        trFit={x:eps,y:fitY,mode:'lines',line:{dash:'dot',color:'crimson'},name:`fit, slope ≈ ${D}`};
+  Plotly.newPlot('logPlot',[trLog,trFit],{
+    xaxis:{title:'ε',type:'log'},
+    yaxis:{title:'N(ε)',type:'log'},
+    margin:{l:60,r:20,t:30,b:50},
+    showlegend:true });
 };
 </script>
 </body>
 </html>
-
-
-
-
-      
-    
-
-
-
