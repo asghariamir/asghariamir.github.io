@@ -8,16 +8,34 @@
   <style>
     body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 1rem; }
     h2 { text-align: center; }
-    #controls { display: flex; flex-wrap: wrap; gap: 0.7rem; justify-content: center; margin-bottom: 1rem; }
-    #controls span, #controls input { margin: 0 0.2rem; }
-    #plots > div { width: 100%; height: 400px; margin-bottom: 1.5rem; }
+    #controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    #controls span {
+      font-weight: bold;
+    }
+    #controls input[type=range],
+    #controls input[type=number] {
+      flex: 1 1 150px;
+      max-width: 200px;
+    }
+    #plots > div {
+      width: 100%;
+      height: 400px;
+      margin-bottom: 1.5rem;
+    }
     button {
-      cursor: pointer;
-      padding: .3rem .8rem;
-      background-color: #007bff;
-      color: white;
+      padding: 0.3rem 0.8rem;
       border: none;
-      border-radius: .25rem;
+      background: #007bff;
+      color: white;
+      border-radius: 0.25rem;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -26,15 +44,17 @@
 <h2>Logistic Map Explorer: Fractal Dimension</h2>
 
 <div id="controls">
-  r = <span id="rVal">3.8000</span>
+  <span>r =</span> <span id="rVal">3.8000</span>
   <input type="range" id="rSlider" min="2.5" max="4" step="0.0001" value="3.8" />
-  x₀ = <span id="x0Val">0.5000</span>
+  <span>x₀ =</span> <span id="x0Val">0.5000</span>
   <input type="range" id="x0Slider" min="0.01" max="0.99" step="0.0001" value="0.5" />
-  Points = <input type="number" id="keepInput" value="10000" min="100" max="50000" style="width: 5rem;" />
-  k = <span id="kVal">8</span>
+  <span>Points =</span> <input type="number" id="keepInput" value="10000" min="100" max="50000" />
+  <span>k =</span> <span id="kVal">8</span>
   <input type="range" id="kSlider" min="4" max="12" step="1" value="8" />
-  ε = <span id="epsVal">2⁻⁸</span>
-  N(ε) = <span id="nVal">-</span>
+  <span>ε =</span> <span id="epsVal">2⁻⁸</span>
+  <span>N(ε) =</span> <span id="nVal">-</span>
+  <button id="toggleBtn">Toggle ε-boxes</button>
+  <button id="animateBtn">Animate D(r)</button>
 </div>
 
 <div id="plots">
@@ -43,15 +63,10 @@
 </div>
 
 <script>
-// ================= Constants =================
 const SKIP_SLICE = 2000, SKIP_DIM = 8192, KEEP_DIM = 65536;
 let showBoxes = true, animating = false;
 let r = 3.8, x0 = 0.5, keepVis = 10000, k = 8;
-const rows = [], bifX = [], bifR = [];
 
-document.getElementById('kVal').textContent = k;
-
-// ================= Series Functions =================
 function step(r, x) { return r * x * (1 - x); }
 function series(r, len, skip, x0) {
   let x = x0, arr = [];
@@ -66,36 +81,11 @@ function NofEps(eps) {
   const xs = series(r, KEEP_DIM, SKIP_DIM, x0);
   return new Set(xs.map(x => Math.floor(x / eps))).size;
 }
-
-// ================= Plots =================
-const R_MIN = 2.5, R_MAX = 4, R_STEP = 0.005;
-for (let rr = R_MIN; rr <= R_MAX + 1e-8; rr += R_STEP) {
-  series(rr, 300, 200, Math.random() * 0.8 + 0.1).forEach(x => {
-    bifR.push(rr); bifX.push(x);
-  });
-}
-Plotly.newPlot('bifPlot', [{
-  x: bifR, y: bifX, mode: 'markers', type: 'scattergl',
-  name: 'Attractor points',
-  marker: { size: 1, color: '#888' }
-}, {
-  x: [3.8, 3.8], y: [0, 1], mode: 'lines',
-  name: 'Selected r',
-  line: { color: 'crimson', width: 3 }
-}], {
-  xaxis: { title: 'r', range: [R_MIN, R_MAX] },
-  yaxis: { title: 'x', range: [0, 1] },
-  margin: { l: 50, r: 5, t: 10, b: 40 },
-  dragmode: false,
-  legend: { x: 1.05, y: 1 }
-});
-
 function updateENreadout() {
   const eps = epsFromK(k);
   document.getElementById('epsVal').textContent = `2⁻${k}`;
   document.getElementById('nVal').textContent = NofEps(eps);
 }
-
 function drawSlice() {
   const xs = series(r, keepVis, SKIP_SLICE, x0);
   const eps = epsFromK(k);
@@ -126,53 +116,67 @@ function drawSlice() {
     legend: { x: 1.05, y: 1 }
   });
 }
+const bifX = [], bifR = [], R_MIN = 2.5, R_MAX = 4, R_STEP = 0.005;
+for (let rr = R_MIN; rr <= R_MAX + 1e-8; rr += R_STEP) {
+  series(rr, 300, 200, Math.random() * 0.8 + 0.1).forEach(x => {
+    bifR.push(rr); bifX.push(x);
+  });
+}
+Plotly.newPlot('bifPlot', [{
+  x: bifR, y: bifX, mode: 'markers', type: 'scattergl',
+  name: 'Attractor points', marker: { size: 1, color: '#888' }
+}, {
+  x: [r, r], y: [0, 1], mode: 'lines',
+  name: 'Selected r', line: { color: 'crimson', width: 3 }
+}], {
+  xaxis: { title: 'r', range: [R_MIN, R_MAX] },
+  yaxis: { title: 'x', range: [0, 1] },
+  margin: { l: 50, r: 5, t: 10, b: 40 },
+  dragmode: false, legend: { x: 1.05, y: 1 }
+});
 drawSlice();
 
-// ================= Event Listeners =================
+// Controls
 document.getElementById('rSlider').oninput = e => {
-  r = +e.value;
+  r = +e.target.value;
   document.getElementById('rVal').textContent = r.toFixed(4);
   Plotly.restyle('bifPlot', { 'x': [[r, r]] }, [1]);
   drawSlice();
 };
 document.getElementById('x0Slider').oninput = e => {
-  x0 = +e.value;
+  x0 = +e.target.value;
   document.getElementById('x0Val').textContent = x0.toFixed(4);
   drawSlice();
 };
 document.getElementById('keepInput').oninput = e => {
-  keepVis = Math.max(1, +e.value | 0);
+  keepVis = +e.target.value;
   drawSlice();
 };
 document.getElementById('kSlider').oninput = e => {
-  k = parseInt(e.target.value);
+  k = +e.target.value;
   document.getElementById('kVal').textContent = k;
   drawSlice();
 };
 
-// ================= Buttons =================
-const toggleBtn = document.createElement('button');
-toggleBtn.textContent = 'Toggle ε-boxes';
-toggleBtn.onclick = () => { showBoxes = !showBoxes; drawSlice(); };
-document.getElementById('controls').appendChild(toggleBtn);
-
-const animateBtn = document.createElement('button');
-animateBtn.textContent = 'Animate D(r)';
-animateBtn.onclick = () => {
+// Buttons
+document.getElementById('toggleBtn').onclick = () => {
+  showBoxes = !showBoxes;
+  drawSlice();
+};
+document.getElementById('animateBtn').onclick = () => {
   if (!animating) {
     animating = true;
     animateFractalDimension(3.5, 4.0, 0.02);
   }
 };
-document.getElementById('controls').appendChild(animateBtn);
 
-// ================= Animation Logic =================
-function animateFractalDimension(start = 3.5, end = 4.0, step = 0.01) {
+// Animate D(r)
+function animateFractalDimension(start, end, step) {
   const results = [];
   let current = start;
   function next() {
     if (current > end) {
-      console.log(\"Animation done.\");
+      console.log('Animation done.');
       animating = false;
       return;
     }
