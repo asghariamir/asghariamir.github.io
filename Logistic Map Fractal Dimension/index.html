@@ -1,203 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Logistic Map Explorer: Fractal Dimension</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <title>Logistic Map Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
-      margin: 1rem;
-    }
-    h2, h3 {
-      text-align: center;
-    }
-    #tabs {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .tab {
-      padding: 0.5rem 1rem;
-      background: #ddd;
-      border-radius: 0.4rem;
-      cursor: pointer;
-    }
-    .tab.active {
-      background: #007bff;
-      color: white;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    #plots { display: flex; flex-direction: column; gap: 1.5rem; }
-    #bifPlot, #slicePlot, #logPlot { width: 100%; height: 400px; }
-    #controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.8rem;
-    }
-    #controls span, #controls input {
-      margin: 0 0.2rem;
-    }
-    table {
-      border-collapse: collapse;
-      margin: 1rem auto;
-      max-width: 28rem;
-    }
-    thead th {
-      background: #eaeaea;
-      padding: 0.4rem;
-    }
-    tbody td {
-      padding: 0.4rem;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-    tbody tr:nth-child(odd) { background: #f9f9f9; }
+    body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 1rem; }
+    h2 { text-align: center; }
+    #controls { display: flex; flex-wrap: wrap; gap: 0.7rem; justify-content: center; margin-bottom: 1rem; }
+    #controls span, #controls input { margin: 0 0.2rem; }
+    #plots > div { width: 100%; height: 400px; margin-bottom: 1.5rem; }
     button {
-      margin: 0.3rem;
-      padding: 0.3rem 0.8rem;
-      background: #007bff;
+      cursor: pointer;
+      padding: .3rem .8rem;
+      background-color: #007bff;
       color: white;
       border: none;
-      border-radius: 0.25rem;
-      cursor: pointer;
-    }
-    button.disabled {
-      background: #aaa;
-      cursor: default;
+      border-radius: .25rem;
     }
   </style>
 </head>
 <body>
 
-<h2>Logistic Map Explorer</h2>
+<h2>Logistic Map Explorer: Fractal Dimension</h2>
 
-<div id="tabs">
-  <div class="tab active" data-tab="plots">Plots</div>
-  <div class="tab" data-tab="etable">ε-table</div>
+<div id="controls">
+  r = <span id="rVal">3.8000</span>
+  <input type="range" id="rSlider" min="2.5" max="4" step="0.0001" value="3.8" />
+  x₀ = <span id="x0Val">0.5000</span>
+  <input type="range" id="x0Slider" min="0.01" max="0.99" step="0.0001" value="0.5" />
+  Points = <input type="number" id="keepInput" value="10000" min="100" max="50000" style="width: 5rem;" />
+  k = <span id="kVal">8</span>
+  <input type="range" id="kSlider" min="4" max="12" step="1" value="8" />
+  ε = <span id="epsVal">2⁻⁸</span>
+  N(ε) = <span id="nVal">-</span>
 </div>
 
-<div id="plots" class="tab-content active">
+<div id="plots">
   <div id="bifPlot"></div>
-  <div id="controls">
-    r = <span id="rVal">3.8000</span>
-    <input type="range" id="rSlider" min="2.5" max="4" step="0.0001" value="3.8">
-    x₀ = <span id="x0Val">0.5000</span>
-    <input type="range" id="x0Slider" min="0.01" max="0.99" step="0.0001" value="0.5">
-    Points: <input type="number" id="keepInput" value="10000" min="100" max="50000" style="width:6rem;">
-    k = <span id="kVal">8</span>
-    <input type="range" id="kSlider" min="4" max="12" step="1" value="8">
-    ε = <span id="epsVal">2⁻⁸</span>
-    N(ε) = <span id="nVal">-</span>
-  </div>
-  <h3 id="sliceTitle">Attractor & ε-boxes</h3>
   <div id="slicePlot"></div>
 </div>
 
-<div id="etable" class="tab-content">
-  <h3 style="text-align:center">ε-table for Fractal Dimension</h3>
-  <div style="text-align:center">
-    <button id="addBtn">Add Row</button>
-    <button id="clrBtn">Clear</button>
-    <button id="plotBtn" class="disabled">Plot Table</button>
-  </div>
-  <table id="epsTable">
-    <thead><tr><th>#</th><th>k</th><th>ε</th><th>N(ε)</th></tr></thead>
-    <tbody></tbody>
-  </table>
-  <div id="logPlot"></div>
-</div>
-
 <script>
-// Tabs
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.onclick = () => {
-    document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(tab.dataset.tab).classList.add('active');
-  };
-});
-
-// Constants
+// ================= Constants =================
 const SKIP_SLICE = 2000, SKIP_DIM = 8192, KEEP_DIM = 65536;
+let showBoxes = true, animating = false;
+let r = 3.8, x0 = 0.5, keepVis = 10000, k = 8;
+const rows = [], bifX = [], bifR = [];
+
+document.getElementById('kVal').textContent = k;
+
+// ================= Series Functions =================
 function step(r, x) { return r * x * (1 - x); }
 function series(r, len, skip, x0) {
   let x = x0, arr = [];
   for (let i = 0; i < skip + len; i++) {
-    x = step(r, x); if (i >= skip) arr.push(x);
+    x = step(r, x);
+    if (i >= skip) arr.push(x);
   }
   return arr;
 }
-const R_MIN = 2.5, R_MAX = 4, R_STEP = 0.0015;
-const bifX = [], bifR = [];
-for (let rr = R_MIN; rr <= R_MAX + 1e-8; rr += R_STEP) {
-  series(rr, 800, 200, Math.random() * 0.8 + 0.1).forEach(x => {
-    bifR.push(rr); bifX.push(x);
-  });
-}
-Plotly.newPlot('bifPlot', [{
-  x: bifR, y: bifX, mode: 'markers', type: 'scattergl',
-  marker: { size: 1, color: '#888' }
-}], {
-  xaxis: { title: 'r', range: [R_MIN, R_MAX] },
-  yaxis: { title: 'x', range: [0, 1] },
-  margin: { l: 50, r: 5, t: 10, b: 40 }, dragmode: false
-}).then(() => Plotly.addTraces('bifPlot', {
-  x: [3.8, 3.8], y: [0, 1], mode: 'lines',
-  line: { color: 'crimson', width: 3 }
-}));
-
-// State
-let r = 3.8, x0 = 0.5, keepVis = 10000, k = 8;
-document.getElementById('kVal').textContent = k;
-const rows = [], tbody = document.querySelector('#epsTable tbody');
-
-// Helpers
 function epsFromK(k) { return 1 / (1 << k); }
 function NofEps(eps) {
   const xs = series(r, KEEP_DIM, SKIP_DIM, x0);
   return new Set(xs.map(x => Math.floor(x / eps))).size;
 }
+
+// ================= Plots =================
+const R_MIN = 2.5, R_MAX = 4, R_STEP = 0.005;
+for (let rr = R_MIN; rr <= R_MAX + 1e-8; rr += R_STEP) {
+  series(rr, 300, 200, Math.random() * 0.8 + 0.1).forEach(x => {
+    bifR.push(rr); bifX.push(x);
+  });
+}
+Plotly.newPlot('bifPlot', [{
+  x: bifR, y: bifX, mode: 'markers', type: 'scattergl',
+  name: 'Attractor points',
+  marker: { size: 1, color: '#888' }
+}, {
+  x: [3.8, 3.8], y: [0, 1], mode: 'lines',
+  name: 'Selected r',
+  line: { color: 'crimson', width: 3 }
+}], {
+  xaxis: { title: 'r', range: [R_MIN, R_MAX] },
+  yaxis: { title: 'x', range: [0, 1] },
+  margin: { l: 50, r: 5, t: 10, b: 40 },
+  dragmode: false,
+  legend: { x: 1.05, y: 1 }
+});
+
 function updateENreadout() {
   const eps = epsFromK(k);
   document.getElementById('epsVal').textContent = `2⁻${k}`;
   document.getElementById('nVal').textContent = NofEps(eps);
 }
+
 function drawSlice() {
   const xs = series(r, keepVis, SKIP_SLICE, x0);
   const eps = epsFromK(k);
   const filled = new Set(xs.map(x => Math.floor(x / eps)));
   updateENreadout();
-  const shapes = [], nBoxes = 1 / eps;
-  for (let b = 0; b < nBoxes; b++) {
-    shapes.push({
-      type: 'rect', xref: 'paper', yref: 'y',
-      x0: 0, x1: 1, y0: b * eps, y1: (b + 1) * eps,
-      fillcolor: filled.has(b) ? 'rgba(255,165,0,0.25)' : 'rgba(150,150,150,0.05)',
-      line: { width: 0 }
-    });
+  const boxes = [], nBoxes = 1 / eps;
+  if (showBoxes) {
+    for (let b = 0; b < nBoxes; b++) {
+      const y0 = b * eps, y1 = (b + 1) * eps;
+      if (filled.has(b)) {
+        boxes.push({
+          type: 'rect', xref: 'x', yref: 'y',
+          x0: 0, x1: keepVis, y0, y1,
+          fillcolor: 'rgba(255,165,0,0.25)', line: { width: 0 }, layer: 'below'
+        });
+      }
+    }
   }
   Plotly.newPlot('slicePlot', [{
     x: xs.map((_, i) => i), y: xs, mode: 'markers',
-    marker: { size: 3, color: 'royalblue' }
+    marker: { size: 3, color: 'royalblue' }, name: 'Orbit'
   }], {
     xaxis: { title: 'n', range: [0, keepVis] },
     yaxis: { title: 'x', range: [0, 1] },
-    margin: { l: 60, r: 5, t: 30, b: 40 }, dragmode: false, shapes
+    margin: { l: 60, r: 5, t: 30, b: 40 },
+    dragmode: false,
+    shapes: boxes,
+    legend: { x: 1.05, y: 1 }
   });
 }
 drawSlice();
 
-// Event listeners
+// ================= Event Listeners =================
 document.getElementById('rSlider').oninput = e => {
   r = +e.value;
   document.getElementById('rVal').textContent = r.toFixed(4);
@@ -219,54 +150,53 @@ document.getElementById('kSlider').oninput = e => {
   drawSlice();
 };
 
-// Table controls
-function refreshTable() {
-  tbody.innerHTML = '';
-  rows.forEach((row, i) => {
-    const tr = tbody.insertRow();
-    tr.insertCell().textContent = i + 1;
-    tr.insertCell().textContent = row.k;
-    tr.insertCell().textContent = `2⁻${row.k}`;
-    tr.insertCell().textContent = row.N;
-  });
-  document.getElementById('plotBtn').classList.toggle('disabled', rows.length < 2);
+// ================= Buttons =================
+const toggleBtn = document.createElement('button');
+toggleBtn.textContent = 'Toggle ε-boxes';
+toggleBtn.onclick = () => { showBoxes = !showBoxes; drawSlice(); };
+document.getElementById('controls').appendChild(toggleBtn);
+
+const animateBtn = document.createElement('button');
+animateBtn.textContent = 'Animate D(r)';
+animateBtn.onclick = () => {
+  if (!animating) {
+    animating = true;
+    animateFractalDimension(3.5, 4.0, 0.02);
+  }
+};
+document.getElementById('controls').appendChild(animateBtn);
+
+// ================= Animation Logic =================
+function animateFractalDimension(start = 3.5, end = 4.0, step = 0.01) {
+  const results = [];
+  let current = start;
+  function next() {
+    if (current > end) {
+      console.log(\"Animation done.\");
+      animating = false;
+      return;
+    }
+    r = parseFloat(current.toFixed(4));
+    document.getElementById('rVal').textContent = r;
+    Plotly.restyle('bifPlot', { 'x': [[r, r]] }, [1]);
+    const epsList = [6, 7, 8, 9, 10];
+    const eps = epsList.map(k => 1 / (1 << k));
+    const Ns = epsList.map(k => NofEps(1 / (1 << k)));
+    const logX = eps.map(e => Math.log10(1 / e));
+    const logY = Ns.map(n => Math.log10(n));
+    const n = logX.length, sx = logX.reduce((a, b) => a + b),
+          sy = logY.reduce((a, b) => a + b),
+          sxy = logX.reduce((s, x, i) => s + x * logY[i], 0),
+          sx2 = logX.reduce((s, x) => s + x * x, 0);
+    const m = (n * sxy - sx * sy) / (n * sx2 - sx * sx);
+    results.push({ r, D: m });
+    console.log(`r = ${r}, D ≈ ${m.toFixed(3)}`);
+    current += step;
+    setTimeout(next, 150);
+  }
+  next();
 }
-document.getElementById('addBtn').onclick = () => {
-  const currentK = parseInt(document.getElementById('kVal').textContent);
-  const eps = epsFromK(currentK);
-  const N = NofEps(eps);
-  rows.push({ k: currentK, N });
-  refreshTable();
-};
-document.getElementById('clrBtn').onclick = () => {
-  rows.length = 0;
-  refreshTable();
-  Plotly.purge('logPlot');
-};
-document.getElementById('plotBtn').onclick = () => {
-  if (rows.length < 2) return;
-  const eps = rows.map(r => epsFromK(r.k));
-  const N = rows.map(r => r.N);
-  const logX = eps.map(e => Math.log10(1 / e));
-  const logY = N.map(n => Math.log10(n));
-  const n = logX.length, sx = logX.reduce((a, b) => a + b),
-        sy = logY.reduce((a, b) => a + b),
-        sxy = logX.reduce((s, x, i) => s + x * logY[i], 0),
-        sx2 = logX.reduce((s, x) => s + x * x, 0);
-  const m = (n * sxy - sx * sy) / (n * sx2 - sx * sx);
-  const b = (sy - m * sx) / n;
-  const fitY = eps.map(e => 10 ** (b + m * Math.log10(1 / e)));
-  const D = m.toFixed(3);
-  Plotly.newPlot('logPlot', [
-    { x: eps, y: N, mode: 'markers', name: 'N(ε)', marker: { color: 'seagreen' } },
-    { x: eps, y: fitY, mode: 'lines', name: `fit, slope ≈ ${D}`, line: { color: 'crimson', dash: 'dot' } }
-  ], {
-    xaxis: { title: 'ε', type: 'log' },
-    yaxis: { title: 'N(ε)', type: 'log' },
-    margin: { l: 60, r: 10, t: 30, b: 50 },
-    showlegend: true
-  });
-};
 </script>
+
 </body>
 </html>
