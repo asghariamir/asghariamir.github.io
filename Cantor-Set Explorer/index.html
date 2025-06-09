@@ -20,6 +20,96 @@
 <body>
 
 <h1>Cantor-Set Explorer</h1>
+  <!-- Add inside <body> just below the existing <h1> -->
+<div class='tab-buttons'>
+  <button id='explorerTabBtn' class='active'>Set Explorer</button>
+  <button id='dimensionTabBtn'>Box Dimension</button>
+</div>
+
+<!-- Existing explorer markup REMAINS THE SAME -->
+
+<!-- === NEW Dimension Tab === -->
+<div id='dimensionTab' style='display:none;'>
+  <canvas id='dimensionCanvas' width='900' height='100'></canvas>
+
+  <div id='dimensionControls'>
+    <label>k (box size = 3^-k)
+      <input type='range' id='boxExpRange' min='0' max='8' step='1' value='0'>
+      <span id='boxExpLabel'>0</span>
+    </label>
+    <p id='boxSizeDisplay'></p>
+    <p id='occupiedDisplay'></p>
+    <button id='addDataBtn'>Add data row</button>
+    <button id='plotBtn'>Plot log‑log</button>
+  </div>
+
+  <table id='dataTable'>
+    <thead><tr><th>k</th><th>Box size</th><th>Occupied boxes</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <canvas id='chartCanvas' width='600' height='400'></canvas>
+</div>
+
+<!-- === SCRIPT additions (put after existing script) === -->
+<script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
+<script>
+// tab switching
+const explorerTabBtn=document.getElementById('explorerTabBtn');
+const dimensionTabBtn=document.getElementById('dimensionTabBtn');
+const dimensionTab=document.getElementById('dimensionTab');
+
+explorerTabBtn.addEventListener('click',()=>{dimensionTab.style.display='none';});
+dimensionTabBtn.addEventListener('click',()=>{dimensionTab.style.display='block';});
+
+// box‑dimension logic (reuses buildLevels from original)
+const boxExpRange=document.getElementById('boxExpRange');
+const boxExpLabel=document.getElementById('boxExpLabel');
+const boxSizeDisp=document.getElementById('boxSizeDisplay');
+const occupiedDisp=document.getElementById('occupiedDisplay');
+const addDataBtn=document.getElementById('addDataBtn');
+const plotBtn=document.getElementById('plotBtn');
+const tableBody=document.getElementById('dataTable').querySelector('tbody');
+const chartCanvas=document.getElementById('chartCanvas');
+let dataPoints=[],chart;
+
+function countOccupied(k){
+  const depth=+depthRange.value;
+  const segments=buildLevels(depth).levels[depth];
+  const size=Math.pow(3,-k);
+  const n=Math.ceil(1/size);
+  let occ=0;
+  for(let i=0;i<n;i++){
+    const a=i*size,b=(i+1)*size;
+    if(segments.some(([s,e])=>!(e<=a||s>=b))) occ++;
+  }
+  return {size,occ};
+}
+function updateBoxInfo(){
+  const k=+boxExpRange.value;
+  const {size,occ}=countOccupied(k);
+  boxExpLabel.textContent=k;
+  boxSizeDisp.textContent=`s = ${size.toFixed(5)}`;
+  occupiedDisp.textContent=`N(s) = ${occ}`;
+}
+boxExpRange.addEventListener('input',updateBoxInfo);
+
+addDataBtn.addEventListener('click',()=>{
+  const k=+boxExpRange.value;
+  const {size,occ}=countOccupied(k);
+  dataPoints.push({k,size,occ});
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${k}</td><td>${size.toExponential(3)}</td><td>${occ}</td>`;
+  tableBody.appendChild(tr);
+});
+plotBtn.addEventListener('click',()=>{
+  if(dataPoints.length<2){alert('Need >=2 points');return;}
+  const pts=dataPoints.map(p=>({x:Math.log10(1/p.size),y:Math.log10(p.occ)}));
+  if(chart) chart.destroy();
+  chart=new Chart(chartCanvas,{type:'scatter',data:{datasets:[{data:pts}]},options:{responsive:false}});
+});
+updateBoxInfo();
+</script>
 
 <!-- ===== Visual & data ===== -->
 <div id="main">
