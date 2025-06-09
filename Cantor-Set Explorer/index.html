@@ -54,7 +54,6 @@
     <div class="controls">
       <label for="depthRange">Depth&nbsp;<span id="depthVal">5</span></label>
       <input id="depthRange" type="range" min="0" max="9" step="1" value="5">
-      
       <button id="animBtn"   class="btn">Animate</button>
     </div>
 
@@ -174,8 +173,6 @@
     if(viewEnd>1){viewStart-=viewEnd-1;viewEnd=1;}
     drawExplorer();
   }
-
-  document.getElementById('resetView').onclick=()=>{viewStart=0;viewEnd=1;drawExplorer();};
 
   expCv.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?0.8:1.25,e.offsetX/expCv.width);},{passive:false});
   let dragging=false,lastX=0;
