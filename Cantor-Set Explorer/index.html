@@ -293,30 +293,27 @@ document.getElementById('resetTbl').onclick=()=>{
   slopeTxt.textContent='';
 };
 
-/**********************  Tabs logic  **********************/
-function switchTab(id){
-  // Toggle tab button highlight
-  document.querySelectorAll('.tabs button').forEach(btn =>
-    btn.classList.toggle('active', btn.id === id)
-  );
-  // Hide all sections, then show only the active one
-  document.querySelectorAll('.section').forEach(sec =>
-    sec.classList.toggle('active',
-      (id === 'tabExp' && sec.id === 'explorer') ||
-      (id === 'tabDim' && sec.id === 'dimension')
-    )
-  );
+/**********************  Tabs logic (robust)  **********************/
+// Always only show one section, and highlight one button
+function switchTab(tabId) {
+  // Highlight correct button
+  document.querySelectorAll('.tabs button').forEach(btn => {
+    btn.classList.toggle('active', btn.id === tabId);
+  });
+  // Hide all sections, then show only the chosen one
+  document.querySelectorAll('.section').forEach(sec => {
+    // Map tabExp -> explorer, tabDim -> dimension
+    const showId = tabId === 'tabExp' ? 'explorer' : 'dimension';
+    sec.classList.toggle('active', sec.id === showId);
+  });
 }
 
-// Remove accidental duplicate sections (rare but possible if using hot reload/dev tools)
-const seen = {};
-document.querySelectorAll('.section').forEach(sec => {
-  if (seen[sec.id]) sec.remove();
-  else seen[sec.id] = true;
+// Ensure only one section is visible after any kind of reload or error
+window.addEventListener('DOMContentLoaded', function() {
+  switchTab('tabExp'); // Start on Explorer every time (change to 'tabDim' if you want the other)
+  document.getElementById('tabExp').onclick = () => switchTab('tabExp');
+  document.getElementById('tabDim').onclick = () => switchTab('tabDim');
 });
-
-document.getElementById('tabExp').onclick = () => switchTab('tabExp');
-document.getElementById('tabDim').onclick = () => switchTab('tabDim');
 
 
 /**********************  Initial paints **********************/
