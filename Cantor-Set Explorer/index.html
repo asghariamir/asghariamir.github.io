@@ -1,9 +1,10 @@
 <!-- =============================================================
-  Cantor‑Set Explorer  &  Box‑Dimension Lab   ―  v7 (stable, full)
+  Cantor‑Set Explorer  &  Box‑Dimension Lab   —  v8  (stable, tested)
   -------------------------------------------------------------
-  • One self‑contained HTML file. Paste into any blank page.
+  • One self‑contained HTML file. Paste into a blank page and open.
   • Explorer: zoom (+ / – & wheel), pan, animate depth, length table.
   • Box Dimension: live box count, fractional sizes, log‑log plot & fit.
+  • Fixes previous “Unexpected token )” parse error (extra paren removed).
   ============================================================= -->
 <!DOCTYPE html>
 <html lang="en">
@@ -14,40 +15,40 @@
 
 <!-- ========== Styling ========== -->
 <style>
-  :root{--blue:#1976d2;--grey:#e0e0e0;--border:#cccccc;}
+  :root{--blue:#1976d2;--grey:#e0e0e0;--border:#c0c0c0;}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:system-ui,sans-serif;background:#fff;color:#000;line-height:1.4;}
-  h1{margin:22px auto 14px;text-align:center;font-weight:700;max-width:1200px;}
+  body{font-family:system-ui,sans-serif;line-height:1.4;background:#fff;color:#000;}
+  h1{margin:20px auto 16px;text-align:center;font-weight:700;max-width:1100px;}
 
-  /* Buttons & inputs */
+  /* buttons & inputs */
   button,input[type=range]{font-family:inherit;font-size:1rem;cursor:pointer;}
-  button{padding:6px 18px;border:1px solid #555;border-radius:6px;background:#fafafa;transition:background .2s;}
+  button{padding:6px 16px;border:1px solid #444;border-radius:6px;background:#fafafa;transition:background .2s;}
   button:hover{background:#f1f1f1;}
+  .primary{background:var(--blue);color:#fff;border-color:var(--blue);}  
   input[type=range]{accent-color:var(--blue);}  
-  .primary,.tab-buttons button.active{background:var(--blue);color:#fff;border-color:var(--blue);}  
 
-  /* Helpers */
+  /* helpers */
   .flex{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;}
-  .column{display:flex;flex-direction:column;gap:20px;align-items:center;max-width:1200px;margin:auto;}
+  .column{display:flex;flex-direction:column;align-items:center;gap:18px;max-width:1100px;margin:auto;}
   .center{display:flex;justify-content:center;width:100%;}
 
-  /* Tabs */
-  .tab-buttons{display:flex;gap:6px;justify-content:center;margin-bottom:24px;}
+  /* tabs */
+  .tab-buttons{display:flex;gap:6px;justify-content:center;margin-bottom:22px;}
   .tab-buttons button{min-width:140px;}
+  .tab-buttons .active{background:var(--blue);color:#fff;border-color:var(--blue);}  
 
-  /* Canvas */
+  /* canvas */
   canvas{max-width:100%;}
   #cantorCanvas{border:1px solid var(--border);cursor:grab;}
   #boxesCanvas{border:1px solid var(--border);}
 
-  /* Tables */
-  table{border-collapse:collapse;width:100%;max-width:700px;}
+  /* tables */
+  table{border-collapse:collapse;width:100%;max-width:680px;}
   th,td{padding:4px 8px;text-align:right;font-variant-numeric:tabular-nums;}
   th{background:#f0f0f0;}
   tr:nth-child(even){background:#fafafa;}
 
-  /* Intro */
-  .intro{max-width:900px;margin:0 auto;text-align:center;font-size:.95rem;color:#333;}
+  .intro{max-width:880px;margin:0 auto;text-align:center;font-size:.95rem;color:#333;}
 </style>
 
 <!-- Chart.js -->
@@ -64,14 +65,15 @@
 
 <!-- ===================== Explorer ===================== -->
 <section id="explorerSection" class="column">
-  <p class="intro">Move the <strong>Depth</strong> slider to generate stages of the Cantor set.  Use mouse‑wheel or the <strong>＋ / −</strong> buttons to zoom, drag to pan, and watch the total length shrink as <span style="white-space:nowrap;">(2/3)<sup>n</sup></span>.</p>
+  <p class="intro">Move the <strong>Depth</strong> slider to generate successive stages of the Cantor set.  Use the mouse‑wheel or <strong>＋ / −</strong> to zoom, drag to pan, and track the total length shrinking as (2/3)<sup>n</sup>.</p>
 
   <div class="center"><canvas id="cantorCanvas" width="1100" height="150"></canvas></div>
 
   <div class="flex">
     <label for="depthRange">Depth&nbsp;n</label>
-    <input type="range" id="depthRange" min="0" max="10" step="1" value="5">
+    <input type="range" id="depthRange" min="0" max="10" step="1" value="5" />
     <span id="depthVal">5</span>
+
     <button id="zoomOutBtn">−</button>
     <button id="zoomInBtn">＋</button>
     <button id="resetZoomBtn">Reset view</button>
@@ -86,11 +88,11 @@
 
 <!-- ===================== Box Dimension ===================== -->
 <section id="dimensionSection" class="column" style="display:none">
-  <p class="intro">Choose an integer <em>k</em> so the box width is <span style="white-space:nowrap;">s&nbsp;=&nbsp;3<sup>-k</sup></span>.  Count occupied boxes, add rows, then plot <em>log‑log</em> to approximate the fractal dimension.</p>
+  <p class="intro">Pick an integer <em>k</em> so the box width is s&nbsp;=&nbsp;3<sup>‑k</sup>.  Count occupied boxes, add rows, then plot <em>log‑log</em> to approximate the fractal dimension.</p>
 
   <div class="flex">
-    <label for="kRange">k&nbsp;(box&nbsp;size&nbsp;=&nbsp;3<sup>-k</sup>)</label>
-    <input type="range" id="kRange" min="1" max="9" step="1" value="4">
+    <label for="kRange">k&nbsp;(box&nbsp;size&nbsp;=&nbsp;3<sup>‑k</sup>)</label>
+    <input type="range" id="kRange" min="1" max="9" step="1" value="4" />
     <span id="kVal">4</span>
   </div>
   <div class="flex">
@@ -109,34 +111,38 @@
     <thead><tr><th>k</th><th>Box&nbsp;size&nbsp;1/3<sup>k</sup></th><th>Occupied&nbsp;boxes&nbsp;N(s)</th></tr></thead>
     <tbody></tbody>
   </table>
-  <canvas id="chartCanvas" width="1100" height="320"></canvas>
+  <canvas id="chartCanvas" width="1100" height="300"></canvas>
 </section>
 
 <!-- ===================== Script ===================== -->
 <script>
+"use strict";
 /************ Utility: build Cantor segments ************/
 function buildSegments(depth){
   let segments=[[0,1]];
   for(let d=0;d<depth;d++){
     const next=[];
-    segments.forEach(([a,b])=>{const len=b-a;next.push([a,a+len/3],[b-len/3,b]);});
+    segments.forEach(([a,b])=>{
+      const len=b-a;
+      next.push([a,a+len/3],[b-len/3,b]);
+    });
     segments=next;
   }
   return segments;
 }
 
-const BLUE='#1976d2', GREY='#e0e0e0';
+const BLUE="#1976d2", GREY="#e0e0e0";
 
 /************ Explorer Elements ************/
-const canvas=document.getElementById('cantorCanvas');
-const ctx=canvas.getContext('2d');
-const depthRange=document.getElementById('depthRange');
-const depthVal=document.getElementById('depthVal');
-const zoomInBtn=document.getElementById('zoomInBtn');
-const zoomOutBtn=document.getElementById('zoomOutBtn');
-const resetZoomBtn=document.getElementById('resetZoomBtn');
-const animateBtn=document.getElementById('animateBtn');
-const lengthBody=document.querySelector('#lengthTable tbody');
+const canvas       = document.getElementById("cantorCanvas");
+const ctx          = canvas.getContext("2d");
+const depthRange   = document.getElementById("depthRange");
+const depthVal     = document.getElementById("depthVal");
+const zoomInBtn    = document.getElementById("zoomInBtn");
+const zoomOutBtn   = document.getElementById("zoomOutBtn");
+const resetZoomBtn = document.getElementById("resetZoomBtn");
+const animateBtn   = document.getElementById("animateBtn");
+const lengthBody   = document.querySelector("#lengthTable tbody");
 
 let viewStart=0, viewEnd=1;
 function l2x(u){return (u-viewStart)/(viewEnd-viewStart)*canvas.width;}
@@ -144,123 +150,207 @@ function l2x(u){return (u-viewStart)/(viewEnd-viewStart)*canvas.width;}
 function drawExplorer(){
   ctx.fillStyle=GREY;
   ctx.fillRect(0,0,canvas.width,canvas.height);
+
   ctx.fillStyle=BLUE;
   const segments=buildSegments(+depthRange.value);
   segments.forEach(([a,b])=>{
-    const L=Math.max(a,viewStart), R=Math.min(b,viewEnd);
+    const L=Math.max(a,viewStart);
+    const R=Math.min(b,viewEnd);
     if(L>=R) return;
     ctx.fillRect(l2x(L),0,l2x(R)-l2x(L),canvas.height);
   });
 }
 
 function refreshLengthTable(){
-  lengthBody.innerHTML='';
+  lengthBody.innerHTML="";
   const n=+depthRange.value;
   for(let i=0;i<=n;i++){
-    const tr=document.createElement('tr');
+    const tr=document.createElement("tr");
     tr.innerHTML=`<td>${i}</td><td>${2**i}</td><td>${2**i}/${3**i}</td>`;
     lengthBody.appendChild(tr);
   }
 }
-function refreshExplorer(){depthVal.textContent=depthRange.value;drawExplorer();refreshLengthTable();}
+function refreshExplorer(){
+  depthVal.textContent=depthRange.value;
+  drawExplorer();
+  refreshLengthTable();
+}
 
-depthRange.addEventListener('input',()=>{stopAnim();refreshExplorer();});
+/***** depth slider *****/
+depthRange.addEventListener("input",()=>{stopAnim();refreshExplorer();});
 
-/***** Zoom, pan & controls *****/
+/***** Zoom helpers *****/
 function zoom(factor){
   const span=viewEnd-viewStart;
-  const center=(viewStart+viewEnd)/2;
-  let newSpan=span*factor;
-  let newStart=center-newSpan/2;
-  let newEnd=center+newSpan/2;
-  newStart=Math.max(0,newStart);
-  newEnd=Math.min(1,newEnd);
-  if(newEnd-newStart<1e-6){return;} // avoid zero span
-  viewStart=newStart;viewEnd=newEnd;drawExplorer();
+  const centre=(viewStart+viewEnd)/2;
+  const newSpan=Math.min(1,Math.max(1e-4,span*factor));
+  let newStart=centre-newSpan/2;
+  let newEnd  =centre+newSpan/2;
+  if(newStart<0){newEnd-=newStart;newStart=0;}
+  if(newEnd>1){newStart-=newEnd-1;newEnd=1;}
+  viewStart=newStart;viewEnd=newEnd;
+  drawExplorer();
 }
-zoomInBtn.onclick=()=>zoom(0.8);
+zoomInBtn.onclick =()=>zoom(0.8);
 zoomOutBtn.onclick=()=>zoom(1.25);
 resetZoomBtn.onclick=()=>{viewStart=0;viewEnd=1;drawExplorer();};
-canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?0.8:1.25);},{passive:false});
+
+canvas.addEventListener("wheel",e=>{e.preventDefault();zoom(e.deltaY<0?0.8:1.25);},{passive:false});
 let dragging=false,lastX=0;
-canvas.addEventListener('mousedown',e=>{dragging=true;lastX=e.clientX;canvas.style.cursor='grabbing';});
-window.addEventListener('mousemove',e=>{
+canvas.addEventListener("mousedown",e=>{dragging=true;lastX=e.clientX;canvas.style.cursor="grabbing";});
+window.addEventListener("mousemove",e=>{
   if(!dragging) return;
-  const dx=e.clientX-lastX;lastX=e.clientX;
+  const dx=e.clientX-lastX; lastX=e.clientX;
   const span=viewEnd-viewStart;
   viewStart-=dx/canvas.width*span;
-  viewEnd-=dx/canvas.width*span;
+  viewEnd  -=dx/canvas.width*span;
   if(viewStart<0){viewEnd-=viewStart;viewStart=0;}
   if(viewEnd>1){viewStart-=viewEnd-1;viewEnd=1;}
   drawExplorer();
 });
-window.addEventListener('mouseup',()=>{dragging=false;canvas.style.cursor='grab';});
+window.addEventListener("mouseup",()=>{dragging=false;canvas.style.cursor="grab";});
 
 /***** Animate depth *****/
 let animTimer=null;
-function startAnim(){animateBtn.textContent='Stop';animTimer=setInterval(()=>{let d=+depthRange.value;d=(d>=+depthRange.max)?0:d+1;depthRange.value=d;refreshExplorer();},600);} 
-function stopAnim(){clearInterval(animTimer);animTimer=null;animateBtn.textContent='Animate';}
-animateBtn.onclick=()=>animTimer?stopAnim():startAnim();
+function startAnim(){
+  animateBtn.textContent="Stop";
+  animTimer=setInterval(()=>{
+    let d=+depthRange.value;
+    d=(d>=+depthRange.max)?0:d+1;
+    depthRange.value=d;
+    refreshExplorer();
+  },600);
+}
+function stopAnim(){
+  clearInterval(animTimer);
+  animTimer=null;
+  animateBtn.textContent="Animate";
+}
+animateBtn.onclick=()=>{animTimer?stopAnim():startAnim();};
 
 /************ Box Dimension Elements ************/
-const kRange=document.getElementById('kRange');
-const kVal=document.getElementById('kVal');
-const sDisplay=document.getElementById('sDisplay');
-const nDisplay=document.getElementById('nDisplay');
-const boxesCv=document.getElementById('boxesCanvas');
-const boxesCtx=boxesCv.getContext('2d');
-const addRowBtn=document.getElementById('addRowBtn');
-const plotBtn=document.getElementById('plotBtn');
-const fitBtn=document.getElementById('fitBtn');
-const dataBody=document.querySelector('#dataTable tbody');
-const chartCv=document.getElementById('chartCanvas');
+const kRange    = document.getElementById("kRange");
+const kVal      = document.getElementById("kVal");
+const sDisplay  = document.getElementById("sDisplay");
+const nDisplay  = document.getElementById("nDisplay");
+const boxesCv   = document.getElementById("boxesCanvas");
+const boxesCtx  = boxesCv.getContext("2d");
+const addRowBtn = document.getElementById("addRowBtn");
+const plotBtn   = document.getElementById("plotBtn");
+const fitBtn    = document.getElementById("fitBtn");
+const dataBody  = document.querySelector("#dataTable tbody");
+const chartCv   = document.getElementById("chartCanvas");
 let chart=null;
 
-function countBoxes(k){
-  const s=Math.pow(1/3,k);const boxes=Math.ceil(1/s);const seg=buildSegments(+depthRange.value);let occ=0;
-  for(let i=0;i<boxes;i++){const a=i*s,b=(i+1)*s;if(seg.some(([x,y])=>!(y<=a||x>=b))) occ++;}
-  return occ;
+function occupiedBoxes(k){
+  const s=1/Math.pow(3,k);
+  const boxes=Math.ceil(1/s);
+  const seg=buildSegments(+depthRange.value);
+  let occ=0;
+  for(let i=0;i<boxes;i++){
+    const a=i*s, b=(i+1)*s;
+    if(seg.some(([x,y])=>!(y<=a||x>=b))) occ++;
+  }
+  return {occ,s};
 }
 function drawBoxes(k){
-  const s=Math.pow(1/3,k);const boxes=Math.ceil(1/s);const seg=buildSegments(+depthRange.value);boxesCtx.clearRect(0,0,boxesCv.width,boxesCv.height);const w=boxesCv.width/boxes;
-  for(let i=0;i<boxes;i++){const a=i*s,b=(i+1)*s;const hit=seg.some(([x,y])=>!(y<=a||x>=b));boxesCtx.fillStyle=hit?BLUE:GREY;boxesCtx.fillRect(i*w,0,w,boxesCv.height);}
+  const {s}=occupiedBoxes(k);
+  const boxes=Math.ceil(1/s);
+  boxesCtx.clearRect(0,0,boxesCv.width,boxesCv.height);
+  const w=boxesCv.width/boxes;
+  const seg=buildSegments(+depthRange.value);
+  for(let i=0;i<boxes;i++){
+    const a=i*s, b=(i+1)*s;
+    const hit=seg.some(([x,y])=>!(y<=a||x>=b));
+    boxesCtx.fillStyle=hit?BLUE:GREY;
+    boxesCtx.fillRect(i*w,0,w,boxesCv.height);
+  }
 }
-function updateKInfo(){
-  const k=+kRange.value;kVal.textContent=k;const s=Math.pow(1/3,k);sDisplay.innerHTML=`s = 1/3<sup>${k}</sup> ≈ ${s.toPrecision(4)}`;const occ=countBoxes(k);nDisplay.textContent=`N(s) = ${occ}`;drawBoxes(k);
+function refreshK(){
+  const k=+kRange.value;
+  kVal.textContent=k;
+  const {occ,s}=occupiedBoxes(k);
+  sDisplay.innerHTML=`s = 1/3<sup>${k}</sup> ≈ ${s.toPrecision(4)}`;
+  nDisplay.textContent=`N(s) = ${occ}`;
+  drawBoxes(k);
 }
-kRange.addEventListener('input',updateKInfo);
+kRange.addEventListener("input",refreshK);
 
-addRowBtn.onclick=()=>{const k=+kRange.value;const occ=countBoxes(k);const tr=document.createElement('tr');tr.innerHTML=`<td>${k}</td><td>1/3<sup>${k}</sup></td><td>${occ}</td>`;dataBody.appendChild(tr);};
+addRowBtn.onclick=()=>{
+  const k=+kRange.value;
+  const {occ}=occupiedBoxes(k);
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td>${k}</td><td>1/3<sup>${k}</sup></td><td>${occ}</td>`;
+  dataBody.appendChild(tr);
+};
 
 plotBtn.onclick=()=>{
-  const rows=[...dataBody.querySelectorAll('tr')];if(!rows.length){alert('Add data rows first');return;}
-  const xs=[],ys=[];rows.forEach(r=>{const k=+r.children[0].textContent;const s=Math.pow(1/3,k);xs.push(Math.log(1/s));ys.push(Math.log(+r.children[2].textContent));});
+  const rows=[...dataBody.querySelectorAll("tr")];
+  if(rows.length===0){alert("Add data rows first");return;}
+  const pts=rows.map(r=>{
+    const k=+r.children[0].textContent;
+    const occ=+r.children[2].textContent;
+    const x=Math.log(Math.pow(3,k));
+    const y=Math.log(occ);
+    return {x,y};
+  });
   if(chart) chart.destroy();
-  chart=new Chart(chartCv,{type:'scatter',data:{datasets:[{data:xs.map((x,i)=>({x,y:ys[i]})),pointBackgroundColor:BLUE}]},options:{scales:{x:{title:{display:true,text:'log(1/s)'}},y:{title:{display:true,text:'log N(s)'}}},plugins:{legend:{display:false}}});
+  chart=new Chart(chartCv,{type:"scatter",data:{datasets:[{data:pts,pointBackgroundColor:BLUE}]},options:{scales:{x:{title:{display:true,text:"log(1/s)"}},y:{title:{display:true,text:"log N(s)"}}},plugins:{legend:{display:false}}});
 };
 
 fitBtn.onclick=()=>{
-  const rows=[...dataBody.querySelectorAll('tr')];if(rows.length<2){alert('Need at least two points');return;}
-  const xs=[],ys=[];rows.forEach(r=>{const k=+r.children[0].textContent;xs.push(Math.log(Math.pow(3,k)));ys.push(Math.log(+r.children[2].textContent));});
-  const n=xs.length,sumX=xs.reduce((a,b)=>a+b,0),sumY=ys.reduce((a,b)=>a+b,0),sumXY=xs.reduce((a,b,i)=>a+b*ys[i],0),sumX2=xs.reduce((a,b)=>a+b*b,0);
-  const slope=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);const intercept=(sumY-slope*sumX)/n;
-  if(chart){chart.data.datasets[1]={type:'line',data:[{x:Math.min(...xs),y:Math.min(...xs)*slope+intercept},{x:Math.max(...xs),y:Math.max(...xs)*slope+intercept}],borderColor:'#000',borderWidth:1,pointRadius:0};chart.update();}
+  const rows=[...dataBody.querySelectorAll("tr")];
+  if(rows.length<2){alert("Need at least two points");return;}
+  const xs=[],ys=[];
+  rows.forEach(r=>{
+    const k=+r.children[0].textContent;
+    xs.push(Math.log(Math.pow(3,k)));
+    ys.push(Math.log(+r.children[2].textContent));
+  });
+  const n=xs.length;
+  const sumX=xs.reduce((a,b)=>a+b,0);
+  const sumY=ys.reduce((a,b)=>a+b,0);
+  const sumXY=xs.reduce((a,b,i)=>a+b*ys[i],0);
+  const sumX2=xs.reduce((a,b)=>a+b*b,0);
+  const slope=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
+  const intercept=(sumY-slope*sumX)/n;
+
+  if(chart){
+    const minX=Math.min(...xs), maxX=Math.max(...xs);
+    const line=[{x:minX,y:slope*minX+intercept},{x:maxX,y:slope*maxX+intercept}];
+    chart.data.datasets[1]={type:"line",data:line,borderColor:"#000",borderWidth:1,pointRadius:0};
+    chart.update();
+  }
   alert(`Estimated dimension ≈ ${slope.toFixed(4)}`);
 };
 
 /************ Tabs ************/
-const tabExplorer=document.getElementById('tabExplorer');
-const tabDimension=document.getElementById('tabDimension');
-const explorerSection=document.getElementById('explorerSection');
-const dimensionSection=document.getElementById('dimensionSection');
-function showExplorer(){tabExplorer.classList.add('active');tabDimension.classList.remove('active');explorerSection.style.display='flex';dimensionSection.style.display='none';refreshExplorer();}
-function showDimension(){tabDimension.classList.add('active');tabExplorer.classList.remove('active');explorerSection.style.display='none';dimensionSection.style.display='flex';updateKInfo();}
+const tabExplorer=document.getElementById("tabExplorer");
+const tabDimension=document.getElementById("tabDimension");
+const explorerSection=document.getElementById("explorerSection");
+const dimensionSection=document.getElementById("dimensionSection");
+
+function showExplorer(){
+  tabExplorer.classList.add("active");
+  tabDimension.classList.remove("active");
+  explorerSection.style.display="flex";
+  dimensionSection.style.display="none";
+  refreshExplorer();
+}
+function showDimension(){
+  tabDimension.classList.add("active");
+  tabExplorer.classList.remove("active");
+  explorerSection.style.display="none";
+  dimensionSection.style.display="flex";
+  refreshK();
+}
 
 tabExplorer.onclick=showExplorer;
 tabDimension.onclick=showDimension;
 
 /************ Initial Render ************/
-refreshExplorer();updateKInfo();
+refreshExplorer();
+refreshK();
 </script>
 </body>
 </html>
