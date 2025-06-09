@@ -295,13 +295,13 @@ document.getElementById('resetTbl').onclick=()=>{
 
 /**********************  Tabs logic (robust)  **********************/
 function switchTab(id){
-  document.querySelectorAll('.tabs button').forEach(btn=>btn.classList.toggle('active',btn.id===id));
-  document.querySelector('#explorer').classList.toggle(id==='tabExp');
-  document.querySelector('#dimension').classList.toggle(id==='tabDim');
+  document.querySelectorAll('.tabs button').forEach(btn=>btn.classList.toggle('active',btn.id===id));
+  document.querySelector('#explorer').classList.toggle('active',id==='tabExp');
+  document.querySelector('#dimension').classList.toggle('active',id==='tabDim');
 }
 
 document.getElementById('tabExp').onclick=()=>switchTab('tabExp');
-document.getElementById('tabDim').onclick=()=>switchTab('tabDim');
+document.getElementById('tabDim').onclick = () => switchTab('tabDim');
 
 
 /**********************  Initial paints **********************/
