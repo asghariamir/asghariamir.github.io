@@ -1,6 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- === Cantor‑Set: Box‑dimension add‑on (improved) === -->
+<!-- Put the style block inside <head> of the host page -->
+<style>
+  /* --- tab navigation --- */
+  .tab-buttons{margin:18px 0 8px;display:flex;gap:6px;}
+  .tab-buttons button{padding:6px 14px;border:1px solid #999;background:#f8f8f8;border-radius:4px;font-size:.93rem;cursor:pointer;user-select:none;transition:background .2s;}
+  .tab-buttons button:hover{background:#e2e2e2;}
+  .tab-buttons button.active{background:#1976d2;color:#fff;}
+
+  /* --- dimension pane --- */
+  #dimensionControls{margin:14px 0;display:flex;flex-wrap:wrap;gap:18px;align-items:center;}
+  #dimensionControls label{display:flex;align-items:center;gap:10px;font-weight:500;}
+  #dimensionControls input[type=range]{width:200px;}
+  #dimensionTab table{border-collapse:collapse;margin-top:10px;min-width:340px;font-size:.9rem;}
+  #dimensionTab th,#dimensionTab td{border:1px solid #ccc;padding:4px 8px;text-align:center;}
+  #dimensionTab th{background:#fafafa;font-weight:600;}
+  #dimensionTab tr:nth-child(even){background:#f6f6f6;}
+</style>
+
+<!-- === Insert just below <h1> === -->
+<div class="tab-buttons">
+  <button id="explorerTabBtn" class="active">Set Explorer</button>
+  <button id="dimensionTabBtn">Box Dimension</button>
+</div>
+
+<!-- === NEW Dimension Tab === -->
+<div id="dimensionTab" style="display:none;">
+  <!-- mini‑canvas shows which boxes are counted (blue = occupied, grey = empty) -->
+  <canvas id="dimensionCanvas" width="900" height="80" style="border:1px solid #ccc;"></canvas>
+
+  <div id="dimensionControls">
+    <label>k (box size = 3^-k)
+      <input type="range" id="boxExpRange" min="0" max="8" step="1" value="0">
+      <span id="boxExpLabel">0</span>
+    </label>
+    <p id="boxSizeDisplay" style="margin:0;">s = 1</p>
+    <p id="occupiedDisplay" style="margin:0;">N(s) = 1</p>
+    <button id="addDataBtn">Add data row</button>
+    <button id="plotBtn">Plot log‑log</button>
+  </div>
+
+  <table id="dataTable">
+    <thead><tr><th>k</th><th>Box size (s)</th><th>Occupied boxes N(s)</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <canvas id="chartCanvas" width="600" height="400"></canvas>
+</div>
+
+<!-- === SCRIPT additions (place AFTER the existing <script> in host HTML) === -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+/***** Tab switching *****/
+const explorerTabBtn=document.getElementById('explorerTabBtn');
+const dimensionTabBtn=document.getElementById('dimensionTabBtn');
+const dimensionTab=document.getElementById('dimensionTab');
+
+function setActive(btn){
+  document.querySelectorAll('.tab-buttons button').forEach(b=>b.classList.toggle('active',b===btn));
+}
+explorerTabBtn.addEventListener('click',()=>{dimensionTab.style.display='none';setActive(explorerTabBtn);});
+dimensionTabBtn.addEventListener('click',()=>{dimensionTab.style.display='block';setActive(dimensionTabBtn);});
+
+/***** Elements *****/
+const boxExpRange=document.getElementById('boxExpRange');
+const boxExpLabel=document.getElementById('boxExpLabel');
+const boxSizeDisp=document.getElementById('boxSizeDisplay');
+const occupiedDisp=document.getElementById('occupiedDisplay');
+const addDataBtn=document.getElementById('addDataBtn');
+const plotBtn=document.getElementById('plotBtn');
+const tableBody=document.querySelector('#dataTable tbody');
+const chartCanvas=document.getElementById('chartCanvas');
+const dimensionCanvas=document.getElementById('dimensionCanvas');
+const dimCtx=dimensionCanvas.getContext('2d');
+
+let dataPoints=[],chart;
+
+/***** Helper: occupied count *****/
+function countOccupied(k){
+  const depth=+depthRange.value;
+  const segments=buildLevels(depth).levels[depth]; // segments at deepest level
+  const size=Math.pow(3,-k);
+  const n=Math.pow(3,k); // exact number of boxes along [0,1]
+  let occ=0;
+  for(let i=0;i<n;i++){
+    const a=i*size,b=(i+1)*size;
+    if(segments.some(([s,e])=>!(e<=a||s>=b))) occ++; // overlap => occupied
+  }
+  return {size,occ,n,segments};
+}
+
+/***** Draw boxes preview *****/
+function drawBoxes(k){
+  const {size,n,segments}=countOccupied(k);
+  dimCtx.clearRect(0,0,dimensionCanvas.width,dimensionCanvas.height);
+  const boxW=dimensionCanvas.width/n;
+  const h=dimensionCanvas.height;
+  for(let i=0;i<n;i++){
+    const a=i*size,b=(i+1)*size;
+    const occupied=segments.some(([s,e])=>!(e<=a||s>=b));
+    dimCtx.fillStyle=occupied?'#1976d2':'#dedede';
+    dimCtx.fillRect(i*boxW,0,boxW-0.8,h-0.8);
+  }
+}
+
+/***** Update displays *****/
+function updateBoxInfo(){
+  const k=+boxExpRange.value;
+  const {size,occ}=countOccupied(k);
+  boxExpLabel.textContent=k;
+  boxSizeDisp.textContent=`s = ${size.toPrecision(4)}`;
+  occupiedDisp.textContent=`N(s) = ${occ}`;
+  drawBoxes(k);
+}
+boxExpRange.addEventListener('input',updateBoxInfo);
+
+/***** Add data rows *****/
+addDataBtn.addEventListener('click',()=>{
+  const k=+boxExpRange.value;
+  const {size,occ}=countOccupied(k);
+  if(dataPoints.some(p=>p.k===k)) return; // avoid duplicates
+  dataPoints.push({k,size,occ});
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${k}</td><td>${size.toExponential(3)}</td><td>${occ}</td>`;
+  tableBody.appendChild(tr);
+});
+
+/***** Plot log‑log *****/
+plotBtn.addEventListener('click',()=>{
+  if(dataPoints.length<2){alert('Add at least two rows first');return;}
+  const pts=dataPoints.map(p=>({x:Math.log10(1/p.size),y:Math.log10(p.occ)})).sort((a,b)=>a.x-b.x);
+  if(chart) chart.destroy();
+  chart=new Chart(chartCanvas,{
+    type:'scatter',
+    data:{datasets:[{label:'Data',data:pts,pointRadius:4}]},
+    options:{
+      responsive:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{title:{display:true,text:'log (1/s)'}},
+        y:{title:{display:true,text:'log N(s)'}}
+      }
+    }
+  });
+});
+
+/***** Keep preview in sync with depth slider *****/
+depthRange.addEventListener('input',()=>{ if(dimensionTab.style.display!=='none') updateBoxInfo(); });
+
+// Initial paint
+updateBoxInfo();
+</script>
+
 <meta charset="UTF-8">
 <title>Cantor-Set Explorer</title>
 <style>
