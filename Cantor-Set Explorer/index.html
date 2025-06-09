@@ -58,14 +58,15 @@
 
 <!-- ===================== EXPLORER SECTION ===================== -->
 <section id="explorer" class="section active">
-  <p class="intro">Move the <strong>Depth</strong> slider to generate stages of the Cantor set. </p>
+  <p class="intro">Move the <strong>Depth</strong> slider to generate stages of the Cantor set. Use mouse‑wheel to zoom, drag to pan, and watch the total length shrink as <em>(2/3)<sup>n</sup></em>.</p>
 
   <canvas id="expCanvas" width="1000" height="140"></canvas>
 
   <div class="controls">
     <label for="depthRange">Depth&nbsp;<span id="depthVal">5</span></label>
     <input id="depthRange" type="range" min="0" max="9" step="1" value="5">
-        <button id="animBtn"   class="btn">Animate</button>
+    <button id="resetView" class="btn">Reset</button>
+    <button id="animBtn"   class="btn">Animate</button>
   </div>
 
   <table id="lenTable">
