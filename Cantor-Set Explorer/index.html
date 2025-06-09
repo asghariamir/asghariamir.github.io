@@ -295,13 +295,29 @@ document.getElementById('resetTbl').onclick=()=>{
 
 /**********************  Tabs logic  **********************/
 function switchTab(id){
-  document.querySelectorAll('.tabs button').forEach(btn=>btn.classList.toggle('active',btn.id===id));
-  document.querySelector('#explorer').classList.toggle('active',id==='tabExp');
-  document.querySelector('#dimension').classList.toggle('active',id==='tabDim');
+  // Toggle tab button highlight
+  document.querySelectorAll('.tabs button').forEach(btn =>
+    btn.classList.toggle('active', btn.id === id)
+  );
+  // Hide all sections, then show only the active one
+  document.querySelectorAll('.section').forEach(sec =>
+    sec.classList.toggle('active',
+      (id === 'tabExp' && sec.id === 'explorer') ||
+      (id === 'tabDim' && sec.id === 'dimension')
+    )
+  );
 }
 
-document.getElementById('tabExp').onclick=()=>switchTab('tabExp');
-document.getElementById('tabDim').onclick=()=>switchTab('tabDim');
+// Remove accidental duplicate sections (rare but possible if using hot reload/dev tools)
+const seen = {};
+document.querySelectorAll('.section').forEach(sec => {
+  if (seen[sec.id]) sec.remove();
+  else seen[sec.id] = true;
+});
+
+document.getElementById('tabExp').onclick = () => switchTab('tabExp');
+document.getElementById('tabDim').onclick = () => switchTab('tabDim');
+
 
 /**********************  Initial paints **********************/
 refreshExplorer();
