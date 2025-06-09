@@ -1,423 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- === Cantor‑Set: Box‑dimension add‑on (improved) === -->
-<!-- Put the style block inside <head> of the host page -->
-<style>
-  /* --- tab navigation --- */
-  .tab-buttons{margin:18px 0 8px;display:flex;gap:6px;}
-  .tab-buttons button{padding:6px 14px;border:1px solid #999;background:#f8f8f8;border-radius:4px;font-size:.93rem;cursor:pointer;user-select:none;transition:background .2s;}
-  .tab-buttons button:hover{background:#e2e2e2;}
-  .tab-buttons button.active{background:#1976d2;color:#fff;}
-
-  /* --- dimension pane --- */
-  #dimensionControls{margin:14px 0;display:flex;flex-wrap:wrap;gap:18px;align-items:center;}
-  #dimensionControls label{display:flex;align-items:center;gap:10px;font-weight:500;}
-  #dimensionControls input[type=range]{width:200px;}
-  #dimensionTab table{border-collapse:collapse;margin-top:10px;min-width:340px;font-size:.9rem;}
-  #dimensionTab th,#dimensionTab td{border:1px solid #ccc;padding:4px 8px;text-align:center;}
-  #dimensionTab th{background:#fafafa;font-weight:600;}
-  #dimensionTab tr:nth-child(even){background:#f6f6f6;}
-</style>
-
-<!-- === Insert just below <h1> === -->
-<div class="tab-buttons">
-  <button id="explorerTabBtn" class="active">Set Explorer</button>
-  <button id="dimensionTabBtn">Box Dimension</button>
-</div>
-
-<!-- === NEW Dimension Tab === -->
-<div id="dimensionTab" style="display:none;">
-  <!-- mini‑canvas shows which boxes are counted (blue = occupied, grey = empty) -->
-  <canvas id="dimensionCanvas" width="900" height="80" style="border:1px solid #ccc;"></canvas>
-
-  <div id="dimensionControls">
-    <label>k (box size = 3^-k)
-      <input type="range" id="boxExpRange" min="0" max="8" step="1" value="0">
-      <span id="boxExpLabel">0</span>
-    </label>
-    <p id="boxSizeDisplay" style="margin:0;">s = 1</p>
-    <p id="occupiedDisplay" style="margin:0;">N(s) = 1</p>
-    <button id="addDataBtn">Add data row</button>
-    <button id="plotBtn">Plot log‑log</button>
-  </div>
-
-  <table id="dataTable">
-    <thead><tr><th>k</th><th>Box size (s)</th><th>Occupied boxes N(s)</th></tr></thead>
-    <tbody></tbody>
-  </table>
-
-  <canvas id="chartCanvas" width="600" height="400"></canvas>
-</div>
-
-<!-- === SCRIPT additions (place AFTER the existing <script> in host HTML) === -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-/***** Tab switching *****/
-const explorerTabBtn=document.getElementById('explorerTabBtn');
-const dimensionTabBtn=document.getElementById('dimensionTabBtn');
-const dimensionTab=document.getElementById('dimensionTab');
-
-function setActive(btn){
-  document.querySelectorAll('.tab-buttons button').forEach(b=>b.classList.toggle('active',b===btn));
-}
-explorerTabBtn.addEventListener('click',()=>{dimensionTab.style.display='none';setActive(explorerTabBtn);});
-dimensionTabBtn.addEventListener('click',()=>{dimensionTab.style.display='block';setActive(dimensionTabBtn);});
-
-/***** Elements *****/
-const boxExpRange=document.getElementById('boxExpRange');
-const boxExpLabel=document.getElementById('boxExpLabel');
-const boxSizeDisp=document.getElementById('boxSizeDisplay');
-const occupiedDisp=document.getElementById('occupiedDisplay');
-const addDataBtn=document.getElementById('addDataBtn');
-const plotBtn=document.getElementById('plotBtn');
-const tableBody=document.querySelector('#dataTable tbody');
-const chartCanvas=document.getElementById('chartCanvas');
-const dimensionCanvas=document.getElementById('dimensionCanvas');
-const dimCtx=dimensionCanvas.getContext('2d');
-
-let dataPoints=[],chart;
-
-/***** Helper: occupied count *****/
-function countOccupied(k){
-  const depth=+depthRange.value;
-  const segments=buildLevels(depth).levels[depth]; // segments at deepest level
-  const size=Math.pow(3,-k);
-  const n=Math.pow(3,k); // exact number of boxes along [0,1]
-  let occ=0;
-  for(let i=0;i<n;i++){
-    const a=i*size,b=(i+1)*size;
-    if(segments.some(([s,e])=>!(e<=a||s>=b))) occ++; // overlap => occupied
-  }
-  return {size,occ,n,segments};
-}
-
-/***** Draw boxes preview *****/
-function drawBoxes(k){
-  const {size,n,segments}=countOccupied(k);
-  dimCtx.clearRect(0,0,dimensionCanvas.width,dimensionCanvas.height);
-  const boxW=dimensionCanvas.width/n;
-  const h=dimensionCanvas.height;
-  for(let i=0;i<n;i++){
-    const a=i*size,b=(i+1)*size;
-    const occupied=segments.some(([s,e])=>!(e<=a||s>=b));
-    dimCtx.fillStyle=occupied?'#1976d2':'#dedede';
-    dimCtx.fillRect(i*boxW,0,boxW-0.8,h-0.8);
-  }
-}
-
-/***** Update displays *****/
-function updateBoxInfo(){
-  const k=+boxExpRange.value;
-  const {size,occ}=countOccupied(k);
-  boxExpLabel.textContent=k;
-  boxSizeDisp.textContent=`s = ${size.toPrecision(4)}`;
-  occupiedDisp.textContent=`N(s) = ${occ}`;
-  drawBoxes(k);
-}
-boxExpRange.addEventListener('input',updateBoxInfo);
-
-/***** Add data rows *****/
-addDataBtn.addEventListener('click',()=>{
-  const k=+boxExpRange.value;
-  const {size,occ}=countOccupied(k);
-  if(dataPoints.some(p=>p.k===k)) return; // avoid duplicates
-  dataPoints.push({k,size,occ});
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${k}</td><td>${size.toExponential(3)}</td><td>${occ}</td>`;
-  tableBody.appendChild(tr);
-});
-
-/***** Plot log‑log *****/
-plotBtn.addEventListener('click',()=>{
-  if(dataPoints.length<2){alert('Add at least two rows first');return;}
-  const pts=dataPoints.map(p=>({x:Math.log10(1/p.size),y:Math.log10(p.occ)})).sort((a,b)=>a.x-b.x);
-  if(chart) chart.destroy();
-  chart=new Chart(chartCanvas,{
-    type:'scatter',
-    data:{datasets:[{label:'Data',data:pts,pointRadius:4}]},
-    options:{
-      responsive:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{title:{display:true,text:'log (1/s)'}},
-        y:{title:{display:true,text:'log N(s)'}}
-      }
-    }
-  });
-});
-
-/***** Keep preview in sync with depth slider *****/
-depthRange.addEventListener('input',()=>{ if(dimensionTab.style.display!=='none') updateBoxInfo(); });
-
-// Initial paint
-updateBoxInfo();
-</script>
-
 <meta charset="UTF-8">
-<title>Cantor-Set Explorer</title>
+<title>Cantor-Set Explorer & Box-Dimension Lab</title>
+
+<!-- ========== Styling ========== -->
 <style>
-  /* ===== Layout & basics ===== */
-  body            {font-family:system-ui,sans-serif;margin:20px;background:#fff;color:#000;}
-  h1              {margin-top:0;}
-  #main           {display:flex;gap:20px;align-items:flex-start;}
-  canvas          {border:1px solid #ccc;}
-  #controls       {display:flex;flex-direction:column;gap:12px;margin-top:20px;}
-  .ctrl-group     {display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-  input[type=range]{width:220px;}
-  button,label    {cursor:pointer;}
-  #data-panel     {min-width:200px;}
-  #data-panel p   {margin:4px 0;}
+  /* ── basics ── */
+  html,body{margin:0;padding:0;font-family:system-ui,sans-serif;background:#fff;color:#000}
+  h1{margin:18px 0;font-weight:700}
+  button,input[type=range]{cursor:pointer;user-select:none}
+  input[type=range]{accent-color:#1976d2}
+
+  /* ── layout helpers ── */
+  .flex        {display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .column      {display:flex;flex-direction:column;gap:14px}
+  .tab-buttons {margin-bottom:14px;display:flex;gap:6px}
+  .tab-buttons button{
+    padding:6px 18px;border:1px solid #777;border-radius:6px;background:#f8f8f8;
+    transition:background .2s,font-weight .2s
+  }
+  .tab-buttons button.active{background:#1976d2;color:#fff;font-weight:600}
+
+  /* ── canvases ── */
+  #cantorCanvas{border:1px solid #ccc}
+  #boxesCanvas{border:1px solid #ccc;margin-top:6px}
+
+  /* ── data table ── */
+  table{border-collapse:collapse;width:100%;margin-top:6px}
+  th,td{padding:4px 8px;text-align:right}
+  th{background:#f0f0f0}
+  tr:nth-child(even){background:#fafafa}
 </style>
+
+<!-- ── Chart.js for log-log plot ── -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 </head>
 <body>
 
 <h1>Cantor-Set Explorer</h1>
-  <!-- Add inside <body> just below the existing <h1> -->
-<div class='tab-buttons'>
-  <button id='explorerTabBtn' class='active'>Set Explorer</button>
-  <button id='dimensionTabBtn'>Box Dimension</button>
+
+<!-- ========== Tab bar ========== -->
+<div class="tab-buttons">
+  <button id="tabExplorer"  class="active">Set Explorer</button>
+  <button id="tabDimension">Box Dimension</button>
 </div>
 
-<!-- Existing explorer markup REMAINS THE SAME -->
+<!-- ===================== 1. SET EXPLORER ===================== -->
+<div id="explorerSection">
+  <!-- canvas + controls -->
+  <div class="column">
+    <canvas id="cantorCanvas" width="1000" height="120"></canvas>
 
-<!-- === NEW Dimension Tab === -->
-<div id='dimensionTab' style='display:none;'>
-  <canvas id='dimensionCanvas' width='900' height='100'></canvas>
+    <div class="flex">
+      <label for="depthRange">Depth n</label>
+      <input type="range" id="depthRange" min="0" max="9" step="1" value="5">
+      <span id="depthVal">5</span>
 
-  <div id='dimensionControls'>
-    <label>k (box size = 3^-k)
-      <input type='range' id='boxExpRange' min='0' max='8' step='1' value='0'>
-      <span id='boxExpLabel'>0</span>
-    </label>
-    <p id='boxSizeDisplay'></p>
-    <p id='occupiedDisplay'></p>
-    <button id='addDataBtn'>Add data row</button>
-    <button id='plotBtn'>Plot log‑log</button>
+      <button id="animateBtn">Animate</button>
+      <button id="resetZoomBtn">Reset view</button>
+    </div>
   </div>
-
-  <table id='dataTable'>
-    <thead><tr><th>k</th><th>Box size</th><th>Occupied boxes</th></tr></thead>
-    <tbody></tbody>
-  </table>
-
-  <canvas id='chartCanvas' width='600' height='400'></canvas>
 </div>
 
-<!-- === SCRIPT additions (put after existing script) === -->
-<script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
+<!-- ===================== 2. BOX DIMENSION LAB ===================== -->
+<div id="dimensionSection" style="display:none">
+  <!-- controls -->
+  <div class="column">
+    <!-- line 1 -->
+    <div class="flex">
+      <label for="kRange">k (box size = 3<sup>-k</sup>)</label>
+      <input type="range" id="kRange" min="1" max="9" step="1" value="4">
+      <span id="kVal">4</span>
+    </div>
+    <!-- line 2 -->
+    <div class="flex">
+      <span id="sDisplay">s = 0.01235</span>
+      <span id="nDisplay">N(s) = 20</span>
+    </div>
+    <!-- line 3 -->
+    <div class="flex">
+      <button id="addRowBtn">Add data row</button>
+      <button id="plotBtn">Plot log-log</button>
+      <button id="fitBtn">Fit line & slope</button>
+    </div>
+
+    <!-- little box-occupancy diagram -->
+    <canvas id="boxesCanvas" width="1000" height="40"></canvas>
+
+    <!-- data table -->
+    <table id="dataTable">
+      <thead><tr><th>k</th><th>Box size s</th><th>Occupied boxes N(s)</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <!-- chart -->
+    <canvas id="chartCanvas" width="1000" height="300"></canvas>
+  </div>
+</div>
+
+<!-- ============================================================= -->
 <script>
-// tab switching
-const explorerTabBtn=document.getElementById('explorerTabBtn');
-const dimensionTabBtn=document.getElementById('dimensionTabBtn');
-const dimensionTab=document.getElementById('dimensionTab');
-
-explorerTabBtn.addEventListener('click',()=>{dimensionTab.style.display='none';});
-dimensionTabBtn.addEventListener('click',()=>{dimensionTab.style.display='block';});
-
-// box‑dimension logic (reuses buildLevels from original)
-const boxExpRange=document.getElementById('boxExpRange');
-const boxExpLabel=document.getElementById('boxExpLabel');
-const boxSizeDisp=document.getElementById('boxSizeDisplay');
-const occupiedDisp=document.getElementById('occupiedDisplay');
-const addDataBtn=document.getElementById('addDataBtn');
-const plotBtn=document.getElementById('plotBtn');
-const tableBody=document.getElementById('dataTable').querySelector('tbody');
-const chartCanvas=document.getElementById('chartCanvas');
-let dataPoints=[],chart;
-
-function countOccupied(k){
-  const depth=+depthRange.value;
-  const segments=buildLevels(depth).levels[depth];
-  const size=Math.pow(3,-k);
-  const n=Math.ceil(1/size);
-  let occ=0;
-  for(let i=0;i<n;i++){
-    const a=i*size,b=(i+1)*size;
-    if(segments.some(([s,e])=>!(e<=a||s>=b))) occ++;
-  }
-  return {size,occ};
-}
-function updateBoxInfo(){
-  const k=+boxExpRange.value;
-  const {size,occ}=countOccupied(k);
-  boxExpLabel.textContent=k;
-  boxSizeDisp.textContent=`s = ${size.toFixed(5)}`;
-  occupiedDisp.textContent=`N(s) = ${occ}`;
-}
-boxExpRange.addEventListener('input',updateBoxInfo);
-
-addDataBtn.addEventListener('click',()=>{
-  const k=+boxExpRange.value;
-  const {size,occ}=countOccupied(k);
-  dataPoints.push({k,size,occ});
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${k}</td><td>${size.toExponential(3)}</td><td>${occ}</td>`;
-  tableBody.appendChild(tr);
-});
-plotBtn.addEventListener('click',()=>{
-  if(dataPoints.length<2){alert('Need >=2 points');return;}
-  const pts=dataPoints.map(p=>({x:Math.log10(1/p.size),y:Math.log10(p.occ)}));
-  if(chart) chart.destroy();
-  chart=new Chart(chartCanvas,{type:'scatter',data:{datasets:[{data:pts}]},options:{responsive:false}});
-});
-updateBoxInfo();
-</script>
-
-<!-- ===== Visual & data ===== -->
-<div id="main">
-  <canvas id="cantorCanvas" width="900" height="500"></canvas>
-
-  <div id="data-panel">
-    <h3>Live data</h3>
-    <p id="depthDisplay"></p>
-    <p id="segmentsDisplay"></p>
-    <p id="lengthDisplay"></p>
-    <p>Hausdorff dim ≈ 0.6309</p>
-  </div>
-</div>
-
-<!-- ===== Controls ===== -->
-<div id="controls">
-  <div class="ctrl-group">
-    <label for="depthRange">Depth</label>
-    <input type="range" id="depthRange" min="0" max="8" step="1" value="5">
-    <span id="depthLabel">5</span>
-  </div>
-
-  <div class="ctrl-group">
-    <button id="animateBtn">Animate</button>
-    <label><input type="checkbox" id="randomColours"> Random colours</label>
-  </div>
-
-  <button id="downloadBtn">Download PNG</button>
-</div>
-
-<script>
-/* =========================================
-   Cantor-Set Explorer – single-file app
-   ========================================= */
-
-/* ---------- Canvas & context ---------- */
-const canvas = document.getElementById('cantorCanvas');
-const ctx    = canvas.getContext('2d');
-
-/* ---------- UI elements ---------- */
-const depthRange   = document.getElementById('depthRange');
-const depthLabel   = document.getElementById('depthLabel');
-const depthDisplay = document.getElementById('depthDisplay');
-const segmentsDisp = document.getElementById('segmentsDisplay');
-const lengthDisp   = document.getElementById('lengthDisplay');
-const animateBtn   = document.getElementById('animateBtn');
-const randomColours= document.getElementById('randomColours');
-const downloadBtn  = document.getElementById('downloadBtn');
-
-/* ---------- State ---------- */
-let animTimer = null;   // interval id
-let dir       = 1;      // ping-pong direction
-
-/* ---------- Utility: pastel colour ---------- */
-const pastel = () => {
-  const h = Math.floor(Math.random()*360);
-  return `hsl(${h}, 60%, 70%)`;
-};
-
-/* ---------- Build levels for classic ratio 1/3 ---------- */
-function buildLevels(depth){
-  const levels = [];
-  const gaps   = [];
-
-  let current = [[0,1]];
-  for(let d=0; d<=depth; d++){
-    levels.push(current.map(s=>s.slice()));       // clone
-    if(d===depth) break;
-
-    const next = [];
-    const gNow = [];
+/* ---------------- Utility: build segments at depth n ---------------- */
+function buildLevels(n){
+  let current=[[0,1]], levels=[current];
+  for(let d=0;d<n;d++){
+    const next=[];
     current.forEach(([s,e])=>{
-      const len = e-s;
-      const gS  = s + len/3;
-      const gE  = e - len/3;
-      next.push([s,gS], [gE,e]);
-      gNow.push([gS,gE]);
+      const len=e-s;
+      next.push([s, s+len/3], [e-len/3, e]);
     });
-    gaps.push(gNow);
-    current = next;
+    current=next;
+    levels.push(current);
   }
-  return {levels,gaps};
+  return levels;                     // array of segment arrays depth 0..n
 }
 
-/* ---------- Drawing ---------- */
-function draw(){
-  const depth = +depthRange.value;
-  const useColours = randomColours.checked;
+/* ====================================================================
+   SECTION 1 — SET EXPLORER  (zoom & pan)
+   ==================================================================== */
+const canvas      = document.getElementById('cantorCanvas');
+const ctx         = canvas.getContext('2d');
+const depthRange  = document.getElementById('depthRange');
+const depthVal    = document.getElementById('depthVal');
+const animateBtn  = document.getElementById('animateBtn');
+const resetZoomBtn= document.getElementById('resetZoomBtn');
 
+let animTimer=null, dir=1;
+const view={start:0, end:1};         // visible x-window in [0,1]
+
+function drawExplorer(){
+  const n=+depthRange.value;
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  const {levels,gaps} = buildLevels(depth);
-  const rowH = canvas.height / (depth+1);
+  // grey background boxes for visual context
+  const numPixels=canvas.width;
+  ctx.fillStyle='#e0e0e0';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  levels.forEach((segments,lvl)=>{
-    const y = lvl * rowH + rowH*0.1;
-    const h = rowH*0.8;
-
-    ctx.fillStyle = useColours ? pastel() : '#000';
-    segments.forEach(([s,e])=>{
-      const x = s*canvas.width;
-      const w = (e-s)*canvas.width;
-      ctx.fillRect(x,y,w,h);
-    });
-
-    /* faint outlines of removed gaps */
-    if(lvl<depth){
-      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-      gaps[lvl].forEach(([s,e])=>{
-        const x = s*canvas.width;
-        const w = (e-s)*canvas.width;
-        ctx.strokeRect(x,y,w,h);
-      });
-    }
+  ctx.fillStyle='#1976d2';
+  const segments=buildLevels(n)[n];           // only deepest level
+  segments.forEach(([s,e])=>{
+    // clip by current view
+    const L=Math.max(s,view.start), R=Math.min(e,view.end);
+    if(L>=R) return;
+    const x=LToPx(L), w=LToPx(R)-LToPx(L);
+    ctx.fillRect(x,0,w,canvas.height);
   });
 }
 
-/* ---------- Data panel ---------- */
-function updateData(){
-  const n = +depthRange.value;
-  depthLabel.textContent   = n;
-  depthDisplay.textContent = `Depth n = ${n}`;
-  segmentsDisp.textContent = `Segments: 2ⁿ = ${(2**n).toLocaleString()}`;
-  lengthDisp.textContent   = `Total length: ${(Math.pow(2/3,n)).toFixed(5)}`;
+/* ----- helpers for view mapping ----- */
+function LToPx(x){return (x-view.start)/(view.end-view.start)*canvas.width;}
+function PxToL(px){return px/canvas.width*(view.end-view.start)+view.start;}
+
+/* ----- zoom (wheel) ----- */
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const zoomFactor=e.deltaY<0?0.8:1.25;          // in/out
+  const mouseX=PxToL(e.offsetX);
+  const newSpan=(view.end-view.start)*zoomFactor;
+  let newStart=mouseX-(mouseX-view.start)*zoomFactor;
+  let newEnd  =newStart+newSpan;
+
+  // clamp
+  if(newStart<0){newEnd-=newStart;newStart=0;}
+  if(newEnd>1){newStart-=newEnd-1;newEnd=1;}
+  view.start=Math.max(0,newStart);
+  view.end  =Math.min(1,newEnd);
+  drawExplorer();
+},{passive:false});
+
+/* ----- pan (drag) ----- */
+let dragging=false,lastX=0;
+canvas.addEventListener('mousedown',e=>{dragging=true;lastX=e.clientX});
+window.addEventListener('mousemove',e=>{
+  if(!dragging) return;
+  const dx=e.clientX-lastX;
+  lastX=e.clientX;
+  const span=view.end-view.start;
+  const shift=dx/canvas.width*span;
+  view.start=Math.max(0,view.start-shift);
+  view.end  =Math.min(1,view.end-shift);
+  if(view.start<0){view.end-=view.start;view.start=0;}
+  if(view.end>1){view.start-=view.end-1;view.end=1;}
+  drawExplorer();
+});
+window.addEventListener('mouseup',()=>dragging=false);
+
+/* ----- reset view ----- */
+resetZoomBtn.onclick=()=>{view.start=0;view.end=1;drawExplorer()};
+
+/* ----- depth/animation ----- */
+function refreshExplorer(){
+  depthVal.textContent=depthRange.value;
+  drawExplorer();
 }
-
-/* ---------- Refresh ---------- */
-function refresh(){ updateData(); draw(); }
-
-/* ---------- Animation ---------- */
+depthRange.oninput=()=>{stopAnim();refreshExplorer();};
 function startAnim(){
   animateBtn.textContent='Stop';
   animTimer=setInterval(()=>{
     let d=+depthRange.value;
-    if(d>=+depthRange.max) dir=-1;
-    if(d<=+depthRange.min) dir=1;
+    if(d>=+depthRange.max)dir=-1;
+    if(d<=+depthRange.min)dir=1;
     depthRange.value=d+dir;
-    refresh();
+    refreshExplorer();
   },600);
 }
-function stopAnim(){ clearInterval(animTimer); animTimer=null; animateBtn.textContent='Animate'; }
+function stopAnim(){clearInterval(animTimer);animTimer=null;animateBtn.textContent='Animate'}
+animateBtn.onclick=()=>animTimer?stopAnim():startAnim();
 
-/* ---------- Event wiring ---------- */
-depthRange.addEventListener('input',()=>{stopAnim(); refresh();});
-randomColours.addEventListener('change',refresh);
-animateBtn.addEventListener('click',()=>{animTimer?stopAnim():startAnim();});
-downloadBtn.addEventListener('click',()=>{
-  const a=document.createElement('a');
-  a.download='cantor.png';
-  a.href=canvas.toDataURL('image/png');
-  a.click();
-});
+/* ====================================================================
+   SECTION 2 — BOX DIMENSION
+   ==================================================================== */
+const kRange     = document.getElementById('kRange');
+const kVal       = document.getElementById('kVal');
+const sDisplay   = document.getElementById('sDisplay');
+const nDisplay   = document.getElementById('nDisplay');
+const boxesCv    = document.getElementById('boxesCanvas');
+const boxesCtx   = boxesCv.getContext('2d');
+const addRowBtn  = document.getElementById('addRowBtn');
+const plotBtn    = document.getElementById('plotBtn');
+const fitBtn     = document.getElementById('fitBtn');
+const dataBody   = document.querySelector('#dataTable tbody');
+const chartCv    = document.getElementById('chartCanvas');
 
-/* ---------- Initial paint ---------- */
-refresh();
+let chart=null;                      // Chart.js instance
+
+function countAndDrawBoxes(){
+  const k=+kRange.value;
+  const s=Math.pow(1/3,k);           // box length
+  const n=+depthRange.value;         // current recursion depth
+  const segments=buildLevels(n)[n];
+
+  let occupied=0;
+  const boxes= Math.ceil(1/s);
+  boxesCtx.clearRect(0,0,boxesCv.width,boxesCv.height);
+  for(let i=0;i<boxes;i++){
+    const boxStart=i*s, boxEnd=(i+1)*s;
+    const hit=segments.some(([a,b])=>!(b<=boxStart||a>=boxEnd));
+    if(hit) occupied++;
+
+    // draw column
+    const x=i/boxes*boxesCv.width, w=boxesCv.width/boxes;
+    boxesCtx.fillStyle=hit?'#1976d2':'#e0e0e0';
+    boxesCtx.fillRect(x,0,w,boxesCv.height);
+  }
+  return {s,occupied};
+}
+function refreshDimension(){
+  kVal.textContent=kRange.value;
+  const {s,occupied}=countAndDrawBoxes();
+  sDisplay.textContent=`s = ${s.toPrecision(4)}`;
+  nDisplay.textContent=`N(s) = ${occupied}`;
+}
+kRange.oninput=refreshDimension;
+
+/* ----- add data row ----- */
+function addRow(){
+  const k=+kRange.value;
+  const {s,occupied}=countAndDrawBoxes();
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${k}</td><td>${s.toExponential(3)}</td><td>${occupied}</td>`;
+  dataBody.appendChild(tr);
+}
+addRowBtn.onclick=addRow;
+
+/* ----- plot log-log ----- */
+function plot(){
+  const rows=[...dataBody.querySelectorAll('tr')];
+  if(!rows.length){alert('Add some data first!');return;}
+  const xs=[], ys=[];
+  rows.forEach(r=>{
+    const s=+r.children[1].textContent;
+    const N=+r.children[2].textContent;
+    xs.push(Math.log(1/s));
+    ys.push(Math.log(N));
+  });
+  if(chart) chart.destroy();
+  chart=new Chart(chartCv,{
+    type:'scatter',
+    data:{datasets:[{data:xs.map((x,i)=>({x, y:ys[i]}))}]},
+    options:{
+      scales:{
+        x:{type:'linear',title:{text:'log(1/s)',display:true}},
+        y:{type:'linear',title:{text:'log N(s)',display:true}}
+      },
+      plugins:{legend:{display:false}}
+    }
+  });
+}
+plotBtn.onclick=plot;
+
+/* ----- fit line & slope ----- */
+function fitLine(){
+  const rows=[...dataBody.querySelectorAll('tr')];
+  if(rows.length<2){alert('Need at least 2 points');return;}
+  const xs=[], ys=[];
+  rows.forEach(r=>{
+    const s=+r.children[1].textContent;
+    const N=+r.children[2].textContent;
+    xs.push(Math.log(1/s));
+    ys.push(Math.log(N));
+  });
+  // least-squares
+  const n=xs.length;
+  const sumX=xs.reduce((a,b)=>a+b,0);
+  const sumY=ys.reduce((a,b)=>a+b,0);
+  const sumXY=xs.reduce((a,b,i)=>a+b*ys[i],0);
+  const sumX2=xs.reduce((a,b)=>a+b*b,0);
+  const slope=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
+  const intercept=(sumY-slope*sumX)/n;
+
+  // draw line on chart
+  if(!chart){plot()}   // ensure chart exists
+  const lineX=[Math.min(...xs),Math.max(...xs)];
+  const lineData=lineX.map(x=>({x,y:slope*x+intercept}));
+  chart.data.datasets[1]={
+    type:'line',
+    data:lineData,
+    borderWidth:1,
+    borderDash:[6,4],
+    pointRadius:0
+  };
+  chart.update();
+
+  // show slope
+  if(!document.getElementById('slopeLabel')){
+    const lbl=document.createElement('p');
+    lbl.id='slopeLabel';
+    chartCv.parentElement.insertBefore(lbl,chartCv.nextSibling);
+  }
+  document.getElementById('slopeLabel').textContent=`Estimated dimension ≈ ${slope.toFixed(4)}`;
+}
+fitBtn.onclick=fitLine;
+
+/* ====================================================================
+   TABS
+   ==================================================================== */
+const tabExplorer=document.getElementById('tabExplorer');
+const tabDimension=document.getElementById('tabDimension');
+tabExplorer.onclick=()=>{
+  tabExplorer.classList.add('active');
+  tabDimension.classList.remove('active');
+  explorerSection.style.display='';
+  dimensionSection.style.display='none';
+};
+tabDimension.onclick=()=>{
+  tabDimension.classList.add('active');
+  tabExplorer.classList.remove('active');
+  explorerSection.style.display='none';
+  dimensionSection.style.display='';
+};
+
+/* ----- initial paints ----- */
+refreshExplorer();
+refreshDimension();
 </script>
 </body>
 </html>
+
+  
