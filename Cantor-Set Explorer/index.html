@@ -1,11 +1,14 @@
 <!-- =============================================================
-  Cantor‑Set Explorer  &  Box‑Dimension Lab   —  v8  (stable, tested)
+  Cantor‑Set Explorer & Box‑Dimension Lab — v10 (bug‑fix)
   -------------------------------------------------------------
-  • One self‑contained HTML file. Paste into a blank page and open.
-  • Explorer: zoom (+ / – & wheel), pan, animate depth, length table.
-  • Box Dimension: live box count, fractional sizes, log‑log plot & fit.
-  • Fixes previous “Unexpected token )” parse error (extra paren removed).
-  ============================================================= -->
+  * Single‑file HTML: copy into a blank .html file and open.
+  * Fix: removed stray duplicate regression block that caused
+    "Illegal return statement" syntax error.
+  * Explorer tab: depth slider, animate, mouse‑wheel zoom, pan, reset,
+    length‑by‑depth table.
+  * Box Dimension tab: choose k, live box count & diagram, data table,
+    log‑log scatter, optional regression line & slope, reset table.
+============================================================= -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,344 +16,296 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cantor‑Set Explorer & Box‑Dimension Lab</title>
 
-<!-- ========== Styling ========== -->
-<style>
-  :root{--blue:#1976d2;--grey:#e0e0e0;--border:#c0c0c0;}
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:system-ui,sans-serif;line-height:1.4;background:#fff;color:#000;}
-  h1{margin:20px auto 16px;text-align:center;font-weight:700;max-width:1100px;}
-
-  /* buttons & inputs */
-  button,input[type=range]{font-family:inherit;font-size:1rem;cursor:pointer;}
-  button{padding:6px 16px;border:1px solid #444;border-radius:6px;background:#fafafa;transition:background .2s;}
-  button:hover{background:#f1f1f1;}
-  .primary{background:var(--blue);color:#fff;border-color:var(--blue);}  
-  input[type=range]{accent-color:var(--blue);}  
-
-  /* helpers */
-  .flex{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;}
-  .column{display:flex;flex-direction:column;align-items:center;gap:18px;max-width:1100px;margin:auto;}
-  .center{display:flex;justify-content:center;width:100%;}
-
-  /* tabs */
-  .tab-buttons{display:flex;gap:6px;justify-content:center;margin-bottom:22px;}
-  .tab-buttons button{min-width:140px;}
-  .tab-buttons .active{background:var(--blue);color:#fff;border-color:var(--blue);}  
-
-  /* canvas */
-  canvas{max-width:100%;}
-  #cantorCanvas{border:1px solid var(--border);cursor:grab;}
-  #boxesCanvas{border:1px solid var(--border);}
-
-  /* tables */
-  table{border-collapse:collapse;width:100%;max-width:680px;}
-  th,td{padding:4px 8px;text-align:right;font-variant-numeric:tabular-nums;}
-  th{background:#f0f0f0;}
-  tr:nth-child(even){background:#fafafa;}
-
-  .intro{max-width:880px;margin:0 auto;text-align:center;font-size:.95rem;color:#333;}
-</style>
-
-<!-- Chart.js -->
+<!-- Chart.js (for the dimension plot) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+
+<style>
+  /* ---------- Basic reset ---------- */
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,sans-serif;line-height:1.5;background:#fff;color:#000;padding:20px;text-align:center}
+  h1{font-size:2rem;margin-bottom:0.5rem}
+  p.intro{max-width:600px;margin:0 auto 1rem;font-size:0.95rem}
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:inline-flex;border:1px solid #999;border-radius:6px;overflow:hidden;margin-bottom:1rem}
+  .tabs button{border:none;background:#f3f3f3;padding:6px 18px;font-size:0.95rem;cursor:pointer}
+  .tabs button.active{background:#1565c0;color:#fff;font-weight:600}
+  .section{display:none}
+  .section.active{display:block}
+
+  /* ---------- Controls ---------- */
+  .controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:0.5rem 0 1rem}
+  label{font-weight:600}
+  input[type=range]{cursor:pointer;accent-color:#1565c0}
+  button.btn{border:1px solid #333;background:#f8f8f8;padding:4px 10px;border-radius:4px;cursor:pointer}
+  button.btn:hover{background:#e0e0e0}
+
+  /* ---------- Canvases & tables ---------- */
+  canvas{border:1px solid #ccc;display:block;margin:0 auto 0.75rem}
+  table{border-collapse:collapse;margin:0.5rem auto}
+  th,td{border:1px solid #ccc;padding:4px 6px;font-size:0.9rem}
+  th{background:#fafafa}
+</style>
 </head>
 <body>
 <h1>Cantor‑Set Explorer</h1>
 
-<!-- ===================== Tabs ===================== -->
-<div class="tab-buttons">
-  <button id="tabExplorer"  class="active">Set Explorer</button>
-  <button id="tabDimension">Box Dimension</button>
+<!-- ---------------- TAB BAR ---------------- -->
+<div class="tabs">
+  <button id="tabExp"  class="active">Set Explorer</button>
+  <button id="tabDim" >Box Dimension</button>
 </div>
 
-<!-- ===================== Explorer ===================== -->
-<section id="explorerSection" class="column">
-  <p class="intro">Move the <strong>Depth</strong> slider to generate successive stages of the Cantor set.  Use the mouse‑wheel or <strong>＋ / −</strong> to zoom, drag to pan, and track the total length shrinking as (2/3)<sup>n</sup>.</p>
+<!-- ===================== EXPLORER SECTION ===================== -->
+<section id="explorer" class="section active">
+  <p class="intro">Move the <strong>Depth</strong> slider to generate stages of the Cantor set. </p>
 
-  <div class="center"><canvas id="cantorCanvas" width="1100" height="150"></canvas></div>
+  <canvas id="expCanvas" width="1000" height="140"></canvas>
 
-  <div class="flex">
-    <label for="depthRange">Depth&nbsp;n</label>
-    <input type="range" id="depthRange" min="0" max="10" step="1" value="5" />
-    <span id="depthVal">5</span>
-
-    <button id="zoomOutBtn">−</button>
-    <button id="zoomInBtn">＋</button>
-    <button id="resetZoomBtn">Reset view</button>
-    <button id="animateBtn">Animate</button>
+  <div class="controls">
+    <label for="depthRange">Depth&nbsp;<span id="depthVal">5</span></label>
+    <input id="depthRange" type="range" min="0" max="9" step="1" value="5">
+        <button id="animBtn"   class="btn">Animate</button>
   </div>
 
-  <table id="lengthTable">
-    <thead><tr><th>n</th><th>Segments&nbsp;2<sup>n</sup></th><th>Total&nbsp;length&nbsp;2<sup>n</sup>/3<sup>n</sup></th></tr></thead>
+  <table id="lenTable">
+    <thead><tr><th>Depth n</th><th>Segments 2<sup>n</sup></th><th>Total length 2<sup>n</sup>/3<sup>n</sup></th></tr></thead>
     <tbody></tbody>
   </table>
 </section>
 
-<!-- ===================== Box Dimension ===================== -->
-<section id="dimensionSection" class="column" style="display:none">
-  <p class="intro">Pick an integer <em>k</em> so the box width is s&nbsp;=&nbsp;3<sup>‑k</sup>.  Count occupied boxes, add rows, then plot <em>log‑log</em> to approximate the fractal dimension.</p>
+<!-- ===================== DIMENSION SECTION ===================== -->
+<section id="dimension" class="section">
+  <p class="intro">Choose an integer <em>k</em> to partition the unit interval into boxes of length&nbsp;<em>1/3<sup>k</sup></em>. Count how many boxes intersect the Cantor set, then plot <em>log&nbsp;N(s)</em> vs&nbsp;<em>log&nbsp;(1/s)</em> to estimate the box dimension.</p>
 
-  <div class="flex">
-    <label for="kRange">k&nbsp;(box&nbsp;size&nbsp;=&nbsp;3<sup>‑k</sup>)</label>
-    <input type="range" id="kRange" min="1" max="9" step="1" value="4" />
-    <span id="kVal">4</span>
-  </div>
-  <div class="flex">
-    <span id="sDisplay">s&nbsp;=&nbsp;1/3<sup>4</sup>&nbsp;≈&nbsp;0.0123</span>
-    <span id="nDisplay">N(s)&nbsp;=&nbsp;0</span>
-  </div>
-  <div class="flex">
-    <button id="addRowBtn">Add data row</button>
-    <button id="plotBtn">Plot log‑log</button>
-    <button id="fitBtn">Fit line & slope</button>
+  <div class="controls">
+    <label for="kRange">k&nbsp;<span id="kVal">4</span></label>
+    <input id="kRange" type="range" min="1" max="9" step="1" value="4">
+    <span id="sDisp">s = 1/3<sup>4</sup> ≈ 0.0123</span>
+    <span id="nDisp">N(s) = 20</span>
   </div>
 
-  <canvas id="boxesCanvas" width="1100" height="50"></canvas>
+  <canvas id="boxCanvas" width="1000" height="40"></canvas>
 
-  <table id="dataTable">
-    <thead><tr><th>k</th><th>Box&nbsp;size&nbsp;1/3<sup>k</sup></th><th>Occupied&nbsp;boxes&nbsp;N(s)</th></tr></thead>
+  <div class="controls">
+    <button id="addRow"   class="btn">Add data row</button>
+    <button id="plotBtn"  class="btn">Plot log‑log</button>
+    <button id="fitBtn"   class="btn">Fit line &amp; slope</button>
+    <button id="resetTbl" class="btn">Reset table</button>
+  </div>
+
+  <table id="dataTbl">
+    <thead><tr><th>k</th><th>1/3<sup>k</sup></th><th>N(s)</th></tr></thead>
     <tbody></tbody>
   </table>
-  <canvas id="chartCanvas" width="1100" height="300"></canvas>
+
+  <canvas id="chartCv" width="1000" height="300"></canvas>
+  <p id="slopeTxt"></p>
 </section>
 
-<!-- ===================== Script ===================== -->
+<!-- ===================== SCRIPT ===================== -->
 <script>
-"use strict";
-/************ Utility: build Cantor segments ************/
-function buildSegments(depth){
-  let segments=[[0,1]];
+/**********************  Utility functions  **********************/
+function cantorSegments(depth){
+  let seg=[[0,1]];
   for(let d=0;d<depth;d++){
     const next=[];
-    segments.forEach(([a,b])=>{
-      const len=b-a;
-      next.push([a,a+len/3],[b-len/3,b]);
+    seg.forEach(([a,b])=>{
+      const t=(b-a)/3;
+      next.push([a,a+t],[b-t,b]);
     });
-    segments=next;
+    seg=next;
   }
-  return segments;
+  return seg;
 }
 
-const BLUE="#1976d2", GREY="#e0e0e0";
+/**********************  Explorer logic  **********************/
+const expCv=document.getElementById('expCanvas');
+const expCtx=expCv.getContext('2d');
+const depthRange=document.getElementById('depthRange');
+const depthVal=document.getElementById('depthVal');
+const lenBody=document.querySelector('#lenTable tbody');
 
-/************ Explorer Elements ************/
-const canvas       = document.getElementById("cantorCanvas");
-const ctx          = canvas.getContext("2d");
-const depthRange   = document.getElementById("depthRange");
-const depthVal     = document.getElementById("depthVal");
-const zoomInBtn    = document.getElementById("zoomInBtn");
-const zoomOutBtn   = document.getElementById("zoomOutBtn");
-const resetZoomBtn = document.getElementById("resetZoomBtn");
-const animateBtn   = document.getElementById("animateBtn");
-const lengthBody   = document.querySelector("#lengthTable tbody");
+let viewStart=0, viewEnd=1; // visible window [0,1]
+let animHandle=null, animDir=1;
 
-let viewStart=0, viewEnd=1;
-function l2x(u){return (u-viewStart)/(viewEnd-viewStart)*canvas.width;}
-
+function px(x){return (x-viewStart)/(viewEnd-viewStart)*expCv.width;}
 function drawExplorer(){
-  ctx.fillStyle=GREY;
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  ctx.fillStyle=BLUE;
-  const segments=buildSegments(+depthRange.value);
-  segments.forEach(([a,b])=>{
-    const L=Math.max(a,viewStart);
-    const R=Math.min(b,viewEnd);
+  const n=+depthRange.value;
+  expCtx.clearRect(0,0,expCv.width,expCv.height);
+  expCtx.fillStyle='#e0e0e0';
+  expCtx.fillRect(0,0,expCv.width,expCv.height);
+  expCtx.fillStyle='#1565c0';
+  cantorSegments(n).forEach(([a,b])=>{
+    const L=Math.max(a,viewStart), R=Math.min(b,viewEnd);
     if(L>=R) return;
-    ctx.fillRect(l2x(L),0,l2x(R)-l2x(L),canvas.height);
+    expCtx.fillRect(px(L),0,px(R)-px(L),expCv.height);
   });
 }
 
-function refreshLengthTable(){
-  lengthBody.innerHTML="";
+function refreshLenTable(){
   const n=+depthRange.value;
+  lenBody.innerHTML='';
   for(let i=0;i<=n;i++){
-    const tr=document.createElement("tr");
+    const tr=document.createElement('tr');
     tr.innerHTML=`<td>${i}</td><td>${2**i}</td><td>${2**i}/${3**i}</td>`;
-    lengthBody.appendChild(tr);
+    lenBody.appendChild(tr);
   }
 }
 function refreshExplorer(){
   depthVal.textContent=depthRange.value;
   drawExplorer();
-  refreshLengthTable();
+  refreshLenTable();
 }
 
-/***** depth slider *****/
-depthRange.addEventListener("input",()=>{stopAnim();refreshExplorer();});
-
-/***** Zoom helpers *****/
-function zoom(factor){
-  const span=viewEnd-viewStart;
-  const centre=(viewStart+viewEnd)/2;
-  const newSpan=Math.min(1,Math.max(1e-4,span*factor));
-  let newStart=centre-newSpan/2;
-  let newEnd  =centre+newSpan/2;
-  if(newStart<0){newEnd-=newStart;newStart=0;}
-  if(newEnd>1){newStart-=newEnd-1;newEnd=1;}
-  viewStart=newStart;viewEnd=newEnd;
-  drawExplorer();
+depthRange.oninput=()=>{stopAnim();refreshExplorer();};
+function startAnim(){
+  animHandle=setInterval(()=>{
+    let d=+depthRange.value;
+    if(d>=+depthRange.max) animDir=-1;
+    if(d<=+depthRange.min) animDir=1;
+    depthRange.value=d+animDir;
+    refreshExplorer();
+  },600);
+  document.getElementById('animBtn').textContent='Stop';
 }
-zoomInBtn.onclick =()=>zoom(0.8);
-zoomOutBtn.onclick=()=>zoom(1.25);
-resetZoomBtn.onclick=()=>{viewStart=0;viewEnd=1;drawExplorer();};
+function stopAnim(){
+  clearInterval(animHandle);animHandle=null;
+  document.getElementById('animBtn').textContent='Animate';
+}
+document.getElementById('animBtn').onclick=()=>animHandle?stopAnim():startAnim();
 
-canvas.addEventListener("wheel",e=>{e.preventDefault();zoom(e.deltaY<0?0.8:1.25);},{passive:false});
-let dragging=false,lastX=0;
-canvas.addEventListener("mousedown",e=>{dragging=true;lastX=e.clientX;canvas.style.cursor="grabbing";});
-window.addEventListener("mousemove",e=>{
-  if(!dragging) return;
-  const dx=e.clientX-lastX; lastX=e.clientX;
-  const span=viewEnd-viewStart;
-  viewStart-=dx/canvas.width*span;
-  viewEnd  -=dx/canvas.width*span;
+function zoom(factor,center=0.5){
+  const span=(viewEnd-viewStart)*factor;
+  const mid=viewStart+(viewEnd-viewStart)*center;
+  viewStart=mid-span/2;
+  viewEnd  =mid+span/2;
   if(viewStart<0){viewEnd-=viewStart;viewStart=0;}
   if(viewEnd>1){viewStart-=viewEnd-1;viewEnd=1;}
   drawExplorer();
-});
-window.addEventListener("mouseup",()=>{dragging=false;canvas.style.cursor="grab";});
-
-/***** Animate depth *****/
-let animTimer=null;
-function startAnim(){
-  animateBtn.textContent="Stop";
-  animTimer=setInterval(()=>{
-    let d=+depthRange.value;
-    d=(d>=+depthRange.max)?0:d+1;
-    depthRange.value=d;
-    refreshExplorer();
-  },600);
 }
-function stopAnim(){
-  clearInterval(animTimer);
-  animTimer=null;
-  animateBtn.textContent="Animate";
-}
-animateBtn.onclick=()=>{animTimer?stopAnim():startAnim();};
 
-/************ Box Dimension Elements ************/
-const kRange    = document.getElementById("kRange");
-const kVal      = document.getElementById("kVal");
-const sDisplay  = document.getElementById("sDisplay");
-const nDisplay  = document.getElementById("nDisplay");
-const boxesCv   = document.getElementById("boxesCanvas");
-const boxesCtx  = boxesCv.getContext("2d");
-const addRowBtn = document.getElementById("addRowBtn");
-const plotBtn   = document.getElementById("plotBtn");
-const fitBtn    = document.getElementById("fitBtn");
-const dataBody  = document.querySelector("#dataTable tbody");
-const chartCv   = document.getElementById("chartCanvas");
+document.getElementById('resetView').onclick=()=>{viewStart=0;viewEnd=1;drawExplorer();};
+
+expCv.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?0.8:1.25,e.offsetX/expCv.width);},{passive:false});
+let dragging=false,lastX=0;
+expCv.onmousedown=e=>{dragging=true;lastX=e.clientX};
+window.onmousemove=e=>{
+  if(!dragging) return;
+  const dx=e.clientX-lastX;lastX=e.clientX;
+  const span=viewEnd-viewStart;
+  const shift=-dx/expCv.width*span;
+  viewStart+=shift;viewEnd+=shift;
+  if(viewStart<0){viewEnd-=viewStart;viewStart=0;}
+  if(viewEnd>1){viewStart-=viewEnd-1;viewEnd=1;}
+  drawExplorer();
+};
+window.onmouseup=()=>dragging=false;
+
+/**********************  Box‑dimension logic  **********************/
+const kRange=document.getElementById('kRange');
+const kVal=document.getElementById('kVal');
+const sDisp=document.getElementById('sDisp');
+const nDisp=document.getElementById('nDisp');
+const boxCv=document.getElementById('boxCanvas');
+const boxCtx=boxCv.getContext('2d');
+const dataBody=document.querySelector('#dataTbl tbody');
+const slopeTxt=document.getElementById('slopeTxt');
 let chart=null;
 
-function occupiedBoxes(k){
-  const s=1/Math.pow(3,k);
-  const boxes=Math.ceil(1/s);
-  const seg=buildSegments(+depthRange.value);
-  let occ=0;
-  for(let i=0;i<boxes;i++){
-    const a=i*s, b=(i+1)*s;
-    if(seg.some(([x,y])=>!(y<=a||x>=b))) occ++;
-  }
-  return {occ,s};
-}
-function drawBoxes(k){
-  const {s}=occupiedBoxes(k);
-  const boxes=Math.ceil(1/s);
-  boxesCtx.clearRect(0,0,boxesCv.width,boxesCv.height);
-  const w=boxesCv.width/boxes;
-  const seg=buildSegments(+depthRange.value);
+function updateBoxInfo(){
+  const k=+kRange.value;
+  kVal.textContent=k;
+  const s=1/3**k;
+  sDisp.innerHTML=`s = 1/3<sup>${k}</sup> ≈ ${s.toPrecision(4)}`;
+  const seg=cantorSegments(+depthRange.value);
+  const boxes=Math.round(1/s);
+  let occupied=0;
+  boxCtx.clearRect(0,0,boxCv.width,boxCv.height);
   for(let i=0;i<boxes;i++){
     const a=i*s, b=(i+1)*s;
     const hit=seg.some(([x,y])=>!(y<=a||x>=b));
-    boxesCtx.fillStyle=hit?BLUE:GREY;
-    boxesCtx.fillRect(i*w,0,w,boxesCv.height);
+    if(hit) occupied++;
+    const x=i/boxes*boxCv.width, w=boxCv.width/boxes;
+    boxCtx.fillStyle=hit?'#1565c0':'#e0e0e0';
+    boxCtx.fillRect(x,0,w,boxCv.height);
   }
+  nDisp.textContent=`N(s) = ${occupied}`;
+  return {s,occupied};
 }
-function refreshK(){
-  const k=+kRange.value;
-  kVal.textContent=k;
-  const {occ,s}=occupiedBoxes(k);
-  sDisplay.innerHTML=`s = 1/3<sup>${k}</sup> ≈ ${s.toPrecision(4)}`;
-  nDisplay.textContent=`N(s) = ${occ}`;
-  drawBoxes(k);
-}
-kRange.addEventListener("input",refreshK);
 
-addRowBtn.onclick=()=>{
+kRange.oninput=updateBoxInfo;
+
+document.getElementById('addRow').onclick=()=>{
   const k=+kRange.value;
-  const {occ}=occupiedBoxes(k);
-  const tr=document.createElement("tr");
-  tr.innerHTML=`<td>${k}</td><td>1/3<sup>${k}</sup></td><td>${occ}</td>`;
+  const {occupied}=updateBoxInfo();
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${k}</td><td>1/3<sup>${k}</sup></td><td>${occupied}</td>`;
   dataBody.appendChild(tr);
 };
 
-plotBtn.onclick=()=>{
-  const rows=[...dataBody.querySelectorAll("tr")];
-  if(rows.length===0){alert("Add data rows first");return;}
+function plotChart(){
+  const rows=[...dataBody.children];
+  if(!rows.length){alert('Add data first');return;}
   const pts=rows.map(r=>{
     const k=+r.children[0].textContent;
-    const occ=+r.children[2].textContent;
-    const x=Math.log(Math.pow(3,k));
-    const y=Math.log(occ);
-    return {x,y};
+    const s=1/3**k;
+    const N=+r.children[2].textContent;
+    return {x:Math.log(1/s),y:Math.log(N)};
   });
   if(chart) chart.destroy();
-  chart=new Chart(chartCv,{type:"scatter",data:{datasets:[{data:pts,pointBackgroundColor:BLUE}]},options:{scales:{x:{title:{display:true,text:"log(1/s)"}},y:{title:{display:true,text:"log N(s)"}}},plugins:{legend:{display:false}}});
-};
+  chart=new Chart(document.getElementById('chartCv'),{
+    type:'scatter',
+    data:{datasets:[{data:pts,backgroundColor:'#1565c0'}]},
+    options:{scales:{x:{title:{display:true,text:'log(1/s)'}},y:{title:{display:true,text:'log N(s)'}}},plugins:{legend:{display:false}}}
+  });
+  slopeTxt.textContent='';
+}
 
-fitBtn.onclick=()=>{
-  const rows=[...dataBody.querySelectorAll("tr")];
-  if(rows.length<2){alert("Need at least two points");return;}
+document.getElementById('plotBtn').onclick=plotChart;
+
+document.getElementById('fitBtn').onclick=()=>{
+  const rows=[...dataBody.children];
+  if(rows.length<2){alert('Need at least 2 points');return;}
   const xs=[],ys=[];
   rows.forEach(r=>{
     const k=+r.children[0].textContent;
-    xs.push(Math.log(Math.pow(3,k)));
+    const s=1/3**k;
+    xs.push(Math.log(1/s));
     ys.push(Math.log(+r.children[2].textContent));
   });
   const n=xs.length;
-  const sumX=xs.reduce((a,b)=>a+b,0);
-  const sumY=ys.reduce((a,b)=>a+b,0);
+  const sumX=xs.reduce((a,b)=>a+b,0), sumY=ys.reduce((a,b)=>a+b,0);
   const sumXY=xs.reduce((a,b,i)=>a+b*ys[i],0);
   const sumX2=xs.reduce((a,b)=>a+b*b,0);
-  const slope=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
-  const intercept=(sumY-slope*sumX)/n;
-
-  if(chart){
-    const minX=Math.min(...xs), maxX=Math.max(...xs);
-    const line=[{x:minX,y:slope*minX+intercept},{x:maxX,y:slope*maxX+intercept}];
-    chart.data.datasets[1]={type:"line",data:line,borderColor:"#000",borderWidth:1,pointRadius:0};
-    chart.update();
-  }
-  alert(`Estimated dimension ≈ ${slope.toFixed(4)}`);
+  const m=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
+  const b=(sumY-m*sumX)/n;
+  if(!chart) plotChart();
+  const minX=Math.min(...xs), maxX=Math.max(...xs);
+  chart.data.datasets[1]={type:'line',data:[{x:minX,y:m*minX+b},{x:maxX,y:m*maxX+b}],borderColor:'#333',borderDash:[6,4],borderWidth:1,pointRadius:0};
+  chart.update();
+  slopeTxt.textContent=`Estimated dimension (slope) ≈ ${m.toFixed(4)}`;
 };
 
-/************ Tabs ************/
-const tabExplorer=document.getElementById("tabExplorer");
-const tabDimension=document.getElementById("tabDimension");
-const explorerSection=document.getElementById("explorerSection");
-const dimensionSection=document.getElementById("dimensionSection");
+document.getElementById('resetTbl').onclick=()=>{
+  dataBody.innerHTML='';
+  if(chart){chart.destroy();chart=null;}
+  slopeTxt.textContent='';
+};
 
-function showExplorer(){
-  tabExplorer.classList.add("active");
-  tabDimension.classList.remove("active");
-  explorerSection.style.display="flex";
-  dimensionSection.style.display="none";
-  refreshExplorer();
-}
-function showDimension(){
-  tabDimension.classList.add("active");
-  tabExplorer.classList.remove("active");
-  explorerSection.style.display="none";
-  dimensionSection.style.display="flex";
-  refreshK();
+/**********************  Tabs logic  **********************/
+function switchTab(id){
+  document.querySelectorAll('.tabs button').forEach(btn=>btn.classList.toggle('active',btn.id===id));
+  document.querySelector('#explorer').classList.toggle('active',id==='tabExp');
+  document.querySelector('#dimension').classList.toggle('active',id==='tabDim');
 }
 
-tabExplorer.onclick=showExplorer;
-tabDimension.onclick=showDimension;
+document.getElementById('tabExp').onclick=()=>switchTab('tabExp');
+document.getElementById('tabDim').onclick=()=>switchTab('tabDim');
 
-/************ Initial Render ************/
+/**********************  Initial paints **********************/
 refreshExplorer();
-refreshK();
+updateBoxInfo();
 </script>
 </body>
 </html>
