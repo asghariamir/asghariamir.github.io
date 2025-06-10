@@ -162,7 +162,7 @@
 <body>
 <div class="container">
     <h2>Multiplicative Sums</h2>
-    <p class="info">Calculate a sum of powers to get a target number. Then, use the calculator and color palette to manually explore its multiplicative structure on the table.</p>
+    <p class="info">Calculate the sum of the first N powers to get a target number. Then, use the calculator and color palette to manually explore its multiplicative structure on the table.</p>
 
     <div class="controls">
          <div class="control-group">
@@ -282,9 +282,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- EVENT LISTENERS ---
     
     tableSizeInput.addEventListener('change', () => {
-        state.size = parseInt(tableSizeInput.value);
-        state.highlights = {};
-        state.sumOfPowersResult = null;
+        const newSize = parseInt(tableSizeInput.value);
+        const oldHighlights = state.highlights;
+        const preservedHighlights = {};
+
+        // Iterate over the keys of the old highlights object
+        for (const key in oldHighlights) {
+            // Keep the highlight only if it fits within the new table size
+            const [r, c] = key.split('-').map(Number);
+            if (r <= newSize && c <= newSize) {
+                preservedHighlights[key] = oldHighlights[key];
+            }
+        }
+
+        // Update the state with the new size and the preserved highlights
+        state.size = newSize;
+        state.highlights = preservedHighlights;
+        
+        // Re-render the table. The sum result is not cleared.
         render();
     });
 
