@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Interpolation Root-Finder</title>
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --secondary-color: #4caf50;
+            --danger-color: #d32f2f;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 1.5rem;
+        }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;}
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem 1.5rem;
+            padding: 1rem;
+            background-color: var(--light-gray);
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .button-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
+        
+        label { font-size: 0.9rem; font-weight: 600; color: #616161; }
+        input[type="number"], select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 8px; font-size: 0.9rem; width: 100%; }
+        
+        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: background-color 0.3s; }
+        button:hover { background-color: #1976d2; }
+        .secondary-button { background-color: #6c757d; }
+        .secondary-button:hover { background-color: #5a6268; }
+        .danger-button { background-color: var(--danger-color); }
+        .danger-button:hover { background-color: #c62828; }
+        button:disabled { background-color: #bdbdbd; cursor: not-allowed; }
+
+        .plot-container { width: 100%; height: 400px; border: 1px solid var(--medium-gray); border-radius: 4px; margin-bottom: 1.5rem;}
+        
+        .log-container { max-height: 300px; overflow-y: auto; border: 1px solid var(--medium-gray); border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { border-bottom: 1px solid var(--medium-gray); padding: 8px; text-align: center; }
+        thead th { background-color: var(--light-gray); font-weight: 600; position: sticky; top: 0; z-index: 1;}
+        tbody tr:last-child td { border-bottom: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Linear Interpolation Root-Finder</h2>
+    <p class="info">This tool demonstrates the Method of False Position (or Linear Interpolation). It finds a root of <strong>f(x) = 0</strong> by drawing a line between the interval endpoints and using the line's x-intercept as the next guess.</p>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label for="function-select">Choose a function f(x):</label>
+            <select id="function-select"></select>
+        </div>
+        <div class="control-group">
+            <label for="a-input">Interval Start (a):</label>
+            <input type="number" id="a-input" value="-1">
+        </div>
+        <div class="control-group">
+            <label for="b-input">Interval End (b):</label>
+            <input type="number" id="b-input" value="2">
+        </div>
+        <div class="control-group">
+            <label for="tolerance-input">Tolerance:</label>
+            <input type="number" id="tolerance-input" value="0.0001" step="0.0001">
+        </div>
+    </div>
+
+    <div id="plot-container" class="plot-container"></div>
+    
+    <div class="button-group">
+        <button id="start-btn">Start Search</button>
+        <button id="step-btn" class="secondary-button" disabled>Step</button>
+        <button id="animate-btn" class="secondary-button" disabled>Animate</button>
+        <button id="reset-btn" class="danger-button" disabled>Reset</button>
+    </div>
+
+    <div class="log-container">
+        <table id="log-table">
+            <thead>
+                <tr><th>Iteration</th><th>a</th><th>b</th><th>New Guess (c)</th><th>f(c)</th><th>New Interval Width</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- FUNCTIONS TO SOLVE ---
+    const FUNCTIONS = {
+        "x³ - x - 2": { fn: x => Math.pow(x, 3) - x - 2, range: [-2, 3] },
+        "x² - 3": { fn: x => x*x - 3, range: [0, 3] },
+        "cos(x) - x": { fn: x => Math.cos(x) - x, range: [-2, 2] },
+        "eˣ - 5x": { fn: x => Math.exp(x) - 5*x, range: [0, 3]}
+    };
+
+    // --- STATE & DOM REFS ---
+    let state = {
+        f: null, a: 0, b: 0, c: 0,
+        iteration: 0, tolerance: 0.0001,
+        log: [], isRunning: false,
+        animationInterval: null
+    };
+
+    const functionSelect = document.getElementById('function-select');
+    const aInput = document.getElementById('a-input');
+    const bInput = document.getElementById('b-input');
+    const toleranceInput = document.getElementById('tolerance-input');
+    const startBtn = document.getElementById('start-btn');
+    const stepBtn = document.getElementById('step-btn');
+    const animateBtn = document.getElementById('animate-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const plotContainer = document.getElementById('plot-container');
+    const logTableBody = document.querySelector('#log-table tbody');
+    
+    // --- CORE LOGIC ---
+    function initialize() {
+        Object.keys(FUNCTIONS).forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            functionSelect.appendChild(option);
+        });
+        
+        functionSelect.addEventListener('change', resetAndPlot);
+        aInput.addEventListener('change', resetAndPlot);
+        bInput.addEventListener('change', resetAndPlot);
+        toleranceInput.addEventListener('change', () => { state.tolerance = parseFloat(toleranceInput.value); });
+        
+        startBtn.addEventListener('click', startSearch);
+        stepBtn.addEventListener('click', performStep);
+        animateBtn.addEventListener('click', toggleAnimation);
+        resetBtn.addEventListener('click', resetAndPlot);
+        
+        resetAndPlot();
+    }
+    
+    function resetAndPlot() {
+        stopAnimation();
+        state.isRunning = false;
+        state.iteration = 0;
+        state.log = [];
+        state.a = parseFloat(aInput.value);
+        state.b = parseFloat(bInput.value);
+        state.tolerance = parseFloat(toleranceInput.value);
+        state.f = FUNCTIONS[functionSelect.value].fn;
+
+        updateButtons();
+        renderLog();
+        plotFunction();
+    }
+
+    function startSearch() {
+        const fa = state.f(state.a);
+        const fb = state.f(state.b);
+
+        if (fa * fb >= 0) {
+            alert("The function must have opposite signs at the interval endpoints (f(a) * f(b) < 0). Please choose a different interval.");
+            return;
+        }
+        
+        state.isRunning = true;
+        updateButtons();
+        updatePlotAnnotations();
+    }
+    
+    function performStep() {
+        if (!state.isRunning || Math.abs(state.b - state.a) < state.tolerance) {
+            stopAnimation();
+            updateButtons();
+            return false;
+        }
+
+        state.iteration++;
+        const fa = state.f(state.a);
+        const fb = state.f(state.b);
+
+        // Linear Interpolation (Method of False Position) formula
+        state.c = (state.a * fb - state.b * fa) / (fb - fa);
+        const fc = state.f(state.c);
+
+        state.log.push({
+            iter: state.iteration, a: state.a, b: state.b,
+            c: state.c, fc: fc, width: Math.abs(state.b - state.a)
+        });
+
+        if (Math.abs(fc) < 1e-12) {
+            state.b = state.a = state.c; // Found exact root
+        } else if (fa * fc < 0) {
+            state.b = state.c;
+        } else {
+            state.a = state.c;
+        }
+        
+        renderLog();
+        updatePlotAnnotations();
+        
+        if (Math.abs(state.b - state.a) < state.tolerance) {
+            state.isRunning = false;
+            updateButtons();
+            return false;
+        }
+        return true;
+    }
+
+    function toggleAnimation() {
+        if (state.animationInterval) {
+            stopAnimation();
+        } else {
+            animateBtn.textContent = "Stop";
+            animateBtn.classList.add('danger-button');
+            state.animationInterval = setInterval(() => {
+                if (!performStep()) {
+                    stopAnimation();
+                }
+            }, 800); // Slower interval to see the line
+        }
+    }
+    
+    function stopAnimation() {
+        clearInterval(state.animationInterval);
+        state.animationInterval = null;
+        animateBtn.textContent = "Animate";
+        animateBtn.classList.remove('danger-button');
+    }
+
+    // --- RENDERING & PLOTTING ---
+    function updateButtons() {
+        startBtn.disabled = state.isRunning;
+        stepBtn.disabled = !state.isRunning;
+        animateBtn.disabled = !state.isRunning;
+        resetBtn.disabled = !state.isRunning && state.iteration === 0;
+    }
+    
+    function renderLog() {
+        logTableBody.innerHTML = '';
+        state.log.forEach(row => {
+            const tr = logTableBody.insertRow(0); // Insert at top
+            tr.innerHTML = `
+                <td>${row.iter}</td>
+                <td>${row.a.toFixed(5)}</td>
+                <td>${row.b.toFixed(5)}</td>
+                <td>${row.c.toFixed(5)}</td>
+                <td>${row.fc.toExponential(3)}</td>
+                <td>${row.width.toExponential(3)}</td>
+            `;
+        });
+    }
+
+    function plotFunction() {
+        const funcData = FUNCTIONS[functionSelect.value];
+        const range = funcData.range;
+        const xValues = [], yValues = [];
+        const stepSize = (range[1] - range[0]) / 400;
+
+        for (let x = range[0]; x <= range[1]; x += stepSize) {
+            xValues.push(x);
+            yValues.push(funcData.fn(x));
+        }
+        
+        const layout = {
+            title: `Plot of f(x) = ${functionSelect.value}`,
+            xaxis: { title: 'x', gridcolor: '#e0e0e0', zerolinecolor: '#9e9e9e' },
+            yaxis: { title: 'f(x)', gridcolor: '#e0e0e0', zerolinecolor: '#9e9e9e' },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: '#ffffff',
+            margin: { l: 50, r: 25, t: 40, b: 40 },
+            shapes: []
+        };
+
+        Plotly.newPlot(plotContainer, [{ x: xValues, y: yValues, mode: 'lines', line: { color: 'royalblue' } }], layout, {responsive: true, displaylogo: false});
+    }
+    
+    function updatePlotAnnotations() {
+        const fa = state.f(state.a);
+        const fb = state.f(state.b);
+
+        const shapes = [
+            // Secant line connecting the two points
+            {
+                type: 'line', layer: 'above',
+                xref: 'x', yref: 'y',
+                x0: state.a, y0: fa,
+                x1: state.b, y1: fb,
+                line: { color: 'rgba(76, 175, 80, 0.7)', width: 2 }
+            },
+            // Vertical line for the new guess 'c'
+            {
+                type: 'line', layer: 'above',
+                xref: 'x', yref: 'paper',
+                x0: state.c, y0: 0,
+                x1: state.c, y1: 1,
+                line: { color: 'crimson', width: 2, dash: 'dot' }
+            },
+            // Endpoint markers
+             { type: 'circle', xref: 'x', yref: 'y', x0: state.a-0.05, y0: fa-0.05, x1: state.a+0.05, y1: fa+0.05, fillcolor: '#6c757d', line: {width: 0}},
+             { type: 'circle', xref: 'x', yref: 'y', x0: state.b-0.05, y0: fb-0.05, x1: state.b+0.05, y1: fb+0.05, fillcolor: '#6c757d', line: {width: 0}},
+        ];
+        Plotly.relayout(plotContainer, { shapes: shapes });
+    }
+    
+    initialize();
+});
+</script>
+</body>
+</html>
