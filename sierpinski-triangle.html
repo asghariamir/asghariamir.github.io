@@ -311,17 +311,23 @@ document.addEventListener('DOMContentLoaded', () => {
             ...getSierpinskiTriangles(depth - 1, p31, p23, p3)
         ];
     }
-
+    
+    // Corrected normalization function
     function getNormalizedTriangles(depth) {
         if(memoizedTriangles[depth]) return memoizedTriangles[depth];
-        const size = 1;
-        const h = size * Math.sqrt(3) / 2;
-        const p1 = {x: 0, y: h}, p2 = {x: size, y: h}, p3 = {x: size/2, y: 0};
+        
+        const side = 1;
+        const h = side * Math.sqrt(3) / 2;
+        const p1 = {x: 0, y: h}, p2 = {x: side, y: h}, p3 = {x: side/2, y: 0};
         const rawTriangles = getSierpinskiTriangles(depth, p1, p2, p3);
 
+        const minX = 0, maxX = 1, minY = 0, maxY = h;
+        const fractalW = maxX - minX, fractalH = maxY - minY;
+        const scale = 1 / Math.max(fractalW, fractalH);
+
         const normalized = rawTriangles.map(tri => tri.map(p => ({
-            x: p.x,
-            y: (h - p.y) / h // Normalize y to be in [0,1] and flip
+            x: (p.x - minX) * scale,
+            y: (p.y - minY) * scale
         })));
         memoizedTriangles[depth] = normalized;
         return normalized;
@@ -429,14 +435,19 @@ document.addEventListener('DOMContentLoaded', () => {
         boxGridCtx.fillStyle = '#ffffff';
         boxGridCtx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+        // Determine the size and position of our drawing area inside the canvas
+        const drawSize = Math.min(canvasWidth, canvasHeight) * 0.9;
+        const marginX = (canvasWidth - drawSize) / 2;
+        const marginY = (canvasHeight - drawSize) / 2;
+
         // Draw background fractal
         const triangles = getNormalizedTriangles(currentDepth);
         boxGridCtx.fillStyle = 'rgba(21, 101, 192, 0.15)';
         boxGridCtx.beginPath();
         triangles.forEach(tri => {
-            boxGridCtx.moveTo(tri[0].x * canvasWidth, tri[0].y * canvasHeight);
-            boxGridCtx.lineTo(tri[1].x * canvasWidth, tri[1].y * canvasHeight);
-            boxGridCtx.lineTo(tri[2].x * canvasWidth, tri[2].y * canvasHeight);
+            boxGridCtx.moveTo(tri[0].x * drawSize + marginX, tri[0].y * drawSize + marginY);
+            boxGridCtx.lineTo(tri[1].x * drawSize + marginX, tri[1].y * drawSize + marginY);
+            boxGridCtx.lineTo(tri[2].x * drawSize + marginX, tri[2].y * drawSize + marginY);
         });
         boxGridCtx.closePath();
         boxGridCtx.fill();
@@ -444,16 +455,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw grid overlay
         const k = parseInt(kSlider.value);
         const numBoxesPerSide = Math.pow(2, k);
-        const boxSize = canvasWidth / numBoxesPerSide;
+        const boxSize = 1 / numBoxesPerSide; // Box size in normalized [0,1] space
 
         for (let i = 0; i < numBoxesPerSide; i++) {
             for (let j = 0; j < numBoxesPerSide; j++) {
+                // Map box from [0,1] space to canvas drawing area
+                const drawX = (i * boxSize) * drawSize + marginX;
+                const drawY = (j * boxSize) * drawSize + marginY;
+                const drawBoxPixelSize = boxSize * drawSize;
+
                 if (occupiedBoxes.has(`${i}-${j}`)) {
                     boxGridCtx.fillStyle = 'rgba(21, 101, 192, 0.6)';
-                    boxGridCtx.fillRect(i * boxSize, j * boxSize, boxSize, boxSize);
+                    boxGridCtx.fillRect(drawX, drawY, drawBoxPixelSize, drawBoxPixelSize);
                 }
                 boxGridCtx.strokeStyle = '#e0e0e0';
-                boxGridCtx.strokeRect(i * boxSize, j * boxSize, boxSize, boxSize);
+                boxGridCtx.strokeRect(drawX, drawY, drawBoxPixelSize, drawBoxPixelSize);
             }
         }
     }
@@ -491,12 +507,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (logLogChart) logLogChart.destroy();
         logLogChart = new Chart(chartCanvas, {
             data: { datasets: [{ label: 'log(N(s)) vs log(1/s)', data: boxData, backgroundColor: 'rgba(21, 101, 192, 0.6)', type: 'scatter' }] },
-            options: { responsive: true, plugins: { title: { display: true, text: 'Log-Log Plot for Box-Counting Dimension' }, subtitle: { display: false } }, scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: 'log(1/s)' } }, y: { title: { display: true, text: 'log(N(s))' } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Log-Log Plot for Box-Counting Dimension' }, subtitle: { display: false } }, scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: 'log(1/s)' } }, y: { title: { display: true, text: 'log(N(s))' } } } }
         });
     }
 
     function fitLine() {
-        if (boxData.length < 2) return alert("Please add at least two data points.");
+        if (!logLogChart || boxData.length < 2) return plotLogLog();
         
         let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
         const n = boxData.length;
@@ -520,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tabButtons.forEach(button => button.classList.remove('active'));
         document.getElementById(`${tabName}-tab`).classList.add('active');
         document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        memoizedTriangles = {}; // Clear cache
+        memoizedTriangles = {};
         handleResize();
     }
 
