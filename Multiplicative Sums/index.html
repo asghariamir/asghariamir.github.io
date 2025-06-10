@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multiplicative Sums Explorer</title>
+    <title>Multiplication Color Pad</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #1565c0;
-            --original-highlight-color: #ffeb3b;
-            --transformed-highlight-color: #ff9800; /* Orange */
+            --color-1: #ffeb3b; /* Yellow */
+            --color-2: #ff9800; /* Orange */
+            --color-3: #4caf50; /* Green */
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
@@ -67,7 +68,7 @@
             border-radius: 6px;
             margin-bottom: 1.5rem;
         }
-
+        
         .control-group {
             display: flex;
             align-items: center;
@@ -80,12 +81,13 @@
             color: #616161;
         }
         
-        input[type="number"], select {
+        input[type="number"] {
             border: 1px solid var(--medium-gray);
             border-radius: 4px;
             padding: 8px;
-            font-size: 0.9rem;
+            font-size: 1rem;
             width: 6rem;
+            text-align: center;
         }
         
         button {
@@ -98,17 +100,35 @@
             font-size: 0.9rem;
             transition: background-color 0.3s;
         }
-
-        button:hover { background-color: #1976d2; }
         .danger-button { background-color: #d32f2f; }
         .danger-button:hover { background-color: #c62828; }
         
-        #result-display, #transform-result-display {
+        /* Calculator */
+        #calc-result {
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--primary-color);
+            min-width: 4rem;
+            text-align: left;
         }
-        #transform-result-display { color: #f57c00; } /* Orange text */
+
+        /* Color Palette */
+        .color-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            transform: scale(1.1);
+        }
 
         /* ---------- Table Styling ---------- */
         .table-container {
@@ -134,54 +154,45 @@
             font-weight: bold;
         }
         td { cursor: pointer; }
-        td.highlight.original {
-            background-color: var(--original-highlight-color);
-        }
-        td.highlight.transformed {
-            background-color: var(--transformed-highlight-color);
-            color: white;
-        }
+
+        td.highlight.color-1 { background-color: var(--color-1); }
+        td.highlight.color-2 { background-color: var(--color-2); color: white; }
+        td.highlight.color-3 { background-color: var(--color-3); color: white; }
+
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>Sums of Powers Playground</h2>
-    <p class="info">Calculate a sum of powers, find the result on the table, and then use the calculator to transform it.</p>
+    <h2>Multiplication Color Pad</h2>
+    <p class="info">Use the calculator to find products, then select a color and click cells on the table to find patterns.</p>
 
     <div class="controls">
-         <div class="control-group">
-            <label for="n-input">First N:</label>
-            <input type="number" id="n-input" min="1" value="5">
-        </div>
         <div class="control-group">
-            <label for="power-select">Power:</label>
-            <select id="power-select">
-                <option value="1">1 (Sum)</option>
-                <option value="2">2 (Squares)</option>
-                <option value="3">3 (Cubes)</option>
-            </select>
+            <input type="number" id="calc-input-1" placeholder="number">
+            <span style="font-size: 1.5rem;">×</span>
+            <input type="number" id="calc-input-2" placeholder="number">
+            <span style="font-size: 1.5rem;">=</span>
+            <span id="calc-result">?</span>
         </div>
-        <button id="calculate-btn">Calculate Sum</button>
-        <div id="result-display"></div>
     </div>
     
-    <div id="calculator-ui" class="controls" style="display: none; background-color: #fff8e1;">
+    <div class="controls" style="background: none; padding-bottom: 1.5rem;">
         <div class="control-group">
-            <label>Transform result <strong id="calc-source-val"></strong> by multiplying:</label>
-            <input type="number" id="calc-factor-input" value="2" min="2">
-            <button id="transform-btn">Transform</button>
+            <label>Active Color:</label>
+            <button class="color-swatch active" data-color="color-1" style="background-color: var(--color-1);"></button>
+            <button class="color-swatch" data-color="color-2" style="background-color: var(--color-2);"></button>
+            <button class="color-swatch" data-color="color-3" style="background-color: var(--color-3);"></button>
         </div>
-        <div id="transform-result-display"></div>
     </div>
 
-    <div id="playground-table-container" class="table-container"></div>
+    <div id="table-container" class="table-container"></div>
     
     <div class="controls" style="background: none; padding-top: 1.5rem; justify-content: space-between;">
-        <button id="clear-highlights-btn" class="danger-button">Clear All</button>
+        <button id="clear-colors-btn" class="danger-button">Clear All Colors</button>
          <div class="control-group">
             <label for="table-size-input">Table Size:</label>
             <input type="number" id="table-size-input" min="5" max="40" value="12">
-            <button id="download-playground-btn">Download as Image</button>
+            <button id="download-btn">Download as Image</button>
         </div>
     </div>
 </div>
@@ -191,27 +202,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- STATE MANAGEMENT ---
     let state = {
         size: 12,
-        n: 5,
-        power: 1,
-        originalSum: null,
-        // highlights is an object: { "row-col": "type" }, e.g. { "3-5": "original" }
+        activeColor: 'color-1',
+        // highlights is an object: { "row-col": "color-name" }
         highlights: {},
     };
     
     // --- DOM REFERENCES ---
-    const pgTableContainer = document.getElementById('playground-table-container');
-    const nInput = document.getElementById('n-input');
-    const powerSelect = document.getElementById('power-select');
+    const tableContainer = document.getElementById('table-container');
     const tableSizeInput = document.getElementById('table-size-input');
-    const calculateBtn = document.getElementById('calculate-btn');
-    const resultDisplay = document.getElementById('result-display');
-    const clearHighlightsBtn = document.getElementById('clear-highlights-btn');
-    const downloadPlaygroundBtn = document.getElementById('download-playground-btn');
-    const calculatorUI = document.getElementById('calculator-ui');
-    const calcSourceVal = document.getElementById('calc-source-val');
-    const calcFactorInput = document.getElementById('calc-factor-input');
-    const transformBtn = document.getElementById('transform-btn');
-    const transformResultDisplay = document.getElementById('transform-result-display');
+    const clearColorsBtn = document.getElementById('clear-colors-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const calcInput1 = document.getElementById('calc-input-1');
+    const calcInput2 = document.getElementById('calc-input-2');
+    const calcResult = document.getElementById('calc-result');
+    const colorSwatches = document.querySelectorAll('.color-swatch');
 
     // --- LOGIC & RENDERING ---
     
@@ -228,11 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let c = 1; c <= size; c++) {
                 const cell = row.insertCell();
                 const key = `${r}-${c}`;
-                const highlightType = highlights[key];
+                const colorClass = highlights[key];
                 cell.textContent = r * c;
                 cell.dataset.key = key;
-                if (highlightType) {
-                    cell.classList.add('highlight', highlightType);
+                if (colorClass) {
+                    cell.classList.add('highlight', colorClass);
                 }
             }
         }
@@ -240,80 +244,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function render() {
-        pgTableContainer.innerHTML = '';
-        pgTableContainer.appendChild(createTable(state.size, state.highlights));
-        resultDisplay.textContent = state.originalSum !== null ? `Result: ${state.originalSum}` : '';
-
-        if (state.originalSum !== null) {
-            calculatorUI.style.display = 'flex';
-            calcSourceVal.textContent = `(${state.originalSum})`;
-        } else {
-            calculatorUI.style.display = 'none';
-            transformResultDisplay.textContent = '';
-        }
+        tableContainer.innerHTML = '';
+        tableContainer.appendChild(createTable(state.size, state.highlights));
     }
-    
-    function findAndHighlight(value, type) {
-        if (value > state.size * state.size || value <= 0) return false;
-        // Find with smallest column number
-        for (let c = 1; c <= state.size; c++) {
-            if (value % c === 0) {
-                const r = value / c;
-                if (r >= 1 && r <= state.size) {
-                    state.highlights[`${r}-${c}`] = type;
-                    return true;
-                }
-            }
+
+    function updateCalculator() {
+        const val1 = parseFloat(calcInput1.value);
+        const val2 = parseFloat(calcInput2.value);
+        if (!isNaN(val1) && !isNaN(val2)) {
+            calcResult.textContent = val1 * val2;
+        } else {
+            calcResult.textContent = '?';
         }
-        return false;
     }
     
     // --- EVENT LISTENERS ---
     
-    tableSizeInput.addEventListener('change', () => { state.size = parseInt(tableSizeInput.value); render(); });
-    
-    calculateBtn.addEventListener('click', () => {
-        let sum = 0;
-        const n = parseInt(nInput.value);
-        const power = parseInt(powerSelect.value);
-        for (let i = 1; i <= n; i++) sum += Math.pow(i, power);
-        
-        state.originalSum = sum;
-        state.highlights = {}; // Clear previous highlights
-        findAndHighlight(sum, 'original'); // Highlight the new sum
-        render();
-    });
-
-    transformBtn.addEventListener('click', () => {
-        if (state.originalSum === null) return;
-        
-        const factor = parseInt(calcFactorInput.value);
-        const transformedValue = state.originalSum * factor;
-        
-        // Remove previous transformed highlights, but keep original
-        for (const key in state.highlights) {
-            if (state.highlights[key] === 'transformed') {
-                delete state.highlights[key];
-            }
-        }
-        
-        findAndHighlight(transformedValue, 'transformed');
-        transformResultDisplay.textContent = `= ${transformedValue}`;
-        render();
-    });
-    
-    clearHighlightsBtn.addEventListener('click', () => {
-        state.originalSum = null;
+    tableSizeInput.addEventListener('change', () => {
+        state.size = parseInt(tableSizeInput.value);
+        // Clear highlights when resizing to avoid confusion
         state.highlights = {};
         render();
     });
 
-    downloadPlaygroundBtn.addEventListener('click', () => {
-        html2canvas(document.getElementById('playground-table-container')).then(canvas => {
+    calcInput1.addEventListener('input', updateCalculator);
+    calcInput2.addEventListener('input', updateCalculator);
+    
+    colorSwatches.forEach(swatch => {
+        swatch.addEventListener('click', () => {
+            colorSwatches.forEach(s => s.classList.remove('active'));
+            swatch.classList.add('active');
+            state.activeColor = swatch.dataset.color;
+        });
+    });
+    
+    tableContainer.addEventListener('click', (e) => {
+        const cell = e.target;
+        if (cell.matches('td')) {
+            const key = cell.dataset.key;
+            const existingColor = state.highlights[key];
+            
+            // If cell has the active color, remove highlight. Otherwise, set it.
+            if (existingColor === state.activeColor) {
+                delete state.highlights[key];
+                cell.classList.remove('highlight', ...Array.from(cell.classList).filter(c => c.startsWith('color-')));
+            } else {
+                // Remove old color class before adding new one
+                cell.classList.remove(...Array.from(cell.classList).filter(c => c.startsWith('color-')));
+                state.highlights[key] = state.activeColor;
+                cell.classList.add('highlight', state.activeColor);
+            }
+        }
+    });
+
+    clearColorsBtn.addEventListener('click', () => {
+        state.highlights = {};
+        render();
+    });
+
+    downloadBtn.addEventListener('click', () => {
+        // Temporarily remove border from active color swatch for clean screenshot
+        const activeSwatch = document.querySelector('.color-swatch.active');
+        if (activeSwatch) activeSwatch.style.borderColor = 'transparent';
+        
+        html2canvas(document.querySelector(".container")).then(canvas => {
             const link = document.createElement("a");
-            link.download = "sums-playground.png";
+            link.download = "multiplication-color-pad.png";
             link.href = canvas.toDataURL();
             link.click();
+            // Restore border after screenshot
+            if (activeSwatch) activeSwatch.style.borderColor = '';
         });
     });
 
