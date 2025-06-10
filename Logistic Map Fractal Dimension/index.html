@@ -1,256 +1,355 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Logistic Map Explorer – Fractal Dimension</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script>
-  <style>
-    body { font-family: Arial, Helvetica, sans-serif; margin: 1rem; background: #f8f9fa; }
-    h2   { text-align: center; margin-bottom: .6rem; }
-    #intro { max-width: 800px; margin: 0 auto 1.4rem; line-height: 1.45; text-align: center; }
+    <meta charset="utf-8" />
+    <title>Logistic Map Explorer – Fractal Dimension</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --danger-color: #d32f2f;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+        }
 
-    /* plots */
-    #plots > div { width: 100%; height: 400px; margin-bottom: 1.2rem; }
+        /* ---------- Basic Structure & Typography ---------- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* r & x0 controls under bifurcation */
-    #bifControls {
-      display:flex; flex-wrap:wrap; justify-content:center; gap:1rem;
-      margin-bottom: 1.2rem;
-    }
-    #bifControls label { font-weight:bold; }
-    #bifControls input { max-width: 6rem; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
 
-    /* slice paragraph */
-    #sliceDesc {
-      max-width: 750px; margin: 1.6rem auto .8rem; font-size: .95rem;
-      line-height: 1.4; text-align: center; color:#333;
-    }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        section {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        section:last-child {
+            border-bottom: none;
+        }
 
-    /* slice controls */
-    #sliceControls {
-      display:flex; flex-wrap:wrap; justify-content:center;
-      align-items:center; gap:1rem; margin-bottom:1rem;
-    }
-    #sliceControls label { font-weight:bold; }
-    #sliceControls input { max-width: 6rem; }
+        h2 {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        p.intro {
+            font-size: 1rem;
+            color: #616161;
+            max-width: 100%;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
 
-    /* ε-table */
-    table {
-      margin: 2rem auto; border-collapse: collapse;
-      width: 85%; max-width: 680px;
-    }
-    table, th, td { border: 1px solid #aaa; }
-    th, td        { padding: .4rem .8rem; text-align:center; }
-    tbody tr:nth-child(odd) { background:#f3f3f3; }
+        /* ---------- Controls ---------- */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
 
-    /* ε-table buttons */
-    #tableControls {
-      text-align:center; margin-top:1rem;
-    }
-    #tableControls button {
-      margin:.4rem; padding:.45rem 1.1rem;
-      background:#007bff; color:#fff; border:none;
-      border-radius:.25rem; cursor:pointer;
-    }
-    #tableControls button.disabled { opacity:.5; cursor:default; }
-  </style>
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #616161;
+        }
+        
+        input[type="number"] {
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 0.9rem;
+            max-width: 8rem;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1976d2;
+        }
+
+        .secondary-button {
+            background-color: #6c757d;
+        }
+        .secondary-button:hover {
+            background-color: #5a6268;
+        }
+        
+        .danger-button {
+             background-color: var(--danger-color);
+        }
+        
+        .danger-button:hover {
+            background-color: #c62828;
+        }
+
+        button.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #9e9e9e;
+        }
+
+        /* ---------- Plots & Tables ---------- */
+        .plot-container {
+            width: 100%;
+            height: 450px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        th, td {
+            text-align: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .math-display {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            background: var(--light-gray);
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-  <h2>Logistic Map Explorer: Fractal Dimension</h2>
-  <p id="intro">
-    Explore the chaotic <strong>logistic map</strong>. Pick a parameter <em>r</em> and starting value
-    <em>x₀</em> (under the bifurcation diagram). Then choose how many orbit points to draw and the
-    ε-resolution (<em>k</em>) to see how the box-count <em>N(ε)</em> grows. Build an ε-table and fit a
-    line in log-log space to estimate the attractor’s fractal dimension.
-  </p>
+<div class="container">
+    <section>
+        <h2>Logistic Map Explorer</h2>
+        <p class="intro">
+            Explore the chaotic <strong>logistic map</strong>. Pick a parameter <em>r</em> and starting value
+            <em>x₀</em>. Then choose how many orbit points to draw and the
+            ε-resolution (<em>k</em>) to see how the box-count <em>N(ε)</em> grows. Build an ε-table and fit a
+            line in log-log space to estimate the attractor’s fractal dimension.
+        </p>
+    </section>
 
-  <div id="plots">
-    <!-- bifurcation -->
-    <div id="bifPlot"></div>
-    <div id="bifControls">
-      <label>r = <input type="number" id="rInput" min="2.5" max="4" step="0.0001" value="3.8"></label>
-      <label>x₀ = <input type="number" id="x0Input" min="0.01" max="0.99" step="0.0001" value="0.5"></label>
-    </div>
+    <section>
+        <div id="bifPlot" class="plot-container"></div>
+        <div class="controls">
+            <div class="control-group">
+                <label for="rInput">r =</label>
+                <input type="number" id="rInput" min="2.5" max="4" step="0.0001" value="3.8">
+            </div>
+            <div class="control-group">
+                <label for="x0Input">x₀ =</label>
+                <input type="number" id="x0Input" min="0.01" max="0.99" step="0.0001" value="0.5">
+            </div>
+        </div>
+    </section>
+    
+    <section>
+        <div id="slicePlot" class="plot-container"></div>
+        <div class="controls">
+            <div class="control-group">
+                <label for="pointsInput">Points =</label>
+                <input type="number" id="pointsInput" value="10000" min="100" max="50000">
+            </div>
+            <div class="control-group">
+                <label for="kInput">k =</label>
+                <input type="number" id="kInput" min="4" max="12" step="1" value="8">
+            </div>
+            <span class="math-display">ε = <span id="epsVal">2⁻8</span></span>
+            <span class="math-display">N(ε) = <span id="nVal">-</span></span>
+            <button id="toggleBtn" class="secondary-button">Toggle ε-boxes</button>
+        </div>
+    </section>
 
-    <!-- explanation -->
-    <p id="sliceDesc">
-      The orbit plot below uses the chosen <em>r</em> and <em>x₀</em> (after discarding transients).
-      Grey bands are ε-boxes; orange boxes are visited. Increase <em>Points</em> for denser sampling or
-      raise <em>k</em> for finer boxes.
-    </p>
+    <section>
+        <div id="logPlot" class="plot-container"></div>
+        <table id="epsTable">
+            <thead>
+                <tr><th>#</th><th>k</th><th>ε</th><th>N(ε)</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="controls">
+            <button id="addBtn">Add Row</button>
+            <button id="plotBtn" class="disabled">Plot Table</button>
+            <button id="clrBtn" class="danger-button">Clear Table</button>
+        </div>
+    </section>
+</div>
 
-    <!-- slice controls -->
-    <div id="sliceControls">
-      <label>Points = <input type="number" id="pointsInput" value="10000" min="100" max="50000"></label>
-      <label>k = <input type="number" id="kInput" min="4" max="12" step="1" value="8"></label>
-      <span>ε = <span id="epsVal">2⁻8</span></span>
-      <span>N(ε) = <span id="nVal">-</span></span>
-      <button id="toggleBtn">Toggle ε-boxes</button>
-    </div>
-    <div id="slicePlot"></div>
-  </div>
-
-  <!-- ε-table -->
-  <div id="tableControls">
-    <button id="addBtn">Add Row</button>
-    <button id="clrBtn">Clear</button>
-    <button id="plotBtn" class="disabled">Plot Table</button>
-  </div>
-  <table id="epsTable">
-    <thead>
-      <tr><th>#</th><th>k</th><th>ε</th><th>N(ε)</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <!-- log-log plot -->
-  <div id="logPlot" style="width:90%;height:400px;margin:2rem auto"></div>
-
-  <!-- javascript -->
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
+<script>
+document.addEventListener('DOMContentLoaded', () => {
     /* === parameters & state === */
     const SKIP_SLICE = 2000, SKIP_DIM = 8192, KEEP_DIM_MAX = 65536;
     let r = 3.8, x0 = 0.5, keepVis = 10000, k = 8, showBoxes = true;
     const rows = [];
 
     /* === helpers === */
-    const step   = (r,x) => r * x * (1 - x);
-    const series = (r,len,skip,x0) => {
-      let x = x0, arr = [];
-      for (let i = 0; i < skip + len; i++) { x = step(r,x); if (i >= skip) arr.push(x); }
-      return arr;
+    const step = (r, x) => r * x * (1 - x);
+    const series = (r, len, skip, x0) => {
+        let x = x0, arr = [];
+        for (let i = 0; i < skip + len; i++) { x = step(r, x); if (i >= skip) arr.push(x); }
+        return arr;
     };
     const epsFromK = k => 1 / (1 << k);
-    const NofEps   = eps => new Set(series(r, KEEP_DIM_MAX, SKIP_DIM, x0)
-                          .map(x => Math.floor(x/eps))).size;
+    const NofEps = eps => new Set(series(r, KEEP_DIM_MAX, SKIP_DIM, x0)
+        .map(x => Math.floor(x / eps))).size;
 
     /* === DOM refs === */
-    const bifPlotEl   = document.getElementById('bifPlot');
+    const bifPlotEl = document.getElementById('bifPlot');
     const slicePlotEl = document.getElementById('slicePlot');
-    const rInput      = document.getElementById('rInput');
-    const x0Input     = document.getElementById('x0Input');
+    const rInput = document.getElementById('rInput');
+    const x0Input = document.getElementById('x0Input');
     const pointsInput = document.getElementById('pointsInput');
-    const kInput      = document.getElementById('kInput');
-    const epsValEl    = document.getElementById('epsVal');
-    const nValEl      = document.getElementById('nVal');
-    const toggleBtn   = document.getElementById('toggleBtn');
-    const addBtn      = document.getElementById('addBtn');
-    const clrBtn      = document.getElementById('clrBtn');
-    const plotBtn     = document.getElementById('plotBtn');
-    const tbody       = document.querySelector('#epsTable tbody');
+    const kInput = document.getElementById('kInput');
+    const epsValEl = document.getElementById('epsVal');
+    const nValEl = document.getElementById('nVal');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const addBtn = document.getElementById('addBtn');
+    const clrBtn = document.getElementById('clrBtn');
+    const plotBtn = document.getElementById('plotBtn');
+    const tbody = document.querySelector('#epsTable tbody');
 
+    /* === General Plot Layout === */
+    const commonLayout = {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: '#ffffff',
+        margin: { l: 50, r: 25, t: 25, b: 40 },
+        xaxis: { gridcolor: '#e0e0e0' },
+        yaxis: { gridcolor: '#e0e0e0' }
+    };
+    
     /* === readouts === */
     const updateEandN = () => {
-      const eps = epsFromK(k);
-      epsValEl.textContent = `2⁻${k}`;
-      nValEl.textContent   = NofEps(eps);
+        const eps = epsFromK(k);
+        epsValEl.textContent = `2⁻${k}`;
+        nValEl.textContent = NofEps(eps);
     };
 
     /* === bifurcation plot === */
     const drawBifurcation = () => {
-      const R_MIN = 2.5, R_MAX = 4, R_STEP = 0.005;
-      const xs=[], rs=[];
-      for (let rr = R_MIN; rr <= R_MAX + 1e-8; rr += R_STEP) {
-        series(rr, 300, 200, Math.random()*0.8 + 0.1)
-          .forEach(x => { xs.push(x); rs.push(rr); });
-      }
-      Plotly.newPlot(bifPlotEl, [
-        { x: rs, y: xs, mode:'markers', type:'scattergl',
-          name:'Attractor', marker:{ size:1, color:'#888' } },
-        { x:[r,r], y:[0,1], mode:'lines', name:'Selected r',
-          line:{ color:'crimson', width:3 } }
-      ], {
-        xaxis:{ title:'r', range:[R_MIN,R_MAX] },
-        yaxis:{ title:'x', range:[0,1] },
-        margin:{ l:50, r:5, t:10, b:40 },
-        dragmode: false,
-        legend:{ x:1.05, y:1 }
-      });
+        const R_MIN = 2.5, R_MAX = 4, R_STEP = 0.005;
+        const xs = [], rs = [];
+        for (let rr = R_MIN; rr <= R_MAX + 1e-8; rr += R_STEP) {
+            series(rr, 300, 200, Math.random() * 0.8 + 0.1)
+                .forEach(x => { xs.push(x); rs.push(rr); });
+        }
+        const layout = { ...commonLayout, xaxis:{title:'r', range:[R_MIN,R_MAX]}, yaxis:{title:'x', range:[0,1]}, showlegend: false };
+        Plotly.newPlot(bifPlotEl, [
+            { x: rs, y: xs, mode: 'markers', type: 'scattergl', marker: { size: 1, color: '#424242' } },
+            { x: [r, r], y: [0, 1], mode: 'lines', name: 'Selected r', line: { color: '#d32f2f', width: 2 } }
+        ], layout, {responsive: true});
     };
 
     /* === slice plot === */
     const drawSlice = () => {
-      const xs  = series(r, keepVis, SKIP_SLICE, x0);
-      const eps = epsFromK(k);
-      const filled = new Set(xs.map(x => Math.floor(x/eps)));
+        const xs = series(r, keepVis, SKIP_SLICE, x0);
+        const eps = epsFromK(k);
+        const filled = new Set(xs.map(x => Math.floor(x / eps)));
+        updateEandN();
 
-      updateEandN();
-
-      const shapes = [];
-      const gridClr = 'rgba(120,120,120,0.35)';
-      if (showBoxes) {
-        for (let b = 0; b < 1/eps; b++) {
-          const y0=b*eps, y1=(b+1)*eps;
-          shapes.push({
-            type:'rect', xref:'x', yref:'y',
-            x0:0, x1:keepVis, y0, y1,
-            fillcolor: filled.has(b)
-              ? 'rgba(255,165,0,0.25)'
-              : 'rgba(0,0,0,0)',
-            line:{ width:0.6, color:gridClr },
-            layer:'below'
-          });
+        const shapes = [];
+        if (showBoxes) {
+            for (let b = 0; b < 1 / eps; b++) {
+                shapes.push({
+                    type: 'rect', xref: 'x', yref: 'y',
+                    x0: 0, x1: keepVis, y0: b * eps, y1: (b + 1) * eps,
+                    fillcolor: filled.has(b) ? 'rgba(21, 101, 192, 0.25)' : 'rgba(0,0,0,0)',
+                    line: { width: 1, color: '#e0e0e0' },
+                    layer: 'below'
+                });
+            }
         }
-      }
 
-      Plotly.newPlot(slicePlotEl, [{
-        x: xs.map((_,i)=>i),
-        y: xs,
-        mode:'markers',
-        marker:{ size:3, color:'royalblue' },
-        name:'Orbit'
-      }], {
-        xaxis:{ title:'n', range:[0,keepVis] },
-        yaxis:{ title:'x', range:[0,1] },
-        margin:{ l:60, r:5, t:30, b:40 },
-        dragmode:false,
-        shapes,
-        legend:{ x:1.05, y:1 }
-      });
+        const layout = { ...commonLayout, xaxis:{title:'n', range:[0,keepVis]}, yaxis:{title:'x', range:[0,1]}, showlegend: false, shapes };
+        Plotly.newPlot(slicePlotEl, [{
+            x: xs.map((_, i) => i), y: xs, mode: 'markers',
+            marker: { size: 3, color: '#1565c0' }, name: 'Orbit'
+        }], layout, {responsive: true});
     };
 
     /* === ε-table & log plot === */
     const refreshTable = () => {
-      tbody.innerHTML = '';
-      rows.forEach((row,i) => {
-        const tr = tbody.insertRow();
-        tr.insertCell().textContent = i+1;
-        tr.insertCell().textContent = row.k;
-        tr.insertCell().textContent = `2⁻${row.k}`;
-        tr.insertCell().textContent = row.N;
-      });
-      plotBtn.classList.toggle('disabled', rows.length < 2);
+        tbody.innerHTML = '';
+        rows.forEach((row, i) => {
+            const tr = tbody.insertRow();
+            tr.insertCell().textContent = i + 1;
+            tr.insertCell().textContent = row.k;
+            tr.insertCell().textContent = `2⁻${row.k}`;
+            tr.insertCell().textContent = row.N;
+        });
+        plotBtn.classList.toggle('disabled', rows.length < 2);
     };
 
     const drawLogPlot = () => {
-      if (rows.length < 2) return;
-      const epsArr = rows.map(r => epsFromK(r.k));
-      const NArr   = rows.map(r => r.N);
-      const logX   = epsArr.map(e => Math.log10(1/e));
-      const logY   = NArr.map(n => Math.log10(n));
-      const n      = logX.length;
-      const sx  = logX.reduce((a,b)=>a+b);
-      const sy  = logY.reduce((a,b)=>a+b);
-      const sxy = logX.reduce((s,x,i)=>s + x*logY[i], 0);
-      const sx2 = logX.reduce((s,x)=>s + x*x, 0);
-      const m   = (n*sxy - sx*sy) / (n*sx2 - sx*sx);
-      const b   = (sy - m*sx) / n;
-      const fitY = epsArr.map(e => 10**(b + m*Math.log10(1/e)));
+        if (rows.length < 2) { Plotly.purge('logPlot'); return; }
+        const epsArr = rows.map(r => epsFromK(r.k));
+        const NArr = rows.map(r => r.N);
+        const logX = epsArr.map(e => Math.log10(1 / e));
+        const logY = NArr.map(n => Math.log10(n));
+        const n = logX.length;
+        const sx = logX.reduce((a, b) => a + b), sy = logY.reduce((a, b) => a + b);
+        const sxy = logX.reduce((s, x, i) => s + x * logY[i], 0);
+        const sx2 = logX.reduce((s, x) => s + x * x, 0);
+        const m = (n * sxy - sx * sy) / (n * sx2 - sx * sx);
+        const b = (sy - m * sx) / n;
+        const fitY = epsArr.map(e => 10 ** (b + m * Math.log10(1 / e)));
 
-      Plotly.newPlot('logPlot', [
-        { x: epsArr, y: NArr, mode:'markers',
-          marker:{ color:'seagreen' }, name:'N(ε)' },
-        { x: epsArr, y: fitY, mode:'lines',
-          line:{ color:'crimson', dash:'dot' },
-          name:`fit slope ≈ ${m.toFixed(3)}` }
-      ], {
-        xaxis:{ title:'ε', type:'log' },
-        yaxis:{ title:'N(ε)', type:'log' },
-        margin:{ l:60, r:10, t:30, b:50 },
-        showlegend:true
-      });
+        const layout = { ...commonLayout, title: `Fractal Dimension (Slope) ≈ ${m.toFixed(4)}`, xaxis:{title:'ε', type:'log'}, yaxis:{title:'N(ε)', type:'log'}, showlegend: false };
+        Plotly.newPlot('logPlot', [
+            { x: epsArr, y: NArr, mode: 'markers', marker: { color: '#1565c0' }, name: 'N(ε)' },
+            { x: epsArr, y: fitY, mode: 'lines', line: { color: '#d32f2f', dash: 'dot' }, name: 'Fit' }
+        ], layout, {responsive: true});
     };
 
     /* === initial draws === */
@@ -258,37 +357,33 @@
     drawSlice();
 
     /* === event listeners === */
-    rInput  .addEventListener('input', () => {
-      r = parseFloat(rInput.value);
-      Plotly.restyle(bifPlotEl, { x:[[r,r]] }, [1]);
-      drawSlice();
+    rInput.addEventListener('input', () => {
+        r = parseFloat(rInput.value);
+        Plotly.restyle(bifPlotEl, { x: [[r, r]] }, [1]);
+        drawSlice();
     });
-
-    x0Input .addEventListener('input', () => { x0 = parseFloat(x0Input.value); drawSlice(); });
+    x0Input.addEventListener('input', () => { x0 = parseFloat(x0Input.value); drawSlice(); });
     pointsInput.addEventListener('input', () => {
-      keepVis = Math.max(100, parseInt(pointsInput.value));
-      drawSlice();
+        keepVis = Math.max(100, parseInt(pointsInput.value));
+        drawSlice();
     });
-    kInput   .addEventListener('input', () => { k = parseInt(kInput.value); drawSlice(); });
-    toggleBtn.addEventListener('click',   () => { showBoxes = !showBoxes; drawSlice(); });
-
-    addBtn .addEventListener('click', () => {
-      const eps = epsFromK(k);
-      const N   = NofEps(eps);
-      rows.push({ k, N });
-      refreshTable();
+    kInput.addEventListener('input', () => { k = parseInt(kInput.value); drawSlice(); });
+    toggleBtn.addEventListener('click', () => { showBoxes = !showBoxes; drawSlice(); });
+    addBtn.addEventListener('click', () => {
+        const eps = epsFromK(k);
+        const N = NofEps(eps);
+        rows.push({ k, N });
+        refreshTable();
     });
-
-    clrBtn .addEventListener('click', () => {
-      rows.length = 0;
-      refreshTable();
-      Plotly.purge('logPlot');
+    clrBtn.addEventListener('click', () => {
+        rows.length = 0;
+        refreshTable();
+        Plotly.purge('logPlot');
     });
-
     plotBtn.addEventListener('click', () => {
-      if (rows.length >= 2) drawLogPlot();
+        if (rows.length >= 2) drawLogPlot();
     });
-  });
-  </script>
+});
+</script>
 </body>
 </html>
