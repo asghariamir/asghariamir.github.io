@@ -109,7 +109,6 @@
             </div>
             <div class="button-group">
                 <button id="animate-btn">Animate</button>
-                 <button id="reset-view-btn" class="secondary-button">Reset View</button>
             </div>
         </div>
         <table id="properties-table">
@@ -162,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const depthSlider = document.getElementById('depth-slider');
     const depthLabel = document.getElementById('depth-label');
     const animateBtn = document.getElementById('animate-btn');
-    const resetViewBtn = document.getElementById('reset-view-btn');
     const propertiesTableBody = document.querySelector('#properties-table tbody');
     const kSlider = document.getElementById('k-slider');
     const kLabel = document.getElementById('k-label');
@@ -182,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dx = p2.x - p1.x, dy = p2.y - p1.y;
         const pA = { x: p1.x + dx / 3, y: p1.y + dy / 3 };
         const pB = { x: p1.x + 2 * dx / 3, y: p1.y + 2 * dy / 3 };
-        const angle = -Math.PI / 3;
+        const angle = Math.PI / 3;
         const pTip = {
             x: pA.x + (pB.x - pA.x) * Math.cos(angle) - (pB.y - pA.y) * Math.sin(angle),
             y: pA.y + (pB.x - pA.x) * Math.sin(angle) + (pB.y - pA.y) * Math.cos(angle)
@@ -198,19 +196,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const side = 1;
         const h = side * Math.sqrt(3) / 2;
-        const p1 = { x: -side / 2, y: h / 3 }, p2 = { x: side / 2, y: h / 3 }, p3 = { x: 0, y: -2 * h / 3 };
-        
+        const p1 = { x: 0, y: h }, p2 = { x: side, y: h }, p3 = { x: side / 2, y: 0 };
+
         const rawSegments = [
-            ...getKochSegments(depth, p1, p2), ...getKochSegments(depth, p2, p3), ...getKochSegments(depth, p3, p1)
+            ...getKochSegments(depth, p1, p2), ...getKochSegments(depth, p3, p1), ...getKochSegments(depth, p2, p3)
         ];
 
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        rawSegments.forEach(seg => {
-            [seg[0], seg[1]].forEach(p => {
-                if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
-                if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
-            });
-        });
+        rawSegments.forEach(seg => [seg[0], seg[1]].forEach(p => {
+            if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+        }));
 
         const fractalW = maxX - minX, fractalH = maxY - minY;
         const scale = 1 / Math.max(fractalW, fractalH);
@@ -225,57 +221,47 @@ document.addEventListener('DOMContentLoaded', () => {
         return normalizedSegments;
     }
 
-    function drawOnCanvas(canvas, depth, panZoom) {
+    function drawOnCanvas(canvas, context, depth, panZoom) {
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
         if (rect.width === 0) return;
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.width * dpr;
-        canvas.style.height = `${rect.width}px`;
-        const canvasCtx = canvas.getContext('2d');
-        canvasCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        canvasCtx.fillStyle = 'white';
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
         
-        canvasCtx.save();
-        canvasCtx.translate(panZoom.panX, panZoom.panY);
-        canvasCtx.scale(panZoom.scale, panZoom.scale);
-        
-        const canvasSize = canvas.width / dpr;
-        const margin = canvasSize * 0.05;
-        const drawSize = canvasSize - 2 * margin;
+        const size = Math.max(rect.width, rect.height);
+        canvas.width = size * dpr;
+        canvas.height = size * dpr;
+        canvas.style.width = `${size}px`;
+        canvas.style.height = `${size}px`;
 
+        context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, size, size);
+        
+        context.save();
+        context.translate(panZoom.panX, panZoom.panY);
+        context.scale(panZoom.scale, panZoom.scale);
+        
+        const margin = size * 0.05;
+        const drawSize = size - 2 * margin;
         const segments = getNormalizedSnowflake(depth);
 
-        canvasCtx.beginPath();
+        context.beginPath();
         const firstPoint = segments[0][0];
-        canvasCtx.moveTo(firstPoint.x * drawSize + margin, firstPoint.y * drawSize + margin);
+        context.moveTo(firstPoint.x * drawSize + margin, firstPoint.y * drawSize + margin);
         for (const seg of segments) {
             const p2 = seg[1];
-            canvasCtx.lineTo(p2.x * drawSize + margin, p2.y * drawSize + margin);
+            context.lineTo(p2.x * drawSize + margin, p2.y * drawSize + margin);
         }
-        canvasCtx.closePath();
-        canvasCtx.fillStyle = '#1565c0';
-        canvasCtx.fill();
-        canvasCtx.strokeStyle = '#1a237e';
-        canvasCtx.lineWidth = 1 / panZoom.scale;
-        canvasCtx.stroke();
-        canvasCtx.restore();
+        context.closePath();
+        context.fillStyle = '#1565c0';
+        context.fill();
+        context.strokeStyle = '#1a237e';
+        context.lineWidth = 1 / panZoom.scale;
+        context.stroke();
+        context.restore();
     }
 
-    function updateExplorer() {
-        depthLabel.textContent = currentDepth;
-        drawOnCanvas(mainCanvas, currentDepth, transform);
-        updateExplorerTable();
-        if (document.getElementById('dimension-tab').classList.contains('active')) {
-             updateDimensionUI();
-        }
-    }
-    
     function updateExplorerTable() {
-        const initialSide = 1;
-        const initialArea = (Math.sqrt(3) / 4) * Math.pow(initialSide, 2);
+        const initialSide = 1, initialArea = (Math.sqrt(3) / 4);
         let area = initialArea;
         propertiesTableBody.innerHTML = '';
         for (let n = 0; n <= MAX_DEPTH; n++) {
@@ -290,6 +276,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function updateExplorer() {
+        depthLabel.textContent = currentDepth;
+        drawOnCanvas(mainCanvas, ctx, currentDepth, transform);
+        updateExplorerTable();
+        if (document.getElementById('dimension-tab').classList.contains('active')) {
+             updateDimensionUI();
+        }
+    }
+    
     function getOccupiedBoxSet(depth, k) {
         const s = 1 / Math.pow(2, k);
         const numBoxesPerSide = Math.pow(2, k);
@@ -315,43 +310,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateDimensionUI() {
-        kLabel.textContent = kSlider.value;
-        const occupiedBoxes = getOccupiedBoxSet(currentDepth, parseInt(kSlider.value));
+        const k = parseInt(kSlider.value);
+        kLabel.textContent = k;
+        const occupiedBoxes = getOccupiedBoxSet(currentDepth, k);
         nVal.textContent = occupiedBoxes.size.toLocaleString();
         drawGridVisualization(occupiedBoxes);
     }
 
     function drawGridVisualization(occupiedBoxes) {
+        // Draw the base fractal on the canvas first
+        drawOnCanvas(boxGridCanvas, boxGridCtx, currentDepth, {scale: 1, panX: 0, panY: 0});
+        
+        // Now, overlay the grid
         const dpr = window.devicePixelRatio || 1;
         const rect = boxGridCanvas.getBoundingClientRect();
-        if (rect.width === 0) return;
-        boxGridCanvas.width = rect.width * dpr;
-        boxGridCanvas.height = rect.height * dpr;
+        const canvasSize = Math.max(rect.width, rect.height);
+        boxGridCtx.save();
         boxGridCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        
-        const canvasWidth = boxGridCanvas.width/dpr;
-        const canvasHeight = boxGridCanvas.height/dpr;
-        boxGridCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-        const margin = canvasWidth * 0.05;
-        const drawSize = canvasWidth - 2 * margin;
-        const segments = getNormalizedSnowflake(currentDepth);
-        
-        boxGridCtx.beginPath();
-        const firstPoint = segments[0][0];
-        boxGridCtx.moveTo(firstPoint.x * drawSize + margin, firstPoint.y * drawSize + margin);
-        for (const seg of segments) boxGridCtx.lineTo(seg[1].x * drawSize + margin, seg[1].y * drawSize + margin);
-        boxGridCtx.strokeStyle = 'rgba(21, 101, 192, 0.3)';
-        boxGridCtx.lineWidth = 1;
-        boxGridCtx.stroke();
-        
         const k = parseInt(kSlider.value);
         const numBoxesPerSide = Math.pow(2, k);
-        const boxSize = canvasWidth / numBoxesPerSide;
+        const boxSize = canvasSize / numBoxesPerSide;
         
         for (let i = 0; i < numBoxesPerSide; i++) {
             for (let j = 0; j < numBoxesPerSide; j++) {
-                if (j * boxSize > canvasHeight) continue;
                  if (occupiedBoxes.has(`${i}-${j}`)) {
                     boxGridCtx.fillStyle = 'rgba(21, 101, 192, 0.6)';
                     boxGridCtx.fillRect(i * boxSize, j * boxSize, boxSize, boxSize);
@@ -360,6 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 boxGridCtx.strokeRect(i * boxSize, j * boxSize, boxSize, boxSize);
             }
         }
+        boxGridCtx.restore();
     }
     
     function addData() {
@@ -401,16 +384,15 @@ document.addEventListener('DOMContentLoaded', () => {
         plotLogLog({ slope, intercept });
     }
 
-    // --- Event Listeners & TABS ---
-    depthSlider.addEventListener('input', e => { currentDepth = parseInt(e.target.value); updateExplorer(); });
-    resetViewBtn.addEventListener('click', () => { transform = { scale: 1, panX: 0, panY: 0 }; drawOnCanvas(mainCanvas, currentDepth, transform); });
-    mainCanvas.addEventListener('mousedown', e => { isDragging = true; startDrag = { x: e.clientX, y: e.clientY }; mainCanvas.style.cursor = 'grabbing'; });
+    depthSlider.addEventListener('input', e => { currentDepth = parseInt(e.target.value); memoizedGeometry = {}; updateExplorer(); });
+    animateBtn.addEventListener('click', () => { isAnimating = !isAnimating; animateBtn.textContent = isAnimating ? 'Stop' : 'Animate'; animateBtn.classList.toggle('danger-button', isAnimating); if (isAnimating) animate(); else clearTimeout(animationFrameId); });
+    function animate() { if (!isAnimating) return; let d = parseInt(depthSlider.value) + animationDirection; if (d > MAX_DEPTH || d < 0) { animationDirection *= -1; d += 2 * animationDirection; } depthSlider.value = d; currentDepth = d; memoizedGeometry = {}; updateExplorer(); animationFrameId = setTimeout(() => requestAnimationFrame(animate), 500); }
+    
+    mainCanvas.addEventListener('mousedown', e => { isAnimating = false; animateBtn.textContent = 'Animate'; animateBtn.classList.remove('danger-button'); clearTimeout(animationFrameId); isDragging = true; startDrag = { x: e.clientX, y: e.clientY }; mainCanvas.style.cursor = 'grabbing'; });
     mainCanvas.addEventListener('mouseup', () => { isDragging = false; mainCanvas.style.cursor = 'grab'; });
     mainCanvas.addEventListener('mouseleave', () => { isDragging = false; mainCanvas.style.cursor = 'grab'; });
-    mainCanvas.addEventListener('mousemove', e => { if(!isDragging) return; transform.panX += e.clientX - startDrag.x; transform.panY += e.clientY - startDrag.y; startDrag = { x: e.clientX, y: e.clientY }; drawOnCanvas(mainCanvas, currentDepth, transform); });
-    mainCanvas.addEventListener('wheel', e => { e.preventDefault(); const rect = mainCanvas.getBoundingClientRect(); const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top; const scaleAmount = e.deltaY < 0 ? 1.1 : 1 / 1.1; transform.scale *= scaleAmount; transform.panX = mouseX - (mouseX - transform.panX) * scaleAmount; transform.panY = mouseY - (mouseY - transform.panY) * scaleAmount; drawOnCanvas(mainCanvas, currentDepth, transform); });
-    animateBtn.addEventListener('click', () => { isAnimating = !isAnimating; animateBtn.textContent = isAnimating ? 'Stop' : 'Animate'; animateBtn.classList.toggle('danger-button', isAnimating); if (isAnimating) animate(); else clearTimeout(animationFrameId); });
-    function animate() { if (!isAnimating) return; let d = parseInt(depthSlider.value) + animationDirection; if (d > MAX_DEPTH || d < 0) { animationDirection *= -1; d += 2 * animationDirection; } depthSlider.value = d; currentDepth = d; updateExplorer(); animationFrameId = setTimeout(() => requestAnimationFrame(animate), 500); }
+    mainCanvas.addEventListener('mousemove', e => { if(!isDragging) return; transform.panX += e.clientX - startDrag.x; transform.panY += e.clientY - startDrag.y; startDrag = { x: e.clientX, y: e.clientY }; drawOnCanvas(mainCanvas, ctx, currentDepth, transform); });
+    mainCanvas.addEventListener('wheel', e => { e.preventDefault(); const rect = mainCanvas.getBoundingClientRect(); const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top; const scaleAmount = e.deltaY < 0 ? 1.1 : 1 / 1.1; const newScale = transform.scale * scaleAmount; transform.panX = mouseX - (mouseX - transform.panX) * scaleAmount; transform.panY = mouseY - (mouseY - transform.panY) * scaleAmount; transform.scale = newScale; drawOnCanvas(mainCanvas, ctx, currentDepth, transform); });
     
     kSlider.addEventListener('input', updateDimensionUI);
     addDataBtn.addEventListener('click', addData);
@@ -423,15 +405,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
         document.getElementById(`${tabName}-tab`).classList.add('active');
         document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        memoizedGeometry = {}; // Clear cache on tab switch for safety
+        memoizedGeometry = {};
         if (tabName === 'explorer') { updateExplorer(); } else { updateDimensionUI(); }
     };
     
-    window.addEventListener('resize', () => { if (document.getElementById('explorer-tab').classList.contains('active')) { drawOnCanvas(mainCanvas, currentDepth, transform); }});
+    window.addEventListener('resize', () => { if (document.getElementById('explorer-tab').classList.contains('active')) { drawOnCanvas(mainCanvas, ctx, currentDepth, transform); }});
     updateExplorer();
 });
 </script>
 </body>
 </html>
-      
-     
