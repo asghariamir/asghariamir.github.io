@@ -8,7 +8,8 @@
     <style>
         :root {
             --primary-color: #1565c0;
-            --highlight-color: #ffeb3b; /* Yellow for highlighting */
+            --original-highlight-color: #ffeb3b;
+            --transformed-highlight-color: #ff9800; /* Orange */
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
@@ -36,48 +37,14 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
             overflow: hidden;
+            padding: 1.5rem;
         }
-
-        /* ---------- Tabs ---------- */
-        .tabs {
-            display: flex;
-            background-color: var(--light-gray);
-            border-bottom: 2px solid var(--medium-gray);
-        }
-
-        .tab-button {
-            padding: 14px 20px;
-            cursor: pointer;
-            border: none;
-            background-color: transparent;
-            font-size: 1rem;
-            color: var(--dark-gray);
-            position: relative;
-            transition: color 0.3s;
-        }
-
-        .tab-button.active {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .tab-button.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--primary-color);
-        }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: block; padding: 1.5rem; }
 
         h2 {
             font-size: 1.75rem;
             color: var(--primary-color);
             margin-bottom: 1rem;
+            text-align: center;
         }
         
         p.info {
@@ -85,6 +52,7 @@
             color: #616161;
             max-width: 100%;
             margin-bottom: 1.5rem;
+            text-align: center;
         }
 
         /* ---------- Controls ---------- */
@@ -92,15 +60,12 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
+            justify-content: center;
             gap: 1rem 1.5rem;
             padding: 1rem;
             background-color: var(--light-gray);
             border-radius: 6px;
             margin-bottom: 1.5rem;
-        }
-        .controls.bare {
-            background-color: transparent;
-            padding: 0;
         }
 
         .control-group {
@@ -135,160 +100,105 @@
         }
 
         button:hover { background-color: #1976d2; }
-        .secondary-button { background-color: #6c757d; }
-        .secondary-button:hover { background-color: #5a6268; }
         .danger-button { background-color: #d32f2f; }
         .danger-button:hover { background-color: #c62828; }
         
-        #result-display, #warning-message {
-            font-size: 1rem;
+        #result-display, #transform-result-display {
+            font-size: 1.25rem;
             font-weight: 600;
             color: var(--primary-color);
         }
-        #warning-message { color: #c62828; }
+        #transform-result-display { color: #f57c00; } /* Orange text */
 
         /* ---------- Table Styling ---------- */
         .table-container {
             width: 100%;
-            overflow: auto;
+            overflow-x: auto;
             border: 1px solid var(--medium-gray);
             border-radius: 4px;
         }
         table {
             border-collapse: collapse;
-            min-width: 100%;
+            font-size: 0.9rem;
+            width: 100%;
         }
-
-        /* Playground Table */
-        #playground-table-container th, 
-        #playground-table-container td {
+        th, td {
             border: 1px solid var(--medium-gray);
             text-align: center;
             min-width: 3.5rem;
             height: 3.5rem;
             padding: 0.5rem;
-            font-size: 0.9rem;
         }
-        #playground-table-container th {
+        th {
             background-color: var(--light-gray);
             font-weight: bold;
         }
-        #playground-table-container td.interactive { cursor: pointer; }
-        #playground-table-container td.highlight {
-            background-color: var(--highlight-color);
-            font-weight: bold;
+        td { cursor: pointer; }
+        td.highlight.original {
+            background-color: var(--original-highlight-color);
         }
-        
-        /* Higher Powers Table (Dot Pattern) */
-        #higher-table-container {
-             background-color: #fff;
+        td.highlight.transformed {
+            background-color: var(--transformed-highlight-color);
+            color: white;
         }
-        #higher-table-container th, 
-        #higher-table-container td {
-            min-width: 8px; /* Dot size */
-            height: 8px;    /* Dot size */
-            padding: 0;
-            border: 1px solid #f5f5f5; /* Faint grid */
-        }
-        #higher-table-container th {
-            background-color: #fff;
-            border-color: #fff;
-        }
-        #higher-table-container td.highlight {
-            background-color: var(--primary-color);
-        }
-
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="tabs">
-        <button class="tab-button active" onclick="switchTab('playground')">Playground</button>
-        <button class="tab-button" onclick="switchTab('higher-powers')">Higher Powers</button>
+    <h2>Sums of Powers Playground</h2>
+    <p class="info">Calculate a sum of powers, find the result on the table, and then use the calculator to transform it.</p>
+
+    <div class="controls">
+         <div class="control-group">
+            <label for="n-input">First N:</label>
+            <input type="number" id="n-input" min="1" value="5">
+        </div>
+        <div class="control-group">
+            <label for="power-select">Power:</label>
+            <select id="power-select">
+                <option value="1">1 (Sum)</option>
+                <option value="2">2 (Squares)</option>
+                <option value="3">3 (Cubes)</option>
+            </select>
+        </div>
+        <button id="calculate-btn">Calculate Sum</button>
+        <div id="result-display"></div>
+    </div>
+    
+    <div id="calculator-ui" class="controls" style="display: none; background-color: #fff8e1;">
+        <div class="control-group">
+            <label>Transform result <strong id="calc-source-val"></strong> by multiplying:</label>
+            <input type="number" id="calc-factor-input" value="2" min="2">
+            <button id="transform-btn">Transform</button>
+        </div>
+        <div id="transform-result-display"></div>
     </div>
 
-    <section id="playground-tab" class="tab-content active">
-        <h2>Sums of Powers Playground</h2>
-        <p class="info">Calculate a sum of powers, then find the result on the table and click to highlight it. You can highlight multiple numbers and transform them automatically.</p>
-        <div class="controls">
-             <div class="control-group">
-                <label for="n-input">First N:</label>
-                <input type="number" id="n-input" min="1" value="5">
-            </div>
-            <div class="control-group">
-                <label for="power-select">Power:</label>
-                <select id="power-select">
-                    <option value="1">1 (Sum)</option>
-                    <option value="2">2 (Squares)</option>
-                    <option value="3">3 (Cubes)</option>
-                </select>
-            </div>
-            <button id="calculate-btn">Calculate Sum</button>
-            <div id="result-display"></div>
+    <div id="playground-table-container" class="table-container"></div>
+    
+    <div class="controls" style="background: none; padding-top: 1.5rem; justify-content: space-between;">
+        <button id="clear-highlights-btn" class="danger-button">Clear All</button>
+         <div class="control-group">
+            <label for="table-size-input">Table Size:</label>
+            <input type="number" id="table-size-input" min="5" max="40" value="12">
+            <button id="download-playground-btn">Download as Image</button>
         </div>
-        <div class="controls bare">
-            <div class="control-group">
-                <label>Multiply highlights by:</label>
-                <button class="secondary-button" data-factor="2">×2</button>
-                <button class="secondary-button" data-factor="3">×3</button>
-                <button class="secondary-button" data-factor="4">×4</button>
-            </div>
-            <button id="clear-highlights-btn" class="danger-button">Clear Highlights</button>
-        </div>
-        <div id="playground-table-container" class="table-container"></div>
-        <div class="controls bare" style="margin-top: 1.5rem; justify-content: flex-end;">
-             <div class="control-group">
-                <label for="table-size-input">Table Size:</label>
-                <input type="number" id="table-size-input" min="5" max="40" value="12">
-            </div>
-            <button id="download-playground-btn" class="secondary-button">Download as Image</button>
-        </div>
-    </section>
-
-    <section id="higher-powers-tab" class="tab-content">
-        <h2>Higher Powers Visualization</h2>
-        <p class="info">See the patterns formed by sums of higher powers. The grid will automatically resize to display the results. Each blue dot represents a sum S<sub>i</sub> = 1<sup>p</sup> + 2<sup>p</sup> + ... + i<sup>p</sup>.</p>
-        <div class="controls">
-            <div class="control-group">
-                <label for="n-higher-input">Show sums up to N:</label>
-                <input type="number" id="n-higher-input" min="1" max="20" value="8">
-            </div>
-            <div class="control-group">
-                <label for="power-higher-select">Power:</label>
-                <select id="power-higher-select">
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                </select>
-            </div>
-            <button id="generate-btn">Generate & Highlight</button>
-        </div>
-        <div class="controls bare">
-            <div class="control-group">
-                <label>Multiply all highlights by:</label>
-                <button class="secondary-button" data-factor="2">×2</button>
-                <button class="secondary-button" data-factor="3">×3</button>
-                <button class="secondary-button" data-factor="4">×4</button>
-                 <button class="secondary-button" data-factor="5">×5</button>
-            </div>
-        </div>
-        <p id="warning-message"></p>
-        <div id="higher-table-container" class="table-container"></div>
-    </section>
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE MANAGEMENT ---
-    const MAX_HIGHER_TABLE_SIZE = 200;
     let state = {
-        playground: { size: 12, n: 5, power: 1, result: null, highlights: new Set() },
-        higher: { size: 30, n: 8, power: 4, highlights: new Set() }
+        size: 12,
+        n: 5,
+        power: 1,
+        originalSum: null,
+        // highlights is an object: { "row-col": "type" }, e.g. { "3-5": "original" }
+        highlights: {},
     };
     
     // --- DOM REFERENCES ---
-    const playgroundTab = document.getElementById('playground-tab');
     const pgTableContainer = document.getElementById('playground-table-container');
     const nInput = document.getElementById('n-input');
     const powerSelect = document.getElementById('power-select');
@@ -297,79 +207,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultDisplay = document.getElementById('result-display');
     const clearHighlightsBtn = document.getElementById('clear-highlights-btn');
     const downloadPlaygroundBtn = document.getElementById('download-playground-btn');
-    
-    const higherTab = document.getElementById('higher-powers-tab');
-    const higherTableContainer = document.getElementById('higher-table-container');
-    const nHigherInput = document.getElementById('n-higher-input');
-    const powerHigherSelect = document.getElementById('power-higher-select');
-    const generateBtn = document.getElementById('generate-btn');
-    const warningMessage = document.getElementById('warning-message');
+    const calculatorUI = document.getElementById('calculator-ui');
+    const calcSourceVal = document.getElementById('calc-source-val');
+    const calcFactorInput = document.getElementById('calc-factor-input');
+    const transformBtn = document.getElementById('transform-btn');
+    const transformResultDisplay = document.getElementById('transform-result-display');
 
-    // --- RENDERING & LOGIC ---
+    // --- LOGIC & RENDERING ---
     
-    function createTable(size, highlights, isInteractive, showContent = true) {
+    function createTable(size, highlights) {
         const table = document.createElement('table');
         const thead = table.createTHead().insertRow();
-        const headerCell = thead.insertCell();
-        if (showContent) headerCell.outerHTML = "<th>×</th>";
-        for (let i = 1; i <= size; i++) {
-            const th = thead.insertCell();
-            if (showContent) th.outerHTML = `<th>${i}</th>`;
-        }
+        thead.insertCell().outerHTML = "<th>×</th>";
+        for (let i = 1; i <= size; i++) thead.insertCell().outerHTML = `<th>${i}</th>`;
         
         const tbody = table.createTBody();
         for (let r = 1; r <= size; r++) {
             const row = tbody.insertRow();
-            const firstCell = row.insertCell();
-            if (showContent) firstCell.outerHTML = `<th>${r}</th>`;
-
-            for (let c = 1; c <= (showContent ? size : size -1) ; c++) {
+            row.insertCell().outerHTML = `<th>${r}</th>`;
+            for (let c = 1; c <= size; c++) {
                 const cell = row.insertCell();
                 const key = `${r}-${c}`;
-                if (showContent) cell.textContent = r * c;
-                if (isInteractive) {
-                    cell.classList.add('interactive');
-                    cell.dataset.key = key;
+                const highlightType = highlights[key];
+                cell.textContent = r * c;
+                cell.dataset.key = key;
+                if (highlightType) {
+                    cell.classList.add('highlight', highlightType);
                 }
-                if (highlights.has(key)) cell.classList.add('highlight');
             }
         }
         return table;
     }
 
-    function renderPlayground() {
+    function render() {
         pgTableContainer.innerHTML = '';
-        pgTableContainer.appendChild(createTable(state.playground.size, state.playground.highlights, true, true));
-        resultDisplay.textContent = state.playground.result !== null ? `Result: ${state.playground.result}` : '';
-    }
+        pgTableContainer.appendChild(createTable(state.size, state.highlights));
+        resultDisplay.textContent = state.originalSum !== null ? `Result: ${state.originalSum}` : '';
 
-    function renderHigherPowers() {
-        higherTableContainer.innerHTML = '';
-        higherTableContainer.appendChild(createTable(state.higher.size, state.higher.highlights, false, false));
+        if (state.originalSum !== null) {
+            calculatorUI.style.display = 'flex';
+            calcSourceVal.textContent = `(${state.originalSum})`;
+        } else {
+            calculatorUI.style.display = 'none';
+            transformResultDisplay.textContent = '';
+        }
     }
     
-    function highlightValueFirstColumn(value, tabState) {
-        if (value > tabState.size * tabState.size || value <= 0) return false;
-        for (let c = 1; c <= tabState.size; c++) {
+    function findAndHighlight(value, type) {
+        if (value > state.size * state.size || value <= 0) return false;
+        // Find with smallest column number
+        for (let c = 1; c <= state.size; c++) {
             if (value % c === 0) {
                 const r = value / c;
-                if (r >= 1 && r <= tabState.size) {
-                    tabState.highlights.add(`${r}-${c}`);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    function highlightOnOrAboveDiagonal(value, tabState) {
-        if (value > tabState.size * tabState.size || value <= 0) return false;
-        const limit = Math.floor(Math.sqrt(value));
-        for (let r = 1; r <= limit; r++) {
-            if (value % r === 0) {
-                const c = value / r;
-                if (c <= tabState.size) {
-                    tabState.highlights.add(`${r}-${c}`);
+                if (r >= 1 && r <= state.size) {
+                    state.highlights[`${r}-${c}`] = type;
                     return true;
                 }
             }
@@ -377,130 +268,57 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
     }
     
-    function multiplyHighlights(factor, tabKey) {
-        const tabState = state[tabKey];
-        let maxNewValue = 0;
-        const newHighlights = new Set();
-        
-        tabState.highlights.forEach(key => {
-            const [r, c] = key.split('-').map(Number);
-            const newValue = r * c * factor;
-            if (newValue > maxNewValue) maxNewValue = newValue;
-        });
-
-        if (tabKey === 'higher') {
-            const requiredSize = Math.ceil(Math.sqrt(maxNewValue));
-            tabState.size = Math.min(Math.max(tabState.size, requiredSize), MAX_HIGHER_TABLE_SIZE);
-        }
-        
-        let allValuesFit = true;
-        const oldHighlights = new Set(tabState.highlights);
-        tabState.highlights = newHighlights;
-        
-        oldHighlights.forEach(key => {
-            const [r, c] = key.split('-').map(Number);
-            const newValue = r * c * factor;
-            const highlightFn = (tabKey === 'higher') ? highlightOnOrAboveDiagonal : highlightValueFirstColumn;
-            if (!highlightFn(newValue, tabState)) allValuesFit = false;
-        });
-        
-        if (tabKey === 'higher') {
-            warningMessage.textContent = allValuesFit ? '' : `Warning: Some results are too large to display (max table size ${MAX_HIGHER_TABLE_SIZE}x${MAX_HIGHER_TABLE_SIZE}).`;
-            renderHigherPowers();
-        } else {
-            renderPlayground();
-        }
-    }
-
     // --- EVENT LISTENERS ---
     
-    tableSizeInput.addEventListener('change', () => { state.playground.size = parseInt(tableSizeInput.value); renderPlayground(); });
+    tableSizeInput.addEventListener('change', () => { state.size = parseInt(tableSizeInput.value); render(); });
     
     calculateBtn.addEventListener('click', () => {
         let sum = 0;
         const n = parseInt(nInput.value);
         const power = parseInt(powerSelect.value);
         for (let i = 1; i <= n; i++) sum += Math.pow(i, power);
-        state.playground.result = sum;
-        resultDisplay.textContent = `Result: ${sum}`;
-    });
-    
-    pgTableContainer.addEventListener('click', (e) => {
-        if (e.target.matches('td.interactive')) {
-            const key = e.target.dataset.key;
-            state.playground.highlights.has(key) ? state.playground.highlights.delete(key) : state.playground.highlights.add(key);
-            e.target.classList.toggle('highlight');
-        }
+        
+        state.originalSum = sum;
+        state.highlights = {}; // Clear previous highlights
+        findAndHighlight(sum, 'original'); // Highlight the new sum
+        render();
     });
 
+    transformBtn.addEventListener('click', () => {
+        if (state.originalSum === null) return;
+        
+        const factor = parseInt(calcFactorInput.value);
+        const transformedValue = state.originalSum * factor;
+        
+        // Remove previous transformed highlights, but keep original
+        for (const key in state.highlights) {
+            if (state.highlights[key] === 'transformed') {
+                delete state.highlights[key];
+            }
+        }
+        
+        findAndHighlight(transformedValue, 'transformed');
+        transformResultDisplay.textContent = `= ${transformedValue}`;
+        render();
+    });
+    
     clearHighlightsBtn.addEventListener('click', () => {
-        state.playground.highlights.clear();
-        state.playground.result = null;
-        renderPlayground();
+        state.originalSum = null;
+        state.highlights = {};
+        render();
     });
 
     downloadPlaygroundBtn.addEventListener('click', () => {
         html2canvas(document.getElementById('playground-table-container')).then(canvas => {
             const link = document.createElement("a");
-            link.download = "playground-table.png";
+            link.download = "sums-playground.png";
             link.href = canvas.toDataURL();
             link.click();
         });
     });
-    
-    playgroundTab.querySelector('.controls.bare').addEventListener('click', (e) => {
-        if (e.target.matches('button[data-factor]')) {
-            multiplyHighlights(parseInt(e.target.dataset.factor), 'playground');
-        }
-    });
 
-    generateBtn.addEventListener('click', () => {
-        const n = parseInt(nHigherInput.value);
-        const power = parseInt(powerHigherSelect.value);
-        const sums = [];
-        let currentSum = 0;
-        for (let i = 1; i <= n; i++) {
-            currentSum += Math.pow(i, power);
-            sums.push(currentSum);
-        }
-        const maxVal = sums.length > 0 ? sums[sums.length - 1] : 0;
-        const requiredSize = Math.ceil(Math.sqrt(maxVal)) || 10;
-        state.higher.size = Math.min(requiredSize, MAX_HIGHER_TABLE_SIZE);
-
-        warningMessage.textContent = requiredSize > MAX_HIGHER_TABLE_SIZE ? `Warning: Some sums are too large to display (max size ${MAX_HIGHER_TABLE_SIZE}x${MAX_HIGHER_TABLE_SIZE}).` : '';
-        
-        state.higher.highlights.clear();
-        sums.forEach(sum => highlightOnOrAboveDiagonal(sum, state.higher));
-        
-        renderHigherPowers();
-    });
-    
-    higherTab.querySelector('.controls.bare').addEventListener('click', (e) => {
-        if (e.target.matches('button[data-factor]')) {
-            multiplyHighlights(parseInt(e.target.dataset.factor), 'higher');
-        }
-    });
-
-    // --- INITIALIZATION AND TAB SWITCHING ---
-    
-    window.switchTab = (tabName) => {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        const tabContent = document.getElementById(`${tabName}-tab`);
-        if (tabContent) tabContent.classList.add('active');
-        const tabButton = document.querySelector(`button[onclick="switchTab('${tabName}')"]`);
-        if (tabButton) tabButton.classList.add('active');
-
-        // Render content for the active tab
-        if (tabName === 'playground') {
-            renderPlayground();
-        } else if (tabName === 'higher-powers') {
-            renderHigherPowers();
-        }
-    };
-
-    // Initial load: set default tab and render its content
-    switchTab('playground');
+    // --- INITIALIZATION ---
+    render();
 });
 </script>
 </body>
