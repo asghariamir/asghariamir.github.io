@@ -140,11 +140,12 @@
         .danger-button { background-color: #d32f2f; }
         .danger-button:hover { background-color: #c62828; }
         
-        #result-display {
-            font-size: 1.25rem;
+        #result-display, #warning-message {
+            font-size: 1rem;
             font-weight: 600;
             color: var(--primary-color);
         }
+        #warning-message { color: #c62828; }
 
         /* ---------- Table ---------- */
         .table-container {
@@ -155,15 +156,15 @@
         }
         table {
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* Smaller font for larger tables */
             min-width: 100%;
         }
         th, td {
             border: 1px solid var(--medium-gray);
             text-align: center;
-            min-width: 3.5rem;
-            height: 3.5rem;
-            padding: 0.5rem;
+            min-width: 3rem;
+            height: 3rem;
+            padding: 0.25rem;
         }
         th {
             background-color: var(--light-gray);
@@ -185,7 +186,7 @@
 
     <section id="playground-tab" class="tab-content active">
         <h2>Sums of Powers Playground</h2>
-        <p class="info">Experiment with sums of powers. Choose the power and number of terms, then calculate the sum. The result can be highlighted on the multiplication table below.</p>
+        <p class="info">Calculate a sum of powers, then find the result on the table and click to highlight it. You can highlight multiple numbers and transform them.</p>
 
         <div class="controls">
              <div class="control-group">
@@ -227,7 +228,7 @@
 
     <section id="higher-powers-tab" class="tab-content">
         <h2>Higher Powers Visualization</h2>
-        <p class="info">See the patterns formed by sums of higher powers. Choose a power and the number of consecutive sums to display. Each highlighted cell represents a sum S<sub>i</sub> = 1<sup>p</sup> + 2<sup>p</sup> + ... + i<sup>p</sup>.</p>
+        <p class="info">See the patterns formed by sums of higher powers. The table will automatically resize to display the results. Each highlighted cell represents a sum S<sub>i</sub> = 1<sup>p</sup> + 2<sup>p</sup> + ... + i<sup>p</sup>.</p>
 
         <div class="controls">
             <div class="control-group">
@@ -255,6 +256,7 @@
                  <button class="secondary-button" data-factor="5">×5</button>
             </div>
         </div>
+        <p id="warning-message"></p>
 
         <div id="higher-table-container" class="table-container"></div>
     </section>
@@ -263,6 +265,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE MANAGEMENT ---
+    const MAX_HIGHER_TABLE_SIZE = 150;
     let state = {
         playground: {
             size: 12,
@@ -295,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nHigherInput = document.getElementById('n-higher-input');
     const powerHigherSelect = document.getElementById('power-higher-select');
     const generateBtn = document.getElementById('generate-btn');
+    const warningMessage = document.getElementById('warning-message');
 
     // --- RENDERING & LOGIC ---
     
@@ -335,17 +339,20 @@ document.addEventListener('DOMContentLoaded', () => {
         higherTableContainer.appendChild(createTable(size, highlights, false));
     }
     
-    function highlightValue(value, tab) {
+    function highlightValueFirstColumn(value, tab) {
         const { size, highlights } = state[tab];
-        for (let r = 1; r <= size; r++) {
-            if (value > 0 && value % r === 0) {
-                const c = value / r;
-                if (c >= 1 && c <= size) {
+        if (value > size * size || value <= 0) return false; // Cannot be represented
+
+        for (let c = 1; c <= size; c++) {
+            if (value % c === 0) {
+                const r = value / c;
+                if (r >= 1 && r <= size) {
                     highlights.add(`${r}-${c}`);
-                    return;
+                    return true; // Found the pair with the smallest column
                 }
             }
         }
+        return false;
     }
     
     function multiplyHighlights(factor, tab) {
@@ -361,40 +368,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (tab === 'higher') {
             const requiredSize = Math.ceil(Math.sqrt(maxNewValue));
-            if (requiredSize > state.higher.size) {
-                state.higher.size = requiredSize;
-            }
+            state.higher.size = Math.min(Math.max(state.higher.size, requiredSize), MAX_HIGHER_TABLE_SIZE);
         }
         
-        const { size } = state[tab];
+        let allValuesFit = true;
         currentHighlights.forEach(key => {
             const [r, c] = key.split('-').map(Number);
             const newValue = r * c * factor;
-            for (let nr = 1; nr <= size; nr++) {
-                if (newValue > 0 && newValue % nr === 0) {
-                    const nc = newValue / nr;
-                    if (nc >= 1 && nc <= size) {
-                        newHighlights.add(`${nr}-${nc}`);
-                        break;
-                    }
-                }
+            if (!highlightValueFirstColumn(newValue, tab)) {
+                allValuesFit = false;
             }
         });
+
         state[tab].highlights = newHighlights;
-        tab === 'playground' ? renderPlayground() : renderHigherPowers();
+        
+        if (tab === 'higher') {
+            warningMessage.textContent = allValuesFit ? '' : `Warning: Some results are too large to display (max table size ${MAX_HIGHER_TABLE_SIZE}x${MAX_HIGHER_TABLE_SIZE}).`;
+            renderHigherPowers();
+        } else {
+            renderPlayground();
+        }
     }
 
     // --- EVENT LISTENERS ---
     
     tableSizeInput.addEventListener('change', () => { state.playground.size = parseInt(tableSizeInput.value); renderPlayground(); });
+    
     calculateBtn.addEventListener('click', () => {
         let sum = 0;
         const n = parseInt(nInput.value);
         const power = parseInt(powerSelect.value);
         for (let i = 1; i <= n; i++) sum += Math.pow(i, power);
         state.playground.result = sum;
-        highlightValue(sum, 'playground');
-        renderPlayground();
+        // ONLY update the text display, do not highlight or re-render table
+        resultDisplay.textContent = `Result: ${sum}`;
     });
     
     pgTableContainer.addEventListener('click', (e) => {
@@ -437,11 +444,14 @@ document.addEventListener('DOMContentLoaded', () => {
             sums.push(currentSum);
         }
         
-        const maxVal = sums[sums.length - 1];
-        state.higher.size = Math.ceil(Math.sqrt(maxVal)) || 10;
+        const maxVal = sums.length > 0 ? sums[sums.length - 1] : 0;
+        const requiredSize = Math.ceil(Math.sqrt(maxVal));
+        state.higher.size = Math.min(requiredSize, MAX_HIGHER_TABLE_SIZE);
+
+        warningMessage.textContent = requiredSize > MAX_HIGHER_TABLE_SIZE ? `Warning: Some sums are too large to display (max table size ${MAX_HIGHER_TABLE_SIZE}x${MAX_HIGHER_TABLE_SIZE}).` : '';
         
         state.higher.highlights.clear();
-        sums.forEach(sum => highlightValue(sum, 'higher'));
+        sums.forEach(sum => highlightValueFirstColumn(sum, 'higher'));
         
         renderHigherPowers();
     });
