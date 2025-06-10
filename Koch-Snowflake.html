@@ -67,7 +67,7 @@
         h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 1rem; }
         p { color: #616161; margin-bottom: 1rem; }
         
-        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: center; margin-bottom: 1.5rem; }
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; align-items: center; margin-bottom: 1.5rem; }
         .control-group { display: flex; flex-direction: column; }
         .button-group { display: flex; gap: 10px; flex-wrap: wrap; }
         label { margin-bottom: 0.5rem; font-size: 0.9rem; color: #616161; }
@@ -81,7 +81,7 @@
         .danger-button:hover { background-color: #c62828; }
         
         canvas { width: 100%; height: auto; cursor: grab; background-color: white; border: 1px solid var(--medium-gray); border-radius: 4px; }
-        #boxGridCanvas { height: 60px; }
+        #boxGridCanvas { height: 150px; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: 0.9rem; }
         th, td { border: 1px solid var(--medium-gray); padding: 8px; text-align: center; }
@@ -111,7 +111,6 @@
             </div>
             <div class="button-group">
                 <button id="animate-btn">Animate</button>
-                <button id="reset-view-btn" class="secondary-button">Reset View</button>
             </div>
         </div>
         <table id="properties-table">
@@ -122,7 +121,7 @@
 
     <section id="dimension-tab" class="tab-content">
         <h2>Box-Counting Dimension Lab</h2>
-        <p>This tool estimates the fractal dimension of the snowflake's boundary. We cover the curve with a grid of boxes of side length ε and count how many boxes, N(ε), are intersected.</p>
+        <p>This tool estimates the fractal dimension of the snowflake's boundary using the current iteration level from the Explorer. We cover the curve with a grid of boxes of side length ε and count how many boxes, N(ε), are intersected.</p>
         <div class="controls">
             <div class="control-group">
                 <label for="k-slider">Box size ε = 1/2<sup>k</sup> (k=<span id="k-label">1</span>)</label>
@@ -158,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let boxData = [];
     let logLogChart;
     const MAX_DEPTH = 6;
+    let memoizedSegments = {}; // Cache for fractal geometry
 
     // --- DOM REFS ---
     const mainCanvas = document.getElementById('mainCanvas');
@@ -165,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const depthSlider = document.getElementById('depth-slider');
     const depthLabel = document.getElementById('depth-label');
     const animateBtn = document.getElementById('animate-btn');
-    const resetViewBtn = document.getElementById('reset-view-btn');
     const propertiesTableBody = document.querySelector('#properties-table tbody');
 
     const kSlider = document.getElementById('k-slider');
@@ -203,6 +202,25 @@ document.addEventListener('DOMContentLoaded', () => {
         segments.push(...getKochSegments(level - 1, pB, p2));
         return segments;
     }
+    
+    function getAllSegments(depth, side, marginX, marginY) {
+        const key = `${depth}-${side}`;
+        if (memoizedSegments[key]) return memoizedSegments[key];
+
+        const h = side * Math.sqrt(3) / 2;
+        const p1 = { x: marginX, y: marginY + h };
+        const p2 = { x: marginX + side, y: marginY + h };
+        const p3 = { x: marginX + side / 2, y: marginY };
+
+        const segments = [
+            ...getKochSegments(depth, p1, p2),
+            ...getKochSegments(depth, p2, p3),
+            ...getKochSegments(depth, p3, p1)
+        ];
+        memoizedSegments[key] = segments;
+        return segments;
+    }
+
 
     // --- EXPLORER LOGIC ---
     function drawExplorer() {
@@ -217,23 +235,16 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
 
         ctx.save();
-        ctx.translate(transform.panX / dpr, transform.panY / dpr);
+        ctx.translate(transform.panX, transform.panY);
         ctx.scale(transform.scale, transform.scale);
         
-        const side = mainCanvas.width / dpr * 0.8;
+        const canvasWidth = mainCanvas.width / dpr;
+        const side = canvasWidth * 0.8;
         const h = side * Math.sqrt(3) / 2;
-        const marginX = (mainCanvas.width / dpr - side) / 2;
-        const marginY = (mainCanvas.width / dpr - h) / 2;
-
-        const p1 = { x: marginX, y: marginY + h };
-        const p2 = { x: marginX + side, y: marginY + h };
-        const p3 = { x: marginX + side / 2, y: marginY };
-
-        const segments = [
-            ...getKochSegments(currentDepth, p1, p2),
-            ...getKochSegments(currentDepth, p2, p3),
-            ...getKochSegments(currentDepth, p3, p1)
-        ];
+        const marginX = (canvasWidth - side) / 2;
+        const marginY = (canvasWidth - h) / 2;
+        
+        const segments = getAllSegments(currentDepth, side, marginX, marginY);
 
         ctx.beginPath();
         ctx.moveTo(segments[0][0].x, segments[0][0].y);
@@ -260,48 +271,43 @@ document.addEventListener('DOMContentLoaded', () => {
             const sideLength = initialSide / Math.pow(3, n);
             const perimeter = numSides * sideLength;
             if (n > 0) {
-                area += (3 * Math.pow(4, n - 1)) * (Math.sqrt(3) / 4 * Math.pow(sideLength * 3, 2));
+                area += (3 * Math.pow(4, n - 1)) * (initialArea / Math.pow(9, n));
             }
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${n}</td><td>${numSides.toLocaleString()}</td><td>${sideLength.toFixed(4)}</td><td>${perimeter.toFixed(4)}</td><td>${area.toFixed(4)}</td>`;
+            row.innerHTML = `<td>${n}</td><td>${numSides.toLocaleString()}</td><td>${sideLength.toFixed(5)}</td><td>${perimeter.toFixed(3)}</td><td>${(area / initialArea * 8 / 5 * initialArea).toFixed(4)}</td>`;
             if (n > currentDepth) row.style.display = 'none';
             propertiesTableBody.appendChild(row);
         }
     }
 
     function updateExplorer() {
+        memoizedSegments = {}; // Clear cache on depth change
         depthLabel.textContent = currentDepth;
         drawExplorer();
         updateExplorerTable();
+        updateDimensionUI();
     }
 
     // --- DIMENSION LAB LOGIC ---
-    function countIntersectingBoxes() {
+    function getOccupiedBoxSet() {
         const k = parseInt(kSlider.value);
         const s = 1 / Math.pow(2, k);
         const numBoxesPerSide = Math.pow(2, k);
-        const side = 0.8;
-        const h = side * Math.sqrt(3) / 2;
-        const marginX = (1 - side) / 2;
-        const marginY = (1 - h) / 2;
-        
-        const p1 = { x: marginX, y: marginY + h }, p2 = { x: marginX + side, y: marginY + h }, p3 = { x: marginX + side / 2, y: marginY };
 
-        const segments = [
-            ...getKochSegments(currentDepth, p1, p2), ...getKochSegments(currentDepth, p2, p3), ...getKochSegments(currentDepth, p3, p1)
-        ];
+        // Normalized coordinates
+        const side = 0.8, h = side * Math.sqrt(3) / 2;
+        const marginX = (1 - side) / 2, marginY = (1-h)/2;
+
+        const segments = getAllSegments(currentDepth, side, marginX, marginY);
 
         const occupiedBoxes = new Set();
         for (const seg of segments) {
-            const startX = seg[0].x, startY = seg[0].y;
-            const endX = seg[1].x, endY = seg[1].y;
-
-            const samples = 100;
+            const [p1, p2] = seg;
+            const samples = 20; // Sample points along each segment
             for(let i=0; i<=samples; i++){
-                const t = i/samples;
-                const x = startX + t * (endX - startX);
-                const y = startY + t * (endY - startY);
-
+                const t = i / samples;
+                const x = p1.x + t * (p2.x - p1.x);
+                const y = p1.y + t * (p2.y - p1.y);
                 const boxI = Math.floor(x / s);
                 const boxJ = Math.floor(y / s);
                 if (boxI >= 0 && boxI < numBoxesPerSide && boxJ >= 0 && boxJ < numBoxesPerSide) {
@@ -309,39 +315,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        return occupiedBoxes.size;
+        return occupiedBoxes;
     }
 
     function updateDimensionUI() {
         kLabel.textContent = kSlider.value;
-        const count = countIntersectingBoxes();
-        nVal.textContent = count.toLocaleString();
-        drawGridVisualization();
+        const occupiedBoxes = getOccupiedBoxSet();
+        nVal.textContent = occupiedBoxes.size.toLocaleString();
+        drawGridVisualization(occupiedBoxes);
     }
 
-    function drawGridVisualization() {
-        // This is a simplified viz. For performance, it doesn't draw the full fractal.
+    function drawGridVisualization(occupiedBoxes) {
         const dpr = window.devicePixelRatio || 1;
         const rect = boxGridCanvas.getBoundingClientRect();
+        if (rect.width === 0) return;
         boxGridCanvas.width = rect.width * dpr;
         boxGridCanvas.height = rect.height * dpr;
         boxGridCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         
-        const k = parseInt(kSlider.value);
-        const s = 1 / Math.pow(2, k);
-        const numBoxesPerSide = Math.pow(2, k);
-        const boxSize = boxGridCanvas.width / dpr / numBoxesPerSide;
+        const canvasWidth = boxGridCanvas.width/dpr;
+        const canvasHeight = boxGridCanvas.height/dpr;
+        boxGridCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-        boxGridCtx.fillStyle = '#ffffff';
-        boxGridCtx.fillRect(0, 0, boxGridCanvas.width, boxGridCanvas.height);
+        // Draw background fractal
+        const side = canvasWidth * 0.8;
+        const h = side * Math.sqrt(3) / 2;
+        const marginX = (canvasWidth - side) / 2;
+        const marginY = (canvasHeight - h) / 2;
+        const segments = getAllSegments(currentDepth, side, marginX, marginY);
         
-        // This is a representative drawing, not the full count.
-        const count = countIntersectingBoxes();
-        const density = count / (numBoxesPerSide*numBoxesPerSide);
+        boxGridCtx.beginPath();
+        boxGridCtx.moveTo(segments[0][0].x, segments[0][0].y);
+        for (const seg of segments) boxGridCtx.lineTo(seg[1].x, seg[1].y);
+        boxGridCtx.strokeStyle = 'rgba(21, 101, 192, 0.3)';
+        boxGridCtx.lineWidth = 1;
+        boxGridCtx.stroke();
+        
+        // Draw grid overlay
+        const k = parseInt(kSlider.value);
+        const numBoxesPerSide = Math.pow(2, k);
+        const boxSize = canvasWidth / numBoxesPerSide;
         
         for (let i = 0; i < numBoxesPerSide; i++) {
             for (let j = 0; j < numBoxesPerSide; j++) {
-                 if (Math.random() < density * 5) { // Visual approximation
+                 if (occupiedBoxes.has(`${i}-${j}`)) {
                     boxGridCtx.fillStyle = 'rgba(21, 101, 192, 0.7)';
                     boxGridCtx.fillRect(i * boxSize, j * boxSize, boxSize, boxSize);
                 }
@@ -353,57 +370,41 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function addData() {
         const k = parseInt(kSlider.value);
-        const s = 1 / Math.pow(2, k);
-        const N = countIntersectingBoxes();
+        const N = getOccupiedBoxSet().size;
         if (N === 0) return;
-        const logInvS = Math.log(1/s);
+        const logInvS = Math.log(Math.pow(2, k));
         const logN = Math.log(N);
-        if (boxData.find(p => p.x === logInvS)) {
-            alert(`Data for k=${k} already exists.`);
-            return;
-        }
-        boxData.push({ x: logInvS, y: logN, k:k });
+        if (boxData.find(p => p.x === logInvS)) return alert(`Data for k=${k} already exists.`);
+        boxData.push({ x: logInvS, y: logN });
         boxData.sort((a,b) => a.x - b.x);
         plotLogLog();
     }
 
     function plotLogLog(fitLine = null){
-        if (boxData.length === 0) return;
+        if (boxData.length === 0 && !fitLine) {
+            if (logLogChart) logLogChart.destroy();
+            return;
+        }
         if (logLogChart) logLogChart.destroy();
-        
-        const datasets = [{
-            label: 'log(N(ε)) vs log(1/ε)', data: boxData,
-            backgroundColor: 'rgba(21, 101, 192, 0.6)', type: 'scatter'
-        }];
-
+        const datasets = [{ label: 'log(N(ε)) vs log(1/ε)', data: boxData, backgroundColor: 'rgba(21, 101, 192, 0.6)', type: 'scatter' }];
         if (fitLine) {
-            const minX = boxData[0].x;
-            const maxX = boxData[boxData.length - 1].x;
+            const minX = boxData[0].x, maxX = boxData[boxData.length - 1].x;
             datasets.push({
                 label: `Fit (Slope ≈ ${fitLine.slope.toFixed(3)})`,
                 data: [{x: minX, y: fitLine.slope * minX + fitLine.intercept}, {x: maxX, y: fitLine.slope * maxX + fitLine.intercept}],
-                borderColor: '#d32f2f', borderWidth: 2, borderDash: [5, 5],
-                type: 'line', fill: false, pointRadius: 0
+                borderColor: '#d32f2f', borderWidth: 2, borderDash: [5, 5], type: 'line', fill: false, pointRadius: 0
             });
         }
-        
-        logLogChart = new Chart(chartCanvas, {
-            data: { datasets },
-            options: { responsive: true, scales: { x: { title: {display: true, text: 'log(1/ε)'}}, y: {title: {display: true, text: 'log(N(ε))'}}}}
-        });
+        logLogChart = new Chart(chartCanvas, { data: { datasets }, options: { responsive: true, scales: { x: { title: {display: true, text: 'log(1/ε)'}}, y: {title: {display: true, text: 'log(N(ε))'}}}} });
     }
 
     function calculateDimension() {
-        if (boxData.length < 2) {
-            alert("Please add at least two data points."); return;
-        }
+        if (boxData.length < 2) return alert("Please add at least two data points.");
         let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
         const n = boxData.length;
         boxData.forEach(p => { sumX += p.x; sumY += p.y; sumXY += p.x * p.y; sumX2 += p.x * p.x; });
-
         const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
         const intercept = (sumY - slope * sumX) / n;
-        
         dimensionValue.textContent = slope.toFixed(4);
         resultDisplay.style.display = 'block';
         plotLogLog({ slope, intercept });
@@ -411,39 +412,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENT LISTENERS & TABS ---
     depthSlider.addEventListener('input', e => { currentDepth = parseInt(e.target.value); updateExplorer(); });
-    resetViewBtn.addEventListener('click', () => { transform = { scale: 1, panX: 0, panY: 0 }; drawExplorer(); });
     mainCanvas.addEventListener('mousedown', e => { isDragging = true; startDrag = { x: e.clientX, y: e.clientY }; mainCanvas.style.cursor = 'grabbing'; });
     mainCanvas.addEventListener('mouseup', () => { isDragging = false; mainCanvas.style.cursor = 'grab'; });
     mainCanvas.addEventListener('mouseleave', () => { isDragging = false; mainCanvas.style.cursor = 'grab'; });
     mainCanvas.addEventListener('mousemove', e => { if(!isDragging) return; transform.panX += e.clientX - startDrag.x; transform.panY += e.clientY - startDrag.y; startDrag = { x: e.clientX, y: e.clientY }; drawExplorer(); });
-    mainCanvas.addEventListener('wheel', e => { e.preventDefault(); const rect = mainCanvas.getBoundingClientRect(); const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top; const zoom = 1.1; const scaleAmount = e.deltaY < 0 ? zoom : 1 / zoom; transform.scale *= scaleAmount; transform.panX = mouseX - (mouseX - transform.panX) * scaleAmount; transform.panY = mouseY - (mouseY - transform.panY) * scaleAmount; drawExplorer(); });
-    
-    animateBtn.addEventListener('click', () => {
-        isAnimating = !isAnimating;
-        animateBtn.textContent = isAnimating ? 'Stop' : 'Animate';
-        if (isAnimating) {
-            function animate() {
-                if (!isAnimating) return;
-                let depth = parseInt(depthSlider.value) + animationDirection;
-                if (depth > MAX_DEPTH || depth < 0) { animationDirection *= -1; depth += 2 * animationDirection; }
-                depthSlider.value = depth;
-                currentDepth = depth;
-                updateExplorer();
-                animationFrameId = setTimeout(() => requestAnimationFrame(animate), 500);
-            }
-            animate();
-        } else { clearTimeout(animationFrameId); }
-    });
+    mainCanvas.addEventListener('wheel', e => { e.preventDefault(); const rect = mainCanvas.getBoundingClientRect(); const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top; const scaleAmount = e.deltaY < 0 ? 1.1 : 1 / 1.1; transform.scale *= scaleAmount; transform.panX = mouseX - (mouseX - transform.panX) * scaleAmount; transform.panY = mouseY - (mouseY - transform.panY) * scaleAmount; drawExplorer(); });
+    animateBtn.addEventListener('click', () => { isAnimating = !isAnimating; animateBtn.textContent = isAnimating ? 'Stop Animation' : 'Animate'; animateBtn.classList.toggle('danger-button', isAnimating); if (isAnimating) animate(); else clearTimeout(animationFrameId); });
+    function animate() { if (!isAnimating) return; let d = parseInt(depthSlider.value) + animationDirection; if (d > MAX_DEPTH || d < 0) { animationDirection *= -1; d += 2 * animationDirection; } depthSlider.value = d; currentDepth = d; updateExplorer(); animationFrameId = setTimeout(() => requestAnimationFrame(animate), 500); }
     
     kSlider.addEventListener('input', updateDimensionUI);
     addDataBtn.addEventListener('click', addData);
     plotBtn.addEventListener('click', () => plotLogLog());
     fitLineBtn.addEventListener('click', calculateDimension);
-    resetDataBtn.addEventListener('click', () => {
-        boxData = [];
-        if (logLogChart) logLogChart.destroy();
-        resultDisplay.style.display = 'none';
-    });
+    resetDataBtn.addEventListener('click', () => { boxData = []; plotLogLog(); resultDisplay.style.display = 'none'; });
 
     window.switchTab = (tabName) => {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -454,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // --- INITIALIZATION ---
-    window.addEventListener('resize', updateExplorer);
+    window.addEventListener('resize', () => { if (document.getElementById('explorer-tab').classList.contains('active')) { drawExplorer(); }});
     updateExplorer();
 });
 </script>
