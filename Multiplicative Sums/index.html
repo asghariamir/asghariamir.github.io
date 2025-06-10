@@ -150,7 +150,7 @@
         /* ---------- Table Styling ---------- */
         .table-container {
             width: 100%;
-            overflow: auto; /* Use auto for scrollbars only when needed */
+            overflow: auto;
             border: 1px solid var(--medium-gray);
             border-radius: 4px;
         }
@@ -190,9 +190,12 @@
             padding: 0;
             border: 1px solid #f5f5f5; /* Faint grid */
         }
+        #higher-table-container th {
+            background-color: #fff;
+            border-color: #fff;
+        }
         #higher-table-container td.highlight {
             background-color: var(--primary-color);
-            border-color: var(--primary-color);
         }
 
     </style>
@@ -207,7 +210,6 @@
     <section id="playground-tab" class="tab-content active">
         <h2>Sums of Powers Playground</h2>
         <p class="info">Calculate a sum of powers, then find the result on the table and click to highlight it. You can highlight multiple numbers and transform them automatically.</p>
-
         <div class="controls">
              <div class="control-group">
                 <label for="n-input">First N:</label>
@@ -224,7 +226,6 @@
             <button id="calculate-btn">Calculate Sum</button>
             <div id="result-display"></div>
         </div>
-
         <div class="controls bare">
             <div class="control-group">
                 <label>Multiply highlights by:</label>
@@ -234,9 +235,7 @@
             </div>
             <button id="clear-highlights-btn" class="danger-button">Clear Highlights</button>
         </div>
-        
         <div id="playground-table-container" class="table-container"></div>
-        
         <div class="controls bare" style="margin-top: 1.5rem; justify-content: flex-end;">
              <div class="control-group">
                 <label for="table-size-input">Table Size:</label>
@@ -249,7 +248,6 @@
     <section id="higher-powers-tab" class="tab-content">
         <h2>Higher Powers Visualization</h2>
         <p class="info">See the patterns formed by sums of higher powers. The grid will automatically resize to display the results. Each blue dot represents a sum S<sub>i</sub> = 1<sup>p</sup> + 2<sup>p</sup> + ... + i<sup>p</sup>.</p>
-
         <div class="controls">
             <div class="control-group">
                 <label for="n-higher-input">Show sums up to N:</label>
@@ -266,7 +264,6 @@
             </div>
             <button id="generate-btn">Generate & Highlight</button>
         </div>
-        
         <div class="controls bare">
             <div class="control-group">
                 <label>Multiply all highlights by:</label>
@@ -277,20 +274,21 @@
             </div>
         </div>
         <p id="warning-message"></p>
-
         <div id="higher-table-container" class="table-container"></div>
     </section>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const MAX_HIGHER_TABLE_SIZE = 200; // Increased cap for better patterns
+    // --- STATE MANAGEMENT ---
+    const MAX_HIGHER_TABLE_SIZE = 200;
     let state = {
         playground: { size: 12, n: 5, power: 1, result: null, highlights: new Set() },
         higher: { size: 30, n: 8, power: 4, highlights: new Set() }
     };
     
     // --- DOM REFERENCES ---
+    const playgroundTab = document.getElementById('playground-tab');
     const pgTableContainer = document.getElementById('playground-table-container');
     const nInput = document.getElementById('n-input');
     const powerSelect = document.getElementById('power-select');
@@ -312,18 +310,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function createTable(size, highlights, isInteractive, showContent = true) {
         const table = document.createElement('table');
         const thead = table.createTHead().insertRow();
-        if (showContent) { // Headers for playground
-            thead.insertCell().outerHTML = "<th>×</th>";
-            for (let i = 1; i <= size; i++) thead.insertCell().outerHTML = `<th>${i}</th>`;
-        } else { // No visible headers for higher powers
-            thead.style.display = 'none';
+        const headerCell = thead.insertCell();
+        if (showContent) headerCell.outerHTML = "<th>×</th>";
+        for (let i = 1; i <= size; i++) {
+            const th = thead.insertCell();
+            if (showContent) th.outerHTML = `<th>${i}</th>`;
         }
         
         const tbody = table.createTBody();
         for (let r = 1; r <= size; r++) {
             const row = tbody.insertRow();
-            if (showContent) row.insertCell().outerHTML = `<th>${r}</th>`;
-            for (let c = 1; c <= size; c++) {
+            const firstCell = row.insertCell();
+            if (showContent) firstCell.outerHTML = `<th>${r}</th>`;
+
+            for (let c = 1; c <= (showContent ? size : size -1) ; c++) {
                 const cell = row.insertCell();
                 const key = `${r}-${c}`;
                 if (showContent) cell.textContent = r * c;
@@ -395,15 +395,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let allValuesFit = true;
         const oldHighlights = new Set(tabState.highlights);
-        tabState.highlights = newHighlights; // Use the new set for highlighting
+        tabState.highlights = newHighlights;
         
         oldHighlights.forEach(key => {
             const [r, c] = key.split('-').map(Number);
             const newValue = r * c * factor;
             const highlightFn = (tabKey === 'higher') ? highlightOnOrAboveDiagonal : highlightValueFirstColumn;
-            if (!highlightFn(newValue, tabState)) {
-                allValuesFit = false;
-            }
+            if (!highlightFn(newValue, tabState)) allValuesFit = false;
         });
         
         if (tabKey === 'higher') {
@@ -465,9 +463,8 @@ document.addEventListener('DOMContentLoaded', () => {
             currentSum += Math.pow(i, power);
             sums.push(currentSum);
         }
-        
         const maxVal = sums.length > 0 ? sums[sums.length - 1] : 0;
-        const requiredSize = Math.ceil(Math.sqrt(maxVal));
+        const requiredSize = Math.ceil(Math.sqrt(maxVal)) || 10;
         state.higher.size = Math.min(requiredSize, MAX_HIGHER_TABLE_SIZE);
 
         warningMessage.textContent = requiredSize > MAX_HIGHER_TABLE_SIZE ? `Warning: Some sums are too large to display (max size ${MAX_HIGHER_TABLE_SIZE}x${MAX_HIGHER_TABLE_SIZE}).` : '';
@@ -484,15 +481,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- INITIALIZATION AND TAB SWITCHING ---
+    
     window.switchTab = (tabName) => {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-        document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        const tabContent = document.getElementById(`${tabName}-tab`);
+        if (tabContent) tabContent.classList.add('active');
+        const tabButton = document.querySelector(`button[onclick="switchTab('${tabName}')"]`);
+        if (tabButton) tabButton.classList.add('active');
+
+        // Render content for the active tab
+        if (tabName === 'playground') {
+            renderPlayground();
+        } else if (tabName === 'higher-powers') {
+            renderHigherPowers();
+        }
     };
 
-    renderPlayground();
-    renderHigherPowers();
+    // Initial load: set default tab and render its content
     switchTab('playground');
 });
 </script>
