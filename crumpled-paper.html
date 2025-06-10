@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crumpled Paper Dimension Lab</title>
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --secondary-color: #4caf50;
+            --danger-color: #d32f2f;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .tabs {
+            display: flex;
+            background-color: var(--light-gray);
+            border-bottom: 2px solid var(--medium-gray);
+        }
+        .tab-button {
+            padding: 14px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1rem;
+            color: var(--dark-gray);
+            position: relative;
+            transition: color 0.3s;
+        }
+        .tab-button.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; padding: 1.5rem; }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 1rem; }
+        h3 { font-size: 1.25rem; color: var(--dark-gray); margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--medium-gray); padding-bottom: 0.5rem; }
+        p, li { color: #616161; margin-bottom: 1rem; }
+        ul { margin-left: 20px; }
+        strong { color: var(--dark-gray); }
+        .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: background-color 0.3s; }
+        button:hover { background-color: #1976d2; }
+        .secondary-button { background-color: var(--secondary-color); }
+        .secondary-button:hover { background-color: #388e3c; }
+        .danger-button { background-color: var(--danger-color); }
+        .danger-button:hover { background-color: #c62828; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        th, td { border: 1px solid var(--medium-gray); padding: 8px 12px; text-align: center; }
+        th { background-color: var(--light-gray); font-weight: 600; }
+        td input[type="number"] { width: 100%; border: 1px solid transparent; padding: 5px; border-radius: 3px; background-color: #fafafa; text-align: center; }
+        td input[type="number"]:focus { border-color: var(--primary-color); background-color: white; }
+        
+        .plot-container { width: 100%; height: 450px; border: 1px solid var(--medium-gray); border-radius: 4px; }
+        .result-display { text-align: center; padding: 1rem; background-color: var(--light-gray); border-radius: 6px; margin-top: 1.5rem; }
+        .result-display h3 { margin: 0; border: none; }
+        .result-display span { font-size: 2rem; font-weight: bold; color: var(--primary-color); }
+        code { background-color: #eee; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('experiment')">The Experiment</button>
+        <button class="tab-button" onclick="switchTab('analysis')">Data Analysis Lab</button>
+    </div>
+
+    <section id="experiment-tab" class="tab-content active">
+        <h2>Calculating the Dimension of a Crumpled Paper Ball</h2>
+        <p>A flat sheet of paper is two-dimensional. A solid ball is three-dimensional. But what is the dimension of a crumpled piece of paper? It fills 3D space, but it's mostly empty air. This object is a real-world fractal, and its dimension is typically between 2 and 3.</p>
+        <p>We can estimate this dimension using the scaling law <strong>M ∝ R<sup>D</sup></strong>, where <strong>M</strong> is the mass of the paper, <strong>R</strong> is its radius, and <strong>D</strong> is the fractal dimension we want to find.</p>
+        
+        <h3>How to Perform the Experiment</h3>
+        <ul>
+            <li><strong>Step 1: Get Your Materials.</strong> You need several sheets of paper of the same type but different sizes (e.g., A5, A4, A3) or you can cut squares of different side lengths (e.g., 10cm, 15cm, 20cm, etc.). You also need a ruler.</li>
+            <li><strong>Step 2: Create the Paper Balls.</strong> Take each sheet and crumple it into the tightest ball you can make with your hands.</li>
+            <li><strong>Step 3: Measure the Radius (R).</strong> For each ball, measure its diameter in several different directions with a ruler and calculate the average diameter. The radius is half of this average diameter. Record this value.</li>
+            <li><strong>Step 4: Determine the "Mass" (M).</strong> Since standard paper has a uniform density, its mass is directly proportional to its area. You can simply use the paper's original area as its "mass." For example, an A4 sheet (21cm &times; 29.7cm) has an area of 623.7 cm². An A5 sheet is half of that, and an A3 is double. If you cut squares, the area is simply <strong>side length<sup>2</sup></strong>. Record this value.</li>
+            <li><strong>Step 5: Enter Your Data.</strong> Go to the "Data Analysis Lab" tab and enter your pairs of (Radius, Mass/Area) into the table.</li>
+        </ul>
+
+        <h3>No Materials? No Problem!</h3>
+        <p>If you don't have the materials, you can load a sample dataset to see how the analysis works.</p>
+        <div class="controls">
+            <button id="load-sample-data-btn" class="secondary-button">Load Sample Data & Go to Lab</button>
+        </div>
+    </section>
+
+    <section id="analysis-tab" class="tab-content">
+        <h2>Data Analysis Lab</h2>
+        <p>Enter your experimental data below. Add rows as needed. The plots will update automatically.</p>
+        
+        <div class="controls">
+            <button id="add-row-btn">Add Data Row</button>
+            <button id="clear-data-btn" class="danger-button">Clear All Data</button>
+        </div>
+        
+        <table id="data-table">
+            <thead>
+                <tr><th>Point #</th><th>Radius (R)</th><th>Mass / Area (M)</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+
+        <h3>Analysis & Visualization</h3>
+        <div class="controls">
+            <button id="plot-normal-btn" class="secondary-button">Plot M vs. R</button>
+            <button id="plot-log-btn">Plot log(M) vs. log(R)</button>
+            <button id="calculate-dim-btn">Calculate Dimension</button>
+        </div>
+
+        <div id="plot-container" class="plot-container"></div>
+        
+        <div id="result-display" style="display: none;">
+            <h3>Estimated Fractal Dimension (D)</h3>
+            <span id="dimension-value">--</span>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- STATE MANAGEMENT ---
+    let data = [];
+    
+    // --- DOM REFERENCES ---
+    const dataTableBody = document.querySelector('#data-table tbody');
+    const plotContainer = document.getElementById('plot-container');
+    const resultDisplay = document.getElementById('result-display');
+    const dimensionValue = document.getElementById('dimension-value');
+    const addRowBtn = document.getElementById('add-row-btn');
+    const clearDataBtn = document.getElementById('clear-data-btn');
+    const loadSampleDataBtn = document.getElementById('load-sample-data-btn');
+    const plotNormalBtn = document.getElementById('plot-normal-btn');
+    const plotLogBtn = document.getElementById('plot-log-btn');
+    const calculateDimBtn = document.getElementById('calculate-dim-btn');
+
+    // --- LOGIC & RENDERING ---
+    
+    const sampleData = [
+        { R: 1.5, M: 148.5 },   // A6 paper (10.5 x 14.8 cm)
+        { R: 1.9, M: 297 },     // A5 paper (14.8 x 21 cm)
+        { R: 2.4, M: 623.7 },   // A4 paper (21 x 29.7 cm)
+        { R: 3.1, M: 1247.4 },  // A3 paper (29.7 x 42 cm)
+        { R: 3.8, M: 2500 },    // A2 paper (approx)
+    ];
+
+    function renderTable() {
+        dataTableBody.innerHTML = '';
+        data.forEach((point, index) => {
+            const row = dataTableBody.insertRow();
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td><input type="number" class="data-input" data-index="${index}" data-prop="R" value="${point.R || ''}" placeholder="e.g., 2.5"></td>
+                <td><input type="number" class="data-input" data-index="${index}" data-prop="M" value="${point.M || ''}" placeholder="e.g., 625"></td>
+                <td><button class="delete-row-btn danger-button" data-index="${index}">Delete</button></td>
+            `;
+        });
+        drawPlot(false); // Default plot
+        resultDisplay.style.display = 'none'; // Hide result when table changes
+    }
+
+    function drawPlot(useLogScale, fitLine = null) {
+        if (data.length === 0) {
+            Plotly.purge(plotContainer);
+            return;
+        }
+
+        const validData = data.filter(d => d.R > 0 && d.M > 0);
+        const R_values = validData.map(d => d.R);
+        const M_values = validData.map(d => d.M);
+
+        const traces = [{
+            x: R_values,
+            y: M_values,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { color: 'royalblue', size: 10 }
+        }];
+
+        if (fitLine) {
+            traces.push({
+                x: R_values,
+                y: R_values.map(r => Math.pow(10, fitLine.slope * Math.log10(r) + fitLine.intercept)),
+                mode: 'lines',
+                line: { color: 'crimson', dash: 'dash' }
+            });
+        }
+        
+        const layout = {
+            title: useLogScale ? 'Log-Log Plot: log(Mass) vs. log(Radius)' : 'Direct Plot: Mass vs. Radius',
+            xaxis: { 
+                title: useLogScale ? 'log(Radius)' : 'Radius (R)', 
+                type: useLogScale ? 'log' : 'linear',
+                gridcolor: '#e0e0e0'
+            },
+            yaxis: { 
+                title: useLogScale ? 'log(Mass / Area)' : 'Mass / Area (M)',
+                type: useLogScale ? 'log' : 'linear',
+                gridcolor: '#e0e0e0'
+            },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: '#ffffff',
+            margin: { l: 60, r: 20, t: 40, b: 50 },
+        };
+
+        Plotly.newPlot(plotContainer, traces, layout, {responsive: true, displaylogo: false});
+    }
+    
+    function calculateDimension() {
+        const validData = data.filter(d => d.R > 0 && d.M > 0);
+        if (validData.length < 2) {
+            alert("Please enter at least two valid data points to calculate the dimension.");
+            return;
+        }
+
+        const logR = validData.map(d => Math.log10(d.R));
+        const logM = validData.map(d => Math.log10(d.M));
+        
+        // Simple linear regression (least squares)
+        const n = validData.length;
+        const sum_x = logR.reduce((a, b) => a + b, 0);
+        const sum_y = logM.reduce((a, b) => a + b, 0);
+        const sum_xy = logR.reduce((sum, x, i) => sum + x * logM[i], 0);
+        const sum_x2 = logR.reduce((sum, x) => sum + x * x, 0);
+
+        const slope = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x * sum_x);
+        const intercept = (sum_y - slope * sum_x) / n;
+
+        if (isNaN(slope)) {
+            alert("Could not calculate a valid dimension. Please check your data.");
+            return;
+        }
+
+        dimensionValue.textContent = slope.toFixed(3);
+        resultDisplay.style.display = 'block';
+
+        drawPlot(true, { slope, intercept }); // Redraw log plot with fit line
+    }
+
+    // --- EVENT LISTENERS ---
+    
+    addRowBtn.addEventListener('click', () => {
+        data.push({ R: '', M: '' });
+        renderTable();
+    });
+
+    clearDataBtn.addEventListener('click', () => {
+        if (confirm("Are you sure you want to clear all data?")) {
+            data = [];
+            renderTable();
+        }
+    });
+
+    loadSampleDataBtn.addEventListener('click', () => {
+        data = JSON.parse(JSON.stringify(sampleData)); // Deep copy
+        switchTab('analysis');
+        renderTable();
+    });
+
+    dataTableBody.addEventListener('input', (e) => {
+        if (e.target.classList.contains('data-input')) {
+            const index = e.target.dataset.index;
+            const prop = e.target.dataset.prop;
+            data[index][prop] = parseFloat(e.target.value);
+            drawPlot(document.querySelector('#plot-log-btn').classList.contains('active')); // Redraw current plot type
+        }
+    });
+
+    dataTableBody.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-row-btn')) {
+            const index = e.target.dataset.index;
+            data.splice(index, 1);
+            renderTable();
+        }
+    });
+
+    plotNormalBtn.addEventListener('click', () => drawPlot(false));
+    plotLogBtn.addEventListener('click', () => drawPlot(true));
+    calculateDimBtn.addEventListener('click', calculateDimension);
+
+    // --- TAB SWITCHING ---
+    window.switchTab = (tabName) => {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+    };
+
+    // --- INITIALIZATION ---
+    renderTable(); // Initial render of empty table
+});
+</script>
+</body>
+</html>
