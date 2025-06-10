@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multiplication Color Pad</title>
+    <title>Multiplicative Sums</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -81,7 +81,7 @@
             color: #616161;
         }
         
-        input[type="number"] {
+        input[type="number"], select {
             border: 1px solid var(--medium-gray);
             border-radius: 4px;
             padding: 8px;
@@ -103,8 +103,7 @@
         .danger-button { background-color: #d32f2f; }
         .danger-button:hover { background-color: #c62828; }
         
-        /* Calculator */
-        #calc-result {
+        #result-display, #calc-result {
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--primary-color);
@@ -158,16 +157,33 @@
         td.highlight.color-1 { background-color: var(--color-1); }
         td.highlight.color-2 { background-color: var(--color-2); color: white; }
         td.highlight.color-3 { background-color: var(--color-3); color: white; }
-
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>Multiplication Color Pad</h2>
-    <p class="info">Use the calculator to find products, then select a color and click cells on the table to find patterns.</p>
+    <h2>Multiplicative Sums</h2>
+    <p class="info">Calculate a sum of powers to get a target number. Then, use the calculator and color palette to manually explore its multiplicative structure on the table.</p>
 
     <div class="controls">
+         <div class="control-group">
+            <label for="n-input">Sum of powers of first N:</label>
+            <input type="number" id="n-input" min="1" value="3">
+        </div>
         <div class="control-group">
+            <label for="power-select">Power:</label>
+            <select id="power-select">
+                <option value="1">1 (e.g. 1+2+3)</option>
+                <option value="2">2 (e.g. 1²+2²+3²)</option>
+                <option value="3">3 (e.g. 1³+2³+3³)</option>
+            </select>
+        </div>
+        <button id="calculate-btn">Calculate Target Number</button>
+        <div id="result-display"></div>
+    </div>
+    
+    <div class="controls" style="background: #e3f2fd;">
+        <div class="control-group">
+            <label>Manual Calculator:</label>
             <input type="number" id="calc-input-1" placeholder="number">
             <span style="font-size: 1.5rem;">×</span>
             <input type="number" id="calc-input-2" placeholder="number">
@@ -175,7 +191,7 @@
             <span id="calc-result">?</span>
         </div>
     </div>
-    
+
     <div class="controls" style="background: none; padding-bottom: 1.5rem;">
         <div class="control-group">
             <label>Active Color:</label>
@@ -203,8 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let state = {
         size: 12,
         activeColor: 'color-1',
-        // highlights is an object: { "row-col": "color-name" }
-        highlights: {},
+        sumOfPowersResult: null,
+        highlights: {}, // Object: { "row-col": "color-name" }
     };
     
     // --- DOM REFERENCES ---
@@ -212,6 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableSizeInput = document.getElementById('table-size-input');
     const clearColorsBtn = document.getElementById('clear-colors-btn');
     const downloadBtn = document.getElementById('download-btn');
+    const nInput = document.getElementById('n-input');
+    const powerSelect = document.getElementById('power-select');
+    const calculateBtn = document.getElementById('calculate-btn');
+    const resultDisplay = document.getElementById('result-display');
     const calcInput1 = document.getElementById('calc-input-1');
     const calcInput2 = document.getElementById('calc-input-2');
     const calcResult = document.getElementById('calc-result');
@@ -246,6 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function render() {
         tableContainer.innerHTML = '';
         tableContainer.appendChild(createTable(state.size, state.highlights));
+        resultDisplay.textContent = state.sumOfPowersResult !== null ? `Target: ${state.sumOfPowersResult}` : '';
     }
 
     function updateCalculator() {
@@ -262,9 +283,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     tableSizeInput.addEventListener('change', () => {
         state.size = parseInt(tableSizeInput.value);
-        // Clear highlights when resizing to avoid confusion
         state.highlights = {};
+        state.sumOfPowersResult = null;
         render();
+    });
+
+    calculateBtn.addEventListener('click', () => {
+        let sum = 0;
+        const n = parseInt(nInput.value);
+        const power = parseInt(powerSelect.value);
+        for (let i = 1; i <= n; i++) sum += Math.pow(i, power);
+        state.sumOfPowersResult = sum;
+        // Only update the display, do not touch highlights
+        resultDisplay.textContent = `Target: ${sum}`;
     });
 
     calcInput1.addEventListener('input', updateCalculator);
@@ -284,13 +315,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = cell.dataset.key;
             const existingColor = state.highlights[key];
             
-            // If cell has the active color, remove highlight. Otherwise, set it.
             if (existingColor === state.activeColor) {
                 delete state.highlights[key];
-                cell.classList.remove('highlight', ...Array.from(cell.classList).filter(c => c.startsWith('color-')));
+                cell.className = ''; // Remove all classes
             } else {
-                // Remove old color class before adding new one
-                cell.classList.remove(...Array.from(cell.classList).filter(c => c.startsWith('color-')));
+                if (existingColor) { // remove old color if it exists
+                    cell.classList.remove(existingColor);
+                }
                 state.highlights[key] = state.activeColor;
                 cell.classList.add('highlight', state.activeColor);
             }
@@ -299,20 +330,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     clearColorsBtn.addEventListener('click', () => {
         state.highlights = {};
+        state.sumOfPowersResult = null;
         render();
     });
 
     downloadBtn.addEventListener('click', () => {
-        // Temporarily remove border from active color swatch for clean screenshot
         const activeSwatch = document.querySelector('.color-swatch.active');
         if (activeSwatch) activeSwatch.style.borderColor = 'transparent';
         
         html2canvas(document.querySelector(".container")).then(canvas => {
             const link = document.createElement("a");
-            link.download = "multiplication-color-pad.png";
+            link.download = "multiplication-sums.png";
             link.href = canvas.toDataURL();
             link.click();
-            // Restore border after screenshot
             if (activeSwatch) activeSwatch.style.borderColor = '';
         });
     });
