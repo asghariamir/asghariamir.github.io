@@ -210,7 +210,6 @@
                 <button class="secondary-button" data-factor="2">×2</button>
                 <button class="secondary-button" data-factor="3">×3</button>
                 <button class="secondary-button" data-factor="4">×4</button>
-                <button class="secondary-button" data-factor="5">×5</button>
             </div>
             <button id="clear-highlights-btn" class="danger-button">Clear Highlights</button>
         </div>
@@ -220,7 +219,7 @@
         <div class="controls bare" style="margin-top: 1.5rem; justify-content: flex-end;">
              <div class="control-group">
                 <label for="table-size-input">Table Size:</label>
-                <input type="number" id="table-size-input" min="5" max="30" value="12">
+                <input type="number" id="table-size-input" min="5" max="40" value="12">
             </div>
             <button id="download-playground-btn" class="secondary-button">Download as Image</button>
         </div>
@@ -241,6 +240,7 @@
                     <option value="4">4</option>
                     <option value="5">5</option>
                     <option value="6">6</option>
+                    <option value="7">7</option>
                 </select>
             </div>
             <button id="generate-btn">Generate & Highlight</button>
@@ -252,7 +252,7 @@
                 <button class="secondary-button" data-factor="2">×2</button>
                 <button class="secondary-button" data-factor="3">×3</button>
                 <button class="secondary-button" data-factor="4">×4</button>
-                <button class="secondary-button" data-factor="5">×5</button>
+                 <button class="secondary-button" data-factor="5">×5</button>
             </div>
         </div>
 
@@ -269,10 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
             n: 5,
             power: 1,
             result: null,
-            highlights: new Set(), // Using a Set for keys like "row-col"
+            highlights: new Set(),
         },
         higher: {
-            size: 30, // Higher powers need a larger table
+            size: 30,
             n: 8,
             power: 4,
             highlights: new Set(),
@@ -280,7 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // --- DOM REFERENCES ---
-    // Playground
     const playgroundTab = document.getElementById('playground-tab');
     const pgTableContainer = document.getElementById('playground-table-container');
     const nInput = document.getElementById('n-input');
@@ -291,7 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearHighlightsBtn = document.getElementById('clear-highlights-btn');
     const downloadPlaygroundBtn = document.getElementById('download-playground-btn');
     
-    // Higher Powers
     const higherTab = document.getElementById('higher-powers-tab');
     const higherTableContainer = document.getElementById('higher-table-container');
     const nHigherInput = document.getElementById('n-higher-input');
@@ -300,16 +298,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- RENDERING & LOGIC ---
     
-    /** Generic function to create a multiplication table */
     function createTable(size, highlights, isInteractive) {
         const table = document.createElement('table');
-        // Header Row
         const thead = table.createTHead().insertRow();
         thead.insertCell().outerHTML = "<th>×</th>";
-        for (let i = 1; i <= size; i++) {
-            thead.insertCell().outerHTML = `<th>${i}</th>`;
-        }
-        // Body Rows
+        for (let i = 1; i <= size; i++) thead.insertCell().outerHTML = `<th>${i}</th>`;
+        
         const tbody = table.createTBody();
         for (let r = 1; r <= size; r++) {
             const row = tbody.insertRow();
@@ -322,15 +316,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     cell.classList.add('interactive');
                     cell.dataset.key = key;
                 }
-                if (highlights.has(key)) {
-                    cell.classList.add('highlight');
-                }
+                if (highlights.has(key)) cell.classList.add('highlight');
             }
         }
         return table;
     }
 
-    /** Render the playground tab's table */
     function renderPlayground() {
         const { size, highlights } = state.playground;
         pgTableContainer.innerHTML = '';
@@ -338,41 +329,53 @@ document.addEventListener('DOMContentLoaded', () => {
         resultDisplay.textContent = state.playground.result !== null ? `Result: ${state.playground.result}` : '';
     }
 
-    /** Render the higher powers tab's table */
     function renderHigherPowers() {
         const { size, highlights } = state.higher;
         higherTableContainer.innerHTML = '';
         higherTableContainer.appendChild(createTable(size, highlights, false));
     }
     
-    /** Highlight a single value on a given table */
     function highlightValue(value, tab) {
         const { size, highlights } = state[tab];
         for (let r = 1; r <= size; r++) {
-            if (value % r === 0) {
+            if (value > 0 && value % r === 0) {
                 const c = value / r;
                 if (c >= 1 && c <= size) {
                     highlights.add(`${r}-${c}`);
-                    return; // Highlight first factor pair found
+                    return;
                 }
             }
         }
     }
     
-    /** Generic multiply highlights function */
     function multiplyHighlights(factor, tab) {
-        const { highlights, size } = state[tab];
+        let maxNewValue = 0;
         const newHighlights = new Set();
-        highlights.forEach(key => {
+        const currentHighlights = state[tab].highlights;
+
+        currentHighlights.forEach(key => {
             const [r, c] = key.split('-').map(Number);
             const newValue = r * c * factor;
-            // Find and highlight the new value
+            if (newValue > maxNewValue) maxNewValue = newValue;
+        });
+
+        if (tab === 'higher') {
+            const requiredSize = Math.ceil(Math.sqrt(maxNewValue));
+            if (requiredSize > state.higher.size) {
+                state.higher.size = requiredSize;
+            }
+        }
+        
+        const { size } = state[tab];
+        currentHighlights.forEach(key => {
+            const [r, c] = key.split('-').map(Number);
+            const newValue = r * c * factor;
             for (let nr = 1; nr <= size; nr++) {
-                if (newValue % nr === 0) {
+                if (newValue > 0 && newValue % nr === 0) {
                     const nc = newValue / nr;
                     if (nc >= 1 && nc <= size) {
                         newHighlights.add(`${nr}-${nc}`);
-                        break; // Highlight first factor pair
+                        break;
                     }
                 }
             }
@@ -383,17 +386,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENT LISTENERS ---
     
-    // Playground Listeners
     tableSizeInput.addEventListener('change', () => { state.playground.size = parseInt(tableSizeInput.value); renderPlayground(); });
-    nInput.addEventListener('input', () => { state.playground.n = parseInt(nInput.value); });
-    powerSelect.addEventListener('change', () => { state.playground.power = parseInt(powerSelect.value); });
-
     calculateBtn.addEventListener('click', () => {
         let sum = 0;
-        const { n, power } = state.playground;
-        for (let i = 1; i <= n; i++) {
-            sum += Math.pow(i, power);
-        }
+        const n = parseInt(nInput.value);
+        const power = parseInt(powerSelect.value);
+        for (let i = 1; i <= n; i++) sum += Math.pow(i, power);
         state.playground.result = sum;
         highlightValue(sum, 'playground');
         renderPlayground();
@@ -402,11 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pgTableContainer.addEventListener('click', (e) => {
         if (e.target.matches('td.interactive')) {
             const key = e.target.dataset.key;
-            if (state.playground.highlights.has(key)) {
-                state.playground.highlights.delete(key);
-            } else {
-                state.playground.highlights.add(key);
-            }
+            state.playground.highlights.has(key) ? state.playground.highlights.delete(key) : state.playground.highlights.add(key);
             e.target.classList.toggle('highlight');
         }
     });
@@ -418,43 +412,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     downloadPlaygroundBtn.addEventListener('click', () => {
-        const element = document.getElementById('playground-table-container');
-        html2canvas(element).then(canvas => {
+        html2canvas(document.getElementById('playground-table-container')).then(canvas => {
             const link = document.createElement("a");
             link.download = "playground-table.png";
             link.href = canvas.toDataURL();
             link.click();
         });
     });
-
-    playgroundTab.addEventListener('click', (e) => {
+    
+    playgroundTab.querySelector('.controls.bare').addEventListener('click', (e) => {
         if (e.target.matches('button[data-factor]')) {
             multiplyHighlights(parseInt(e.target.dataset.factor), 'playground');
         }
     });
 
-    // Higher Powers Listeners
-    nHigherInput.addEventListener('input', () => { state.higher.n = parseInt(nHigherInput.value); });
-    powerHigherSelect.addEventListener('change', () => { state.higher.power = parseInt(powerHigherSelect.value); });
-    
     generateBtn.addEventListener('click', () => {
-        const { n, power } = state.higher;
-        state.higher.highlights.clear();
+        const n = parseInt(nHigherInput.value);
+        const power = parseInt(powerHigherSelect.value);
+        
+        const sums = [];
         let currentSum = 0;
         for (let i = 1; i <= n; i++) {
             currentSum += Math.pow(i, power);
-            highlightValue(currentSum, 'higher');
+            sums.push(currentSum);
         }
+        
+        const maxVal = sums[sums.length - 1];
+        state.higher.size = Math.ceil(Math.sqrt(maxVal)) || 10;
+        
+        state.higher.highlights.clear();
+        sums.forEach(sum => highlightValue(sum, 'higher'));
+        
         renderHigherPowers();
     });
     
-    higherTab.addEventListener('click', (e) => {
+    higherTab.querySelector('.controls.bare').addEventListener('click', (e) => {
         if (e.target.matches('button[data-factor]')) {
             multiplyHighlights(parseInt(e.target.dataset.factor), 'higher');
         }
     });
 
-    // --- TAB SWITCHING ---
     window.switchTab = (tabName) => {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -462,7 +459,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
     };
 
-    // --- INITIALISATION ---
     renderPlayground();
     renderHigherPowers();
     switchTab('playground');
