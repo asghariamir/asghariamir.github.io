@@ -1,313 +1,486 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Cantor‑Set Explorer & Box‑Dimension Lab</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cantor Set Explorer & Box-Dimension Lab</title>
 
-  <!-- Chart.js (for the dimension plot) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
-  <style>
-    /* ---------- Basic reset ---------- */
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:system-ui,sans-serif;line-height:1.5;background:#fff;color:#000;padding:20px;text-align:center}
-    h1{font-size:2rem;margin-bottom:0.5rem}
-    p.intro{max-width:600px;margin:0 auto 1rem;font-size:0.95rem}
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+        }
 
-    /* ---------- Tabs ---------- */
-    .tabs{display:inline-flex;border:1px solid #999;border-radius:6px;overflow:hidden;margin-bottom:1rem}
-    .tabs button{border:none;background:#f3f3f3;padding:6px 18px;font-size:0.95rem;cursor:pointer}
-    .tabs button.active{background:#1565c0;color:#fff;font-weight:600}
-    .section{display:none}
-    .section.active{display:block}
+        /* ---------- Basic Structure & Typography ---------- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ---------- Controls ---------- */
-    .controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:0.5rem 0 1rem}
-    label{font-weight:600}
-    input[type=range]{cursor:pointer;accent-color:#1565c0}
-    button.btn{border:1px solid #333;background:#f8f8f8;padding:4px 10px;border-radius:4px;cursor:pointer}
-    button.btn:hover{background:#e0e0e0}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
 
-    /* ---------- Canvases & tables ---------- */
-    canvas{border:1px solid #ccc;display:block;margin:0 auto 0.75rem}
-    table{border-collapse:collapse;margin:0.5rem auto}
-    th,td{border:1px solid #ccc;padding:4px 6px;font-size:0.9rem}
-    th{background:#fafafa}
-  </style>
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px_8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--medium-gray);
+            padding-bottom: 0.5rem;
+            margin: 0 1.5rem 1rem;
+        }
+        
+        p.intro {
+            font-size: 0.95rem;
+            color: #616161;
+            max-width: 100%;
+            margin: 0 1.5rem 1.5rem;
+        }
+        
+        /* ---------- Tabs ---------- */
+        .tabs {
+            display: flex;
+            background-color: var(--light-gray);
+            border-bottom: 2px solid var(--medium-gray);
+        }
+
+        .tab-button {
+            padding: 14px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1rem;
+            color: var(--dark-gray);
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .section { display: none; }
+        .section.active { display: block; padding: 0; }
+
+        /* ---------- Controls ---------- */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 0 1.5rem 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: #616161;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1976d2;
+        }
+        
+        .danger-button {
+             background-color: #d32f2f;
+        }
+        
+        .danger-button:hover {
+            background-color: #c62828;
+        }
+
+
+        input[type="range"] {
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        /* ---------- Canvases & Tables ---------- */
+        canvas {
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            display: block;
+            margin: 0 1.5rem 1.5rem;
+            width: calc(100% - 3rem); /* Full width minus padding */
+            height: auto;
+        }
+
+        #boxCanvas { height: 40px; }
+        #chartCv { height: 300px; }
+        
+        table {
+            width: calc(100% - 3rem);
+            border-collapse: collapse;
+            margin: 1.5rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .math-display {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            background: var(--light-gray);
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        #slopeTxt {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+    </style>
 </head>
 <body>
-  <h1>Cantor‑Set Explorer</h1>
-
-  <!-- ---------------- TAB BAR ---------------- -->
-  <div class="tabs">
-    <button id="tabExp"  class="active">Set Explorer</button>
-    <button id="tabDim" >Box Dimension</button>
-  </div>
-
-  <!-- ===================== EXPLORER SECTION ===================== -->
-  <section id="explorer" class="section active">
-    <p class="intro">Move the <strong>Depth</strong> slider to generate stages of the Cantor set. Use mouse‑wheel to zoom, drag to pan, and watch the total length shrink as <em>(2/3)<sup>n</sup></em>.</p>
-
-    <canvas id="expCanvas" width="1000" height="140"></canvas>
-
-    <div class="controls">
-      <label for="depthRange">Depth&nbsp;<span id="depthVal">5</span></label>
-      <input id="depthRange" type="range" min="0" max="9" step="1" value="5">
-      <button id="animBtn"   class="btn">Animate</button>
+<div class="container">
+    <div class="tabs">
+        <button id="tabExp" class="tab-button active">Set Explorer</button>
+        <button id="tabDim" class="tab-button">Box Dimension</button>
     </div>
 
-    <table id="lenTable">
-      <thead><tr><th>Depth n</th><th>Segments 2<sup>n</sup></th><th>Total length 2<sup>n</sup>/3<sup>n</sup></th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </section>
+    <section id="explorer" class="section active">
+        <h2>Cantor Set Explorer</h2>
+        <p class="intro">Move the <strong>Depth</strong> slider to generate stages of the Cantor set. Use the mouse-wheel to zoom and drag to pan. Watch the total length shrink as <em>(2/3)<sup>n</sup></em>.</p>
 
-  <!-- ===================== DIMENSION SECTION ===================== -->
-  <section id="dimension" class="section">
-    <p class="intro">Choose an integer <em>k</em> to partition the unit interval into boxes of length&nbsp;<em>1/3<sup>k</sup></em>. Count how many boxes intersect the Cantor set, then plot <em>log&nbsp;N(s)</em> vs&nbsp;<em>log&nbsp;(1/s)</em> to estimate the box dimension.</p>
+        <canvas id="expCanvas" height="140"></canvas>
 
-    <div class="controls">
-      <label for="kRange">k&nbsp;<span id="kVal">4</span></label>
-      <input id="kRange" type="range" min="1" max="9" step="1" value="4">
-      <span id="sDisp">s = 1/3<sup>4</sup> ≈ 0.0123</span>
-      <span id="nDisp">N(s) = 20</span>
-    </div>
+        <div class="controls">
+            <div class="control-group">
+                <label for="depthRange">Depth</label>
+                <input id="depthRange" type="range" min="0" max="9" step="1" value="5">
+                <span id="depthVal" class="math-display">5</span>
+            </div>
+            <button id="animBtn">Animate</button>
+        </div>
 
-    <canvas id="boxCanvas" width="1000" height="40"></canvas>
+        <table id="lenTable">
+            <thead><tr><th>Depth n</th><th>Segments 2<sup>n</sup></th><th>Total length (2/3)<sup>n</sup></th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </section>
 
-    <div class="controls">
-      <button id="addRow"   class="btn">Add data row</button>
-      <button id="plotBtn"  class="btn">Plot log‑log</button>
-      <button id="fitBtn"   class="btn">Fit line &amp; slope</button>
-      <button id="resetTbl" class="btn">Reset table</button>
-    </div>
+    <section id="dimension" class="section">
+        <h2>Box-Counting Dimension Lab</h2>
+        <p class="intro">Choose an integer <em>k</em> to partition the unit interval into boxes of length&nbsp;<em>1/3<sup>k</sup></em>. Count how many boxes intersect the Cantor set, then plot <em>log&nbsp;N(s)</em> vs&nbsp;<em>log&nbsp;(1/s)</em> to estimate the box dimension.</p>
 
-    <table id="dataTbl">
-      <thead><tr><th>k</th><th>1/3<sup>k</sup></th><th>N(s)</th></tr></thead>
-      <tbody></tbody>
-    </table>
+        <div class="controls">
+            <div class="control-group">
+                <label for="kRange">k</label>
+                <input id="kRange" type="range" min="1" max="9" step="1" value="4">
+                <span id="kVal" class="math-display">4</span>
+            </div>
+            <div class="control-group">
+                <span id="sDisp" class="math-display">s = 1/3<sup>4</sup> ≈ 0.0123</span>
+                <span id="nDisp" class="math-display">N(s) = 20</span>
+            </div>
+        </div>
 
-    <canvas id="chartCv" width="1000" height="300"></canvas>
-    <p id="slopeTxt"></p>
-  </section>
+        <canvas id="boxCanvas" height="40"></canvas>
 
-  <!-- ===================== SCRIPT ===================== -->
-  <script>
-  /**********************  Utility functions  **********************/
-  function cantorSegments(depth){
-    let seg=[[0,1]];
-    for(let d=0;d<depth;d++){
-      const next=[];
-      seg.forEach(([a,b])=>{
-        const t=(b-a)/3;
-        next.push([a,a+t],[b-t,b]);
-      });
-      seg=next;
+        <div class="controls">
+            <button id="addRow">Add data row</button>
+            <button id="plotBtn">Plot log-log</button>
+            <button id="fitBtn">Fit line &amp; slope</button>
+            <button id="resetTbl" class="danger-button">Reset table</button>
+        </div>
+
+        <table id="dataTbl">
+            <thead><tr><th>k</th><th>s = 1/3<sup>k</sup></th><th>N(s)</th></tr></thead>
+            <tbody></tbody>
+        </table>
+
+        <canvas id="chartCv" height="300"></canvas>
+        <p id="slopeTxt"></p>
+    </section>
+</div>
+<script>
+    /********************** Utility functions  **********************/
+    function cantorSegments(depth) {
+        let seg = [[0, 1]];
+        for (let d = 0; d < depth; d++) {
+            const next = [];
+            seg.forEach(([a, b]) => {
+                const t = (b - a) / 3;
+                next.push([a, a + t], [b - t, b]);
+            });
+            seg = next;
+        }
+        return seg;
     }
-    return seg;
-  }
 
-  /**********************  Explorer logic  **********************/
-  const expCv=document.getElementById('expCanvas');
-  const expCtx=expCv.getContext('2d');
-  const depthRange=document.getElementById('depthRange');
-  const depthVal=document.getElementById('depthVal');
-  const lenBody=document.querySelector('#lenTable tbody');
+    /********************** Explorer logic  **********************/
+    const expCv = document.getElementById('expCanvas');
+    const expCtx = expCv.getContext('2d');
+    const depthRange = document.getElementById('depthRange');
+    const depthVal = document.getElementById('depthVal');
+    const lenBody = document.querySelector('#lenTable tbody');
 
-  let viewStart=0, viewEnd=1; // visible window [0,1]
-  let animHandle=null, animDir=1;
+    let viewStart = 0, viewEnd = 1; // visible window [0,1]
+    let animHandle = null, animDir = 1;
 
-  function px(x){return (x-viewStart)/(viewEnd-viewStart)*expCv.width;}
-  function drawExplorer(){
-    const n=+depthRange.value;
-    expCtx.clearRect(0,0,expCv.width,expCv.height);
-    expCtx.fillStyle='#e0e0e0';
-    expCtx.fillRect(0,0,expCv.width,expCv.height);
-    expCtx.fillStyle='#1565c0';
-    cantorSegments(n).forEach(([a,b])=>{
-      const L=Math.max(a,viewStart), R=Math.min(b,viewEnd);
-      if(L>=R) return;
-      expCtx.fillRect(px(L),0,px(R)-px(L),expCv.height);
-    });
-  }
-
-  function refreshLenTable(){
-    const n=+depthRange.value;
-    lenBody.innerHTML='';
-    for(let i=0;i<=n;i++){
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${i}</td><td>${2**i}</td><td>${2**i}/${3**i}</td>`;
-      lenBody.appendChild(tr);
+    function px(x) { return (x - viewStart) / (viewEnd - viewStart) * expCv.width; }
+    function drawExplorer() {
+        if (expCv.width === 0) return;
+        const n = +depthRange.value;
+        expCtx.clearRect(0, 0, expCv.width, expCv.height);
+        expCtx.fillStyle = '#ffffff';
+        expCtx.fillRect(0, 0, expCv.width, expCv.height);
+        expCtx.fillStyle = '#1565c0';
+        cantorSegments(n).forEach(([a, b]) => {
+            const L = Math.max(a, viewStart), R = Math.min(b, viewEnd);
+            if (L >= R) return;
+            expCtx.fillRect(px(L), 0, px(R) - px(L), expCv.height);
+        });
     }
-  }
-  function refreshExplorer(){
-    depthVal.textContent=depthRange.value;
-    drawExplorer();
-    refreshLenTable();
-  }
 
-  depthRange.oninput=()=>{stopAnim();refreshExplorer();};
-  function startAnim(){
-    animHandle=setInterval(()=>{
-      let d=+depthRange.value;
-      if(d>=+depthRange.max) animDir=-1;
-      if(d<=+depthRange.min) animDir=1;
-      depthRange.value=d+animDir;
-      refreshExplorer();
-    },600);
-    document.getElementById('animBtn').textContent='Stop';
-  }
-  function stopAnim(){
-    clearInterval(animHandle);animHandle=null;
-    document.getElementById('animBtn').textContent='Animate';
-  }
-  document.getElementById('animBtn').onclick=()=>animHandle?stopAnim():startAnim();
-
-  function zoom(factor,center=0.5){
-    const span=(viewEnd-viewStart)*factor;
-    const mid=viewStart+(viewEnd-viewStart)*center;
-    viewStart=mid-span/2;
-    viewEnd  =mid+span/2;
-    if(viewStart<0){viewEnd-=viewStart;viewStart=0;}
-    if(viewEnd>1){viewStart-=viewEnd-1;viewEnd=1;}
-    drawExplorer();
-  }
-
-  expCv.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?0.8:1.25,e.offsetX/expCv.width);},{passive:false});
-  let dragging=false,lastX=0;
-  expCv.onmousedown=e=>{dragging=true;lastX=e.clientX};
-  window.onmousemove=e=>{
-    if(!dragging) return;
-    const dx=e.clientX-lastX;lastX=e.clientX;
-    const span=viewEnd-viewStart;
-    const shift=-dx/expCv.width*span;
-    viewStart+=shift;viewEnd+=shift;
-    if(viewStart<0){viewEnd-=viewStart;viewStart=0;}
-    if(viewEnd>1){viewStart-=viewEnd-1;viewEnd=1;}
-    drawExplorer();
-  };
-  window.onmouseup=()=>dragging=false;
-
-  /**********************  Box‑dimension logic  **********************/
-  const kRange=document.getElementById('kRange');
-  const kVal=document.getElementById('kVal');
-  const sDisp=document.getElementById('sDisp');
-  const nDisp=document.getElementById('nDisp');
-  const boxCv=document.getElementById('boxCanvas');
-  const boxCtx=boxCv.getContext('2d');
-  const dataBody=document.querySelector('#dataTbl tbody');
-  const slopeTxt=document.getElementById('slopeTxt');
-  let chart=null;
-
-  function updateBoxInfo(){
-    const k=+kRange.value;
-    kVal.textContent=k;
-    const s=1/3**k;
-    sDisp.innerHTML=`s = 1/3<sup>${k}</sup> ≈ ${s.toPrecision(4)}`;
-    const seg=cantorSegments(+depthRange.value);
-    const boxes=Math.round(1/s);
-    let occupied=0;
-    boxCtx.clearRect(0,0,boxCv.width,boxCv.height);
-    for(let i=0;i<boxes;i++){
-      const a=i*s, b=(i+1)*s;
-      const hit=seg.some(([x,y])=>!(y<=a||x>=b));
-      if(hit) occupied++;
-      const x=i/boxes*boxCv.width, w=boxCv.width/boxes;
-      boxCtx.fillStyle=hit?'#1565c0':'#e0e0e0';
-      boxCtx.fillRect(x,0,w,boxCv.height);
+    function refreshLenTable() {
+        const n = +depthRange.value;
+        lenBody.innerHTML = '';
+        for (let i = 0; i <= 9; i++) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${i}</td><td>${2 ** i}</td><td>(2/3)<sup>${i}</sup> &approx; ${(2/3)**i.toFixed(4)}</td>`;
+            tr.style.display = (i <= n) ? 'table-row' : 'none';
+            lenBody.appendChild(tr);
+        }
     }
-    nDisp.textContent=`N(s) = ${occupied}`;
-    return {s,occupied};
-  }
-
-  kRange.oninput=updateBoxInfo;
-
-  document.getElementById('addRow').onclick=()=>{
-    const k=+kRange.value;
-    const {occupied}=updateBoxInfo();
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${k}</td><td>1/3<sup>${k}</sup></td><td>${occupied}</td>`;
-    dataBody.appendChild(tr);
-  };
-
-  function plotChart(){
-    const rows=[...dataBody.children];
-    if(!rows.length){alert('Add data first');return;}
-    const pts=rows.map(r=>{
-      const k=+r.children[0].textContent;
-      const s=1/3**k;
-      const N=+r.children[2].textContent;
-      return {x:Math.log(1/s),y:Math.log(N)};
-    });
-    if(chart) chart.destroy();
-    chart=new Chart(document.getElementById('chartCv'),{
-      type:'scatter',
-      data:{datasets:[{data:pts,backgroundColor:'#1565c0'}]},
-      options:{scales:{x:{title:{display:true,text:'log(1/s)'}},y:{title:{display:true,text:'log N(s)'}}},plugins:{legend:{display:false}}}
-    });
-    slopeTxt.textContent='';
-  }
-
-  document.getElementById('plotBtn').onclick=plotChart;
-
-  document.getElementById('fitBtn').onclick=()=>{
-    const rows=[...dataBody.children];
-    if(rows.length<2){alert('Need at least 2 points');return;}
-    const xs=[],ys=[];
-    rows.forEach(r=>{
-      const k=+r.children[0].textContent;
-      const s=1/3**k;
-      xs.push(Math.log(1/s));
-      ys.push(Math.log(+r.children[2].textContent));
-    });
-    const n=xs.length;
-    const sumX=xs.reduce((a,b)=>a+b,0), sumY=ys.reduce((a,b)=>a+b,0);
-    const sumXY=xs.reduce((a,b,i)=>a+b*ys[i],0);
-    const sumX2=xs.reduce((a,b)=>a+b*b,0);
-    const m=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
-    const b=(sumY-m*sumX)/n;
-    if(!chart) plotChart();
-    const minX=Math.min(...xs), maxX=Math.max(...xs);
-    chart.data.datasets[1]={type:'line',data:[{x:minX,y:m*minX+b},{x:maxX,y:m*maxX+b}],borderColor:'#333',borderDash:[6,4],borderWidth:1,pointRadius:0};
-    chart.update();
-    slopeTxt.textContent=`Estimated dimension (slope) ≈ ${m.toFixed(4)}`;
-  };
-
-  document.getElementById('resetTbl').onclick=()=>{
-    dataBody.innerHTML='';
-    if(chart){chart.destroy();chart=null;}
-    slopeTxt.textContent='';
-  };
-
-  /**********************  Tabs logic (robust fix)  **********************/
-  function switchTab(id) {
-    // Highlight the correct tab button
-    document.querySelectorAll('.tabs button').forEach(btn =>
-      btn.classList.toggle('active', btn.id === id)
-    );
-    // Hide all sections, show only the one that matches
-    document.querySelectorAll('.section').forEach(sec =>
-      sec.classList.remove('active')
-    );
-    if (id === 'tabExp') {
-      document.getElementById('explorer').classList.add('active');
-    } else if (id === 'tabDim') {
-      document.getElementById('dimension').classList.add('active');
+    function refreshExplorer() {
+        depthVal.textContent = depthRange.value;
+        drawExplorer();
+        refreshLenTable();
     }
-  }
 
-  // Wire up tab clicks after DOM is loaded
-  window.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('tabExp').onclick = () => switchTab('tabExp');
-    document.getElementById('tabDim').onclick = () => switchTab('tabDim');
-    // Ensure Explorer tab is active on page load
-    switchTab('tabExp');
-  });
+    depthRange.oninput = () => { stopAnim(); refreshExplorer(); };
+    function startAnim() {
+        animHandle = setInterval(() => {
+            let d = +depthRange.value;
+            if (d >= +depthRange.max) animDir = -1;
+            if (d <= +depthRange.min) animDir = 1;
+            depthRange.value = d + animDir;
+            refreshExplorer();
+        }, 600);
+        document.getElementById('animBtn').textContent = 'Stop';
+        document.getElementById('animBtn').classList.add('danger-button');
+    }
+    function stopAnim() {
+        clearInterval(animHandle); animHandle = null;
+        document.getElementById('animBtn').textContent = 'Animate';
+        document.getElementById('animBtn').classList.remove('danger-button');
+    }
+    document.getElementById('animBtn').onclick = () => animHandle ? stopAnim() : startAnim();
 
-  /**********************  Initial paints **********************/
-  refreshExplorer();
-  updateBoxInfo();
-  </script>
+    function zoom(factor, center = 0.5) {
+        const span = (viewEnd - viewStart) * factor;
+        const mid = viewStart + (viewEnd - viewStart) * center;
+        viewStart = mid - span / 2;
+        viewEnd = mid + span / 2;
+        if (viewStart < 0) { viewEnd -= viewStart; viewStart = 0; }
+        if (viewEnd > 1) { viewStart -= viewEnd - 1; viewEnd = 1; }
+        drawExplorer();
+    }
+
+    expCv.addEventListener('wheel', e => { e.preventDefault(); zoom(e.deltaY < 0 ? 0.8 : 1.25, e.offsetX / expCv.width); }, { passive: false });
+    let dragging = false, lastX = 0;
+    expCv.onmousedown = e => { dragging = true; lastX = e.clientX; expCv.style.cursor = 'grabbing'; };
+    window.onmousemove = e => {
+        if (!dragging) return;
+        const dx = e.clientX - lastX; lastX = e.clientX;
+        const span = viewEnd - viewStart;
+        const shift = -dx / expCv.width * span;
+        viewStart += shift; viewEnd += shift;
+        if (viewStart < 0) { viewEnd -= viewStart; viewStart = 0; }
+        if (viewEnd > 1) { viewStart -= viewEnd - 1; viewEnd = 1; }
+        drawExplorer();
+    };
+    window.onmouseup = () => { dragging = false; expCv.style.cursor = 'grab'; };
+
+    /********************** Box-dimension logic  **********************/
+    const kRange = document.getElementById('kRange');
+    const kVal = document.getElementById('kVal');
+    const sDisp = document.getElementById('sDisp');
+    const nDisp = document.getElementById('nDisp');
+    const boxCv = document.getElementById('boxCanvas');
+    const boxCtx = boxCv.getContext('2d');
+    const dataBody = document.querySelector('#dataTbl tbody');
+    const slopeTxt = document.getElementById('slopeTxt');
+    let chart = null;
+
+    function updateBoxInfo() {
+        const k = +kRange.value;
+        kVal.textContent = k;
+        const s = 1 / 3 ** k;
+        sDisp.innerHTML = `s = 1/3<sup>${k}</sup> &approx; ${s.toPrecision(4)}`;
+        const seg = cantorSegments(+depthRange.value);
+        const boxes = Math.round(1 / s);
+        let occupied = 0;
+        if(boxCv.width > 0) {
+            boxCtx.clearRect(0, 0, boxCv.width, boxCv.height);
+            for (let i = 0; i < boxes; i++) {
+                const a = i * s, b = (i + 1) * s;
+                const hit = seg.some(([x, y]) => !(y <= a || x >= b));
+                if (hit) occupied++;
+                const xPos = i / boxes * boxCv.width, w = Math.max(1, boxCv.width / boxes);
+                boxCtx.fillStyle = hit ? '#1565c0' : '#e0e0e0';
+                boxCtx.fillRect(xPos, 0, w, boxCv.height);
+            }
+        }
+        nDisp.innerHTML = `N(s) = ${occupied}`;
+        return { s, occupied };
+    }
+
+    kRange.oninput = updateBoxInfo;
+
+    document.getElementById('addRow').onclick = () => {
+        const k = +kRange.value;
+        const { occupied } = updateBoxInfo();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${k}</td><td>1/3<sup>${k}</sup></td><td>${occupied}</td>`;
+        dataBody.appendChild(tr);
+    };
+
+    function plotChart() {
+        const rows = [...dataBody.children];
+        if (!rows.length) { alert('Add data first'); return; }
+        const pts = rows.map(r => {
+            const k = +r.children[0].textContent;
+            const s = 1 / 3 ** k;
+            const N = +r.children[2].textContent;
+            return { x: Math.log(1 / s), y: Math.log(N) };
+        });
+        if (chart) chart.destroy();
+        chart = new Chart(document.getElementById('chartCv'), {
+            type: 'scatter',
+            data: { datasets: [{ data: pts, backgroundColor: '#1565c0' }] },
+            options: { scales: { x: { title: { display: true, text: 'log(1/s)' } }, y: { title: { display: true, text: 'log N(s)' } } }, plugins: { legend: { display: false } } }
+        });
+        slopeTxt.textContent = '';
+    }
+
+    document.getElementById('plotBtn').onclick = plotChart;
+
+    document.getElementById('fitBtn').onclick = () => {
+        const rows = [...dataBody.children];
+        if (rows.length < 2) { alert('Need at least 2 points'); return; }
+        const xs = [], ys = [];
+        rows.forEach(r => {
+            const k = +r.children[0].textContent;
+            const s = 1 / 3 ** k;
+            xs.push(Math.log(1 / s));
+            ys.push(Math.log(+r.children[2].textContent));
+        });
+        const n = xs.length;
+        const sumX = xs.reduce((a, b) => a + b, 0), sumY = ys.reduce((a, b) => a + b, 0);
+        const sumXY = xs.reduce((a, b, i) => a + b * ys[i], 0);
+        const sumX2 = xs.reduce((a, b) => a + b * b, 0);
+        const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const b = (sumY - m * sumX) / n;
+        if (!chart) plotChart();
+        const minX = Math.min(...xs), maxX = Math.max(...xs);
+        chart.data.datasets[1] = { type: 'line', data: [{ x: minX, y: m * minX + b }, { x: maxX, y: m * maxX + b }], borderColor: '#d32f2f', borderDash: [6, 4], borderWidth: 2, pointRadius: 0 };
+        chart.update();
+        slopeTxt.textContent = `Estimated dimension (slope) ≈ ${m.toFixed(4)}`;
+    };
+
+    document.getElementById('resetTbl').onclick = () => {
+        dataBody.innerHTML = '';
+        if (chart) { chart.destroy(); chart = null; }
+        slopeTxt.textContent = '';
+    };
+
+    /********************** Tabs logic & Responsiveness  **********************/
+    function switchTab(id) {
+        document.querySelectorAll('.tabs button').forEach(btn => btn.classList.toggle('active', btn.id === id));
+        document.querySelectorAll('.section').forEach(sec => sec.classList.toggle('active', sec.id === (id === 'tabExp' ? 'explorer' : 'dimension')));
+        // Resize canvas on tab switch to ensure correct dimensions
+        resizeCanvases();
+    }
+    
+    function resizeCanvases() {
+        [expCv, boxCv, document.getElementById('chartCv')].forEach(cv => {
+            if(cv.offsetParent !== null) { // Only resize visible canvases
+                const dpr = window.devicePixelRatio || 1;
+                const rect = cv.getBoundingClientRect();
+                cv.width = rect.width * dpr;
+                // height is set in HTML or by Chart.js, we don't change it here
+                const ctx = cv.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+        });
+        // Redraw content after resize
+        drawExplorer();
+        updateBoxInfo();
+        if(chart) chart.resize();
+    }
+    
+    window.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('tabExp').onclick = () => switchTab('tabExp');
+        document.getElementById('tabDim').onclick = () => switchTab('tabDim');
+        
+        // Initial setup
+        resizeCanvases();
+        refreshExplorer();
+        updateBoxInfo();
+
+        window.addEventListener('resize', resizeCanvases);
+    });
+</script>
 </body>
 </html>
