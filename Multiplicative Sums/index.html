@@ -162,8 +162,8 @@
         th, td {
             border: 1px solid var(--medium-gray);
             text-align: center;
-            min-width: 3rem;
-            height: 3rem;
+            min-width: 2.5rem; /* Smaller cells for pattern view */
+            height: 2.5rem;
             padding: 0.25rem;
         }
         th {
@@ -173,7 +173,7 @@
         td.interactive { cursor: pointer; }
         td.highlight {
             background-color: var(--highlight-color);
-            font-weight: bold;
+            border-color: #fbc02d;
         }
     </style>
 </head>
@@ -186,7 +186,7 @@
 
     <section id="playground-tab" class="tab-content active">
         <h2>Sums of Powers Playground</h2>
-        <p class="info">Calculate a sum of powers, then find the result on the table and click to highlight it. You can highlight multiple numbers and transform them.</p>
+        <p class="info">Calculate a sum of powers, then find the result on the table and click to highlight it. You can highlight multiple numbers and transform them automatically.</p>
 
         <div class="controls">
              <div class="control-group">
@@ -267,19 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- STATE MANAGEMENT ---
     const MAX_HIGHER_TABLE_SIZE = 150;
     let state = {
-        playground: {
-            size: 12,
-            n: 5,
-            power: 1,
-            result: null,
-            highlights: new Set(),
-        },
-        higher: {
-            size: 30,
-            n: 8,
-            power: 4,
-            highlights: new Set(),
-        }
+        playground: { size: 12, n: 5, power: 1, result: null, highlights: new Set() },
+        higher: { size: 30, n: 8, power: 4, highlights: new Set() }
     };
     
     // --- DOM REFERENCES ---
@@ -302,20 +291,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- RENDERING & LOGIC ---
     
-    function createTable(size, highlights, isInteractive) {
+    function createTable(size, highlights, isInteractive, showNumbers = true) {
         const table = document.createElement('table');
         const thead = table.createTHead().insertRow();
-        thead.insertCell().outerHTML = "<th>×</th>";
-        for (let i = 1; i <= size; i++) thead.insertCell().outerHTML = `<th>${i}</th>`;
+        thead.insertCell().outerHTML = `<th>${showNumbers ? '×' : ''}</th>`;
+        for (let i = 1; i <= size; i++) thead.insertCell().outerHTML = `<th>${showNumbers ? i : ''}</th>`;
         
         const tbody = table.createTBody();
         for (let r = 1; r <= size; r++) {
             const row = tbody.insertRow();
-            row.insertCell().outerHTML = `<th>${r}</th>`;
+            row.insertCell().outerHTML = `<th>${showNumbers ? r : ''}</th>`;
             for (let c = 1; c <= size; c++) {
                 const cell = row.insertCell();
                 const key = `${r}-${c}`;
-                cell.textContent = r * c;
+                if (showNumbers) cell.textContent = r * c;
                 if (isInteractive) {
                     cell.classList.add('interactive');
                     cell.dataset.key = key;
@@ -329,26 +318,41 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderPlayground() {
         const { size, highlights } = state.playground;
         pgTableContainer.innerHTML = '';
-        pgTableContainer.appendChild(createTable(size, highlights, true));
+        pgTableContainer.appendChild(createTable(size, highlights, true, true));
         resultDisplay.textContent = state.playground.result !== null ? `Result: ${state.playground.result}` : '';
     }
 
     function renderHigherPowers() {
         const { size, highlights } = state.higher;
         higherTableContainer.innerHTML = '';
-        higherTableContainer.appendChild(createTable(size, highlights, false));
+        higherTableContainer.appendChild(createTable(size, highlights, false, false));
     }
     
     function highlightValueFirstColumn(value, tab) {
         const { size, highlights } = state[tab];
-        if (value > size * size || value <= 0) return false; // Cannot be represented
-
+        if (value > size * size || value <= 0) return false;
         for (let c = 1; c <= size; c++) {
             if (value % c === 0) {
                 const r = value / c;
                 if (r >= 1 && r <= size) {
                     highlights.add(`${r}-${c}`);
-                    return true; // Found the pair with the smallest column
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function highlightOnOrAboveDiagonal(value, tab) {
+        const { size, highlights } = state[tab];
+        if (value > size * size || value <= 0) return false;
+        const limit = Math.floor(Math.sqrt(value));
+        for (let r = 1; r <= limit; r++) {
+            if (value % r === 0) {
+                const c = value / r;
+                if (c <= size) {
+                    highlights.add(`${r}-${c}`);
+                    return true;
                 }
             }
         }
@@ -375,7 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentHighlights.forEach(key => {
             const [r, c] = key.split('-').map(Number);
             const newValue = r * c * factor;
-            if (!highlightValueFirstColumn(newValue, tab)) {
+            const highlightFn = (tab === 'higher') ? highlightOnOrAboveDiagonal : highlightValueFirstColumn;
+            if (!highlightFn(newValue, tab)) {
                 allValuesFit = false;
             }
         });
@@ -400,7 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const power = parseInt(powerSelect.value);
         for (let i = 1; i <= n; i++) sum += Math.pow(i, power);
         state.playground.result = sum;
-        // ONLY update the text display, do not highlight or re-render table
         resultDisplay.textContent = `Result: ${sum}`;
     });
     
@@ -451,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
         warningMessage.textContent = requiredSize > MAX_HIGHER_TABLE_SIZE ? `Warning: Some sums are too large to display (max table size ${MAX_HIGHER_TABLE_SIZE}x${MAX_HIGHER_TABLE_SIZE}).` : '';
         
         state.higher.highlights.clear();
-        sums.forEach(sum => highlightValueFirstColumn(sum, 'higher'));
+        sums.forEach(sum => highlightOnOrAboveDiagonal(sum, 'higher'));
         
         renderHigherPowers();
     });
