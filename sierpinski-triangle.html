@@ -69,11 +69,11 @@
 
         .tab-content {
             padding: 1.5rem;
-            display: none; /* Hidden by default */
+            display: none;
         }
 
         .tab-content.active {
-            display: block; /* Made visible by the active class */
+            display: block;
         }
 
         h2 {
@@ -93,11 +93,10 @@
         }
         
         #boxGridCanvas {
-             height: 150px; /* Increased height for better visualization */
-             background-color: #ffffff;
+             height: 200px;
         }
 
-        .controls, .box-controls {
+        .controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
@@ -201,7 +200,7 @@
         <h2>Sierpiński Triangle Explorer</h2>
         <div class="controls">
              <div class="control-group">
-                <label for="depth-slider">Calculation Depth: <span id="depth-label">0</span></label>
+                <label for="depth-slider">Depth: <span id="depth-label">0</span></label>
                 <input type="range" id="depth-slider" min="0" max="9" value="4">
             </div>
             <div class="button-group">
@@ -226,29 +225,22 @@
 
     <section id="box-dimension-tab" class="tab-content">
         <h2>Box-Counting Dimension Lab</h2>
-        <p>The data points and N(s) value are calculated using the <strong>Calculation Depth</strong> from the Explorer tab.</p>
-        <div class="box-controls">
+        <p>The dimension is calculated using the triangle at depth <strong id="box-depth-label">4</strong> from the explorer.</p>
+        <div class="controls">
             <div class="control-group">
                 <label for="k-slider">Box side length s = 1/2<sup>k</sup> (k=<span id="k-label">1</span>)</label>
                 <input type="range" id="k-slider" min="1" max="9" value="3">
             </div>
-            <div class="control-group">
-                <label>Current Values (for Depth <span id="box-depth-label">4</span>)</label>
-                <div id="box-info" class="math-display">s ≈ 0.125, N(s) = ?</div>
-            </div>
+            <div class="math-display">N(s) = <span id="n-val">?</span></div>
         </div>
         
-        <div class="control-group">
-            <label for="box-vis-depth-slider">Visualization Depth: <span id="box-vis-depth-label">2</span></label>
-            <input type="range" id="box-vis-depth-slider" min="0" max="8" value="2">
-        </div>
         <canvas id="boxGridCanvas"></canvas>
 
         <div class="button-group">
             <button id="add-data-btn">Add Data Point</button>
             <button id="plot-btn">Plot log-log</button>
             <button id="fit-line-btn">Fit Line &amp; Show Slope</button>
-            <button id="reset-table-btn" class="danger-button">Reset Data</button>
+            <button id="reset-data-btn" class="danger-button">Reset Data</button>
         </div>
         
         <table id="box-data-table">
@@ -273,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const boxDimensionTab = document.getElementById('box-dimension-tab');
     const tabButtons = document.querySelectorAll('.tab-button');
 
-    // Explorer elements
     const canvas = document.getElementById('sierpinski-canvas');
     const ctx = canvas.getContext('2d');
     const depthSlider = document.getElementById('depth-slider');
@@ -282,123 +273,94 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadPngBtn = document.getElementById('download-png-btn');
     const explorerTableBody = document.querySelector('#explorer-table tbody');
 
-    // Box-Dimension elements
     const kSlider = document.getElementById('k-slider');
     const kLabel = document.getElementById('k-label');
-    const boxInfo = document.getElementById('box-info');
+    const nVal = document.getElementById('n-val');
     const boxDepthLabel = document.getElementById('box-depth-label');
     const boxGridCanvas = document.getElementById('boxGridCanvas');
     const boxGridCtx = boxGridCanvas.getContext('2d');
-    const boxVisDepthSlider = document.getElementById('box-vis-depth-slider');
-    const boxVisDepthLabel = document.getElementById('box-vis-depth-label');
     const addDataBtn = document.getElementById('add-data-btn');
     const plotBtn = document.getElementById('plot-btn');
     const fitLineBtn = document.getElementById('fit-line-btn');
-    const resetTableBtn = document.getElementById('reset-table-btn');
+    const resetDataBtn = document.getElementById('reset-data-btn');
     const boxDataTableBody = document.querySelector('#box-data-table tbody');
     const chartCanvas = document.getElementById('log-log-chart');
 
-    // State variables
     let currentDepth = 4;
     let animationFrameId;
     let isAnimating = false;
     let animationDirection = 1;
-
     let transform = { scale: 1, panX: 0, panY: 0 };
     let isDragging = false;
     let startDrag = { x: 0, y: 0 };
-
     let boxData = [];
     let logLogChart;
-    let lastK = 3;
-    let lastN = 0;
-    let lastCalcDepth = 4;
+    let memoizedTriangles = {};
 
-    // --- CANVAS SIZING AND DRAWING LOGIC ---
+    // --- GEOMETRY & CORE LOGIC ---
+    function getSierpinskiTriangles(depth, p1, p2, p3) {
+        if (depth === 0) return [[p1, p2, p3]];
+        
+        const p12 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+        const p23 = { x: (p2.x + p3.x) / 2, y: (p2.y + p3.y) / 2 };
+        const p31 = { x: (p3.x + p1.x) / 2, y: (p3.y + p1.y) / 2 };
+        
+        return [
+            ...getSierpinskiTriangles(depth - 1, p1, p12, p31),
+            ...getSierpinskiTriangles(depth - 1, p12, p2, p23),
+            ...getSierpinskiTriangles(depth - 1, p31, p23, p3)
+        ];
+    }
 
-    function resizeExplorerCanvas() {
+    function getNormalizedTriangles(depth) {
+        if(memoizedTriangles[depth]) return memoizedTriangles[depth];
+        const size = 1;
+        const h = size * Math.sqrt(3) / 2;
+        const p1 = {x: 0, y: h}, p2 = {x: size, y: h}, p3 = {x: size/2, y: 0};
+        const rawTriangles = getSierpinskiTriangles(depth, p1, p2, p3);
+
+        const normalized = rawTriangles.map(tri => tri.map(p => ({
+            x: p.x,
+            y: (h - p.y) / h // Normalize y to be in [0,1] and flip
+        })));
+        memoizedTriangles[depth] = normalized;
+        return normalized;
+    }
+
+
+    // --- DRAWING & UI ---
+    function drawExplorer() {
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
-        if (rect.width === 0) return;
-
+        if(rect.width === 0) return;
+        
         canvas.width = rect.width * dpr;
         canvas.height = rect.width * Math.sqrt(3) / 2 * dpr;
         canvas.style.height = `${rect.width * Math.sqrt(3) / 2}px`;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        updateExplorer();
-    }
 
-    function resizeBoxCanvas() {
-        const dpr = window.devicePixelRatio || 1;
-        const boxRect = boxGridCanvas.getBoundingClientRect();
-        if (boxRect.width === 0) return;
-
-        boxGridCanvas.width = boxRect.width * dpr;
-        boxGridCanvas.height = boxRect.height * dpr;
-        boxGridCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        updateBoxDimensionUI();
-        if (logLogChart) {
-            logLogChart.resize();
-        }
-    }
-
-    // --- TAB SWITCHING LOGIC ---
-    window.switchTab = function(tabName) {
-        document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
-        tabButtons.forEach(button => button.classList.remove('active'));
-
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-        document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        
-        if (tabName === 'explorer') {
-            resizeExplorerCanvas();
-        } else if (tabName === 'box-dimension') {
-            resizeBoxCanvas();
-        }
-    }
-
-
-    // --- TAB 1: TRIANGLE EXPLORER LOGIC ---
-
-    function drawSierpinski(pCtx, depth, p1, p2, p3) {
-        if (depth === 0) {
-            pCtx.beginPath();
-            pCtx.moveTo(p1.x, p1.y);
-            pCtx.lineTo(p2.x, p2.y);
-            pCtx.lineTo(p3.x, p3.y);
-            pCtx.closePath();
-            pCtx.fill();
-        } else {
-            const p12 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
-            const p23 = { x: (p2.x + p3.x) / 2, y: (p2.y + p3.y) / 2 };
-            const p31 = { x: (p3.x + p1.x) / 2, y: (p3.y + p1.y) / 2 };
-            
-            drawSierpinski(pCtx, depth - 1, p1, p12, p31);
-            drawSierpinski(pCtx, depth - 1, p12, p2, p23);
-            drawSierpinski(pCtx, depth - 1, p31, p23, p3);
-        }
-    }
-
-    function drawExplorer() {
-        const { width, height } = canvas;
-        const dpr = window.devicePixelRatio || 1;
-        const canvasWidth = width / dpr;
-        const canvasHeight = height / dpr;
-        
-        ctx.save();
         ctx.fillStyle = '#f5f5f5';
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
         ctx.translate(transform.panX, transform.panY);
         ctx.scale(transform.scale, transform.scale);
 
-        const margin = 20;
-        const w = canvasWidth - 2 * margin;
-        const p1 = { x: margin, y: canvasHeight - margin };
-        const p2 = { x: w + margin, y: canvasHeight - margin };
-        const p3 = { x: canvasWidth / 2, y: margin };
-
+        const canvasWidth = canvas.width / dpr;
+        const canvasHeight = canvas.height / dpr;
+        
+        const p1 = { x: 0, y: canvasHeight }, p2 = { x: canvasWidth, y: canvasHeight }, p3 = { x: canvasWidth / 2, y: 0 };
+        const triangles = getSierpinskiTriangles(currentDepth, p1, p2, p3);
+        
         ctx.fillStyle = '#1565c0';
-        drawSierpinski(ctx, currentDepth, p1, p2, p3);
+        ctx.beginPath();
+        triangles.forEach(tri => {
+            ctx.moveTo(tri[0].x, tri[0].y);
+            ctx.lineTo(tri[1].x, tri[1].y);
+            ctx.lineTo(tri[2].x, tri[2].y);
+        });
+        ctx.closePath();
+        ctx.fill();
         ctx.restore();
     }
 
@@ -408,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const numTriangles = Math.pow(3, n);
             const area = Math.pow(0.75, n);
             const row = `<tr style="display: ${n <= currentDepth ? 'table-row' : 'none'};">
-                    <td>${n}</td><td>${numTriangles.toLocaleString()}</td><td>${area.toFixed(4)}</td></tr>`;
+                <td>${n}</td><td>${numTriangles.toLocaleString()}</td><td>${area.toFixed(4)}</td></tr>`;
             explorerTableBody.insertAdjacentHTML('beforeend', row);
         }
     }
@@ -418,149 +380,79 @@ document.addEventListener('DOMContentLoaded', () => {
         boxDepthLabel.textContent = currentDepth;
         drawExplorer();
         updateExplorerTable();
-        updateBoxDimensionUI();
-    }
-
-    function handleAnimate() {
-        isAnimating = !isAnimating;
-        animateBtn.textContent = isAnimating ? 'Stop Animation' : 'Animate';
-        animateBtn.classList.toggle('danger-button', isAnimating);
-        if (isAnimating) animate(); else clearTimeout(animationFrameId);
-    }
-
-    function animate() {
-        if (!isAnimating) return;
-        let depth = parseInt(depthSlider.value) + animationDirection;
-        if (depth > depthSlider.max || depth < depthSlider.min) {
-            animationDirection *= -1;
-            depth += 2 * animationDirection;
+        if (boxDimensionTab.classList.contains('active')) {
+             updateBoxDimensionUI();
         }
-        depthSlider.value = depth;
-        currentDepth = depth;
-        updateExplorer();
-        animationFrameId = setTimeout(() => { requestAnimationFrame(animate); }, 400);
     }
-
-    depthSlider.addEventListener('input', (e) => {
-        currentDepth = parseInt(e.target.value);
-        updateExplorer();
-    });
-    animateBtn.addEventListener('click', handleAnimate);
-    downloadPngBtn.addEventListener('click', () => {
-        const link = document.createElement('a');
-        link.download = `sierpinski-depth-${currentDepth}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    });
-
-    canvas.addEventListener('mousedown', (e) => { isDragging = true; startDrag.x = e.clientX - transform.panX; startDrag.y = e.clientY - transform.panY; canvas.style.cursor = 'grabbing'; });
-    canvas.addEventListener('mouseup', () => { isDragging = false; canvas.style.cursor = 'grab'; });
-    canvas.addEventListener('mouseleave', () => { isDragging = false; canvas.style.cursor = 'grab'; });
-    canvas.addEventListener('mousemove', (e) => { if (!isDragging) return; transform.panX = e.clientX - startDrag.x; transform.panY = e.clientY - startDrag.y; drawExplorer(); });
-    canvas.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        const scaleAmount = e.deltaY < 0 ? 1.1 : 1 / 1.1;
-        transform.panX = mouseX - (mouseX - transform.panX) * scaleAmount;
-        transform.panY = mouseY - (mouseY - transform.panY) * scaleAmount;
-        transform.scale *= scaleAmount;
-        drawExplorer();
-    });
-
-
-    // --- TAB 2: BOX DIMENSION LOGIC ---
-
-    function getSierpinskiTriangles(depth) {
-        const triangles = [];
-        const size = 1, height = Math.sqrt(3) / 2 * size;
-        const p1 = { x: 0, y: height }, p2 = { x: size, y: height }, p3 = { x: size / 2, y: 0 };
-        function generate(d, pt1, pt2, pt3) {
-            if (d === 0) {
-                triangles.push([pt1, pt2, pt3]);
-            } else {
-                const p12 = { x: (pt1.x + pt2.x) / 2, y: (pt1.y + pt2.y) / 2 };
-                const p23 = { x: (pt2.x + pt3.x) / 2, y: (pt2.y + pt3.y) / 2 };
-                const p31 = { x: (pt3.x + pt1.x) / 2, y: (pt3.y + pt1.y) / 2 };
-                generate(d - 1, pt1, p12, p31);
-                generate(d - 1, p12, pt2, p23);
-                generate(d - 1, p31, p23, pt3);
-            }
-        }
-        generate(depth, p1, p2, p3);
-        return triangles;
-    }
-
+    
+    // --- BOX DIMENSION LOGIC ---
     function checkIntersection(triangle, box) {
-        const triMinX = Math.min(triangle[0].x, triangle[1].x, triangle[2].x), triMaxX = Math.max(triangle[0].x, triangle[1].x, triangle[2].x);
-        const triMinY = Math.min(triangle[0].y, triangle[1].y, triangle[2].y), triMaxY = Math.max(triangle[0].y, triangle[1].y, triangle[2].y);
-        const boxMinX = box.x, boxMaxX = box.x + box.s, boxMinY = box.y, boxMaxY = box.y + box.s;
-        return triMaxX >= boxMinX && triMinX <= boxMaxX && triMaxY >= boxMinY && triMinY <= boxMaxY;
+        const triMinX = Math.min(triangle[0].x, triangle[1].x, triangle[2].x);
+        const triMaxX = Math.max(triangle[0].x, triangle[1].x, triangle[2].x);
+        const triMinY = Math.min(triangle[0].y, triangle[1].y, triangle[2].y);
+        const triMaxY = Math.max(triangle[0].y, triangle[1].y, triangle[2].y);
+        
+        return triMaxX >= box.x && triMinX <= box.x + box.s && triMaxY >= box.y && triMinY <= box.y + box.s;
     }
 
-    function countIntersectingBoxes(calcDepth, k) {
+    function getOccupiedBoxes(depth, k) {
         const s = 1 / Math.pow(2, k);
-        const triangles = getSierpinskiTriangles(calcDepth);
+        const triangles = getNormalizedTriangles(depth);
         const numBoxesPerSide = Math.pow(2, k);
-        let count = 0;
-        const height = Math.sqrt(3) / 2, yOffset = (1 - height) / 2;
-        const normalizedTriangles = triangles.map(tri => tri.map(p => ({ x: p.x, y: (height - p.y) + yOffset })));
+        const occupied = new Set();
+        
         for (let i = 0; i < numBoxesPerSide; i++) {
             for (let j = 0; j < numBoxesPerSide; j++) {
                 const box = { x: i * s, y: j * s, s: s };
-                for (const triangle of normalizedTriangles) {
-                    if (checkIntersection(triangle, box)) { count++; break; }
+                for (const triangle of triangles) {
+                    if (checkIntersection(triangle, box)) {
+                        occupied.add(`${i}-${j}`);
+                        break;
+                    }
                 }
             }
         }
-        return count;
+        return occupied;
     }
 
-    function drawBoxGrid() {
-        const { width, height } = boxGridCanvas;
+    function drawBoxGrid(occupiedBoxes) {
         const dpr = window.devicePixelRatio || 1;
-        const canvasWidth = width / dpr, canvasHeight = height / dpr;
-        if(canvasWidth === 0) return;
+        const rect = boxGridCanvas.getBoundingClientRect();
+        if(rect.width === 0) return;
+        boxGridCanvas.width = rect.width * dpr;
+        boxGridCanvas.height = rect.height * dpr;
+        boxGridCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        const k = parseInt(kSlider.value);
-        const s = 1 / Math.pow(2, k);
-        const numBoxesPerSide = Math.pow(2, k);
-        const boxSize = canvasWidth / numBoxesPerSide;
-        
-        const visDepth = parseInt(boxVisDepthSlider.value);
-        const visTriangles = getSierpinskiTriangles(visDepth);
-        
+        const canvasWidth = boxGridCanvas.width / dpr;
+        const canvasHeight = boxGridCanvas.height / dpr;
+
         boxGridCtx.fillStyle = '#ffffff';
         boxGridCtx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        // Draw the triangle first
-        const triHeight = Math.sqrt(3) / 2;
-        const yOffset = (canvasHeight - triHeight * canvasWidth) / 2; // Center it vertically
-        boxGridCtx.fillStyle = 'rgba(21, 101, 192, 0.25)'; // Semi-transparent blue
-        visTriangles.forEach(tri => {
-            const p1 = {x: tri[0].x * canvasWidth, y: (triHeight - tri[0].y) * canvasWidth + yOffset};
-            const p2 = {x: tri[1].x * canvasWidth, y: (triHeight - tri[1].y) * canvasWidth + yOffset};
-            const p3 = {x: tri[2].x * canvasWidth, y: (triHeight - tri[2].y) * canvasWidth + yOffset};
-            drawSierpinski(boxGridCtx, 0, p1, p2, p3);
+        // Draw background fractal
+        const triangles = getNormalizedTriangles(currentDepth);
+        boxGridCtx.fillStyle = 'rgba(21, 101, 192, 0.15)';
+        boxGridCtx.beginPath();
+        triangles.forEach(tri => {
+            boxGridCtx.moveTo(tri[0].x * canvasWidth, tri[0].y * canvasHeight);
+            boxGridCtx.lineTo(tri[1].x * canvasWidth, tri[1].y * canvasHeight);
+            boxGridCtx.lineTo(tri[2].x * canvasWidth, tri[2].y * canvasHeight);
         });
+        boxGridCtx.closePath();
+        boxGridCtx.fill();
 
-        // Overlay the grid
-        const normalizedTrianglesForIntersect = getSierpinskiTriangles(visDepth).map(tri => tri.map(p => ({ x: p.x, y: (triHeight - p.y) + (1 - triHeight)/2 })));
-        
+        // Draw grid overlay
+        const k = parseInt(kSlider.value);
+        const numBoxesPerSide = Math.pow(2, k);
+        const boxSize = canvasWidth / numBoxesPerSide;
+
         for (let i = 0; i < numBoxesPerSide; i++) {
-            if (i * boxSize > canvasWidth) break;
-            for (let j = 0; j * boxSize < canvasHeight; j++) {
-                const box = { x: i * s, y: j * s, s: s };
-                let intersects = false;
-                for (const triangle of normalizedTrianglesForIntersect) {
-                    if (checkIntersection(triangle, box)) { intersects = true; break; }
-                }
-                if(intersects) {
-                    boxGridCtx.fillStyle = 'rgba(21, 101, 192, 0.7)';
+            for (let j = 0; j < numBoxesPerSide; j++) {
+                if (occupiedBoxes.has(`${i}-${j}`)) {
+                    boxGridCtx.fillStyle = 'rgba(21, 101, 192, 0.6)';
                     boxGridCtx.fillRect(i * boxSize, j * boxSize, boxSize, boxSize);
                 }
-                boxGridCtx.strokeStyle = '#bdbdbd';
+                boxGridCtx.strokeStyle = '#e0e0e0';
                 boxGridCtx.strokeRect(i * boxSize, j * boxSize, boxSize, boxSize);
             }
         }
@@ -569,27 +461,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateBoxDimensionUI() {
         const k = parseInt(kSlider.value);
         kLabel.textContent = k;
-        const s = 1 / Math.pow(2, k);
-        
-        if (k !== lastK || currentDepth !== lastCalcDepth) {
-            lastK = k;
-            lastCalcDepth = currentDepth;
-            lastN = countIntersectingBoxes(currentDepth, k);
-        }
-        
-        boxInfo.innerHTML = `s &approx; ${s.toFixed(4)}, N(s) = ${lastN.toLocaleString()}`;
-        if (boxDimensionTab.classList.contains('active')) {
-            drawBoxGrid();
-        }
+        const occupied = getOccupiedBoxes(currentDepth, k);
+        nVal.textContent = occupied.size.toLocaleString();
+        drawBoxGrid(occupied);
     }
-
+    
     function addDataRow() {
         const k = parseInt(kSlider.value);
-        const n_s = countIntersectingBoxes(currentDepth, k);
+        const n_s = getOccupiedBoxes(currentDepth, k).size;
         if (n_s === 0) return;
-        const log_inv_s = Math.log(1 / (1 / Math.pow(2, k)));
+        const log_inv_s = Math.log(Math.pow(2, k));
         const log_n_s = Math.log(n_s);
-        if (boxData.find(p => p.k === k)) { alert(`Data for k=${k} already exists.`); return; }
+        
+        if (boxData.find(p => p.x === log_inv_s)) return alert(`Data for k=${k} already exists.`);
         boxData.push({ x: log_inv_s, y: log_n_s, k: k });
         boxData.sort((a, b) => a.x - b.x);
         updateBoxDataTable();
@@ -603,61 +487,63 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function plotLogLog() {
-        if (boxData.length < 2) { alert("Please add at least two data points to create a plot."); return; }
+        if (boxData.length < 2) return alert("Please add at least two data points.");
         if (logLogChart) logLogChart.destroy();
         logLogChart = new Chart(chartCanvas, {
-            data: { datasets: [{ label: 'log(N(s)) vs log(1/s)', data: boxData, backgroundColor: 'rgba(21, 101, 192, 0.6)', borderColor: '#1565c0', borderWidth: 1, pointRadius: 5, type: 'scatter' }] },
+            data: { datasets: [{ label: 'log(N(s)) vs log(1/s)', data: boxData, backgroundColor: 'rgba(21, 101, 192, 0.6)', type: 'scatter' }] },
             options: { responsive: true, plugins: { title: { display: true, text: 'Log-Log Plot for Box-Counting Dimension' }, subtitle: { display: false } }, scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: 'log(1/s)' } }, y: { title: { display: true, text: 'log(N(s))' } } } }
         });
     }
 
     function fitLine() {
-        if (!logLogChart || boxData.length < 2) { alert("Please plot at least two data points first."); return; }
-        let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0; const n = boxData.length;
+        if (boxData.length < 2) return alert("Please add at least two data points.");
+        
+        let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+        const n = boxData.length;
         boxData.forEach(p => { sumX += p.x; sumY += p.y; sumXY += p.x * p.y; sumX2 += p.x * p.x; });
-        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX), intercept = (sumY - slope * sumX) / n;
-        const fitLineData = [{ x: boxData[0].x, y: slope * boxData[0].x + intercept }, { x: boxData[n - 1].x, y: slope * boxData[n - 1].x + intercept }];
-        const fitLineIndex = logLogChart.data.datasets.findIndex(ds => ds.label === 'Fit Line');
-        if (fitLineIndex !== -1) { logLogChart.data.datasets[fitLineIndex].data = fitLineData; } else { logLogChart.data.datasets.push({ label: 'Fit Line', data: fitLineData, borderColor: '#d32f2f', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, type: 'line', fill: false }); }
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+        
+        const fitLineData = [{ x: boxData[0].x, y: slope * boxData[0].x + intercept }, { x: boxData[boxData.length-1].x, y: slope * boxData[boxData.length-1].x + intercept }];
+
+        logLogChart.data.datasets[1] = { label: 'Fit Line', data: fitLineData, borderColor: '#d32f2f', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, type: 'line', fill: false };
         logLogChart.options.plugins.subtitle.text = `Slope (Box-Counting Dimension) ≈ ${slope.toFixed(4)}`;
         logLogChart.options.plugins.subtitle.display = true;
         logLogChart.update();
     }
 
-    function resetBoxData() {
-        boxData = [];
-        updateBoxDataTable();
-        if (logLogChart) { logLogChart.destroy(); logLogChart = null; }
+    // --- EVENT LISTENERS & TABS ---
+    function handleResize() { if (explorerTab.classList.contains('active')) drawExplorer(); else updateBoxDimensionUI(); }
+    window.switchTab = function(tabName) {
+        document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
+        tabButtons.forEach(button => button.classList.remove('active'));
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        memoizedTriangles = {}; // Clear cache
+        handleResize();
     }
 
-    kSlider.addEventListener('input', (e) => { kLabel.textContent = e.target.value; });
-    kSlider.addEventListener('change', () => { updateBoxDimensionUI(); });
-    boxVisDepthSlider.addEventListener('input', (e) => {
-        boxVisDepthLabel.textContent = e.target.value;
-        drawBoxGrid();
-    });
+    depthSlider.addEventListener('input', e => { currentDepth = parseInt(e.target.value); updateExplorer(); });
+    animateBtn.addEventListener('click', () => { isAnimating = !isAnimating; animateBtn.textContent = isAnimating ? 'Stop' : 'Animate'; animateBtn.classList.toggle('danger-button', isAnimating); if (isAnimating) { animationFrameId = requestAnimationFrame(animate); } else { cancelAnimationFrame(animationFrameId); } });
+    function animate() { if (!isAnimating) return; let d = parseInt(depthSlider.value) + animationDirection; if (d > 9 || d < 0) { animationDirection *= -1; d += 2 * animationDirection; } depthSlider.value = d; currentDepth = d; updateExplorer(); setTimeout(() => { animationFrameId = requestAnimationFrame(animate); }, 400); }
+    downloadPngBtn.addEventListener('click', () => { const link = document.createElement('a'); link.download = `sierpinski-depth-${currentDepth}.png`; link.href = canvas.toDataURL('image/png'); link.click(); });
+    canvas.addEventListener('mousedown', (e) => { isDragging = true; startDrag.x = e.clientX - transform.panX; startDrag.y = e.clientY - transform.panY; canvas.style.cursor = 'grabbing'; });
+    canvas.addEventListener('mouseup', () => { isDragging = false; canvas.style.cursor = 'grab'; });
+    canvas.addEventListener('mouseleave', () => { isDragging = false; canvas.style.cursor = 'grab'; });
+    canvas.addEventListener('mousemove', (e) => { if (!isDragging) return; transform.panX = e.clientX - startDrag.x; transform.panY = e.clientY - startDrag.y; drawExplorer(); });
+    canvas.addEventListener('wheel', (e) => { e.preventDefault(); const rect = canvas.getBoundingClientRect(); const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top; const scaleAmount = e.deltaY < 0 ? 1.1 : 1 / 1.1; transform.panX = mouseX - (mouseX - transform.panX) * scaleAmount; transform.panY = mouseY - (mouseY - transform.panY) * scaleAmount; transform.scale *= scaleAmount; drawExplorer(); });
+
+    kSlider.addEventListener('input', () => { kLabel.textContent = kSlider.value; });
+    kSlider.addEventListener('change', updateBoxDimensionUI);
     addDataBtn.addEventListener('click', addDataRow);
     plotBtn.addEventListener('click', plotLogLog);
     fitLineBtn.addEventListener('click', fitLine);
-    resetTableBtn.addEventListener('click', resetBoxData);
-
-    // --- INITIALIZATION ---
-    function init() {
-        currentDepth = parseInt(depthSlider.value);
-        lastK = parseInt(kSlider.value);
-        lastCalcDepth = currentDepth;
-        boxVisDepthLabel.textContent = boxVisDepthSlider.value;
-        resizeExplorerCanvas();
-    }
+    resetDataBtn.addEventListener('click', () => { boxData = []; if (logLogChart) logLogChart.destroy(); updateBoxDataTable(); });
     
-    window.addEventListener('resize', () => {
-        if (explorerTab.classList.contains('active')) {
-            resizeExplorerCanvas();
-        } else {
-            resizeBoxCanvas();
-        }
-    });
-    init();
+    // --- INITIALIZATION ---
+    window.addEventListener('resize', handleResize);
+    updateExplorer();
 });
 </script>
 </body>
