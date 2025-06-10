@@ -92,9 +92,7 @@
             border-radius: 4px;
         }
         
-        #boxGridCanvas {
-             height: 200px;
-        }
+        /* Removed fixed height for boxGridCanvas */
 
         .controls {
             display: grid;
@@ -312,7 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
     }
     
-    // Corrected normalization function
     function getNormalizedTriangles(depth) {
         if(memoizedTriangles[depth]) return memoizedTriangles[depth];
         
@@ -425,8 +422,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const dpr = window.devicePixelRatio || 1;
         const rect = boxGridCanvas.getBoundingClientRect();
         if(rect.width === 0) return;
+
+        // Force the canvas to have the same aspect ratio as the explorer
         boxGridCanvas.width = rect.width * dpr;
-        boxGridCanvas.height = rect.height * dpr;
+        boxGridCanvas.height = rect.width * Math.sqrt(3) / 2 * dpr;
+        boxGridCanvas.style.height = `${rect.width * Math.sqrt(3) / 2}px`;
         boxGridCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         const canvasWidth = boxGridCanvas.width / dpr;
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
         boxGridCtx.fillRect(0, 0, canvasWidth, canvasHeight);
 
         // Determine the size and position of our drawing area inside the canvas
-        const drawSize = Math.min(canvasWidth, canvasHeight) * 0.9;
+        const drawSize = Math.min(canvasWidth, canvasHeight) * 0.95;
         const marginX = (canvasWidth - drawSize) / 2;
         const marginY = (canvasHeight - drawSize) / 2;
 
@@ -459,7 +459,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let i = 0; i < numBoxesPerSide; i++) {
             for (let j = 0; j < numBoxesPerSide; j++) {
-                // Map box from [0,1] space to canvas drawing area
                 const drawX = (i * boxSize) * drawSize + marginX;
                 const drawY = (j * boxSize) * drawSize + marginY;
                 const drawBoxPixelSize = boxSize * drawSize;
