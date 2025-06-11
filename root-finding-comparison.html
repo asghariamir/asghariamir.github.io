@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Root-Finding Method Comparison Lab</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --danger-color: #d32f2f;
+            --bisection-color: #ff9800; /* Orange */
+            --false-pos-color: #f44336; /* Red */
+            --secant-color: #9c27b0;   /* Purple */
+            --newton-color: #4caf50;   /* Green */
+            --fixed-point-color: #2196f3; /* Blue */
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: var(--light-gray); color: var(--dark-gray); padding: 1rem; }
+        .container { width: 100%; max-width: 1100px; margin: 0 auto; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; padding: 1.5rem; }
+        
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;}
+        h3 { font-size: 1.25rem; color: var(--dark-gray); margin: 2rem 0 1rem; border-bottom: 1px solid var(--medium-gray); padding-bottom: 0.5rem; }
+
+        .control-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem 1.5rem; padding: 1rem; background-color: var(--light-gray); border-radius: 6px; margin-bottom: 1.5rem; }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .full-width { grid-column: 1 / -1; }
+        
+        label { font-size: 0.9rem; font-weight: 600; color: #616161; }
+        input, select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; }
+        input[type="text"] { font-family: monospace; }
+        input.error { border-color: var(--danger-color); }
+
+        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; width: 100%; }
+        button:hover { background-color: #1976d2; }
+
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .result-card { border: 1px solid var(--medium-gray); border-radius: 6px; padding: 1rem; text-align: center; }
+        .result-card h4 { margin: 0 0 0.5rem; font-size: 1rem; }
+        .result-card .value { font-size: 1.2rem; font-weight: bold; word-wrap: break-word; }
+        .result-card .status { font-size: 0.8rem; font-style: italic; margin-top: 0.5rem; }
+        .status.converged { color: #2e7d32; }
+        .status.failed { color: var(--danger-color); }
+        h4.bisection { color: var(--bisection-color); }
+        h4.false-pos { color: var(--false-pos-color); }
+        h4.secant { color: var(--secant-color); }
+        h4.newton { color: var(--newton-color); }
+        h4.fixed-point { color: var(--fixed-point-color); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Root-Finding Method Comparison Lab</h2>
+    <p class="info">Analyze and compare the performance of five different root-finding algorithms on the same problem. The main chart shows the **log of the error** at each iteration, providing a clear view of each method's convergence speed.</p>
+    
+    <h3>1. Setup Problem</h3>
+    <div class="control-panel">
+        <div class="control-group full-width">
+            <label for="example-select">Load an Example Problem</label>
+            <select id="example-select"></select>
+        </div>
+        <div class="control-group full-width">
+            <label for="function-input">Enter Function f(x) = 0:</label>
+            <input type="text" id="function-input">
+        </div>
+        <div class="control-group full-width">
+            <label for="g-function-input">Enter Rearrangement x = g(x) (for Fixed-Point):</label>
+            <input type="text" id="g-function-input">
+        </div>
+        <div class="control-group">
+            <label for="true-root-input">Known True Root:</label>
+            <input type="number" id="true-root-input" step="any">
+        </div>
+        <div class="control-group">
+            <label for="a-input">Interval Start (a):</label>
+            <input type="number" id="a-input">
+        </div>
+        <div class="control-group">
+            <label for="b-input">Interval End (b):</label>
+            <input type="number" id="b-input">
+        </div>
+        <div class="control-group">
+            <label for="x0-input">Guess (x₀):</label>
+            <input type="number" id="x0-input">
+        </div>
+        <div class="control-group">
+            <label for="x1-input">Guess (x₁):</label>
+            <input type="number" id="x1-input">
+        </div>
+        <div class="control-group">
+            <label for="max-iter-input">Max Iterations:</label>
+            <input type="number" id="max-iter-input" value="50">
+        </div>
+    </div>
+    <button id="run-btn">Run Analysis</button>
+
+    <h3>2. Results Summary</h3>
+    <div class="results-grid">
+        <div class="result-card"><h4 class="bisection">Bisection</h4><div id="bisection-result" class="value">-</div><div id="bisection-status" class="status"></div></div>
+        <div class="result-card"><h4 class="false-pos">Linear Interpolation</h4><div id="false-pos-result" class="value">-</div><div id="false-pos-status" class="status"></div></div>
+        <div class="result-card"><h4 class="secant">Secant</h4><div id="secant-result" class="value">-</div><div id="secant-status" class="status"></div></div>
+        <div class="result-card"><h4 class="newton">Newton-Raphson</h4><div id="newton-result" class="value">-</div><div id="newton-status" class="status"></div></div>
+        <div class="result-card"><h4 class="fixed-point">Fixed-Point</h4><div id="fixed-point-result" class="value">-</div><div id="fixed-point-status" class="status"></div></div>
+    </div>
+
+    <h3>3. Error Analysis Plot</h3>
+    <canvas id="error-chart"></canvas>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const EXAMPLES = {
+        "x^3 - x - 2 = 0": { f_string: "x^3 - x - 2", g_string: "(x+2)^(1/3)", a: 1, b: 2, x0: 1, x1: 2, true_root: 1.5213797068 },
+        "cos(x) - x = 0": { f_string: "cos(x) - x", g_string: "cos(x)", a: 0, b: 1, x0: 0.5, x1: 1, true_root: 0.7390851332 },
+        "e^x - 5*x = 0": { f_string: "exp(x) - 5*x", g_string: "exp(x)/5", a: 0, b: 1, x0: 0.1, x1: 0.3, true_root: 0.2591711018 },
+    };
+
+    let f_compiled, f_prime_compiled, g_compiled;
+    let errorChart;
+    const DOM = {
+        exampleSelect: document.getElementById('example-select'),
+        functionInput: document.getElementById('function-input'),
+        gFunctionInput: document.getElementById('g-function-input'),
+        trueRootInput: document.getElementById('true-root-input'),
+        aInput: document.getElementById('a-input'),
+        bInput: document.getElementById('b-input'),
+        x0Input: document.getElementById('x0-input'),
+        x1Input: document.getElementById('x1-input'),
+        maxIterInput: document.getElementById('max-iter-input'),
+        runBtn: document.getElementById('run-btn'),
+        errorChartCanvas: document.getElementById('error-chart'),
+    };
+    
+    function initialize() {
+        Object.keys(EXAMPLES).forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            DOM.exampleSelect.appendChild(option);
+        });
+        
+        DOM.exampleSelect.addEventListener('change', loadExample);
+        DOM.runBtn.addEventListener('click', runAnalysis);
+        loadExample();
+    }
+
+    function loadExample() {
+        const example = EXAMPLES[DOM.exampleSelect.value];
+        DOM.functionInput.value = example.f_string;
+        DOM.gFunctionInput.value = example.g_string;
+        DOM.aInput.value = example.a;
+        DOM.bInput.value = example.b;
+        DOM.x0Input.value = example.x0;
+        DOM.x1Input.value = example.x1;
+        DOM.trueRootInput.value = example.true_root;
+    }
+
+    function compileFunctions() {
+        DOM.functionInput.classList.remove('error');
+        DOM.gFunctionInput.classList.remove('error');
+        try {
+            f_compiled = math.compile(DOM.functionInput.value);
+            f_prime_compiled = math.derivative(DOM.functionInput.value, 'x').compile();
+            g_compiled = math.compile(DOM.gFunctionInput.value);
+            return true;
+        } catch (e) {
+            alert(`Invalid function syntax: ${e.message}`);
+            if (e.message.includes(DOM.functionInput.value)) DOM.functionInput.classList.add('error');
+            if (e.message.includes(DOM.gFunctionInput.value)) DOM.gFunctionInput.classList.add('error');
+            return false;
+        }
+    }
+    
+    function runAnalysis() {
+        if (!compileFunctions()) return;
+        
+        const trueRoot = parseFloat(DOM.trueRootInput.value);
+        const maxIter = parseInt(DOM.maxIterInput.value);
+        const tolerance = 1e-9;
+        
+        const results = {
+            bisection: runBisection(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tolerance),
+            falsePos: runFalsePosition(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tolerance),
+            secant: runSecant(parseFloat(DOM.x0Input.value), parseFloat(DOM.x1Input.value), trueRoot, maxIter, tolerance),
+            newton: runNewton(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tolerance),
+            fixedPoint: runFixedPoint(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tolerance)
+        };
+        
+        updateSummaryCards(results);
+        drawErrorPlot(results);
+    }
+
+    // --- ALGORITHM IMPLEMENTATIONS ---
+    function runBisection(a, b, root, maxIter, tol) {
+        const errors = [];
+        try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Evaluation error" }; }
+        let iter = 0;
+        while(iter < maxIter) {
+            const m = (a + b) / 2;
+            errors.push(Math.abs(m - root));
+            if (Math.abs(b - a) / 2 < tol) return { status: `Converged in ${iter} iter.`, root: m, errors };
+            iter++;
+            if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:m}) < 0) b = m; else a = m;
+        }
+        return { status: "Failed: Max iterations", root: (a+b)/2, errors };
+    }
+
+    function runFalsePosition(a, b, root, maxIter, tol) {
+        const errors = [];
+         try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Evaluation error" }; }
+        let iter = 0; let c = b;
+        while(iter < maxIter) {
+            const fa = f_compiled.evaluate({x:a}), fb = f_compiled.evaluate({x:b});
+            const c_prev = c;
+            c = (a * fb - b * fa) / (fb - fa);
+            errors.push(Math.abs(c - root));
+            if (Math.abs(c - c_prev) < tol) return { status: `Converged in ${iter} iter.`, root: c, errors };
+            iter++;
+            if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:c}) < 0) b = c; else a = c;
+        }
+        return { status: "Failed: Max iterations", root: c, errors };
+    }
+    
+    function runSecant(x0, x1, root, maxIter, tol) {
+        const errors = [Math.abs(x0 - root), Math.abs(x1 - root)];
+        let iter = 0;
+        while(iter < maxIter) {
+            const fx0 = f_compiled.evaluate({x:x0}), fx1 = f_compiled.evaluate({x:x1});
+            if(Math.abs(fx1 - fx0) < 1e-12) return { status: "Failed: Flat slope", root: x1, errors };
+            const x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
+            errors.push(Math.abs(x2 - root));
+            if (isNaN(x2) || !isFinite(x2)) return { status: "Failed: Diverged", root: x1, errors };
+            if (Math.abs(x2 - x1) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x2, errors };
+            iter++; x0 = x1; x1 = x2;
+        }
+        return { status: "Failed: Max iterations", root: x1, errors };
+    }
+
+    function runNewton(x0, root, maxIter, tol) {
+        const errors = [Math.abs(x0 - root)];
+        let iter = 0;
+        while(iter < maxIter) {
+            const fx0 = f_compiled.evaluate({x:x0});
+            const f_prime_x0 = f_prime_compiled.evaluate({x:x0});
+            if(Math.abs(f_prime_x0) < 1e-12) return { status: "Failed: Derivative is zero", root: x0, errors };
+            const x1 = x0 - fx0 / f_prime_x0;
+            errors.push(Math.abs(x1 - root));
+            if (isNaN(x1) || !isFinite(x1)) return { status: "Failed: Diverged", root: x0, errors };
+            if (Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x1, errors };
+            iter++; x0 = x1;
+        }
+        return { status: "Failed: Max iterations", root: x0, errors };
+    }
+    
+    function runFixedPoint(x0, root, maxIter, tol) {
+        const errors = [Math.abs(x0 - root)];
+        let iter = 0;
+        while(iter < maxIter) {
+            const x1 = g_compiled.evaluate({x:x0});
+            errors.push(Math.abs(x1 - root));
+            if (isNaN(x1) || !isFinite(x1)) return { status: "Failed: Diverged", root: x0, errors };
+            if (Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x1, errors };
+            iter++; x0 = x1;
+        }
+        return { status: "Failed: Max iterations", root: x0, errors };
+    }
+
+    // --- UI UPDATES ---
+    function updateSummaryCards(results) {
+        const methods = ['bisection', 'false-pos', 'secant', 'newton', 'fixed-point'];
+        methods.forEach(method => {
+            const res = results[method];
+            const resultEl = document.getElementById(`${method}-result`);
+            const statusEl = document.getElementById(`${method}-status`);
+            if (res && res.root !== undefined) {
+                resultEl.textContent = res.root.toFixed(7);
+                statusEl.textContent = res.status;
+                statusEl.className = res.status.startsWith('Converged') ? 'status converged' : 'status failed';
+            } else {
+                resultEl.textContent = '-';
+                statusEl.textContent = res ? res.status : 'Error';
+                statusEl.className = 'status failed';
+            }
+        });
+    }
+
+    function drawErrorPlot(results) {
+        if (errorChart) errorChart.destroy();
+        
+        const datasets = [
+            { label: 'Bisection', data: results.bisection.errors, borderColor: 'var(--bisection-color)', backgroundColor: 'var(--bisection-color)', tension: 0.1 },
+            { label: 'Linear Interpolation', data: results.falsePos.errors, borderColor: 'var(--false-pos-color)', backgroundColor: 'var(--false-pos-color)', tension: 0.1 },
+            { label: 'Secant', data: results.secant.errors, borderColor: 'var(--secant-color)', backgroundColor: 'var(--secant-color)', tension: 0.1 },
+            { label: 'Newton-Raphson', data: results.newton.errors, borderColor: 'var(--newton-color)', backgroundColor: 'var(--newton-color)', tension: 0.1 },
+            { label: 'Fixed-Point', data: results.fixedPoint.errors, borderColor: 'var(--fixed-point-color)', backgroundColor: 'var(--fixed-point-color)', tension: 0.1 },
+        ];
+
+        errorChart = new Chart(DOM.errorChartCanvas, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: DOM.maxIterInput.value}, (_, i) => i),
+                datasets: datasets
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: 'Iteration Number' } },
+                    y: { type: 'logarithmic', title: { display: true, text: 'log |Error|  ( |xₙ - true root| )' } }
+                },
+                plugins: { title: { display: true, text: 'Convergence Rate Comparison', font: {size: 16} } }
+            }
+        });
+    }
+    
+    initialize();
+});
+</script>
+</body>
+</html>
