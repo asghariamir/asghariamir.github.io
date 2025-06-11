@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Multiplication Web</title>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --known-bg: #e8f5e9;
+            --known-border: #a5d6a7;
+            --unknown-bg: #ffffff;
+            --unknown-border: #e0e0e0;
+            --selected-border: var(--primary-color);
+            --light-gray: #f5f5f5;
+            --dark-gray: #424242;
+            --text-color: #212121;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(13, minmax(0, 1fr));
+            gap: 4px;
+            margin-bottom: 1.5rem;
+        }
+        .grid-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+        .grid-button {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--unknown-border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .grid-button.unknown {
+            background-color: var(--unknown-bg);
+            color: var(--primary-color);
+        }
+        .grid-button.unknown:hover {
+            background-color: #f0f0f0;
+        }
+        .grid-button.known {
+            background-color: var(--known-bg);
+            border-color: var(--known-border);
+            color: #2e7d32;
+            font-weight: 600;
+            cursor: not-allowed;
+        }
+        .grid-button.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-color);
+            background-color: #e3f2fd;
+        }
+        
+        .strategy-panel {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--light-gray);
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .strategy-panel p {
+            font-weight: 600;
+            margin: 0 0 1rem;
+            color: var(--dark-gray);
+        }
+        .strategy-panel .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .strategy-panel button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .strategy-panel button.purple { background-color: #6a1b9a; }
+        .strategy-panel button.purple:hover { background-color: #7b1fa2; }
+        
+        .message-area {
+            text-align: center;
+            font-weight: 600;
+            min-height: 1.6em;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Multiplication Web</h2>
+    <p class="info">Click on a question mark `?` to select a multiplication fact you want to solve. Then, use a strategy to unlock it. Unlock all the facts!</p>
+    
+    <div id="grid-container" class="grid-container"></div>
+    
+    <div id="strategy-panel" style="display: none;">
+        <p id="strategy-title"></p>
+        <div class="button-group">
+            <button id="nearby-btn">Use Nearby Fact</button>
+            <button id="distributive-btn" class="purple">Use Distributive Property</button>
+        </div>
+    </div>
+
+    <p id="message-area" class="message-area"></p>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- STATE & CONFIG ---
+    const GRID_SIZE = 12;
+    const initialUnlocked = new Set([
+        ...Array.from({length: GRID_SIZE}, (_,j)=>`1x${j+1}`),
+        ...Array.from({length: GRID_SIZE}, (_,j)=>`2x${j+1}`),
+        ...Array.from({length: GRID_SIZE}, (_,j)=>`5x${j+1}`),
+        ...Array.from({length: GRID_SIZE}, (_,j)=>`10x${j+1}`),
+    ]);
+
+    let state = {
+        known: withPairs(initialUnlocked),
+        selectedCell: null, // { i, j, key }
+        message: 'Select a `?` to begin.'
+    };
+
+    // --- DOM REFS ---
+    const gridContainer = document.getElementById('grid-container');
+    const strategyPanel = document.getElementById('strategy-panel');
+    const strategyTitle = document.getElementById('strategy-title');
+    const messageArea = document.getElementById('message-area');
+    const nearbyBtn = document.getElementById('nearby-btn');
+    const distributiveBtn = document.getElementById('distributive-btn');
+
+    // --- HELPERS ---
+    function withPairs(set) {
+        const res = new Set(set);
+        set.forEach(key => {
+            const [a, b] = key.split('x');
+            res.add(`${b}x${a}`);
+        });
+        return res;
+    }
+
+    // --- CORE LOGIC ---
+    function handleCellClick(cellData) {
+        if (state.known.has(cellData.key)) return;
+        state.selectedCell = cellData;
+        state.message = '';
+        render();
+    }
+
+    function unlock(key) {
+        state.known = withPairs(new Set([...state.known, key]));
+        state.selectedCell = null;
+        state.message = '🎉 Great job! Fact unlocked.';
+        render();
+    }
+
+    function useNearbyFact() {
+        if (!state.selectedCell) return;
+        const { i, j } = state.selectedCell;
+        const prevKey = `${i}x${j - 1}`;
+        if (state.known.has(prevKey)) {
+            unlock(state.selectedCell.key);
+        } else {
+            state.message = `You need to know ${i} × ${j - 1} first.`;
+            renderMessage();
+        }
+    }
+
+    function useDistributiveProp() {
+        if (!state.selectedCell) return;
+        const { i, j } = state.selectedCell;
+        for (let k = 1; k < j; k++) {
+            if (state.known.has(`${i}x${k}`) && state.known.has(`${i}x${j - k}`)) {
+                unlock(state.selectedCell.key);
+                return;
+            }
+        }
+        state.message = 'Cannot find two known facts that add up to this one.';
+        renderMessage();
+    }
+
+    // --- RENDERING ---
+    function render() {
+        renderGrid();
+        renderStrategyPanel();
+        renderMessage();
+    }
+
+    function renderGrid() {
+        gridContainer.innerHTML = '';
+        // Create headers
+        gridContainer.appendChild(document.createElement('div')); // Top-left corner
+        for (let i = 1; i <= GRID_SIZE; i++) {
+            const header = document.createElement('div');
+            header.className = 'grid-header';
+            header.textContent = i;
+            gridContainer.appendChild(header);
+        }
+        // Create grid
+        for (let i = 1; i <= GRID_SIZE; i++) {
+            const header = document.createElement('div');
+            header.className = 'grid-header';
+            header.textContent = i;
+            gridContainer.appendChild(header);
+            for (let j = 1; j <= GRID_SIZE; j++) {
+                const key = `${i}x${j}`;
+                const cellData = { i, j, key };
+                const button = document.createElement('button');
+                button.className = 'grid-button';
+                
+                const isKnown = state.known.has(key);
+                button.classList.add(isKnown ? 'known' : 'unknown');
+                button.disabled = isKnown;
+                button.textContent = isKnown ? i * j : '?';
+                
+                if (state.selectedCell?.key === key) {
+                    button.classList.add('selected');
+                }
+                
+                button.addEventListener('click', () => handleCellClick(cellData));
+                gridContainer.appendChild(button);
+            }
+        }
+    }
+
+    function renderStrategyPanel() {
+        if (state.selectedCell) {
+            strategyTitle.textContent = `How can we find ${state.selectedCell.i} × ${state.selectedCell.j}?`;
+            strategyPanel.style.display = 'block';
+        } else {
+            strategyPanel.style.display = 'none';
+        }
+    }
+    
+    function renderMessage() {
+        messageArea.textContent = state.message;
+    }
+    
+    // --- INITIALIZATION ---
+    nearbyBtn.addEventListener('click', useNearbyFact);
+    distributiveBtn.addEventListener('click', useDistributiveProp);
+    
+    render();
+});
+</script>
+</body>
+</html>
