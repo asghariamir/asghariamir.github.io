@@ -154,20 +154,29 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const METHOD_COLORS = {
-        bisection: 'rgb(255, 152, 0)',   /* Orange */
-        falsePos: 'rgb(244, 67, 54)',    /* Red */
-        secant: 'rgb(156, 39, 176)',     /* Purple */
-        newton: 'rgb(76, 175, 80)',      /* Green */
-        fixedPoint: 'rgb(33, 150, 243)', /* Blue */
+        bisection: 'rgb(255, 152, 0)',
+        'false-pos': 'rgb(244, 67, 54)',
+        secant: 'rgb(156, 39, 176)',
+        newton: 'rgb(76, 175, 80)',
+        'fixed-point': 'rgb(33, 150, 243)',
     };
     
     let f_compiled, f_prime_compiled, g_compiled;
     let analysisResults = null;
     let errorChart;
-    const DOM = { /* DOM refs */ };
-    for (const id of ['example-select', 'function-input', 'g-function-input', 'true-root-input', 'a-input', 'b-input', 'x0-input', 'x1-input', 'max-iter-input', 'run-btn', 'plot-container']) {
-        DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
-    }
+    const DOM = {
+        exampleSelect: document.getElementById('example-select'),
+        functionInput: document.getElementById('function-input'),
+        gFunctionInput: document.getElementById('g-function-input'),
+        trueRootInput: document.getElementById('true-root-input'),
+        aInput: document.getElementById('a-input'),
+        bInput: document.getElementById('b-input'),
+        x0Input: document.getElementById('x0-input'),
+        x1Input: document.getElementById('x1-input'),
+        maxIterInput: document.getElementById('max-iter-input'),
+        runBtn: document.getElementById('run-btn'),
+        plotContainer: document.getElementById('plot-container'),
+    };
     
     function initialize() {
         Object.keys(EXAMPLES).forEach(name => {
@@ -207,38 +216,38 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function runAnalysis() {
         if (!compileFunctions()) return;
+        
         const trueRoot = parseFloat(DOM.trueRootInput.value);
         const maxIter = parseInt(DOM.maxIterInput.value);
         const tol = 1e-9;
         
         analysisResults = {
-            bisection: runBisection(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tol),
-            falsePos: runFalsePosition(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tol),
-            secant: runSecant(parseFloat(DOM.x0Input.value), parseFloat(DOM.x1Input.value), trueRoot, maxIter, tol),
-            newton: runNewton(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tol),
-            fixedPoint: runFixedPoint(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tol)
+            'bisection': runBisection(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tol),
+            'false-pos': runFalsePosition(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tol),
+            'secant': runSecant(parseFloat(DOM.x0Input.value), parseFloat(DOM.x1Input.value), trueRoot, maxIter, tol),
+            'newton': runNewton(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tol),
+            'fixed-point': runFixedPoint(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tol)
         };
         updateSummaryCards(analysisResults);
     }
 
-    // --- ALGORITHM IMPLEMENTATIONS (with robust checks) ---
     function runBisection(a, b, root, maxIter, tol) {
-        let errors = [];
+        const errors = [];
         try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Eval error" }; }
         let iter = 0; let fa = f_compiled.evaluate({x:a});
         while(iter < maxIter) {
-            let m = (a + b) / 2;
+            const m = (a + b) / 2;
             errors.push(Math.max(1e-16, Math.abs(m - root)));
-            if (Math.abs(b - a) < tol) return { status: `Converged in ${iter} iter.`, root: m, errors };
+            if (Math.abs(b - a) / 2 < tol) return { status: `Converged in ${iter} iter.`, root: m, errors };
             iter++;
-            let fm = f_compiled.evaluate({x:m});
+            const fm = f_compiled.evaluate({x:m});
             if (fa * fm < 0) { b = m; } else { a = m; fa = fm; }
         }
         return { status: "Failed: Max iterations", root: (a+b)/2, errors };
     }
 
     function runFalsePosition(a, b, root, maxIter, tol) {
-        let errors = [];
+        const errors = [];
         try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Eval error" }; }
         let iter = 0, c = b;
         while(iter < maxIter) {
@@ -246,8 +255,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const c_prev = c;
             if (Math.abs(fb - fa) < 1e-14) return { status: "Failed: Flat slope", root: c, errors };
             c = (a * fb - b * fa) / (fb - fa);
-            errors.push(Math.max(1e-16, Math.abs(c - root)));
             if (isNaN(c) || !isFinite(c)) return { status: "Failed: Diverged", root: c_prev, errors };
+            errors.push(Math.max(1e-16, Math.abs(c - root)));
             if (Math.abs(c - c_prev) < tol) return { status: `Converged in ${iter + 1} iter.`, root: c, errors };
             iter++;
             const fc = f_compiled.evaluate({x:c});
@@ -263,8 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const fx0 = f_compiled.evaluate({x:x0}), fx1 = f_compiled.evaluate({x:x1});
             if(Math.abs(fx1 - fx0) < 1e-14) return { status: "Failed: Flat slope", root: x1, errors };
             const x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
-            errors.push(Math.max(1e-16, Math.abs(x2 - root)));
             if (isNaN(x2) || !isFinite(x2)) return { status: "Failed: Diverged", root: x1, errors };
+            errors.push(Math.max(1e-16, Math.abs(x2 - root)));
             if (Math.abs(x2 - x1) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x2, errors };
             iter++; x0 = x1; x1 = x2;
         }
@@ -279,8 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const f_prime_x0 = f_prime_compiled.evaluate({x:x0});
             if(Math.abs(f_prime_x0) < 1e-14) return { status: "Failed: Derivative is zero", root: x0, errors };
             const x1 = x0 - fx0 / f_prime_x0;
-            errors.push(Math.max(1e-16, Math.abs(x1 - root)));
             if (isNaN(x1) || !isFinite(x1)) return { status: "Failed: Diverged", root: x0, errors };
+            errors.push(Math.max(1e-16, Math.abs(x1 - root)));
             if (Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x1, errors };
             iter++; x0 = x1;
         }
@@ -290,18 +299,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function runFixedPoint(x0, root, maxIter, tol) {
         const errors = [Math.max(1e-16, Math.abs(x0 - root))];
         let iter = 0;
+        let x_prev = x0;
         while(iter < maxIter) {
-            let x1;
-            try { x1 = g_compiled.evaluate({x:x0}); } catch { return { status: "Failed: Eval error" }; }
-            errors.push(Math.max(1e-16, Math.abs(x1 - root)));
-            if (isNaN(x1) || !isFinite(x1)) return { status: "Failed: Diverged", root: x0, errors };
-            if (Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x1, errors };
-            iter++; x0 = x1;
+            let x_next;
+            try { x_next = g_compiled.evaluate({x: x_prev}); } catch { return { status: "Failed: Eval error" }; }
+            if (isNaN(x_next) || !isFinite(x_next)) return { status: "Failed: Diverged", root: x_prev, errors };
+            errors.push(Math.max(1e-16, Math.abs(x_next - root)));
+            if (Math.abs(x_next - x_prev) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x_next, errors };
+            iter++;
+            x_prev = x_next;
         }
-        return { status: "Failed: Max iterations", root: x0, errors };
+        return { status: "Failed: Max iterations", root: x_prev, errors };
     }
 
-    // --- UI UPDATES ---
     function updateSummaryCards(results) {
         const methods = ['bisection', 'false-pos', 'secant', 'newton', 'fixed-point'];
         methods.forEach(method => {
@@ -321,16 +331,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawErrorPlot() {
+        if (!analysisResults) return;
         DOM.plotContainer.innerHTML = '<canvas id="error-chart-canvas"></canvas>';
         const canvas = document.getElementById('error-chart-canvas');
         if (errorChart) errorChart.destroy();
         
         const datasets = [
             { label: 'Bisection', data: analysisResults.bisection.errors, borderColor: METHOD_COLORS.bisection, tension: 0.1, fill: false },
-            { label: 'Linear Interpolation', data: analysisResults.falsePos.errors, borderColor: METHOD_COLORS.falsePos, tension: 0.1, fill: false },
+            { label: 'Linear Interpolation', data: analysisResults['false-pos'].errors, borderColor: METHOD_COLORS['false-pos'], tension: 0.1, fill: false },
             { label: 'Secant', data: analysisResults.secant.errors, borderColor: METHOD_COLORS.secant, tension: 0.1, fill: false },
             { label: 'Newton-Raphson', data: analysisResults.newton.errors, borderColor: METHOD_COLORS.newton, tension: 0.1, fill: false },
-            { label: 'Fixed-Point', data: analysisResults.fixedPoint.errors, borderColor: METHOD_COLORS.fixedPoint, tension: 0.1, fill: false },
+            { label: 'Fixed-Point', data: analysisResults['fixed-point'].errors, borderColor: METHOD_COLORS['fixed-point'], tension: 0.1, fill: false },
         ];
 
         errorChart = new Chart(canvas, {
