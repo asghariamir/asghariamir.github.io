@@ -116,6 +116,7 @@
         <button id="start-btn">Start Iteration</button>
         <button id="step-btn" class="secondary-button" disabled>Step</button>
         <button id="animate-btn" class="secondary-button" disabled>Animate</button>
+        <button id="reset-btn" class="danger-button">Reset</button>
     </div>
 
     <div class="log-container">
@@ -179,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('start-btn');
     const stepBtn = document.getElementById('step-btn');
     const animateBtn = document.getElementById('animate-btn');
+    const resetBtn = document.getElementById('reset-btn');
     const plotContainer = document.getElementById('plot-container');
     const logTableBody = document.querySelector('#log-table tbody');
     const convergenceInfo = document.getElementById('convergence-info');
@@ -194,13 +196,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         exampleSelect.addEventListener('change', loadExample);
         gInput.addEventListener('change', updateFunction);
-        x0Input.addEventListener('change', reset);
-        plotMinInput.addEventListener('change', reset);
-        plotMaxInput.addEventListener('change', reset);
+        x0Input.addEventListener('input', () => { state.x_current = parseFloat(x0Input.value); });
+        plotMinInput.addEventListener('change', updateFunction);
+        plotMaxInput.addEventListener('change', updateFunction);
         
         startBtn.addEventListener('click', startIteration);
         stepBtn.addEventListener('click', performStep);
         animateBtn.addEventListener('click', toggleAnimation);
+        resetBtn.addEventListener('click', reset);
         
         loadExample();
     }
@@ -248,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function startIteration() {
         if (!state.g) return;
-        reset();
+        reset(); // Reset before starting a new run
         state.log = [{ iter: 0, x: state.x_current, g_prime_val: getDerivativeValue(state.x_current) }];
         state.isRunning = true;
         renderLog();
@@ -262,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const x_next = state.g.evaluate({x: x_prev});
         
         if (isNaN(x_next) || !isFinite(x_next)) {
-            stopAnimation(); state.isRunning = false; updateButtons();
+            stopAnimation();
             alert("Iteration resulted in an invalid number. Stopping.");
             return false;
         }
@@ -275,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePlotAnnotations();
 
         if (Math.abs(x_next - x_prev) < 1e-7 || state.iteration > 100) {
-            stopAnimation(); state.isRunning = false; updateButtons();
+            stopAnimation();
             return false;
         }
         return true;
@@ -295,13 +298,16 @@ document.addEventListener('DOMContentLoaded', () => {
         state.animationInterval = null;
         animateBtn.textContent = "Animate";
         animateBtn.classList.remove('danger-button');
+        if (state.isRunning) {
+            state.isRunning = false;
+            updateButtons();
+        }
     }
 
     function getDerivativeValue(x) {
         try { return state.g_prime ? state.g_prime.evaluate({x: x}) : NaN; } catch { return NaN; }
     }
 
-    // --- RENDERING & PLOTTING ---
     function updateButtons() {
         startBtn.disabled = !state.g || state.isRunning;
         stepBtn.disabled = !state.isRunning;
@@ -318,11 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkConvergence() {
-        if (!state.g_prime || state.fixedPoint === null) {
-            convergenceInfo.className = 'info-box';
-            convergenceInfo.textContent = 'Enter a function and starting point.';
-            return;
-        };
+        if (!state.g_prime) return;
         const derivativeAtFixedPoint = getDerivativeValue(state.fixedPoint);
         const absDerivative = Math.abs(derivativeAtFixedPoint);
         
