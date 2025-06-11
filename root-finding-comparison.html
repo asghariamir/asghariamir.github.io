@@ -38,7 +38,7 @@
             content: ''; position: absolute; bottom: -2px; left: 0;
             width: 100%; height: 2px; background-color: var(--primary-color);
         }
-        .tab-content { display: none; padding-top: 1.5rem; }
+        .tab-content { display: none; padding: 1.5rem; }
         .tab-content.active { display: block; }
         
         h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
@@ -164,25 +164,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let f_compiled, f_prime_compiled, g_compiled;
     let analysisResults = null;
     let errorChart;
-    const DOM = {
-        exampleSelect: document.getElementById('example-select'),
-        functionInput: document.getElementById('function-input'),
-        gFunctionInput: document.getElementById('g-function-input'),
-        trueRootInput: document.getElementById('true-root-input'),
-        aInput: document.getElementById('a-input'),
-        bInput: document.getElementById('b-input'),
-        x0Input: document.getElementById('x0-input'),
-        x1Input: document.getElementById('x1-input'),
-        maxIterInput: document.getElementById('max-iter-input'),
-        runBtn: document.getElementById('run-btn'),
-        plotContainer: document.getElementById('plot-container'),
-    };
+    const DOM = { /* DOM refs */ };
+    for (const id of ['example-select', 'function-input', 'g-function-input', 'true-root-input', 'a-input', 'b-input', 'x0-input', 'x1-input', 'max-iter-input', 'run-btn', 'plot-container']) {
+        DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
+    }
     
     function initialize() {
         Object.keys(EXAMPLES).forEach(name => {
             const option = document.createElement('option');
-            option.value = name;
-            option.textContent = name;
+            option.value = name; option.textContent = name;
             DOM.exampleSelect.appendChild(option);
         });
         
@@ -211,58 +201,57 @@ document.addEventListener('DOMContentLoaded', () => {
             g_compiled = math.compile(DOM.gFunctionInput.value);
             return true;
         } catch (e) {
-            alert(`Invalid function syntax: ${e.message}`);
-            return false;
+            alert(`Invalid function syntax: ${e.message}`); return false;
         }
     }
     
     function runAnalysis() {
         if (!compileFunctions()) return;
-        
         const trueRoot = parseFloat(DOM.trueRootInput.value);
         const maxIter = parseInt(DOM.maxIterInput.value);
-        const tolerance = 1e-9;
+        const tol = 1e-9;
         
         analysisResults = {
-            bisection: runBisection(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tolerance),
-            falsePos: runFalsePosition(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tolerance),
-            secant: runSecant(parseFloat(DOM.x0Input.value), parseFloat(DOM.x1Input.value), trueRoot, maxIter, tolerance),
-            newton: runNewton(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tolerance),
-            fixedPoint: runFixedPoint(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tolerance)
+            bisection: runBisection(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tol),
+            falsePos: runFalsePosition(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tol),
+            secant: runSecant(parseFloat(DOM.x0Input.value), parseFloat(DOM.x1Input.value), trueRoot, maxIter, tol),
+            newton: runNewton(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tol),
+            fixedPoint: runFixedPoint(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tol)
         };
-        
         updateSummaryCards(analysisResults);
     }
 
-    // --- ALGORITHM IMPLEMENTATIONS ---
+    // --- ALGORITHM IMPLEMENTATIONS (with robust checks) ---
     function runBisection(a, b, root, maxIter, tol) {
-        const errors = [];
+        let errors = [];
         try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Eval error" }; }
-        let iter = 0;
+        let iter = 0; let fa = f_compiled.evaluate({x:a});
         while(iter < maxIter) {
-            const m = (a + b) / 2;
+            let m = (a + b) / 2;
             errors.push(Math.max(1e-16, Math.abs(m - root)));
-            if (Math.abs(b - a) / 2 < tol) return { status: `Converged in ${iter} iter.`, root: m, errors };
+            if (Math.abs(b - a) < tol) return { status: `Converged in ${iter} iter.`, root: m, errors };
             iter++;
-            if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:m}) < 0) b = m; else a = m;
+            let fm = f_compiled.evaluate({x:m});
+            if (fa * fm < 0) { b = m; } else { a = m; fa = fm; }
         }
         return { status: "Failed: Max iterations", root: (a+b)/2, errors };
     }
 
     function runFalsePosition(a, b, root, maxIter, tol) {
-        const errors = [];
+        let errors = [];
         try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Eval error" }; }
         let iter = 0, c = b;
         while(iter < maxIter) {
             const fa = f_compiled.evaluate({x:a}), fb = f_compiled.evaluate({x:b});
-            const prev_c = c;
+            const c_prev = c;
             if (Math.abs(fb - fa) < 1e-14) return { status: "Failed: Flat slope", root: c, errors };
             c = (a * fb - b * fa) / (fb - fa);
             errors.push(Math.max(1e-16, Math.abs(c - root)));
-            if (isNaN(c) || !isFinite(c)) return { status: "Failed: Diverged", root: c, errors };
-            if (Math.abs(c - prev_c) < tol) return { status: `Converged in ${iter + 1} iter.`, root: c, errors };
+            if (isNaN(c) || !isFinite(c)) return { status: "Failed: Diverged", root: c_prev, errors };
+            if (Math.abs(c - c_prev) < tol) return { status: `Converged in ${iter + 1} iter.`, root: c, errors };
             iter++;
-            if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:c}) < 0) b = c; else a = c;
+            const fc = f_compiled.evaluate({x:c});
+            if (fa * fc < 0) { b = c; } else { a = c; }
         }
         return { status: "Failed: Max iterations", root: c, errors };
     }
@@ -302,10 +291,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const errors = [Math.max(1e-16, Math.abs(x0 - root))];
         let iter = 0;
         while(iter < maxIter) {
-            const x1 = g_compiled.evaluate({x:x0});
+            let x1;
+            try { x1 = g_compiled.evaluate({x:x0}); } catch { return { status: "Failed: Eval error" }; }
             errors.push(Math.max(1e-16, Math.abs(x1 - root)));
             if (isNaN(x1) || !isFinite(x1)) return { status: "Failed: Diverged", root: x0, errors };
-            if (iter > 0 && Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter} iter.`, root: x1, errors };
+            if (Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x1, errors };
             iter++; x0 = x1;
         }
         return { status: "Failed: Max iterations", root: x0, errors };
@@ -331,26 +321,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawErrorPlot() {
-        if (!analysisResults) return;
-        
         DOM.plotContainer.innerHTML = '<canvas id="error-chart-canvas"></canvas>';
         const canvas = document.getElementById('error-chart-canvas');
-
         if (errorChart) errorChart.destroy();
         
         const datasets = [
-            { label: 'Bisection', data: analysisResults.bisection.errors, borderColor: METHOD_COLORS.bisection, backgroundColor: METHOD_COLORS.bisection, tension: 0.1, fill:false },
-            { label: 'Linear Interpolation', data: analysisResults.falsePos.errors, borderColor: METHOD_COLORS.falsePos, backgroundColor: METHOD_COLORS.falsePos, tension: 0.1, fill:false },
-            { label: 'Secant', data: analysisResults.secant.errors, borderColor: METHOD_COLORS.secant, backgroundColor: METHOD_COLORS.secant, tension: 0.1, fill:false },
-            { label: 'Newton-Raphson', data: analysisResults.newton.errors, borderColor: METHOD_COLORS.newton, backgroundColor: METHOD_COLORS.newton, tension: 0.1, fill:false },
-            { label: 'Fixed-Point', data: analysisResults.fixedPoint.errors, borderColor: METHOD_COLORS.fixedPoint, backgroundColor: METHOD_COLORS.fixedPoint, tension: 0.1, fill:false },
+            { label: 'Bisection', data: analysisResults.bisection.errors, borderColor: METHOD_COLORS.bisection, tension: 0.1, fill: false },
+            { label: 'Linear Interpolation', data: analysisResults.falsePos.errors, borderColor: METHOD_COLORS.falsePos, tension: 0.1, fill: false },
+            { label: 'Secant', data: analysisResults.secant.errors, borderColor: METHOD_COLORS.secant, tension: 0.1, fill: false },
+            { label: 'Newton-Raphson', data: analysisResults.newton.errors, borderColor: METHOD_COLORS.newton, tension: 0.1, fill: false },
+            { label: 'Fixed-Point', data: analysisResults.fixedPoint.errors, borderColor: METHOD_COLORS.fixedPoint, tension: 0.1, fill: false },
         ];
 
         errorChart = new Chart(canvas, {
             type: 'line',
             data: {
                 labels: Array.from({length: DOM.maxIterInput.value}, (_, i) => i),
-                datasets: datasets.filter(ds => ds.data) // Only plot datasets that have data
+                datasets: datasets.filter(ds => ds.data)
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
@@ -368,7 +355,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
         document.getElementById(`${tabName}-tab`).classList.add('active');
         document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        if (tabName === 'plot') drawErrorPlot();
+
+        if(tabName === 'plot' && analysisResults) {
+            drawErrorPlot();
+        }
     };
     
     initialize();
