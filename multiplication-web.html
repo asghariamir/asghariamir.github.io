@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Multiplication Strategy Explorer</title>
+    <title>Multiplication Rectangle Visualizer</title>
     <style>
         :root {
-            --primary-color: #1565c0;
-            --known-bg: #e8f5e9;
-            --known-border: #a5d6a7;
-            --unknown-bg: #ffffff;
-            --unknown-border: #e0e0e0;
-            --selected-border: var(--primary-color);
+            --primary-color: #1565c0; /* Target color */
+            --secondary-color: #2e7d32; /* Helper color */
             --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
             --dark-gray: #424242;
             --text-color: #212121;
         }
@@ -28,7 +25,7 @@
         }
         .container {
             width: 100%;
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -38,294 +35,261 @@
         h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
         p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; }
 
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(13, minmax(0, 1fr));
-            gap: 4px;
-            margin-bottom: 1.5rem;
-        }
-        .grid-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: var(--dark-gray);
-        }
-        .grid-button {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--unknown-border);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-        .grid-button.unknown {
-            background-color: var(--unknown-bg);
-            color: var(--primary-color);
-        }
-        .grid-button.unknown:hover { background-color: #f0f0f0; }
-        .grid-button.known {
-            background-color: var(--known-bg);
-            border-color: var(--known-border);
-            color: #2e7d32;
-            font-weight: 600;
-            cursor: not-allowed;
-        }
-        .grid-button.selected {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px var(--primary-color);
-            background-color: #e3f2fd;
-        }
-        .flash {
-            animation: flash-animation 1s;
-        }
-        @keyframes flash-animation {
-            50% { background-color: #fffde7; border-color: #fdd835; }
-        }
-        
-        #strategy-panel {
-            text-align: center;
-            padding: 1.5rem;
+        .info-panel {
+            padding: 1rem;
             background-color: var(--light-gray);
             border-radius: 6px;
             margin-bottom: 1.5rem;
-        }
-        #strategy-panel p { font-weight: 600; margin: 0 0 1rem; color: var(--dark-gray); }
-        #strategy-panel .button-group { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-        #strategy-panel button {
-            background-color: var(--primary-color);
-            color: white; border: none; padding: 10px 15px;
-            border-radius: 4px; cursor: pointer; font-size: 0.9rem;
-        }
-        #strategy-panel button.purple { background-color: #6a1b9a; }
-        #strategy-panel button.purple:hover { background-color: #7b1fa2; }
-        
-        .quiz-area { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--medium-gray); }
-        .quiz-area p { font-weight: normal; font-family: monospace; font-size: 1rem; }
-        .quiz-area input {
-            width: 80px;
-            padding: 8px;
-            font-size: 1.1rem;
+            min-height: 100px;
             text-align: center;
+        }
+        .info-panel p { margin: 0.25rem 0; font-size: 1.1rem; }
+        .info-panel .target-text { color: var(--primary-color); font-weight: bold; }
+        .info-panel .helper-text { color: var(--secondary-color); font-weight: bold; }
+        .info-panel .relationship-text { font-style: italic; color: var(--dark-gray); margin-top: 0.75rem; }
+
+        .grid-wrapper {
+            position: relative;
+            display: inline-block; /* Fit to table size */
+        }
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
             border: 1px solid var(--medium-gray);
-            border-radius: 4px;
-            margin: 0 0.5rem;
+            text-align: center;
+            min-width: 44px;
+            height: 44px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+        th {
+            background-color: var(--light-gray);
+            font-weight: bold;
+        }
+        td { cursor: pointer; }
+        
+        td.target-cell { border: 3px solid var(--primary-color); }
+        td.helper-cell { border: 3px solid var(--secondary-color); }
+
+        .overlay-rectangle {
+            position: absolute;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+        .target-overlay {
+            background: rgba(21, 101, 192, 0.2);
+            border: 2px solid var(--primary-color);
+        }
+        .helper-overlay {
+            background: rgba(46, 125, 50, 0.25);
+            border: 2px solid var(--secondary-color);
         }
         
-        .message-area {
-            text-align: center;
-            font-weight: 600;
-            min-height: 1.6em;
-            color: var(--primary-color);
-            transition: color 0.3s;
+        .action-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
         }
-        .message-area.error { color: var(--danger-color); }
+        .control-group { display: flex; align-items: center; gap: 0.5rem; }
+        label { font-size: 0.9rem; font-weight: 600; color: #616161; }
+        input[type="number"] { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 8px; font-size: 0.9rem; width: 6rem; }
+        button { background-color: #d32f2f; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
 
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>Multiplication Strategy Explorer</h2>
-    <p class="info">Click a `?` to solve a multiplication fact. Then, use one of the strategies to unlock the answer!</p>
+    <h2>Multiplication Rectangle Visualizer</h2>
+    <p class="info">Click a "target" cell to see its area. Then, click a "helper" cell to see how they relate.</p>
     
-    <div id="grid-container" class="grid-container"></div>
-    
-    <div id="strategy-panel" style="display: none;">
-        <p id="strategy-title"></p>
-        <div id="strategy-buttons" class="button-group"></div>
-        <div id="quiz-area"></div>
+    <div id="info-panel">
+        <p>Select any cell in the grid to begin.</p>
     </div>
 
-    <p id="message-area" class="message-area"></p>
+    <div class="grid-wrapper" id="grid-wrapper">
+        <div id="table-container" class="table-container"></div>
+        </div>
+    
+    <div class="action-controls">
+        <button id="clear-btn">Clear Selection</button>
+        <div class="control-group">
+            <label for="table-size-input">Table Size:</label>
+            <input type="number" id="table-size-input" min="5" max="20" value="12">
+        </div>
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const GRID_SIZE = 12;
-    const initialUnlocked = new Set([
-        ...Array.from({length: GRID_SIZE}, (_,j)=>`1x${j+1}`),
-        ...Array.from({length: GRID_SIZE}, (_,j)=>`2x${j+1}`),
-        ...Array.from({length: GRID_SIZE}, (_,j)=>`5x${j+1}`),
-        ...Array.from({length: GRID_SIZE}, (_,j)=>`10x${j+1}`),
-    ]);
-
+    // --- STATE & CONFIG ---
     let state = {
-        known: withPairs(initialUnlocked),
-        selectedCell: null, // { i, j, key }
-        message: 'Select a `?` to begin.',
-        activeStrategyData: null, // { type, answer, ... }
+        size: 12,
+        targetCell: null, // { r, c }
+        helperCell: null, // { r, c }
     };
 
-    const gridContainer = document.getElementById('grid-container');
-    const strategyPanel = document.getElementById('strategy-panel');
-    const strategyTitle = document.getElementById('strategy-title');
-    const strategyButtons = document.getElementById('strategy-buttons');
-    const quizArea = document.getElementById('quiz-area');
-    const messageArea = document.getElementById('message-area');
+    // --- DOM REFS ---
+    const tableContainer = document.getElementById('table-container');
+    const gridWrapper = document.getElementById('grid-wrapper');
+    const infoPanel = document.getElementById('info-panel');
+    const tableSizeInput = document.getElementById('table-size-input');
+    const clearBtn = document.getElementById('clear-btn');
 
-    function withPairs(set) {
-        const res = new Set(set);
-        set.forEach(key => { const [a, b] = key.split('x'); res.add(`${b}x${a}`); });
-        return res;
-    }
-
-    function handleCellClick(cellData) {
-        if (state.known.has(cellData.key)) return;
-        state.selectedCell = cellData;
-        state.message = '';
-        state.activeStrategyData = null;
-        render();
-    }
-
-    function unlock(key) {
-        const [i, j] = key.split('x');
-        state.known = withPairs(new Set([...state.known, key]));
-        state.selectedCell = null;
-        state.activeStrategyData = null;
-        state.message = `🎉 Fact ${i} × ${j} unlocked!`;
-        render();
-        // Flash the commutative pair
-        const commutativeCell = gridContainer.querySelector(`[data-key="${j}x${i}"]`);
-        if (commutativeCell) {
-            commutativeCell.classList.add('flash');
-            setTimeout(() => commutativeCell.classList.remove('flash'), 1000);
-        }
-    }
-
-    function checkAnswer() {
-        if (!state.activeStrategyData) return;
-        const userInput = document.getElementById('quiz-input');
-        const answer = parseInt(userInput.value);
-        if (answer === state.activeStrategyData.answer) {
-            unlock(state.selectedCell.key);
+    // --- LOGIC ---
+    function handleCellClick(r, c) {
+        if (!state.targetCell || (state.targetCell && state.helperCell)) {
+            // If no target, or if both are already set, this click sets a new target.
+            state.targetCell = { r, c };
+            state.helperCell = null;
         } else {
-            state.message = 'Not quite! Try calculating again.';
-            renderMessage();
+            // If there's a target but no helper, this click sets the helper.
+            state.helperCell = { r, c };
         }
+        render();
     }
 
-    function presentQuiz(quiz) {
-        state.activeStrategyData = quiz;
-        state.message = '';
-        quizArea.innerHTML = `
-            <p>${quiz.prompt}</p>
-            <div style="margin-top: 0.5rem;">
-                ${quiz.calculation} = 
-                <input type="number" id="quiz-input" autofocus />
-                <button id="check-answer-btn">Check</button>
-            </div>
-        `;
-        document.getElementById('check-answer-btn').addEventListener('click', checkAnswer);
-        document.getElementById('quiz-input').addEventListener('keydown', e => {
-            if (e.key === 'Enter') checkAnswer();
-        });
-    }
-
-    function setupNearbyStrategy() {
-        const { i, j } = state.selectedCell;
-        const prevKey = `${i}x${j - 1}`;
-        const fact1 = i * (j - 1);
-        presentQuiz({
-            type: 'nearby',
-            answer: fact1 + i,
-            prompt: `We know <strong>${i} × ${j - 1} = ${fact1}</strong>.`,
-            calculation: `<strong>${fact1} + ${i}</strong>`
-        });
-    }
-
-    function setupDistributiveStrategy(parts) {
-        const { i, j } = state.selectedCell;
-        const [k1, k2] = parts;
-        const fact1 = i * k1;
-        const fact2 = i * k2;
-        presentQuiz({
-            type: 'distributive',
-            answer: fact1 + fact2,
-            prompt: `Since ${j} = ${k1} + ${k2}, we can solve this by adding <strong>(${i} × ${k1}) + (${i} × ${k2})</strong>.`,
-            calculation: `<strong>${fact1} + ${fact2}</strong>`
-        });
+    function clearSelection() {
+        state.targetCell = null;
+        state.helperCell = null;
+        render();
     }
 
     // --- RENDERING ---
     function render() {
         renderGrid();
-        renderStrategyPanel();
-        renderMessage();
+        renderOverlays();
+        renderInfoPanel();
     }
 
     function renderGrid() {
-        gridContainer.innerHTML = '';
-        gridContainer.appendChild(document.createElement('div'));
-        for (let i = 1; i <= GRID_SIZE; i++) {
-            const header = document.createElement('div');
-            header.className = 'grid-header'; header.textContent = i;
-            gridContainer.appendChild(header);
-        }
-        for (let i = 1; i <= GRID_SIZE; i++) {
-            const header = document.createElement('div');
-            header.className = 'grid-header'; header.textContent = i;
-            gridContainer.appendChild(header);
-            for (let j = 1; j <= GRID_SIZE; j++) {
-                const key = `${i}x${j}`;
-                const button = document.createElement('button');
-                button.className = 'grid-button';
-                button.dataset.key = key;
-                
-                const isKnown = state.known.has(key);
-                button.classList.add(isKnown ? 'known' : 'unknown');
-                button.disabled = isKnown;
-                button.textContent = isKnown ? i * j : '?';
-                
-                if (state.selectedCell?.key === key) button.classList.add('selected');
-                
-                button.addEventListener('click', () => handleCellClick({ i, j, key }));
-                gridContainer.appendChild(button);
+        const { size, targetCell, helperCell } = state;
+        let html = '<table id="multiplication-table">';
+        // Header
+        html += '<thead><tr><th>×</th>';
+        for (let i = 1; i <= size; i++) html += `<th>${i}</th>`;
+        html += '</tr></thead>';
+        // Body
+        html += '<tbody>';
+        for (let r = 1; r <= size; r++) {
+            html += `<tr><th>${r}</th>`;
+            for (let c = 1; c <= size; c++) {
+                let className = '';
+                if (targetCell?.r === r && targetCell?.c === c) className = 'target-cell';
+                if (helperCell?.r === r && helperCell?.c === c) className = 'helper-cell';
+                html += `<td class="${className}" data-r="${r}" data-c="${c}">${r * c}</td>`;
             }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        tableContainer.innerHTML = html;
+    }
+
+    function renderOverlays() {
+        // Clear existing overlays
+        gridWrapper.querySelectorAll('.overlay-rectangle').forEach(el => el.remove());
+        
+        const table = document.getElementById('multiplication-table');
+        if (!table) return;
+
+        // Get dimensions of a single cell for scaling
+        const firstCell = table.querySelector('td');
+        if (!firstCell) return;
+        const cellWidth = firstCell.offsetWidth;
+        const cellHeight = firstCell.offsetHeight;
+        const headerWidth = table.querySelector('th').offsetWidth;
+
+        // Draw helper overlay first so it's underneath
+        if (state.helperCell) {
+            const { r, c } = state.helperCell;
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay-rectangle helper-overlay';
+            overlay.style.left = `${headerWidth}px`;
+            overlay.style.top = `${r * cellHeight}px`;
+            overlay.style.width = `${c * cellWidth}px`;
+            overlay.style.height = `${r * cellHeight}px`;
+            gridWrapper.appendChild(overlay);
+        }
+
+        // Draw target overlay
+        if (state.targetCell) {
+            const { r, c } = state.targetCell;
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay-rectangle target-overlay';
+            overlay.style.left = `${headerWidth}px`;
+            overlay.style.top = `${r * cellHeight}px`; // Top of headers is one cellHeight
+            overlay.style.width = `${c * cellWidth}px`;
+            overlay.style.height = `${r * cellHeight}px`;
+            gridWrapper.appendChild(overlay);
         }
     }
 
-    function renderStrategyPanel() {
-        quizArea.innerHTML = '';
-        if (state.selectedCell) {
-            strategyTitle.textContent = `How can we find ${state.selectedCell.i} × ${state.selectedCell.j}?`;
-            strategyButtons.innerHTML = '';
+    function renderInfoPanel() {
+        const { targetCell, helperCell } = state;
+        let html = '';
 
-            // Check for Nearby Fact strategy
-            const { i, j } = state.selectedCell;
-            const prevKey = `${i}x${j - 1}`;
-            if (j > 1 && state.known.has(prevKey)) {
-                const btn = document.createElement('button');
-                btn.textContent = 'Use Nearby Fact';
-                btn.addEventListener('click', setupNearbyStrategy);
-                strategyButtons.appendChild(btn);
-            }
-
-            // Check for Distributive Property strategy
-            for (let k = 1; k < j / 2 + 1; k++) {
-                if (state.known.has(`${i}x${k}`) && state.known.has(`${i}x${j - k}`)) {
-                    const btn = document.createElement('button');
-                    btn.textContent = `Break into (${i}x${k}) + (${i}x${j-k})`;
-                    btn.className = 'purple';
-                    btn.addEventListener('click', () => setupDistributiveStrategy([k, j - k]));
-                    strategyButtons.appendChild(btn);
-                    break; // Only show one distributive option for simplicity
-                }
-            }
-
-            strategyPanel.style.display = 'block';
+        if (!targetCell) {
+            html = '<p>Select any cell in the grid to begin.</p>';
         } else {
-            strategyPanel.style.display = 'none';
+            html = `<p class="target-text">Target: ${targetCell.r} × ${targetCell.c}</p>`;
+            if (!helperCell) {
+                html += '<p>Now, select a "helper" cell to see how it relates.</p>';
+            } else {
+                const targetValue = targetCell.r * targetCell.c;
+                const helperValue = helperCell.r * helperCell.c;
+                html += `<p class="helper-text">Helper: ${helperCell.r} × ${helperCell.c} = ${helperValue}</p>`;
+                
+                let relationship = '';
+                // Case 1: Nearby fact (same row)
+                if (targetCell.r === helperCell.r && Math.abs(targetCell.c - helperCell.c) === 1) {
+                    if (targetCell.c > helperCell.c) { // Target is one group larger
+                        relationship = `<code>${targetCell.r} × ${targetCell.c}</code> is one more group of ${targetCell.r} than <code>${helperCell.r} × ${helperCell.c}</code>.<br>So, <strong>${helperValue} + ${targetCell.r} = ${targetValue}</strong>.`;
+                    } else { // Target is one group smaller
+                         relationship = `<code>${targetCell.r} × ${targetCell.c}</code> is one less group of ${targetCell.r} than <code>${helperCell.r} × ${helperCell.c}</code>.<br>So, <strong>${helperValue} - ${targetCell.r} = ${targetValue}</strong>.`;
+                    }
+                }
+                // Case 2: Nearby fact (same column)
+                else if (targetCell.c === helperCell.c && Math.abs(targetCell.r - helperCell.r) === 1) {
+                     if (targetCell.r > helperCell.r) { // Target is one group larger
+                        relationship = `<code>${targetCell.r} × ${targetCell.c}</code> is one more group of ${targetCell.c} than <code>${helperCell.r} × ${helperCell.c}</code>.<br>So, <strong>${helperValue} + ${targetCell.c} = ${targetValue}</strong>.`;
+                    } else { // Target is one group smaller
+                         relationship = `<code>${targetCell.r} × ${targetCell.c}</code> is one less group of ${targetCell.c} than <code>${helperCell.r} × ${helperCell.c}</code>.<br>So, <strong>${helperValue} - ${targetCell.c} = ${targetValue}</strong>.`;
+                    }
+                } 
+                // Could add more strategy detections here (e.g., doubling, distributive)
+                else {
+                    relationship = "Can you see how these two facts are related?";
+                }
+                html += `<p class="relationship-text">${relationship}</p>`;
+            }
         }
+        infoPanel.innerHTML = html;
     }
     
-    function renderMessage() {
-        messageArea.textContent = state.message;
-        messageArea.className = state.message.startsWith('🎉') ? 'message-area' : 'message-area error';
-    }
+    // --- EVENT LISTENERS ---
+    tableSizeInput.addEventListener('change', (e) => {
+        state.size = parseInt(e.target.value);
+        clearSelection();
+    });
+
+    clearBtn.addEventListener('click', clearSelection);
+
+    tableContainer.addEventListener('click', (e) => {
+        if (e.target.matches('td')) {
+            const r = parseInt(e.target.dataset.r);
+            const c = parseInt(e.target.dataset.c);
+            handleCellClick(r, c);
+        }
+    });
+
+    // Re-render overlays on resize because cell dimensions change
+    new ResizeObserver(renderOverlays).observe(tableContainer);
     
     // --- INITIALIZATION ---
     render();
