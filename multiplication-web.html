@@ -6,13 +6,12 @@
     <title>Multiplication Area Model</title>
     <style>
         :root {
-            --primary-color: #1565c0;
-            --target-color: rgba(21, 101, 192, 0.25);
-            --target-border: #1565c0;
-            --helper-color: rgba(46, 125, 50, 0.25);
-            --helper-border: #2e7d32;
-            --user-color: rgba(255, 152, 0, 0.25);
-            --user-border: #ff9800;
+            --primary-color: #1565c0; /* Target color */
+            --secondary-color: #2e7d32; /* Helper color */
+            --user-color: #ff9800; /* User-drawn color */
+            --target-rgba: rgba(21, 101, 192, 0.25);
+            --helper-rgba: rgba(46, 125, 50, 0.25);
+            --user-rgba: rgba(255, 152, 0, 0.25);
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
@@ -45,53 +44,49 @@
             background-color: var(--light-gray);
             border-radius: 6px;
             margin-bottom: 1.5rem;
-            min-height: 50px;
+            min-height: 100px;
             text-align: center;
+            border: 1px solid var(--medium-gray);
         }
         .info-panel p { margin: 0.25rem 0; font-size: 1.1rem; }
-        .info-panel .target-text { color: var(--target-border); font-weight: bold; }
+        .info-panel .target-text { color: var(--primary-color); font-weight: bold; }
         .info-panel .helper-text { color: var(--secondary-color); font-weight: bold; }
-        
+        .info-panel .relationship-text { font-style: italic; color: var(--dark-gray); margin-top: 0.75rem; }
+
         .grid-wrapper {
-            position: relative;
-            display: inline-block;
-            padding: 30px 0 0 30px; /* Space for headers */
-            cursor: crosshair;
+            position: relative; /* For overlay positioning */
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            aspect-ratio: 1 / 1;
         }
         .grid-container {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
             display: grid;
-            grid-template-columns: repeat(var(--grid-size, 12), minmax(0, 1fr));
-            grid-template-rows: repeat(var(--grid-size, 12), minmax(0, 1fr));
+            grid-template-columns: repeat(var(--grid-size, 12), 1fr);
+            grid-template-rows: repeat(var(--grid-size, 12), 1fr);
             border: 1px solid var(--medium-gray);
-            width: 500px;
-            height: 500px;
+            cursor: crosshair;
         }
-        .grid-cell, .header-cell {
+        .grid-cell {
             border-right: 1px solid var(--medium-gray);
             border-bottom: 1px solid var(--medium-gray);
         }
-        .header-cell {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-        .col-header { top: 0; height: 30px; }
-        .row-header { left: 0; width: 30px; }
 
         .overlay-rectangle {
             position: absolute;
             pointer-events: none;
+            transition: all 0.3s ease;
             z-index: 1;
             border-radius: 2px;
         }
-        .target-overlay { background-color: var(--target-color); border: 2px solid var(--target-border); }
-        .helper-overlay { background-color: var(--helper-color); border: 2px solid var(--helper-border); }
-        .user-overlay { background-color: var(--user-color); border: 2px solid var(--user-border); }
+        .target-overlay { background-color: var(--target-rgba); border: 2px solid var(--primary-color); }
+        .helper-overlay { background-color: var(--helper-rgba); border: 2px solid var(--secondary-color); }
+        .user-overlay { background-color: var(--user-rgba); border: 2px solid var(--user-color); }
         .preview-overlay { background-color: rgba(0,0,0,0.1); border: 1px dashed var(--dark-gray); }
 
-        .action-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
+        .action-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;}
         button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
         button.check-btn { background-color: #4caf50; }
         button.clear-btn { background-color: #d32f2f; }
@@ -110,7 +105,7 @@
     </div>
     
     <div id="action-controls" class="action-controls">
-        <button id="clear-btn" class="clear-btn">Clear All</button>
+        <button id="clear-btn" class="clear-btn">Clear Selections & Drawings</button>
     </div>
 </div>
 
@@ -125,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawStart: null,  // { r, c }
     };
 
+    const gridWrapper = document.getElementById('grid-wrapper');
     const gridContainer = document.getElementById('grid-container');
     const overlayContainer = document.getElementById('overlay-container');
     const infoPanel = document.getElementById('info-panel');
@@ -138,43 +134,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderGrid() {
-        gridContainer.innerHTML = '';
-        gridContainer.style.setProperty('--grid-size', state.size);
-        for (let i = 0; i < state.size * state.size; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'grid-cell';
-            const r = Math.floor(i / state.size) + 1;
-            const c = (i % state.size) + 1;
-            cell.dataset.r = r;
-            cell.dataset.c = c;
-            gridContainer.appendChild(cell);
-        }
-        renderHeaders();
-    }
-
-    function renderHeaders() {
-        gridWrapper.querySelectorAll('.header-cell').forEach(el => el.remove());
-        const cellWidth = gridContainer.offsetWidth / state.size;
-        const cellHeight = gridContainer.offsetHeight / state.size;
-        for (let i = 1; i <= state.size; i++) {
-            const colHead = document.createElement('div');
-            colHead.className = 'header-cell col-header';
-            colHead.textContent = i;
-            colHead.style.width = `${cellWidth}px`;
-            colHead.style.left = `${(i - 1) * cellWidth + 30}px`;
-            gridWrapper.appendChild(colHead);
-
-            const rowHead = document.createElement('div');
-            rowHead.className = 'header-cell row-header';
-            rowHead.textContent = i;
-            rowHead.style.height = `${cellHeight}px`;
-            rowHead.style.top = `${(i - 1) * cellHeight + 30}px`;
-            gridWrapper.appendChild(rowHead);
+        if (gridContainer.children.length !== state.size * state.size) {
+            gridContainer.innerHTML = '';
+            gridContainer.style.setProperty('--grid-size', state.size);
+            for (let i = 0; i < state.size * state.size; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.dataset.r = Math.floor(i / state.size) + 1;
+                cell.dataset.c = (i % state.size) + 1;
+                gridContainer.appendChild(cell);
+            }
         }
     }
 
     function renderOverlays() {
-        overlayContainer.innerHTML = ''; // Clear previous overlays
+        overlayContainer.innerHTML = ''; 
+        if (!gridContainer.firstChild) return;
         const cellWidth = gridContainer.offsetWidth / state.size;
         const cellHeight = gridContainer.offsetHeight / state.size;
 
@@ -188,19 +163,23 @@ document.addEventListener('DOMContentLoaded', () => {
             overlayContainer.appendChild(overlay);
         };
         
-        const drawUserRect = (r1, c1, r2, c2, className) => {
-            const overlay = document.createElement('div');
-            overlay.className = `overlay-rectangle ${className}`;
-            overlay.style.left = `${(Math.min(c1, c2) - 1) * cellWidth}px`;
-            overlay.style.top = `${(Math.min(r1, r2) - 1) * cellHeight}px`;
-            overlay.style.width = `${(Math.abs(c1 - c2) + 1) * cellWidth}px`;
-            overlay.style.height = `${(Math.abs(r1 - r2) + 1) * cellHeight}px`;
-            overlayContainer.appendChild(overlay);
+        const drawUserRect = (rect, className) => {
+            overlayContainer.appendChild(createRectElement(rect, className, cellWidth, cellHeight));
         }
 
         if (state.helperCell) drawRect(state.helperCell.r, state.helperCell.c, 'helper-overlay');
         if (state.targetCell) drawRect(state.targetCell.r, state.targetCell.c, 'target-overlay');
-        state.userRects.forEach(rect => drawUserRect(rect.r1, rect.c1, rect.r2, rect.c2, 'user-overlay'));
+        state.userRects.forEach(rect => drawUserRect(rect, 'user-overlay'));
+    }
+
+    function createRectElement({r1, c1, r2, c2}, className, cellWidth, cellHeight) {
+        const overlay = document.createElement('div');
+        overlay.className = `overlay-rectangle ${className}`;
+        overlay.style.left = `${(Math.min(c1, c2) - 1) * cellWidth}px`;
+        overlay.style.top = `${(Math.min(r1, r2) - 1) * cellHeight}px`;
+        overlay.style.width = `${(Math.abs(c1 - c2) + 1) * cellWidth}px`;
+        overlay.style.height = `${(Math.abs(r1 - r2) + 1) * cellHeight}px`;
+        return overlay;
     }
 
     function renderInfoPanel() {
@@ -212,13 +191,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!state.helperCell) {
                 html += '<p>Now, select a "Helper" cell.</p>';
             } else {
-                html += `<p class="helper-text">Helper Area: ${state.helperCell.r} × ${state.helperCell.c} = ${state.helperCell.r * state.helperCell.c}</p>`;
+                const helperValue = state.helperCell.r * state.helperCell.c;
+                html += `<p class="helper-text">Helper Area: ${state.helperCell.r} × ${state.helperCell.c} = ${helperValue}</p>`;
                 html += '<p>Now, click and drag to draw rectangles to show the relationship.</p>';
             }
         }
         infoPanel.innerHTML = html;
         
-        // Add/Remove check button
         actionControls.querySelector('.check-btn')?.remove();
         if (state.userRects.length > 0) {
             const checkBtn = document.createElement('button');
@@ -238,67 +217,77 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetArea = state.targetCell.r * state.targetCell.c;
 
         if (totalArea === targetArea) {
-            // A more robust check would verify no overlaps, but this is good for a start
             alert(`Proof successful! ${state.helperCell.r * state.helperCell.c} + ${userArea} = ${targetArea}.`);
         } else {
-            alert(`Not quite! Your total area is ${totalArea}, but the target is ${targetArea}. Try again.`);
+            alert(`Not quite! Your constructed area is ${totalArea}, but the target is ${targetArea}. Try again.`);
         }
-    }
-
-    function handleMouseDown(e) {
-        if (!state.targetCell || !state.helperCell) return;
-        state.isDrawing = true;
-        const { r, c } = getCellFromEvent(e);
-        state.drawStart = { r, c };
-    }
-
-    function handleMouseMove(e) {
-        if (!state.isDrawing) return;
-        const { r, c } = getCellFromEvent(e);
-        
-        // Remove old preview
-        gridWrapper.querySelector('.preview-overlay')?.remove();
-
-        const cellWidth = gridContainer.offsetWidth / state.size;
-        const cellHeight = gridContainer.offsetHeight / state.size;
-        
-        const r1 = state.drawStart.r, c1 = state.drawStart.c;
-        
-        const preview = document.createElement('div');
-        preview.className = 'overlay-rectangle preview-overlay';
-        preview.style.left = `${(Math.min(c1, c) - 1) * cellWidth}px`;
-        preview.style.top = `${(Math.min(r1, r) - 1) * cellHeight}px`;
-        preview.style.width = `${(Math.abs(c1 - c) + 1) * cellWidth}px`;
-        preview.style.height = `${(Math.abs(r1 - r) + 1) * cellHeight}px`;
-        overlayContainer.appendChild(preview);
-    }
-    
-    function handleMouseUp(e) {
-        if (!state.isDrawing) return;
-        gridWrapper.querySelector('.preview-overlay')?.remove();
-        const { r, c } = getCellFromEvent(e);
-        state.userRects.push({r1: state.drawStart.r, c1: state.drawStart.c, r2: r, c2: c});
-        state.isDrawing = false;
-        state.drawStart = null;
-        render();
     }
     
     function getCellFromEvent(e) {
         const rect = gridContainer.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        const c = Math.min(state.size, Math.max(1, Math.ceil(x / (rect.width / state.size))));
-        const r = Math.min(state.size, Math.max(1, Math.ceil(y / (rect.height / state.size))));
+        if (x < 0 || x > rect.width || y < 0 || y > rect.height) return null;
+        const c = Math.ceil(x / (rect.width / state.size));
+        const r = Math.ceil(y / (rect.height / state.size));
         return {r, c};
     }
 
-    // --- EVENT LISTENERS ---
+    function handleInteraction(e) {
+        const cell = getCellFromEvent(e);
+        if (!cell) return;
+        const {r, c} = cell;
+
+        if (!state.targetCell || (state.targetCell && state.helperCell)) {
+            state.targetCell = { r, c };
+            state.helperCell = null;
+            state.userRects = [];
+        } else {
+            state.helperCell = { r, c };
+        }
+        render();
+    }
+
+    function handleMouseDown(e) {
+        if (!state.targetCell || !state.helperCell) return;
+        const startPos = getCellFromEvent(e);
+        if (startPos) {
+            state.isDrawing = true;
+            state.drawStart = startPos;
+        }
+    }
+
+    function handleMouseMove(e) {
+        if (!state.isDrawing) return;
+        overlayContainer.querySelector('.preview-overlay')?.remove();
+        const currentPos = getCellFromEvent(e);
+        if (currentPos && state.drawStart) {
+            const cellWidth = gridContainer.offsetWidth / state.size;
+            const cellHeight = gridContainer.offsetHeight / state.size;
+            const rect = { r1: state.drawStart.r, c1: state.drawStart.c, r2: currentPos.r, c2: currentPos.c };
+            overlayContainer.appendChild(createRectElement(rect, 'preview-overlay', cellWidth, cellHeight));
+        }
+    }
+    
+    function handleMouseUp(e) {
+        if (!state.isDrawing) return;
+        overlayContainer.querySelector('.preview-overlay')?.remove();
+        const endPos = getCellFromEvent(e);
+        if (endPos) {
+            state.userRects.push({r1: state.drawStart.r, c1: state.drawStart.c, r2: endPos.r, c2: endPos.c});
+        }
+        state.isDrawing = false;
+        state.drawStart = null;
+        render();
+    }
+    
     clearBtn.addEventListener('click', () => { state.targetCell = null; state.helperCell = null; state.userRects = []; render(); });
+    gridContainer.addEventListener('click', handleInteraction);
     gridContainer.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mousemove', handleMouseMove); // Listen on window to catch drags outside grid
+    window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     
-    // --- INITIALIZATION ---
+    new ResizeObserver(render).observe(gridWrapper);
     render();
 });
 </script>
