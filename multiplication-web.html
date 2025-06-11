@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Multiplication Area Model</title>
+    <title>Multiplication Area Explorer</title>
     <style>
         :root {
-            --primary-color: #1565c0; /* Target */
-            --secondary-color: #2e7d32; /* Helper */
-            --user-color: #ff9800; /* User-drawn */
-            --target-rgba: rgba(21, 101, 192, 0.2);
-            --helper-rgba: rgba(46, 125, 50, 0.2);
-            --user-rgba: rgba(255, 152, 0, 0.25);
+            --primary-color: #1565c0; /* Goal color */
+            --secondary-color: #2e7d32; /* Start color */
+            --user-color: #ff9800; /* User-drawn color */
+            --goal-rgba: rgba(21, 101, 192, 0.25);
+            --start-rgba: rgba(46, 125, 50, 0.25);
+            --user-rgba: rgba(255, 152, 0, 0.3);
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
@@ -33,70 +33,68 @@
             background-color: white;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
-            overflow: hidden;
+            padding: 1.5rem;
+            text-align: center;
         }
-        .main-content { padding: 1.5rem; }
-        .tabs { display: flex; background-color: var(--light-gray); border-bottom: 2px solid var(--medium-gray); }
-        .tab-button {
-            flex: 1; padding: 14px 10px; cursor: pointer; border: none;
-            background-color: transparent; font-size: 1rem; color: var(--dark-gray);
-            position: relative; transition: color 0.3s;
-        }
-        .tab-button.active { color: var(--primary-color); font-weight: 600; }
-        .tab-button.active::after {
-            content: ''; position: absolute; bottom: -2px; left: 0;
-            width: 100%; height: 2px; background-color: var(--primary-color);
-        }
-        .tab-content { display: none; padding: 1.5rem; }
-        .tab-content.active { display: block; }
-
-        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center;}
-        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+        p.info { color: #616161; margin-bottom: 1.5rem; }
 
         .info-panel {
             padding: 1rem; background-color: var(--light-gray); border-radius: 6px;
             margin-bottom: 1.5rem; text-align: center; border: 1px solid var(--medium-gray);
         }
         .info-panel p { margin: 0.25rem 0; font-size: 1.1rem; }
-        .info-panel strong { font-family: monospace; }
-        .target-text { color: var(--primary-color); }
-        .helper-text { color: var(--secondary-color); }
+        .info-panel strong { font-family: monospace; font-size: 1.2rem;}
+        .goal-text { color: var(--primary-color); }
+        .start-text { color: var(--secondary-color); }
+        .info-panel .relation-text { font-style: italic; color: var(--dark-gray); margin-top: 0.75rem; }
 
         .grid-wrapper {
             position: relative;
-            display: grid;
-            grid-template-columns: 30px 1fr;
-            grid-template-rows: 30px 1fr;
+            display: inline-block;
+        }
+        .table-container {
             width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            aspect-ratio: 1 / 1;
+            overflow-x: auto;
+            padding: 30px 0 0 30px; /* Space for headers */
         }
-        .headers-col, .headers-row { display: grid; }
-        .headers-col { grid-template-columns: repeat(var(--grid-size, 12), 1fr); }
-        .headers-row { grid-template-rows: repeat(var(--grid-size, 12), 1fr); }
-        .header-cell { display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem; }
-        
-        .grid-container {
+        table {
+            border-collapse: collapse;
             position: relative;
-            display: grid;
-            grid-template-columns: repeat(var(--grid-size, 12), 1fr);
-            grid-template-rows: repeat(var(--grid-size, 12), 1fr);
+        }
+        th, td {
             border: 1px solid var(--medium-gray);
-            cursor: crosshair;
+            text-align: center;
+            width: 44px;
+            height: 44px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            -webkit-user-select: none; user-select: none;
         }
-        .grid-cell {
-            border-right: 1px solid var(--medium-gray);
-            border-bottom: 1px solid var(--medium-gray);
+        .header-cell {
+             background-color: var(--light-gray);
+             font-weight: bold;
+             cursor: default;
+             position: absolute;
+             display: flex;
+             align-items: center;
+             justify-content: center;
         }
-
+        td { cursor: pointer; background-color: white; }
+        
+        .overlay-container {
+            position: absolute;
+            top: 30px; left: 30px; 
+            right: 0; bottom: 0;
+            pointer-events: none;
+        }
         .overlay-rectangle {
-            position: absolute; pointer-events: none;
-            z-index: 1; border-radius: 2px;
-            transition: all 0.3s ease;
+            position: absolute;
+            z-index: 1;
+            border-radius: 2px;
         }
-        .target-overlay { background-color: var(--target-rgba); border: 2px solid var(--primary-color); }
-        .helper-overlay { background-color: var(--helper-rgba); border: 2px solid var(--secondary-color); }
+        .goal-overlay { background-color: var(--goal-rgba); border: 2px solid var(--primary-color); }
+        .start-overlay { background-color: var(--start-rgba); border: 2px solid var(--secondary-color); }
         .user-overlay { background-color: var(--user-rgba); border: 2px solid var(--user-color); }
         .preview-overlay { background-color: rgba(0,0,0,0.1); border: 1px dashed var(--dark-gray); }
 
@@ -104,321 +102,298 @@
         button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
         .check-btn { background-color: #4caf50; }
         .clear-btn { background-color: #d32f2f; }
+        .swap-btn { background-color: #6c757d }
         
-        #algebra-controls { display: flex; align-items: center; gap: 0.5rem; }
-        #algebra-controls input { font-family: monospace; flex-grow: 1; font-size: 1.1rem; padding: 8px; }
-
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>Multiplication Area Model</h2>
+    <h2>Multiplication Area Explorer</h2>
+    <p class="info">Click two cells to define a Goal Area and a Starting Area. Then, click and drag to draw the rectangle(s) that show how they are related.</p>
+    
+    <div id="info-panel"><p>Select a cell to begin.</p></div>
 
-    <div class="tabs">
-        <button class="tab-button active" onclick="switchTab('visual')">Visual Explorer</button>
-        <button class="tab-button" onclick="switchTab('algebra')">Algebraic Proof</button>
+    <div class="grid-wrapper" id="grid-wrapper">
+        <div id="table-container"></div>
+        <div id="overlay-container"></div>
     </div>
-
-    <section id="visual-tab" class="tab-content active">
-        <p class="info">Click a "Target" cell. Click a "Helper" cell. Then, click and drag to draw the missing rectangles to complete the proof.</p>
-        <div id="info-panel-visual"><p>Select a "Target" cell to begin.</p></div>
-        <div class="grid-wrapper" id="grid-wrapper-visual">
-            <div style="grid-area: 1/1/2/2;"></div>
-            <div class="headers-col" id="col-headers-visual"></div>
-            <div class="headers-row" id="row-headers-visual"></div>
-            <div class="grid-container" id="grid-container-visual" style="grid-area: 2/2/3/3;"></div>
-        </div>
-        <div id="action-controls-visual" class="action-controls">
-            <button id="clear-btn-visual" class="clear-btn">Clear All</button>
-        </div>
-    </section>
-
-    <section id="algebra-tab" class="tab-content">
-        <p class="info">After selecting a Target and Helper on the first tab, write a correct equality below to prove the relationship. The app will then draw the result.</p>
-        <div id="info-panel-algebra"><p>Please select a Target and Helper on the Visual Explorer tab first.</p></div>
-        <div id="algebra-controls">
-            <span id="equation-start"></span>
-            <input type="text" id="equation-input" placeholder="(r1*c1) + (r2*c2) + ...">
-        </div>
-        <div class="action-controls">
-            <button id="check-draw-btn" class="check-btn">Check & Draw</button>
-        </div>
-        <div class="grid-wrapper" id="grid-wrapper-algebra">
-             <div style="grid-area: 1/1/2/2;"></div>
-            <div class="headers-col" id="col-headers-algebra"></div>
-            <div class="headers-row" id="row-headers-algebra"></div>
-            <div class="grid-container" id="grid-container-algebra" style="grid-area: 2/2/3/3;"></div>
-        </div>
-    </section>
+    
+    <div id="action-controls" class="action-controls">
+        <button id="clear-btn" class="clear-btn">Clear All</button>
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     let state = {
-        size: 12, targetCell: null, helperCell: null, userRects: [],
-        isDrawing: false, drawStart: null, solutionRects: [],
+        size: 12, firstSelection: null, secondSelection: null,
+        goalCell: null, startCell: null, userRects: [],
+        isDrawing: false, drawStart: null,
     };
 
-    // --- DOM REFS ---
-    const visual = {
-        panel: document.getElementById('info-panel-visual'),
-        wrapper: document.getElementById('grid-wrapper-visual'),
-        grid: document.getElementById('grid-container-visual'),
-        colHeaders: document.getElementById('col-headers-visual'),
-        rowHeaders: document.getElementById('row-headers-visual'),
-        actions: document.getElementById('action-controls-visual'),
-        clearBtn: document.getElementById('clear-btn-visual'),
-    };
-    const algebra = {
-        panel: document.getElementById('info-panel-algebra'),
-        equationStart: document.getElementById('equation-start'),
-        equationInput: document.getElementById('equation-input'),
-        checkBtn: document.getElementById('check-draw-btn'),
-        grid: document.getElementById('grid-container-algebra'),
-        colHeaders: document.getElementById('col-headers-algebra'),
-        rowHeaders: document.getElementById('row-headers-algebra'),
-    };
-
-    // --- CORE LOGIC ---
-    function handleCellClick(r, c) {
-        if (!state.targetCell || (state.targetCell && state.helperCell)) {
-            clearSelection();
-            state.targetCell = { r, c };
-        } else {
-            state.helperCell = { r, c };
-            calculateSolutionRects();
-        }
-        render();
-    }
-
-    function clearSelection() {
-        state.targetCell = null;
-        state.helperCell = null;
-        state.userRects = [];
-        state.solutionRects = [];
-        render();
-    }
+    const gridWrapper = document.getElementById('grid-wrapper');
+    const tableContainer = document.getElementById('table-container');
+    const overlayContainer = document.getElementById('overlay-container');
+    const infoPanel = document.getElementById('info-panel');
+    const actionControls = document.getElementById('action-controls');
     
-    function calculateSolutionRects() {
-        if (!state.targetCell || !state.helperCell) return;
-        const { r: tr, c: tc } = state.targetCell;
-        const { r: hr, c: hc } = state.helperCell;
-        state.solutionRects = [];
-        // Assuming helper is smaller and at top-left
-        if (hr < tr) { // Rectangle below helper
-            state.solutionRects.push({ r1: hr + 1, c1: 1, r2: tr, c2: tc });
-        }
-        if (hc < tc) { // Rectangle to the right of helper
-            state.solutionRects.push({ r1: 1, c1: hc + 1, r2: hr, c2: tc });
-        }
-    }
-
-    function checkProof() {
-        if(state.userRects.length !== state.solutionRects.length) return alert('Not quite right. Try to find all the missing pieces.');
-        
-        const userRectsSorted = JSON.stringify(state.userRects.map(r => [r.r1,r.c1,r.r2,r.c2].sort()).sort());
-        const solutionRectsSorted = JSON.stringify(state.solutionRects.map(r => [r.r1,r.c1,r.r2,r.c2].sort()).sort());
-
-        if (userRectsSorted === solutionRectsSorted) {
-            alert('Excellent! You have visually proven the relationship.');
-        } else {
-            alert('The rectangles you drew do not match the required pieces. Try again!');
-        }
-    }
-
-    // --- RENDERING ---
     function render() {
-        renderGrid(visual.grid, visual.colHeaders, visual.rowHeaders);
-        renderOverlays(visual.grid, state);
-        renderInfoPanel();
+        renderGridAndHeaders();
+        // Use a small timeout to allow the browser to render the table before we measure it
+        setTimeout(() => {
+            renderOverlays();
+            renderInfoPanel();
+        }, 0);
     }
 
-    function renderGrid(gridEl, colHeaderEl, rowHeaderEl) {
-        gridEl.innerHTML = '';
-        gridEl.style.setProperty('--grid-size', state.size);
-        for (let i = 0; i < state.size * state.size; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'grid-cell';
-            cell.dataset.r = Math.floor(i / state.size) + 1;
-            cell.dataset.c = (i % state.size) + 1;
-            gridEl.appendChild(cell);
+    function renderGridAndHeaders() {
+        let tableHtml = '<table id="multiplication-table"><tbody>';
+        for (let r = 1; r <= state.size; r++) {
+            tableHtml += `<tr>`;
+            for (let c = 1; c <= state.size; c++) {
+                tableHtml += `<td data-r="${r}" data-c="${c}"></td>`;
+            }
+            tableHtml += '</tr>';
         }
-        renderHeaders(colHeaderEl, rowHeaderEl);
-    }
-    
-    function renderHeaders(colHeaderEl, rowHeaderEl) {
-        colHeaderEl.innerHTML = '';
-        rowHeaderEl.innerHTML = '';
-        colHeaderEl.style.setProperty('--grid-size', state.size);
-        rowHeaderEl.style.setProperty('--grid-size', state.size);
+        tableHtml += '</tbody></table>';
+        tableContainer.innerHTML = tableHtml;
+
+        // Render headers separately to avoid being part of the table structure for overlays
+        gridWrapper.querySelectorAll('.header-cell').forEach(el => el.remove());
+        const table = document.getElementById('multiplication-table');
+        if (!table) return;
+        const firstCell = table.querySelector('td');
+        if (!firstCell) return;
+
+        const cellWidth = firstCell.offsetWidth;
+        const cellHeight = firstCell.offsetHeight;
+
         for (let i = 1; i <= state.size; i++) {
             const colHead = document.createElement('div');
             colHead.className = 'header-cell';
             colHead.textContent = i;
-            colHeaderEl.appendChild(colHead);
+            colHead.style.cssText = `position:absolute; top: 0; left: ${(i-1)*cellWidth + 30}px; width: ${cellWidth}px; height: 30px;`;
+            gridWrapper.appendChild(colHead);
+
             const rowHead = document.createElement('div');
             rowHead.className = 'header-cell';
             rowHead.textContent = i;
-            rowHeaderEl.appendChild(rowHead);
+            rowHead.style.cssText = `position:absolute; left: 0; top: ${(i-1)*cellHeight + 30}px; width: 30px; height: ${cellHeight}px;`;
+            gridWrapper.appendChild(rowHead);
         }
     }
 
-    function renderOverlays(gridEl, st) {
-        const wrapper = gridEl.parentElement;
-        wrapper.querySelectorAll('.overlay-rectangle').forEach(el => el.remove());
-        if (!gridEl.firstChild) return;
-        const cellWidth = gridEl.offsetWidth / st.size;
-        const cellHeight = gridEl.offsetHeight / st.size;
+    function renderOverlays() {
+        overlayContainer.innerHTML = ''; 
+        const table = document.getElementById('multiplication-table');
+        if (!table) return;
 
-        const drawRect = (r, c, className) => wrapper.appendChild(createRectElement({ r1: 1, c1: 1, r2: r, c2: c }, className, cellWidth, cellHeight));
-        const drawUserRect = (rect, className) => wrapper.appendChild(createRectElement(rect, className, cellWidth, cellHeight));
+        const firstCell = table.querySelector('td');
+        if (!firstCell) return;
         
-        if (st.helperCell) drawRect(st.helperCell.r, st.helperCell.c, 'helper-overlay');
-        if (st.targetCell) drawRect(st.targetCell.r, st.targetCell.c, 'target-overlay');
-        st.userRects.forEach(rect => drawUserRect(rect, 'user-overlay'));
+        const cellWidth = firstCell.offsetWidth;
+        const cellHeight = firstCell.offsetHeight;
+
+        const drawRect = (r, c, className) => {
+            overlayContainer.appendChild(createRectElement({ r1: 1, c1: 1, r2: r, c2: c }, className, cellWidth, cellHeight));
+        };
+        
+        const drawUserRect = (rect, className) => {
+            overlayContainer.appendChild(createRectElement(rect, className, cellWidth, cellHeight));
+        }
+
+        if (state.startCell) drawRect(state.startCell.r, state.startCell.c, 'start-overlay');
+        if (state.goalCell) drawRect(state.goalCell.r, state.goalCell.c, 'goal-overlay');
+        state.userRects.forEach(rect => drawUserRect(rect, 'user-overlay'));
     }
 
     function createRectElement({r1, c1, r2, c2}, className, cellW, cellH) {
         const overlay = document.createElement('div');
         overlay.className = `overlay-rectangle ${className}`;
-        overlay.style.gridArea = `${Math.min(r1,r2)} / ${Math.min(c1,c2)} / ${Math.max(r1,r2)+1} / ${Math.max(c1,c2)+1}`;
+        overlay.style.left = `${(Math.min(c1, c2) - 1) * cellW}px`;
+        overlay.style.top = `${(Math.min(r1, r2) - 1) * cellH}px`;
+        overlay.style.width = `${(Math.abs(c1 - c2) + 1) * cellW}px`;
+        overlay.style.height = `${(Math.abs(r1 - r2) + 1) * cellH}px`;
+        overlay.style.zIndex = (className.includes('overlay')) ? 1 : 2;
         return overlay;
     }
 
     function renderInfoPanel() {
         let html = '';
-        if (!state.targetCell) {
-            html = '<p>Select a "Target" cell to begin.</p>';
+        const { goalCell, startCell } = state;
+
+        if (!goalCell) {
+            html = '<p>Select a cell to define the Goal Area.</p>';
         } else {
-            html = `<p class="target-text">Target: <strong>${state.targetCell.r} × ${state.targetCell.c}</strong></p>`;
-            if (!state.helperCell) {
-                html += '<p>Now, select a "Helper" cell.</p>';
+            html = `<p class="goal-text">Goal: <strong>${goalCell.r} × ${goalCell.c} = ${goalCell.r * goalCell.c}</strong></p>`;
+            if (!startCell) {
+                html += '<p>Now, select a second cell to define the Starting Area.</p>';
             } else {
-                html += `<p class="helper-text">Helper: <strong>${state.helperCell.r} × ${state.helperCell.c}</strong></p>`;
-                html += '<p>Now, click and drag to draw the missing rectangle(s).</p>';
+                html += `<p class="start-text">Start: <strong>${startCell.r} × ${startCell.c} = ${startCell.r * startCell.c}</strong></p>`;
+                const goalArea = goalCell.r * goalCell.c;
+                const startArea = startCell.r * startCell.c;
+                if (goalArea > startArea) {
+                     html += `<p class="relation-text">How can you add to the green area to make the blue area? Draw the missing rectangle(s).</p>`;
+                } else {
+                     html += `<p class="relation-text">How can you get from the larger green area to the smaller blue area? Draw the piece you need to subtract.</p>`;
+                }
             }
         }
-        visual.panel.innerHTML = html;
+        infoPanel.innerHTML = html;
         
-        visual.actions.querySelector('.check-btn')?.remove();
+        actionControls.innerHTML = '<button id="clear-btn" class="clear-btn">Clear All</button>';
+        actionControls.querySelector('#clear-btn').onclick = clearSelection;
+        if (state.firstSelection && state.secondSelection) {
+             const swapBtn = document.createElement('button');
+             swapBtn.className = 'swap-btn'; swapBtn.textContent = 'Swap Selections';
+             swapBtn.onclick = swapRoles;
+             actionControls.appendChild(swapBtn);
+        }
         if (state.userRects.length > 0) {
             const checkBtn = document.createElement('button');
-            checkBtn.className = 'check-btn'; checkBtn.textContent = 'Check My Proof';
-            checkBtn.onclick = checkProof;
-            visual.actions.appendChild(checkBtn);
+            checkBtn.className = 'check-btn'; checkBtn.textContent = 'Check My Work';
+            checkBtn.onclick = checkWork;
+            actionControls.appendChild(checkBtn);
         }
     }
+    
+    function checkWork() {
+        let userArea = 0;
+        state.userRects.forEach(rect => {
+            userArea += (Math.abs(rect.r1 - rect.r2) + 1) * (Math.abs(rect.c1 - rect.c2) + 1);
+        });
+        
+        const goalArea = state.goalCell.r * state.goalCell.c;
+        const startArea = state.startCell.r * state.startCell.c;
 
+        if (goalArea > startArea) { // Addition case
+            if (startArea + userArea === goalArea) {
+                alert(`Correct! You've shown that ${startArea} + ${userArea} = ${goalArea}.`);
+            } else {
+                alert(`Not quite! Your total area is ${startArea + userArea}, but the goal is ${goalArea}.`);
+            }
+        } else { // Subtraction case
+            if (startArea - userArea === goalArea) {
+                alert(`Correct! You've shown that ${startArea} - ${userArea} = ${goalArea}.`);
+            } else {
+                alert(`Not quite! Your result is ${startArea - userArea}, but the goal is ${goalArea}.`);
+            }
+        }
+    }
+    
     function getCellFromEvent(e) {
-        const el = e.target;
-        if(el && el.classList.contains('grid-cell')) {
-            return { r: parseInt(el.dataset.r), c: parseInt(el.dataset.c) };
+        const target = e.target;
+        if(target && target.matches('td[data-r]')) {
+            return { r: parseInt(target.dataset.r), c: parseInt(target.dataset.c) };
         }
         return null;
     }
     
-    // --- EVENT LISTENERS ---
-    visual.clearBtn.addEventListener('click', clearSelection);
-    visual.grid.addEventListener('click', e => handleCellClick(parseInt(e.target.dataset.r), parseInt(e.target.dataset.c)));
-    
-    visual.grid.addEventListener('mousedown', e => {
+    function determineRoles() {
+        if (!state.firstSelection || !state.secondSelection) {
+            state.goalCell = state.firstSelection;
+            state.startCell = null;
+            return;
+        }
+        const area1 = state.firstSelection.r * state.firstSelection.c;
+        const area2 = state.secondSelection.r * state.secondSelection.c;
+        if (area1 > area2) {
+            state.goalCell = state.firstSelection;
+            state.startCell = state.secondSelection;
+        } else {
+            state.goalCell = state.secondSelection;
+            state.startCell = state.firstSelection;
+        }
+    }
+
+    function swapRoles() {
+        [state.firstSelection, state.secondSelection] = [state.secondSelection, state.firstSelection];
+        determineRoles();
+        state.userRects = [];
+        render();
+    }
+
+    function handleCellClick(e) {
         const cell = getCellFromEvent(e);
-        if (cell && state.targetCell && state.helperCell) {
+        if (!cell) return;
+        
+        if (!state.firstSelection || (state.firstSelection && state.secondSelection)) {
+            clearSelection();
+            state.firstSelection = cell;
+        } else {
+            state.secondSelection = cell;
+        }
+        determineRoles();
+        render();
+    }
+    
+    function handleMouseDown(e) {
+        const cell = getCellFromEvent(e);
+        if (cell && state.goalCell && state.startCell) {
             state.isDrawing = true;
             state.drawStart = cell;
+            e.preventDefault();
         }
-    });
+    }
 
-    window.addEventListener('mousemove', e => {
+    function handleMouseMove(e) {
         if (!state.isDrawing) return;
-        visual.wrapper.querySelector('.preview-overlay')?.remove();
-        const rect = visual.grid.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        if (x < 0 || x > rect.width || y < 0 || y > rect.height) return;
+        gridWrapper.querySelector('.preview-overlay')?.remove();
         
-        const c = Math.ceil(x / (rect.width / state.size));
-        const r = Math.ceil(y / (rect.height / state.size));
+        const tableRect = tableContainer.getBoundingClientRect();
+        const x = e.clientX - tableRect.left;
+        const y = e.clientY - tableRect.top;
+
+        const cellWidth = tableContainer.querySelector('td').offsetWidth;
+        const cellHeight = tableContainer.querySelector('td').offsetHeight;
+        
+        const c = Math.min(state.size, Math.max(1, Math.ceil(x / cellWidth)));
+        const r = Math.min(state.size, Math.max(1, Math.ceil(y / cellHeight)));
         
         if (state.drawStart) {
             const previewRect = { r1: state.drawStart.r, c1: state.drawStart.c, r2: r, c2: c };
-            const cellW = visual.grid.offsetWidth / state.size;
-            const cellH = visual.grid.offsetHeight / state.size;
-            const previewEl = createRectElement(previewRect, 'preview-overlay', cellW, cellH);
-            previewEl.style.left = `${(Math.min(previewRect.c1, previewRect.c2) - 1) * cellW}px`;
-            previewEl.style.top = `${(Math.min(previewRect.r1, previewRect.r2) - 1) * cellH}px`;
-            visual.grid.appendChild(previewEl);
+            const xOffset = tableContainer.querySelector('th').offsetWidth;
+            const yOffset = tableContainer.querySelector('th').offsetHeight;
+            const previewEl = createRectElement(previewRect, 'preview-overlay', cellWidth, cellHeight);
+            previewEl.style.left = `${(Math.min(previewRect.c1, previewRect.c2) - 1) * cellWidth}px`;
+            previewEl.style.top = `${(Math.min(previewRect.r1, previewRect.r2) - 1) * cellHeight}px`;
+            overlayContainer.appendChild(previewEl);
         }
-    });
+    }
     
-    window.addEventListener('mouseup', e => {
+    function handleMouseUp(e) {
         if (!state.isDrawing) return;
-        visual.wrapper.querySelector('.preview-overlay')?.remove();
-        visual.grid.querySelector('.preview-overlay')?.remove();
-        const cell = getCellFromEvent(e) || state.drawStart; // Use start if mouse is released outside
-        if (cell) {
-            state.userRects.push({r1: state.drawStart.r, c1: state.drawStart.c, r2: cell.r, c2: cell.c});
+        overlayContainer.querySelector('.preview-overlay')?.remove();
+        
+        const tableRect = tableContainer.getBoundingClientRect();
+        const x = e.clientX - tableRect.left;
+        const y = e.clientY - tableRect.top;
+        const cellWidth = tableContainer.querySelector('td').offsetWidth;
+        const cellHeight = tableContainer.querySelector('td').offsetHeight;
+        const c = Math.min(state.size, Math.max(1, Math.ceil(x / cellWidth)));
+        const r = Math.min(state.size, Math.max(1, Math.ceil(y / cellHeight)));
+        
+        if (r > 0 && c > 0) {
+            state.userRects.push({r1: state.drawStart.r, c1: state.drawStart.c, r2: r, c2: c});
         }
         state.isDrawing = false;
         state.drawStart = null;
         render();
-    });
-
-    // --- ALGEBRA TAB LOGIC ---
-    function setupAlgebraTab() {
-        if (!state.targetCell || !state.helperCell) {
-            algebra.panel.innerHTML = '<p>Please select a Target and Helper on the Visual Explorer tab first.</p>';
-            algebra.equationStart.textContent = '';
-            algebra.equationInput.value = '';
-            algebra.equationInput.disabled = true;
-            algebra.checkBtn.disabled = true;
-            algebra.grid.innerHTML = '';
-        } else {
-            algebra.panel.innerHTML = `<p class="target-text">Target: <strong>${state.targetCell.r} × ${state.targetCell.c} = ${state.targetCell.r*state.targetCell.c}</strong></p><p class="helper-text">Helper: <strong>${state.helperCell.r} × ${state.helperCell.c} = ${state.helperCell.r*state.helperCell.c}</strong></p>`;
-            algebra.equationStart.textContent = `${state.targetCell.r} * ${state.targetCell.c} = ${state.helperCell.r} * ${state.helperCell.c} + `;
-            algebra.equationInput.disabled = false;
-            algebra.checkBtn.disabled = false;
-        }
     }
-
-    algebra.checkBtn.addEventListener('click', () => {
-        if (!state.targetCell || !state.helperCell) return;
-        const targetValue = state.targetCell.r * state.targetCell.c;
-        const helperValue = state.helperCell.r * state.helperCell.c;
-        let userEquation = algebra.equationInput.value;
-        try {
-            const userValue = math.evaluate(userEquation);
-            if(targetValue === helperValue + userValue) {
-                alert('Correct! Drawing the result.');
-                // Parse rectangles from the user equation
-                const rects = (userEquation.match(/\(\s*\d+\s*\*\s*\d+\s*\)/g) || []).map(s => {
-                    const [r,c] = s.replace(/[()]/g, '').split('*').map(Number);
-                    return {r1:1, c1:1, r2:r, c2:c}; // This is a simplified viz
-                });
-                const algebraState = { targetCell: state.targetCell, helperCell: state.helperCell, userRects: rects };
-                renderGrid(algebra.grid, algebra.colHeaders, algebra.rowHeaders);
-                setTimeout(() => renderOverlays(algebra.grid, algebraState), 0);
-            } else {
-                alert(`The equation is incorrect. Your right side evaluates to ${helperValue + userValue}, not ${targetValue}.`);
-            }
-        } catch(e) {
-            alert(`Could not evaluate your equation. Please check the syntax. Error: ${e.message}`);
-        }
-    });
-
-    // --- TAB SWITCHING ---
-    window.switchTab = (tabName) => {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-        document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-
-        if(tabName === 'algebra') {
-            setupAlgebraTab();
-        }
-    };
     
-    new ResizeObserver(render).observe(visual.wrapper);
+    function clearSelection() {
+        state.firstSelection = null; state.secondSelection = null;
+        state.goalCell = null; state.startCell = null;
+        state.userRects = [];
+        render();
+    }
+    
+    tableContainer.addEventListener('click', handleCellClick);
+    tableContainer.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    
+    new ResizeObserver(render).observe(gridWrapper);
     render();
 });
 </script>
