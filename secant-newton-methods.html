@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Root-Finding Methods</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --danger-color: #d32f2f;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .tabs {
+            display: flex;
+            background-color: var(--light-gray);
+            border-bottom: 2px solid var(--medium-gray);
+        }
+        .tab-button {
+            flex: 1; padding: 14px 10px; cursor: pointer; border: none;
+            background-color: transparent; font-size: 1rem; color: var(--dark-gray);
+            position: relative; transition: color 0.3s;
+        }
+        .tab-button.active { color: var(--primary-color); font-weight: 600; }
+        .tab-button.active::after {
+            content: ''; position: absolute; bottom: -2px; left: 0;
+            width: 100%; height: 2px; background-color: var(--primary-color);
+        }
+        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content.active { display: block; }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;}
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem 1.5rem; padding: 1rem; background-color: var(--light-gray);
+            border-radius: 6px; margin-bottom: 1.5rem;
+        }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .full-width { grid-column: 1 / -1; }
+        .button-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
+        
+        label { font-size: 0.9rem; font-weight: 600; color: #616161; }
+        input[type="text"], input[type="number"], select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; }
+        input[type="text"] { font-family: monospace; }
+        input.error { border-color: var(--danger-color); }
+        
+        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: background-color 0.3s; }
+        button:hover { background-color: #1976d2; }
+        .secondary-button { background-color: #6c757d; }
+        .secondary-button:hover { background-color: #5a6268; }
+        .danger-button { background-color: var(--danger-color); }
+        .danger-button:hover { background-color: #c62828; }
+        button:disabled { background-color: #bdbdbd; cursor: not-allowed; }
+
+        .plot-container { width: 100%; height: 450px; border: 1px solid var(--medium-gray); border-radius: 4px; margin-bottom: 1.5rem;}
+        
+        .log-container { max-height: 250px; overflow-y: auto; border: 1px solid var(--medium-gray); border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { border-bottom: 1px solid var(--medium-gray); padding: 8px; text-align: center; }
+        thead th { background-color: var(--light-gray); font-weight: 600; position: sticky; top: 0; z-index: 1;}
+        tbody tr:last-child td { border-bottom: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('secant')">Secant Method</button>
+        <button class="tab-button" onclick="switchTab('newton')">Newton-Raphson Method</button>
+    </div>
+
+    <section id="secant-tab" class="tab-content active">
+        <h2>Secant Method</h2>
+        <p class="info">This method finds a root by drawing a secant line through the two most recent guess points (x<sub>n-1</sub>, x<sub>n</sub>) and finding its x-intercept. It requires two initial guesses but does not need to bracket the root.</p>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="secant-x0-input">Initial guess (x₀):</label>
+                <input type="number" id="secant-x0-input" value="1" step="0.1">
+            </div>
+            <div class="control-group">
+                <label for="secant-x1-input">Initial guess (x₁):</label>
+                <input type="number" id="secant-x1-input" value="2" step="0.1">
+            </div>
+        </div>
+        
+        <div id="secant-plot-container" class="plot-container"></div>
+        
+        <div class="button-group">
+            <button id="secant-start-btn">Start Iteration</button>
+            <button id="secant-step-btn" class="secondary-button" disabled>Step</button>
+            <button id="secant-animate-btn" class="secondary-button" disabled>Animate</button>
+        </div>
+
+        <div class="log-container" style="margin-top: 1rem;">
+            <table id="secant-log-table">
+                <thead><tr><th>Iteration (n)</th><th>xₙ</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="newton-tab" class="tab-content">
+        <h2>Newton-Raphson Method</h2>
+        <p class="info">This method finds a root by drawing a tangent line at the current guess (x<sub>n</sub>) and finding its x-intercept. It is very fast but requires the function's derivative, f'(x), and can fail if f'(x) is close to zero.</p>
+        
+         <div class="controls">
+            <div class="control-group">
+                <label for="newton-x0-input">Initial guess (x₀):</label>
+                <input type="number" id="newton-x0-input" value="1" step="0.1">
+            </div>
+        </div>
+        
+        <div id="newton-plot-container" class="plot-container"></div>
+        
+        <div class="button-group">
+            <button id="newton-start-btn">Start Iteration</button>
+            <button id="newton-step-btn" class="secondary-button" disabled>Step</button>
+            <button id="newton-animate-btn" class="secondary-button" disabled>Animate</button>
+        </div>
+
+        <div class="log-container" style="margin-top: 1rem;">
+            <table id="newton-log-table">
+                <thead><tr><th>Iteration (n)</th><th>xₙ</th><th>f(xₙ)</th><th>f'(xₙ)</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="controls" style="margin-top: 1.5rem;">
+        <div class="control-group full-width">
+            <label for="example-select">Load an Example Problem f(x) = 0</label>
+            <select id="example-select"></select>
+        </div>
+        <div class="control-group full-width">
+            <label for="function-input">Or, Enter Your Own Function f(x):</label>
+            <input type="text" id="function-input">
+        </div>
+        <div class="control-group">
+            <label for="plot-min-input">Plot Range Min:</label>
+            <input type="number" id="plot-min-input">
+        </div>
+        <div class="control-group">
+            <label for="plot-max-input">Plot Range Max:</label>
+            <input type="number" id="plot-max-input">
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- PRE-DEFINED EXAMPLES ---
+    const EXAMPLES = {
+        "x^3 - x - 2": { f_string: "x^3 - x - 2", range: [-2, 3], secant_x0: 1, secant_x1: 2, newton_x0: 1 },
+        "x^2 - 3": { f_string: "x^2 - 3", range: [0, 3], secant_x0: 1, secant_x1: 2, newton_x0: 1 },
+        "cos(x) - x": { f_string: "cos(x) - x", range: [-2, 2], secant_x0: 0, secant_x1: 1, newton_x0: 0.5 },
+        "e^x - 5*x": { f_string: "exp(x) - 5*x", range: [-1, 4], secant_x0: 2, secant_x1: 3, newton_x0: 2.5 },
+    };
+
+    // --- STATE & DOM REFS ---
+    let state = {
+        f_compiled: null, f_prime_compiled: null, plotRange: [],
+        secant: { x0: 1, x1: 2, log: [], isRunning: false, animationInterval: null },
+        newton: { x0: 1, log: [], isRunning: false, animationInterval: null }
+    };
+    
+    // Shared Controls
+    const exampleSelect = document.getElementById('example-select');
+    const functionInput = document.getElementById('function-input');
+    const plotMinInput = document.getElementById('plot-min-input');
+    const plotMaxInput = document.getElementById('plot-max-input');
+    
+    // Secant Method Elements
+    const secantPlot = document.getElementById('secant-plot-container');
+    const secantLogBody = document.querySelector('#secant-log-table tbody');
+    const secantX0Input = document.getElementById('secant-x0-input');
+    const secantX1Input = document.getElementById('secant-x1-input');
+    const secantStartBtn = document.getElementById('secant-start-btn');
+    const secantStepBtn = document.getElementById('secant-step-btn');
+    const secantAnimateBtn = document.getElementById('secant-animate-btn');
+    
+    // Newton-Raphson Method Elements
+    const newtonPlot = document.getElementById('newton-plot-container');
+    const newtonLogBody = document.querySelector('#newton-log-table tbody');
+    const newtonX0Input = document.getElementById('newton-x0-input');
+    const newtonStartBtn = document.getElementById('newton-start-btn');
+    const newtonStepBtn = document.getElementById('newton-step-btn');
+    const newtonAnimateBtn = document.getElementById('newton-animate-btn');
+
+    
+    // --- CORE LOGIC ---
+    function initialize() {
+        Object.keys(EXAMPLES).forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            exampleSelect.appendChild(option);
+        });
+        
+        // Listeners
+        exampleSelect.addEventListener('change', loadExample);
+        functionInput.addEventListener('change', updateFunction);
+        plotMinInput.addEventListener('change', updatePlotRanges);
+        plotMaxInput.addEventListener('change', updatePlotRanges);
+
+        secantX0Input.addEventListener('input', () => state.secant.x0 = parseFloat(secantX0Input.value));
+        secantX1Input.addEventListener('input', () => state.secant.x1 = parseFloat(secantX1Input.value));
+        secantStartBtn.addEventListener('click', startSecant);
+        secantStepBtn.addEventListener('click', performSecantStep);
+        secantAnimateBtn.addEventListener('click', () => toggleAnimation('secant'));
+
+        newtonX0Input.addEventListener('input', () => state.newton.x0 = parseFloat(newtonX0Input.value));
+        newtonStartBtn.addEventListener('click', startNewton);
+        newtonStepBtn.addEventListener('click', performNewtonStep);
+        newtonAnimateBtn.addEventListener('click', () => toggleAnimation('newton'));
+        
+        loadExample();
+    }
+
+    function loadExample() {
+        const example = EXAMPLES[exampleSelect.value];
+        functionInput.value = example.f_string;
+        plotMinInput.value = example.range[0];
+        plotMaxInput.value = example.range[1];
+        secantX0Input.value = example.secant_x0;
+        secantX1Input.value = example.secant_x1;
+        newtonX0Input.value = example.newton_x0;
+        updateFunction();
+    }
+
+    function updateFunction() {
+        const funcString = functionInput.value;
+        functionInput.classList.remove('error');
+        try {
+            state.f_compiled = math.compile(funcString);
+            state.f_prime_compiled = math.derivative(funcString, 'x').compile();
+            resetAll();
+        } catch (e) {
+            functionInput.classList.add('error');
+            alert(`Invalid function syntax: ${e.message}`);
+            state.f_compiled = null;
+            state.f_prime_compiled = null;
+        }
+    }
+    
+    function updatePlotRanges() {
+        state.plotRange = [parseFloat(plotMinInput.value), parseFloat(plotMaxInput.value)];
+        resetAll();
+    }
+
+    function resetAll() {
+        reset('secant');
+        reset('newton');
+    }
+
+    function reset(method) {
+        stopAnimation(method);
+        const s = state[method];
+        s.isRunning = false;
+        s.log = [];
+        s.x0 = parseFloat(document.getElementById(`${method}-x0-input`).value);
+        if (method === 'secant') s.x1 = parseFloat(secantX1Input.value);
+        
+        updateButtons(method);
+        renderLog(method);
+        plotFunction(method);
+    }
+    
+    function updateButtons(method) {
+        const s = state[method];
+        const start = document.getElementById(`${method}-start-btn`);
+        const step = document.getElementById(`${method}-step-btn`);
+        const animate = document.getElementById(`${method}-animate-btn`);
+        
+        start.disabled = !state.f_compiled || s.isRunning;
+        step.disabled = !s.isRunning;
+        animate.disabled = !s.isRunning;
+    }
+
+    // --- SECANT METHOD ---
+    function startSecant() {
+        if (!state.f_compiled) return;
+        reset('secant');
+        state.secant.log = [state.secant.x0, state.secant.x1];
+        state.secant.isRunning = true;
+        renderLog('secant');
+        updateButtons('secant');
+        updatePlotAnnotations('secant');
+    }
+
+    function performSecantStep() {
+        if (!state.secant.isRunning) return false;
+        const log = state.secant.log;
+        const x_prev = log[log.length - 2];
+        const x_curr = log[log.length - 1];
+
+        const f_prev = state.f_compiled.evaluate({x: x_prev});
+        const f_curr = state.f_compiled.evaluate({x: x_curr});
+
+        const x_next = x_curr - f_curr * (x_curr - x_prev) / (f_curr - f_prev);
+        
+        if (isNaN(x_next) || !isFinite(x_next) || log.length > 50) {
+            stopAnimation('secant'); return false;
+        }
+
+        log.push(x_next);
+        renderLog('secant');
+        updatePlotAnnotations('secant');
+
+        if (Math.abs(x_next - x_curr) < 1e-7) {
+            stopAnimation('secant'); return false;
+        }
+        return true;
+    }
+    
+    // --- NEWTON-RAPHSON METHOD ---
+    function startNewton() {
+        if (!state.f_compiled) return;
+        reset('newton');
+        state.newton.log = [{ x: state.newton.x0, fx: null, f_prime_x: null }];
+        state.newton.isRunning = true;
+        renderLog('newton');
+        updateButtons('newton');
+        updatePlotAnnotations('newton');
+    }
+
+    function performNewtonStep() {
+        if (!state.newton.isRunning) return false;
+        const log = state.newton.log;
+        const x_curr = log[log.length - 1].x;
+        
+        const f_curr = state.f_compiled.evaluate({x: x_curr});
+        const f_prime_curr = state.f_prime_compiled.evaluate({x: x_curr});
+
+        if (Math.abs(f_prime_curr) < 1e-9) {
+            alert("Derivative is zero or close to zero. Newton's method fails.");
+            stopAnimation('newton'); return false;
+        }
+        
+        const x_next = x_curr - f_curr / f_prime_curr;
+        
+        if (isNaN(x_next) || !isFinite(x_next) || log.length > 50) {
+            stopAnimation('newton'); return false;
+        }
+
+        log.push({ x: x_next, fx: f_curr, f_prime_x: f_prime_curr });
+        renderLog('newton');
+        updatePlotAnnotations('newton');
+        
+        if (Math.abs(x_next - x_curr) < 1e-7) {
+            stopAnimation('newton'); return false;
+        }
+        return true;
+    }
+
+    // --- SHARED UTILITIES ---
+    function toggleAnimation(method) {
+        const s = state[method];
+        const btn = document.getElementById(`${method}-animate-btn`);
+        if (s.animationInterval) stopAnimation(method);
+        else {
+            btn.textContent = "Stop"; btn.classList.add('danger-button');
+            const stepFn = method === 'secant' ? performSecantStep : performNewtonStep;
+            s.animationInterval = setInterval(() => { if (!stepFn()) stopAnimation(method); }, 800);
+        }
+    }
+
+    function stopAnimation(method) {
+        const s = state[method];
+        const btn = document.getElementById(`${method}-animate-btn`);
+        clearInterval(s.animationInterval);
+        s.animationInterval = null;
+        s.isRunning = false;
+        btn.textContent = "Animate"; btn.classList.remove('danger-button');
+        updateButtons(method);
+    }
+    
+    function renderLog(method) {
+        const body = document.getElementById(`${method}-log-table`).tBodies[0];
+        const log = state[method].log;
+        body.innerHTML = '';
+        if (method === 'secant') {
+            log.forEach((x, i) => {
+                const tr = body.insertRow(0);
+                tr.innerHTML = `<td>${i}</td><td>${x.toFixed(6)}</td>`;
+            });
+        } else { // Newton
+             log.forEach((row, i) => {
+                const tr = body.insertRow(0);
+                const fx_val = row.fx === null ? '-' : row.fx.toExponential(3);
+                const fp_val = row.f_prime_x === null ? '-' : row.f_prime_x.toExponential(3);
+                tr.innerHTML = `<td>${i}</td><td>${row.x.toFixed(6)}</td><td>${fx_val}</td><td>${fp_val}</td>`;
+            });
+        }
+    }
+
+    function plotFunction(method) {
+        if (!state.f_compiled) return;
+        const xValues = [], yValues = [];
+        const stepSize = (state.plotRange[1] - state.plotRange[0]) / 400;
+
+        for (let x = state.plotRange[0]; x <= state.plotRange[1]; x += stepSize) {
+            try {
+                const y = state.f_compiled.evaluate({x: x});
+                if(isFinite(y)) { xValues.push(x); yValues.push(y); }
+            } catch {}
+        }
+        
+        const plotEl = document.getElementById(`${method}-plot-container`);
+        Plotly.newPlot(plotEl, [{ x: xValues, y: yValues, mode: 'lines', line: { color: 'royalblue' } }], {
+            title: `Plot of f(x) = ${functionInput.value}`,
+            xaxis: { title: 'x', gridcolor: '#e0e0e0', zerolinecolor: '#9e9e9e', range: state.plotRange },
+            yaxis: { title: 'y', gridcolor: '#e0e0e0', zerolinecolor: '#9e9e9e' },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: '#ffffff',
+            margin: { l: 50, r: 25, t: 40, b: 40 }, shapes: []
+        }, {responsive: true, displaylogo: false});
+    }
+    
+    function updatePlotAnnotations(method) {
+        const log = state[method].log;
+        if (log.length < 1) return;
+        const shapes = [];
+
+        if(method === 'secant' && log.length >= 2) {
+            const x_prev = log[log.length-2], x_curr = log[log.length-1];
+            const f_prev = state.f_compiled.evaluate({x: x_prev}), f_curr = state.f_compiled.evaluate({x: x_curr});
+            shapes.push({type: 'line', layer: 'above', xref: 'x', yref: 'y', x0: x_prev, y0: f_prev, x1: x_curr, y1: f_curr, line: { color: 'rgba(76, 175, 80, 0.7)', width: 2 }});
+        } else if (method === 'newton') {
+            const x_curr = log[log.length-1].x;
+            const f_curr = state.f_compiled.evaluate({x: x_curr});
+            const f_prime_curr = state.f_prime_compiled.evaluate({x: x_curr});
+            // Tangent line goes from (x_curr, f_curr) to its x-intercept (x_next, 0)
+            const x_next = x_curr - f_curr / f_prime_curr;
+            shapes.push({type: 'line', layer: 'above', xref: 'x', yref: 'y', x0: x_curr, y0: f_curr, x1: x_next, y1: 0, line: { color: 'rgba(255, 152, 0, 0.8)', width: 2 }});
+        }
+        Plotly.relayout(document.getElementById(`${method}-plot-container`), { shapes: shapes });
+    }
+
+    // --- INITIALIZATION & TABS ---
+    window.switchTab = (tabName) => {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        resetAll(); // Reset state when switching tabs
+    };
+    
+    initialize();
+});
+</script>
+</body>
+</html>
