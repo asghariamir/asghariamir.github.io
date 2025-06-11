@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fixed-Point Iteration Visualizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
     <style>
         :root {
             --primary-color: #1565c0;
-            --secondary-color: #4caf50;
             --danger-color: #d32f2f;
             --convergent-color: #2e7d32;
             --divergent-color: #c62828;
@@ -42,7 +42,7 @@
         
         .controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem 1.5rem;
             padding: 1rem;
             background-color: var(--light-gray);
@@ -50,10 +50,13 @@
             margin-bottom: 1.5rem;
         }
         .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .full-width { grid-column: 1 / -1; }
         .button-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
         
         label { font-size: 0.9rem; font-weight: 600; color: #616161; }
-        input[type="number"], select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 8px; font-size: 0.9rem; width: 100%; }
+        input[type="text"], input[type="number"], select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; }
+        input[type="text"] { font-family: monospace; }
+        input.error { border-color: var(--danger-color); }
         
         button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: background-color 0.3s; }
         button:hover { background-color: #1976d2; }
@@ -71,7 +74,7 @@
         thead th { background-color: var(--light-gray); font-weight: 600; position: sticky; top: 0; z-index: 1;}
         tbody tr:last-child td { border-bottom: none; }
 
-        .info-box { padding: 0.75rem; border-radius: 4px; margin-bottom: 1.5rem; border: 1px solid; }
+        .info-box { padding: 0.75rem; border-radius: 4px; margin-bottom: 1.5rem; border: 1px solid; text-align: center; }
         .info-box.convergent { background-color: #e8f5e9; border-color: var(--convergent-color); color: var(--convergent-color); }
         .info-box.divergent { background-color: #ffebee; border-color: var(--divergent-color); color: var(--divergent-color); }
         .info-box strong { font-family: monospace; }
@@ -80,20 +83,28 @@
 <body>
 <div class="container">
     <h2>Fixed-Point Iteration Visualizer</h2>
-    <p class="info">This method finds a root of <strong>f(x) = 0</strong> by first rearranging the equation into the form <strong>x = g(x)</strong>. The solution is the "fixed point" where the graph of <strong>y = g(x)</strong> intersects the line <strong>y = x</strong>. The iteration x<sub>n+1</sub> = g(x<sub>n</sub>) is then used to find this point.</p>
+    <p class="info">This tool demonstrates the fixed-point iteration method for solving <strong>x = g(x)</strong>. Load an example or enter your own function, set an initial guess x₀, and see how the iteration behaves.</p>
     
     <div class="controls">
-        <div class="control-group">
-            <label for="problem-select">1. Choose a problem:</label>
-            <select id="problem-select"></select>
+        <div class="control-group full-width">
+            <label for="example-select">Load an Example:</label>
+            <select id="example-select"></select>
+        </div>
+        <div class="control-group full-width">
+            <label for="g-input">Enter function g(x):</label>
+            <input type="text" id="g-input" placeholder="e.g., cos(x) or (x^2 + 2)/3">
         </div>
         <div class="control-group">
-            <label for="g-select">2. Choose rearrangement g(x):</label>
-            <select id="g-select"></select>
+            <label for="x0-input">Initial guess (x₀):</label>
+            <input type="number" id="x0-input" step="0.1">
         </div>
         <div class="control-group">
-            <label for="x0-input">3. Choose initial guess (x₀):</label>
-            <input type="number" id="x0-input" value="1.5" step="0.1">
+            <label for="plot-min-input">Plot Range Min:</label>
+            <input type="number" id="plot-min-input">
+        </div>
+        <div class="control-group">
+            <label for="plot-max-input">Plot Range Max:</label>
+            <input type="number" id="plot-max-input">
         </div>
     </div>
     
@@ -105,13 +116,12 @@
         <button id="start-btn">Start Iteration</button>
         <button id="step-btn" class="secondary-button" disabled>Step</button>
         <button id="animate-btn" class="secondary-button" disabled>Animate</button>
-        <button id="reset-btn" class="danger-button">Reset</button>
     </div>
 
     <div class="log-container">
         <table id="log-table">
             <thead>
-                <tr><th>Iteration (n)</th><th>xₙ</th></tr>
+                <tr><th>Iteration (n)</th><th>xₙ</th><th>|g'(xₙ)|</th></tr>
             </thead>
             <tbody></tbody>
         </table>
@@ -120,26 +130,37 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- PROBLEMS & FUNCTIONS ---
-    const PROBLEMS = {
-        "x³ + 4x² - 10 = 0": {
-            range: [-4, 2],
-            fixedPoint: 1.36523,
-            rearrangements: {
-                "g(x) = x - x³ - 4x² + 10": { g: x => x - Math.pow(x,3) - 4*x*x + 10, g_prime: x => 1 - 3*x*x - 8*x },
-                "g(x) = √(10/x - 4x)": { g: x => Math.sqrt(10/x - 4*x), g_prime: x => ( -10/(x*x) - 4 ) / (2*Math.sqrt(10/x - 4*x)) },
-                "g(x) = 0.5 * √(10 - x³)": { g: x => 0.5 * Math.sqrt(10 - Math.pow(x,3)), g_prime: x => -0.75 * x*x / Math.sqrt(10 - x*x*x) },
-                "g(x) = √(10 / (4+x))": { g: x => Math.sqrt(10 / (4+x)), g_prime: x => -0.5 * Math.sqrt(10) * Math.pow(x+4, -1.5) },
-                "g(x) = x - (x³ + 4x² - 10)/(3x² + 8x)": { g: x => x - (x*x*x + 4*x*x - 10)/(3*x*x + 8*x), g_prime: null } // Newton's method
-            }
+    // --- PRE-DEFINED EXAMPLES ---
+    const EXAMPLES = {
+        "sqrt(x + 2)  (Convergent)": {
+            g_string: "sqrt(x + 2)",
+            plot_range: [-2, 5],
+            x0: 2.5,
+            fixedPoint: 2
         },
-        "cos(x) - x = 0": {
-            range: [-1, 2],
-            fixedPoint: 0.739085,
-            rearrangements: {
-                "g(x) = cos(x)": { g: x => Math.cos(x), g_prime: x => -Math.sin(x) },
-                "g(x) = x + cos(x) - x": { g: x => x + Math.cos(x) - x, g_prime: x => 1 - Math.sin(x) -1},
-            }
+        "cos(x)  (Convergent)": {
+            g_string: "cos(x)",
+            plot_range: [-2, 2],
+            x0: 0.5,
+            fixedPoint: 0.739085
+        },
+        "1 + 2/x  (Convergent)": {
+            g_string: "1 + 2/x",
+            plot_range: [-5, 5],
+            x0: 1.5,
+            fixedPoint: 2
+        },
+        "x^2 - 2  (Divergent from x₀=1.5)": {
+            g_string: "x^2 - 2",
+            plot_range: [-3, 3],
+            x0: 1.5,
+            fixedPoint: 2
+        },
+        "10 / (x + 4)  (Convergent)": {
+            g_string: "10 / (x+4)",
+            plot_range: [0, 4],
+            x0: 1.5,
+            fixedPoint: 1.36523
         }
     };
 
@@ -147,74 +168,88 @@ document.addEventListener('DOMContentLoaded', () => {
     let state = {
         g: null, g_prime: null, x_current: 0,
         iteration: 0, log: [], isRunning: false,
-        animationInterval: null, fixedPoint: null
+        animationInterval: null, plotRange: [-1, 3], fixedPoint: null
     };
 
-    const problemSelect = document.getElementById('problem-select');
-    const gSelect = document.getElementById('g-select');
+    const exampleSelect = document.getElementById('example-select');
+    const gInput = document.getElementById('g-input');
     const x0Input = document.getElementById('x0-input');
+    const plotMinInput = document.getElementById('plot-min-input');
+    const plotMaxInput = document.getElementById('plot-max-input');
     const startBtn = document.getElementById('start-btn');
     const stepBtn = document.getElementById('step-btn');
     const animateBtn = document.getElementById('animate-btn');
-    const resetBtn = document.getElementById('reset-btn');
     const plotContainer = document.getElementById('plot-container');
     const logTableBody = document.querySelector('#log-table tbody');
     const convergenceInfo = document.getElementById('convergence-info');
     
     // --- CORE LOGIC ---
     function initialize() {
-        Object.keys(PROBLEMS).forEach(name => {
+        Object.keys(EXAMPLES).forEach(name => {
             const option = document.createElement('option');
             option.value = name;
             option.textContent = name;
-            problemSelect.appendChild(option);
+            exampleSelect.appendChild(option);
         });
         
-        problemSelect.addEventListener('change', populateGFunctions);
-        gSelect.addEventListener('change', resetAndPlot);
-        x0Input.addEventListener('change', resetAndPlot);
+        exampleSelect.addEventListener('change', loadExample);
+        gInput.addEventListener('change', updateFunction);
+        x0Input.addEventListener('change', reset);
+        plotMinInput.addEventListener('change', reset);
+        plotMaxInput.addEventListener('change', reset);
         
         startBtn.addEventListener('click', startIteration);
         stepBtn.addEventListener('click', performStep);
         animateBtn.addEventListener('click', toggleAnimation);
-        resetBtn.addEventListener('click', resetAndPlot);
         
-        populateGFunctions();
-    }
-
-    function populateGFunctions() {
-        const problem = PROBLEMS[problemSelect.value];
-        gSelect.innerHTML = '';
-        Object.keys(problem.rearrangements).forEach(name => {
-            const option = document.createElement('option');
-            option.value = name;
-            option.textContent = name;
-            gSelect.appendChild(option);
-        });
-        resetAndPlot();
+        loadExample();
     }
     
-    function resetAndPlot() {
+    function loadExample() {
+        const example = EXAMPLES[exampleSelect.value];
+        gInput.value = example.g_string;
+        x0Input.value = example.x0;
+        plotMinInput.value = example.plot_range[0];
+        plotMaxInput.value = example.plot_range[1];
+        state.fixedPoint = example.fixedPoint;
+        updateFunction();
+    }
+
+    function updateFunction() {
+        const funcString = gInput.value;
+        gInput.classList.remove('error');
+        try {
+            state.g = math.compile(funcString);
+            const derivativeNode = math.derivative(funcString, 'x');
+            state.g_prime = derivativeNode.compile();
+            reset();
+        } catch (e) {
+            gInput.classList.add('error');
+            convergenceInfo.className = 'info-box divergent';
+            convergenceInfo.innerHTML = `Invalid function syntax: ${e.message}`;
+            state.g = null;
+            state.g_prime = null;
+        }
+    }
+
+    function reset() {
         stopAnimation();
         state.isRunning = false;
         state.iteration = 0;
         state.log = [];
         state.x_current = parseFloat(x0Input.value);
-        
-        const problem = PROBLEMS[problemSelect.value];
-        const g_data = problem.rearrangements[gSelect.value];
-        state.g = g_data.g;
-        state.g_prime = g_data.g_prime;
-        state.fixedPoint = problem.fixedPoint;
-        
+        state.plotRange = [parseFloat(plotMinInput.value), parseFloat(plotMaxInput.value)];
+
         updateButtons();
         renderLog();
         plotFunction();
         checkConvergence();
     }
-
+    
     function startIteration() {
-        state.log = [{ iter: 0, x: state.x_current }];
+        if (!state.g) return;
+        reset();
+        state.log = [{ iter: 0, x: state.x_current, g_prime_val: getDerivativeValue(state.x_current) }];
         state.isRunning = true;
         renderLog();
         updateButtons();
@@ -224,19 +259,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function performStep() {
         if (!state.isRunning) return false;
         const x_prev = state.x_current;
-        const x_next = state.g(x_prev);
+        const x_next = state.g.evaluate({x: x_prev});
         
+        if (isNaN(x_next) || !isFinite(x_next)) {
+            stopAnimation(); state.isRunning = false; updateButtons();
+            alert("Iteration resulted in an invalid number. Stopping.");
+            return false;
+        }
+
         state.iteration++;
         state.x_current = x_next;
-        state.log.push({ iter: state.iteration, x: x_next });
+        state.log.push({ iter: state.iteration, x: x_next, g_prime_val: getDerivativeValue(x_next) });
         
         renderLog();
         updatePlotAnnotations();
 
-        if (Math.abs(x_next - x_prev) < 1e-6 || state.iteration > 100) {
-            stopAnimation();
-            state.isRunning = false;
-            updateButtons();
+        if (Math.abs(x_next - x_prev) < 1e-7 || state.iteration > 100) {
+            stopAnimation(); state.isRunning = false; updateButtons();
             return false;
         }
         return true;
@@ -258,9 +297,13 @@ document.addEventListener('DOMContentLoaded', () => {
         animateBtn.classList.remove('danger-button');
     }
 
+    function getDerivativeValue(x) {
+        try { return state.g_prime ? state.g_prime.evaluate({x: x}) : NaN; } catch { return NaN; }
+    }
+
     // --- RENDERING & PLOTTING ---
     function updateButtons() {
-        startBtn.disabled = state.isRunning;
+        startBtn.disabled = !state.g || state.isRunning;
         stepBtn.disabled = !state.isRunning;
         animateBtn.disabled = !state.isRunning;
     }
@@ -269,36 +312,46 @@ document.addEventListener('DOMContentLoaded', () => {
         logTableBody.innerHTML = '';
         state.log.forEach(row => {
             const tr = logTableBody.insertRow(0);
-            tr.innerHTML = `<td>${row.iter}</td><td>${isNaN(row.x) ? 'Invalid' : row.x.toFixed(6)}</td>`;
+            const derivVal = isNaN(row.g_prime_val) ? 'N/A' : Math.abs(row.g_prime_val).toFixed(4);
+            tr.innerHTML = `<td>${row.iter}</td><td>${isNaN(row.x) ? 'Invalid' : row.x.toFixed(6)}</td><td>${derivVal}</td>`;
         });
     }
 
     function checkConvergence() {
-        if (state.g_prime) {
-            const derivativeAtFixedPoint = state.g_prime(state.fixedPoint);
-            const absDerivative = Math.abs(derivativeAtFixedPoint);
-            if (absDerivative < 1) {
-                convergenceInfo.className = 'info-box convergent';
-                convergenceInfo.innerHTML = `Condition met: <strong>|g'(${state.fixedPoint.toFixed(2)})| &approx; ${absDerivative.toFixed(3)} < 1</strong>. Iteration should converge.`;
-            } else {
-                convergenceInfo.className = 'info-box divergent';
-                convergenceInfo.innerHTML = `Condition NOT met: <strong>|g'(${state.fixedPoint.toFixed(2)})| &approx; ${absDerivative.toFixed(3)} &ge; 1</strong>. Iteration will likely diverge.`;
-            }
-        } else {
+        if (!state.g_prime || state.fixedPoint === null) {
             convergenceInfo.className = 'info-box';
-            convergenceInfo.innerHTML = "Convergence condition for this g(x) is more complex (e.g., Newton's method).";
+            convergenceInfo.textContent = 'Enter a function and starting point.';
+            return;
+        };
+        const derivativeAtFixedPoint = getDerivativeValue(state.fixedPoint);
+        const absDerivative = Math.abs(derivativeAtFixedPoint);
+        
+        if (isNaN(absDerivative)) {
+             convergenceInfo.className = 'info-box';
+             convergenceInfo.textContent = "Could not evaluate g'(x) at the known fixed point.";
+             return;
+        }
+
+        if (absDerivative < 1) {
+            convergenceInfo.className = 'info-box convergent';
+            convergenceInfo.innerHTML = `Condition met near fixed point: <strong>|g'(${state.fixedPoint.toFixed(2)})| &approx; ${absDerivative.toFixed(3)} < 1</strong>. Iteration is expected to converge.`;
+        } else {
+            convergenceInfo.className = 'info-box divergent';
+            convergenceInfo.innerHTML = `Condition NOT met near fixed point: <strong>|g'(${state.fixedPoint.toFixed(2)})| &approx; ${absDerivative.toFixed(3)} &ge; 1</strong>. Iteration is expected to diverge.`;
         }
     }
 
     function plotFunction() {
-        const problem = PROBLEMS[problemSelect.value];
-        const range = problem.range;
+        if (!state.g) { Plotly.purge(plotContainer); return; }
+        const range = state.plotRange;
         const xValues = [], gValues = [];
         const stepSize = (range[1] - range[0]) / 400;
 
         for (let x = range[0]; x <= range[1]; x += stepSize) {
-            xValues.push(x);
-            gValues.push(state.g(x));
+            try {
+                const y = state.g.evaluate({x: x});
+                if(isFinite(y)) { xValues.push(x); gValues.push(y); }
+            } catch {}
         }
         
         Plotly.newPlot(plotContainer, [
@@ -308,10 +361,8 @@ document.addEventListener('DOMContentLoaded', () => {
             title: `Plot of y = g(x) and y = x`,
             xaxis: { title: 'x', gridcolor: '#e0e0e0', range: range },
             yaxis: { title: 'y', gridcolor: '#e0e0e0', scaleanchor: 'x', scaleratio: 1 },
-            paper_bgcolor: 'rgba(0,0,0,0)',
-            plot_bgcolor: '#ffffff',
-            margin: { l: 50, r: 25, t: 40, b: 40 },
-            showlegend: false
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: '#ffffff',
+            margin: { l: 50, r: 25, t: 40, b: 40 }, showlegend: false
         }, {responsive: true, displaylogo: false});
     }
     
@@ -320,10 +371,8 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < state.log.length - 1; i++) {
             const x_prev = state.log[i].x;
             const x_next = state.log[i+1].x;
-            // Vertical line: (x_prev, x_prev) -> (x_prev, x_next)
-            traces.push({ x: [x_prev, x_prev], y: [x_prev, x_next], mode: 'lines', line: { color: 'rgba(211, 47, 47, 0.6)', width: 1.5 } });
-            // Horizontal line: (x_prev, x_next) -> (x_next, x_next)
-            traces.push({ x: [x_prev, x_next], y: [x_next, x_next], mode: 'lines', line: { color: 'rgba(76, 175, 80, 0.8)', width: 1.5 } });
+            traces.push({ x: [x_prev, x_prev], y: [x_prev, x_next], mode: 'lines', line: { color: 'rgba(211, 47, 47, 0.7)', width: 1.5 }, hoverinfo: 'none' });
+            traces.push({ x: [x_prev, x_next], y: [x_next, x_next], mode: 'lines', line: { color: 'rgba(76, 175, 80, 0.9)', width: 1.5 }, hoverinfo: 'none' });
         }
         Plotly.addTraces(plotContainer, traces);
     }
