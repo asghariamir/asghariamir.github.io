@@ -26,6 +26,7 @@
             background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 8px; overflow: hidden;
         }
+        .main-content { padding: 1.5rem; }
         .tabs { display: flex; background-color: var(--light-gray); border-bottom: 2px solid var(--medium-gray); }
         .tab-button {
             flex: 1; padding: 14px 10px; cursor: pointer; border: none;
@@ -37,7 +38,7 @@
             content: ''; position: absolute; bottom: -2px; left: 0;
             width: 100%; height: 2px; background-color: var(--primary-color);
         }
-        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content { display: none; padding-top: 1.5rem; }
         .tab-content.active { display: block; }
         
         h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
@@ -74,8 +75,10 @@
 </head>
 <body>
 <div class="container">
-    <h2>Root-Finding Method Comparison Lab</h2>
-    <p class="info">Analyze and compare the performance of five different root-finding algorithms on the same function. The chart on the second tab shows the **log of the error** at each iteration, providing a clear view of each method's convergence speed.</p>
+    <div class="main-content">
+        <h2>Root-Finding Method Comparison Lab</h2>
+        <p class="info">Analyze and compare the performance of five different root-finding algorithms on the same function. The chart on the second tab shows the **log of the error** at each iteration, providing a clear view of each method's convergence speed.</p>
+    </div>
     
     <div class="tabs">
         <button class="tab-button active" onclick="switchTab('summary')">Analysis & Summary</button>
@@ -110,11 +113,11 @@
                 <input type="number" id="b-input">
             </div>
             <div class="control-group">
-                <label for="x0-input">Guess (x₀)</label>
+                <label for="x0-input">Guess (x₀):</label>
                 <input type="number" id="x0-input">
             </div>
             <div class="control-group">
-                <label for="x1-input">Guess (x₁)</label>
+                <label for="x1-input">Guess (x₁):</label>
                 <input type="number" id="x1-input">
             </div>
             <div class="control-group">
@@ -136,7 +139,7 @@
 
     <section id="plot-tab" class="tab-content">
         <h3>3. Error Analysis Plot</h3>
-        <div id="plot-container" style="width: 100%; height: 60vh;">
+        <div id="plot-container" style="position: relative; height: 60vh;">
              <p>Run an analysis on the first tab to see the error plot.</p>
         </div>
     </section>
@@ -150,6 +153,14 @@ document.addEventListener('DOMContentLoaded', () => {
         "e^x - 5*x = 0": { f_string: "exp(x) - 5*x", g_string: "exp(x)/5", a: 0, b: 1, x0: 0.1, x1: 0.3, true_root: 0.2591711018 },
     };
 
+    const METHOD_COLORS = {
+        bisection: 'rgb(255, 152, 0)',   /* Orange */
+        falsePos: 'rgb(244, 67, 54)',    /* Red */
+        secant: 'rgb(156, 39, 176)',     /* Purple */
+        newton: 'rgb(76, 175, 80)',      /* Green */
+        fixedPoint: 'rgb(33, 150, 243)', /* Blue */
+    };
+    
     let f_compiled, f_prime_compiled, g_compiled;
     let analysisResults = null;
     let errorChart;
@@ -221,17 +232,16 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         updateSummaryCards(analysisResults);
-        // Do not draw plot immediately, wait for tab switch
     }
 
-    // --- ALGORITHM IMPLEMENTATIONS (with robust checks) ---
+    // --- ALGORITHM IMPLEMENTATIONS ---
     function runBisection(a, b, root, maxIter, tol) {
         const errors = [];
         try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Eval error" }; }
         let iter = 0;
         while(iter < maxIter) {
             const m = (a + b) / 2;
-            errors.push(Math.max(1e-16, Math.abs(m - root))); // Prevent log(0)
+            errors.push(Math.max(1e-16, Math.abs(m - root)));
             if (Math.abs(b - a) / 2 < tol) return { status: `Converged in ${iter} iter.`, root: m, errors };
             iter++;
             if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:m}) < 0) b = m; else a = m;
@@ -242,14 +252,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function runFalsePosition(a, b, root, maxIter, tol) {
         const errors = [];
         try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Eval error" }; }
-        let iter = 0; let c = b;
+        let iter = 0, c = b;
         while(iter < maxIter) {
             const fa = f_compiled.evaluate({x:a}), fb = f_compiled.evaluate({x:b});
-            const c_prev = c;
-            if (Math.abs(fb - fa) < 1e-12) return { status: "Failed: Flat slope", root: c, errors };
+            const prev_c = c;
+            if (Math.abs(fb - fa) < 1e-14) return { status: "Failed: Flat slope", root: c, errors };
             c = (a * fb - b * fa) / (fb - fa);
             errors.push(Math.max(1e-16, Math.abs(c - root)));
-            if (Math.abs(c - c_prev) < tol) return { status: `Converged in ${iter} iter.`, root: c, errors };
+            if (isNaN(c) || !isFinite(c)) return { status: "Failed: Diverged", root: c, errors };
+            if (Math.abs(c - prev_c) < tol) return { status: `Converged in ${iter + 1} iter.`, root: c, errors };
             iter++;
             if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:c}) < 0) b = c; else a = c;
         }
@@ -261,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let iter = 0;
         while(iter < maxIter) {
             const fx0 = f_compiled.evaluate({x:x0}), fx1 = f_compiled.evaluate({x:x1});
-            if(Math.abs(fx1 - fx0) < 1e-12) return { status: "Failed: Flat slope", root: x1, errors };
+            if(Math.abs(fx1 - fx0) < 1e-14) return { status: "Failed: Flat slope", root: x1, errors };
             const x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
             errors.push(Math.max(1e-16, Math.abs(x2 - root)));
             if (isNaN(x2) || !isFinite(x2)) return { status: "Failed: Diverged", root: x1, errors };
@@ -277,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         while(iter < maxIter) {
             const fx0 = f_compiled.evaluate({x:x0});
             const f_prime_x0 = f_prime_compiled.evaluate({x:x0});
-            if(Math.abs(f_prime_x0) < 1e-12) return { status: "Failed: Derivative is zero", root: x0, errors };
+            if(Math.abs(f_prime_x0) < 1e-14) return { status: "Failed: Derivative is zero", root: x0, errors };
             const x1 = x0 - fx0 / f_prime_x0;
             errors.push(Math.max(1e-16, Math.abs(x1 - root)));
             if (isNaN(x1) || !isFinite(x1)) return { status: "Failed: Diverged", root: x0, errors };
@@ -294,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const x1 = g_compiled.evaluate({x:x0});
             errors.push(Math.max(1e-16, Math.abs(x1 - root)));
             if (isNaN(x1) || !isFinite(x1)) return { status: "Failed: Diverged", root: x0, errors };
-            if (Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x1, errors };
+            if (iter > 0 && Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter} iter.`, root: x1, errors };
             iter++; x0 = x1;
         }
         return { status: "Failed: Max iterations", root: x0, errors };
@@ -307,10 +318,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = results[method];
             const resultEl = document.getElementById(`${method}-result`);
             const statusEl = document.getElementById(`${method}-status`);
-            if (res && res.root !== undefined) {
+            if (res && res.status.startsWith('Converged')) {
                 resultEl.textContent = res.root.toFixed(7);
                 statusEl.textContent = res.status;
-                statusEl.className = res.status.startsWith('Converged') ? 'status converged' : 'status failed';
+                statusEl.className = 'status converged';
             } else {
                 resultEl.textContent = '-';
                 statusEl.textContent = res ? res.status : 'Error';
@@ -322,25 +333,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function drawErrorPlot() {
         if (!analysisResults) return;
         
-        DOM.plotContainer.innerHTML = ''; // Clear placeholder text
-        const canvas = document.createElement('canvas');
-        DOM.plotContainer.appendChild(canvas);
+        DOM.plotContainer.innerHTML = '<canvas id="error-chart-canvas"></canvas>';
+        const canvas = document.getElementById('error-chart-canvas');
 
         if (errorChart) errorChart.destroy();
         
         const datasets = [
-            { label: 'Bisection', data: analysisResults.bisection.errors, borderColor: 'var(--bisection-color)', backgroundColor: 'var(--bisection-color)', tension: 0.1, fill:false },
-            { label: 'Linear Interpolation', data: analysisResults.falsePos.errors, borderColor: 'var(--false-pos-color)', backgroundColor: 'var(--false-pos-color)', tension: 0.1, fill:false },
-            { label: 'Secant', data: analysisResults.secant.errors, borderColor: 'var(--secant-color)', backgroundColor: 'var(--secant-color)', tension: 0.1, fill:false },
-            { label: 'Newton-Raphson', data: analysisResults.newton.errors, borderColor: 'var(--newton-color)', backgroundColor: 'var(--newton-color)', tension: 0.1, fill:false },
-            { label: 'Fixed-Point', data: analysisResults.fixedPoint.errors, borderColor: 'var(--fixed-point-color)', backgroundColor: 'var(--fixed-point-color)', tension: 0.1, fill:false },
+            { label: 'Bisection', data: analysisResults.bisection.errors, borderColor: METHOD_COLORS.bisection, backgroundColor: METHOD_COLORS.bisection, tension: 0.1, fill:false },
+            { label: 'Linear Interpolation', data: analysisResults.falsePos.errors, borderColor: METHOD_COLORS.falsePos, backgroundColor: METHOD_COLORS.falsePos, tension: 0.1, fill:false },
+            { label: 'Secant', data: analysisResults.secant.errors, borderColor: METHOD_COLORS.secant, backgroundColor: METHOD_COLORS.secant, tension: 0.1, fill:false },
+            { label: 'Newton-Raphson', data: analysisResults.newton.errors, borderColor: METHOD_COLORS.newton, backgroundColor: METHOD_COLORS.newton, tension: 0.1, fill:false },
+            { label: 'Fixed-Point', data: analysisResults.fixedPoint.errors, borderColor: METHOD_COLORS.fixedPoint, backgroundColor: METHOD_COLORS.fixedPoint, tension: 0.1, fill:false },
         ];
 
         errorChart = new Chart(canvas, {
             type: 'line',
             data: {
                 labels: Array.from({length: DOM.maxIterInput.value}, (_, i) => i),
-                datasets: datasets
+                datasets: datasets.filter(ds => ds.data) // Only plot datasets that have data
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
@@ -358,10 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
         document.getElementById(`${tabName}-tab`).classList.add('active');
         document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-
-        if(tabName === 'plot') {
-            drawErrorPlot();
-        }
+        if (tabName === 'plot') drawErrorPlot();
     };
     
     initialize();
