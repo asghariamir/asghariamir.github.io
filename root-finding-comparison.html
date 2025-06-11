@@ -21,7 +21,24 @@
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: var(--light-gray); color: var(--dark-gray); padding: 1rem; }
-        .container { width: 100%; max-width: 1100px; margin: 0 auto; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; padding: 1.5rem; }
+        .container {
+            width: 100%; max-width: 1100px; margin: 0 auto;
+            background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px; overflow: hidden;
+        }
+        .tabs { display: flex; background-color: var(--light-gray); border-bottom: 2px solid var(--medium-gray); }
+        .tab-button {
+            flex: 1; padding: 14px 10px; cursor: pointer; border: none;
+            background-color: transparent; font-size: 1rem; color: var(--dark-gray);
+            position: relative; transition: color 0.3s;
+        }
+        .tab-button.active { color: var(--primary-color); font-weight: 600; }
+        .tab-button.active::after {
+            content: ''; position: absolute; bottom: -2px; left: 0;
+            width: 100%; height: 2px; background-color: var(--primary-color);
+        }
+        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content.active { display: block; }
         
         h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
         p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;}
@@ -51,65 +68,78 @@
         h4.secant { color: var(--secant-color); }
         h4.newton { color: var(--newton-color); }
         h4.fixed-point { color: var(--fixed-point-color); }
+        
+        #plot-container p { font-style: italic; font-size: 1.2rem; color: #9e9e9e; }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>Root-Finding Method Comparison Lab</h2>
-    <p class="info">Analyze and compare the performance of five different root-finding algorithms on the same problem. The main chart shows the **log of the error** at each iteration, providing a clear view of each method's convergence speed.</p>
+    <p class="info">Analyze and compare the performance of five different root-finding algorithms on the same function. The chart on the second tab shows the **log of the error** at each iteration, providing a clear view of each method's convergence speed.</p>
     
-    <h3>1. Setup Problem</h3>
-    <div class="control-panel">
-        <div class="control-group full-width">
-            <label for="example-select">Load an Example Problem</label>
-            <select id="example-select"></select>
-        </div>
-        <div class="control-group full-width">
-            <label for="function-input">Enter Function f(x) = 0:</label>
-            <input type="text" id="function-input">
-        </div>
-        <div class="control-group full-width">
-            <label for="g-function-input">Enter Rearrangement x = g(x) (for Fixed-Point):</label>
-            <input type="text" id="g-function-input">
-        </div>
-        <div class="control-group">
-            <label for="true-root-input">Known True Root:</label>
-            <input type="number" id="true-root-input" step="any">
-        </div>
-        <div class="control-group">
-            <label for="a-input">Interval Start (a):</label>
-            <input type="number" id="a-input">
-        </div>
-        <div class="control-group">
-            <label for="b-input">Interval End (b):</label>
-            <input type="number" id="b-input">
-        </div>
-        <div class="control-group">
-            <label for="x0-input">Guess (x₀):</label>
-            <input type="number" id="x0-input">
-        </div>
-        <div class="control-group">
-            <label for="x1-input">Guess (x₁):</label>
-            <input type="number" id="x1-input">
-        </div>
-        <div class="control-group">
-            <label for="max-iter-input">Max Iterations:</label>
-            <input type="number" id="max-iter-input" value="50">
-        </div>
-    </div>
-    <button id="run-btn">Run Analysis</button>
-
-    <h3>2. Results Summary</h3>
-    <div class="results-grid">
-        <div class="result-card"><h4 class="bisection">Bisection</h4><div id="bisection-result" class="value">-</div><div id="bisection-status" class="status"></div></div>
-        <div class="result-card"><h4 class="false-pos">Linear Interpolation</h4><div id="false-pos-result" class="value">-</div><div id="false-pos-status" class="status"></div></div>
-        <div class="result-card"><h4 class="secant">Secant</h4><div id="secant-result" class="value">-</div><div id="secant-status" class="status"></div></div>
-        <div class="result-card"><h4 class="newton">Newton-Raphson</h4><div id="newton-result" class="value">-</div><div id="newton-status" class="status"></div></div>
-        <div class="result-card"><h4 class="fixed-point">Fixed-Point</h4><div id="fixed-point-result" class="value">-</div><div id="fixed-point-status" class="status"></div></div>
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('summary')">Analysis & Summary</button>
+        <button class="tab-button" onclick="switchTab('plot')">Error Plot</button>
     </div>
 
-    <h3>3. Error Analysis Plot</h3>
-    <canvas id="error-chart"></canvas>
+    <section id="summary-tab" class="tab-content active">
+        <h3>1. Setup Problem</h3>
+        <div class="control-panel">
+            <div class="control-group full-width">
+                <label for="example-select">Load an Example Problem</label>
+                <select id="example-select"></select>
+            </div>
+            <div class="control-group full-width">
+                <label for="function-input">Enter Function f(x) = 0:</label>
+                <input type="text" id="function-input">
+            </div>
+            <div class="control-group full-width">
+                <label for="g-function-input">Enter Rearrangement x = g(x) (for Fixed-Point):</label>
+                <input type="text" id="g-function-input">
+            </div>
+            <div class="control-group">
+                <label for="true-root-input">Known True Root:</label>
+                <input type="number" id="true-root-input" step="any">
+            </div>
+            <div class="control-group">
+                <label for="a-input">Interval Start (a)</label>
+                <input type="number" id="a-input">
+            </div>
+            <div class="control-group">
+                <label for="b-input">Interval End (b)</label>
+                <input type="number" id="b-input">
+            </div>
+            <div class="control-group">
+                <label for="x0-input">Guess (x₀)</label>
+                <input type="number" id="x0-input">
+            </div>
+            <div class="control-group">
+                <label for="x1-input">Guess (x₁)</label>
+                <input type="number" id="x1-input">
+            </div>
+            <div class="control-group">
+                <label for="max-iter-input">Max Iterations:</label>
+                <input type="number" id="max-iter-input" value="50">
+            </div>
+        </div>
+        <button id="run-btn">Run Analysis & View Summary</button>
+
+        <h3>2. Results Summary</h3>
+        <div class="results-grid">
+            <div class="result-card"><h4 class="bisection">Bisection</h4><div id="bisection-result" class="value">-</div><div id="bisection-status" class="status">Not run</div></div>
+            <div class="result-card"><h4 class="false-pos">Linear Interpolation</h4><div id="false-pos-result" class="value">-</div><div id="false-pos-status" class="status">Not run</div></div>
+            <div class="result-card"><h4 class="secant">Secant</h4><div id="secant-result" class="value">-</div><div id="secant-status" class="status">Not run</div></div>
+            <div class="result-card"><h4 class="newton">Newton-Raphson</h4><div id="newton-result" class="value">-</div><div id="newton-status" class="status">Not run</div></div>
+            <div class="result-card"><h4 class="fixed-point">Fixed-Point</h4><div id="fixed-point-result" class="value">-</div><div id="fixed-point-status" class="status">Not run</div></div>
+        </div>
+    </section>
+
+    <section id="plot-tab" class="tab-content">
+        <h3>3. Error Analysis Plot</h3>
+        <div id="plot-container" style="width: 100%; height: 60vh;">
+             <p>Run an analysis on the first tab to see the error plot.</p>
+        </div>
+    </section>
 </div>
 
 <script>
@@ -121,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let f_compiled, f_prime_compiled, g_compiled;
+    let analysisResults = null;
     let errorChart;
     const DOM = {
         exampleSelect: document.getElementById('example-select'),
@@ -133,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         x1Input: document.getElementById('x1-input'),
         maxIterInput: document.getElementById('max-iter-input'),
         runBtn: document.getElementById('run-btn'),
-        errorChartCanvas: document.getElementById('error-chart'),
+        plotContainer: document.getElementById('plot-container'),
     };
     
     function initialize() {
@@ -170,8 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return true;
         } catch (e) {
             alert(`Invalid function syntax: ${e.message}`);
-            if (e.message.includes(DOM.functionInput.value)) DOM.functionInput.classList.add('error');
-            if (e.message.includes(DOM.gFunctionInput.value)) DOM.gFunctionInput.classList.add('error');
             return false;
         }
     }
@@ -183,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxIter = parseInt(DOM.maxIterInput.value);
         const tolerance = 1e-9;
         
-        const results = {
+        analysisResults = {
             bisection: runBisection(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tolerance),
             falsePos: runFalsePosition(parseFloat(DOM.aInput.value), parseFloat(DOM.bInput.value), trueRoot, maxIter, tolerance),
             secant: runSecant(parseFloat(DOM.x0Input.value), parseFloat(DOM.x1Input.value), trueRoot, maxIter, tolerance),
@@ -191,18 +220,18 @@ document.addEventListener('DOMContentLoaded', () => {
             fixedPoint: runFixedPoint(parseFloat(DOM.x0Input.value), trueRoot, maxIter, tolerance)
         };
         
-        updateSummaryCards(results);
-        drawErrorPlot(results);
+        updateSummaryCards(analysisResults);
+        // Do not draw plot immediately, wait for tab switch
     }
 
-    // --- ALGORITHM IMPLEMENTATIONS ---
+    // --- ALGORITHM IMPLEMENTATIONS (with robust checks) ---
     function runBisection(a, b, root, maxIter, tol) {
         const errors = [];
-        try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Evaluation error" }; }
+        try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Eval error" }; }
         let iter = 0;
         while(iter < maxIter) {
             const m = (a + b) / 2;
-            errors.push(Math.abs(m - root));
+            errors.push(Math.max(1e-16, Math.abs(m - root))); // Prevent log(0)
             if (Math.abs(b - a) / 2 < tol) return { status: `Converged in ${iter} iter.`, root: m, errors };
             iter++;
             if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:m}) < 0) b = m; else a = m;
@@ -212,13 +241,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function runFalsePosition(a, b, root, maxIter, tol) {
         const errors = [];
-         try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Evaluation error" }; }
+        try { if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:b}) >= 0) return { status: "Failed: Bad interval" }; } catch { return { status: "Failed: Eval error" }; }
         let iter = 0; let c = b;
         while(iter < maxIter) {
             const fa = f_compiled.evaluate({x:a}), fb = f_compiled.evaluate({x:b});
             const c_prev = c;
+            if (Math.abs(fb - fa) < 1e-12) return { status: "Failed: Flat slope", root: c, errors };
             c = (a * fb - b * fa) / (fb - fa);
-            errors.push(Math.abs(c - root));
+            errors.push(Math.max(1e-16, Math.abs(c - root)));
             if (Math.abs(c - c_prev) < tol) return { status: `Converged in ${iter} iter.`, root: c, errors };
             iter++;
             if (f_compiled.evaluate({x:a}) * f_compiled.evaluate({x:c}) < 0) b = c; else a = c;
@@ -227,13 +257,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function runSecant(x0, x1, root, maxIter, tol) {
-        const errors = [Math.abs(x0 - root), Math.abs(x1 - root)];
+        const errors = [Math.max(1e-16, Math.abs(x0 - root)), Math.max(1e-16, Math.abs(x1 - root))];
         let iter = 0;
         while(iter < maxIter) {
             const fx0 = f_compiled.evaluate({x:x0}), fx1 = f_compiled.evaluate({x:x1});
             if(Math.abs(fx1 - fx0) < 1e-12) return { status: "Failed: Flat slope", root: x1, errors };
             const x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
-            errors.push(Math.abs(x2 - root));
+            errors.push(Math.max(1e-16, Math.abs(x2 - root)));
             if (isNaN(x2) || !isFinite(x2)) return { status: "Failed: Diverged", root: x1, errors };
             if (Math.abs(x2 - x1) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x2, errors };
             iter++; x0 = x1; x1 = x2;
@@ -242,14 +272,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function runNewton(x0, root, maxIter, tol) {
-        const errors = [Math.abs(x0 - root)];
+        const errors = [Math.max(1e-16, Math.abs(x0 - root))];
         let iter = 0;
         while(iter < maxIter) {
             const fx0 = f_compiled.evaluate({x:x0});
             const f_prime_x0 = f_prime_compiled.evaluate({x:x0});
             if(Math.abs(f_prime_x0) < 1e-12) return { status: "Failed: Derivative is zero", root: x0, errors };
             const x1 = x0 - fx0 / f_prime_x0;
-            errors.push(Math.abs(x1 - root));
+            errors.push(Math.max(1e-16, Math.abs(x1 - root)));
             if (isNaN(x1) || !isFinite(x1)) return { status: "Failed: Diverged", root: x0, errors };
             if (Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x1, errors };
             iter++; x0 = x1;
@@ -258,11 +288,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function runFixedPoint(x0, root, maxIter, tol) {
-        const errors = [Math.abs(x0 - root)];
+        const errors = [Math.max(1e-16, Math.abs(x0 - root))];
         let iter = 0;
         while(iter < maxIter) {
             const x1 = g_compiled.evaluate({x:x0});
-            errors.push(Math.abs(x1 - root));
+            errors.push(Math.max(1e-16, Math.abs(x1 - root)));
             if (isNaN(x1) || !isFinite(x1)) return { status: "Failed: Diverged", root: x0, errors };
             if (Math.abs(x1 - x0) < tol) return { status: `Converged in ${iter + 1} iter.`, root: x1, errors };
             iter++; x0 = x1;
@@ -289,18 +319,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function drawErrorPlot(results) {
+    function drawErrorPlot() {
+        if (!analysisResults) return;
+        
+        DOM.plotContainer.innerHTML = ''; // Clear placeholder text
+        const canvas = document.createElement('canvas');
+        DOM.plotContainer.appendChild(canvas);
+
         if (errorChart) errorChart.destroy();
         
         const datasets = [
-            { label: 'Bisection', data: results.bisection.errors, borderColor: 'var(--bisection-color)', backgroundColor: 'var(--bisection-color)', tension: 0.1 },
-            { label: 'Linear Interpolation', data: results.falsePos.errors, borderColor: 'var(--false-pos-color)', backgroundColor: 'var(--false-pos-color)', tension: 0.1 },
-            { label: 'Secant', data: results.secant.errors, borderColor: 'var(--secant-color)', backgroundColor: 'var(--secant-color)', tension: 0.1 },
-            { label: 'Newton-Raphson', data: results.newton.errors, borderColor: 'var(--newton-color)', backgroundColor: 'var(--newton-color)', tension: 0.1 },
-            { label: 'Fixed-Point', data: results.fixedPoint.errors, borderColor: 'var(--fixed-point-color)', backgroundColor: 'var(--fixed-point-color)', tension: 0.1 },
+            { label: 'Bisection', data: analysisResults.bisection.errors, borderColor: 'var(--bisection-color)', backgroundColor: 'var(--bisection-color)', tension: 0.1, fill:false },
+            { label: 'Linear Interpolation', data: analysisResults.falsePos.errors, borderColor: 'var(--false-pos-color)', backgroundColor: 'var(--false-pos-color)', tension: 0.1, fill:false },
+            { label: 'Secant', data: analysisResults.secant.errors, borderColor: 'var(--secant-color)', backgroundColor: 'var(--secant-color)', tension: 0.1, fill:false },
+            { label: 'Newton-Raphson', data: analysisResults.newton.errors, borderColor: 'var(--newton-color)', backgroundColor: 'var(--newton-color)', tension: 0.1, fill:false },
+            { label: 'Fixed-Point', data: analysisResults.fixedPoint.errors, borderColor: 'var(--fixed-point-color)', backgroundColor: 'var(--fixed-point-color)', tension: 0.1, fill:false },
         ];
 
-        errorChart = new Chart(DOM.errorChartCanvas, {
+        errorChart = new Chart(canvas, {
             type: 'line',
             data: {
                 labels: Array.from({length: DOM.maxIterInput.value}, (_, i) => i),
@@ -316,6 +352,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    window.switchTab = (tabName) => {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+        if(tabName === 'plot') {
+            drawErrorPlot();
+        }
+    };
     
     initialize();
 });
