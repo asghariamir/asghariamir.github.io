@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Decimal Search Root-Finder</title>
+    <title>Decimal Search (Bisection Method) Root-Finder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
     <style>
         :root {
             --primary-color: #1565c0;
-            --secondary-color: #4caf50;
             --danger-color: #d32f2f;
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
             --text-color: #212121;
-            --highlight-bg: rgba(21, 101, 192, 0.1);
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -49,10 +48,13 @@
             margin-bottom: 1.5rem;
         }
         .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .full-width { grid-column: 1 / -1; }
         .button-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
         
         label { font-size: 0.9rem; font-weight: 600; color: #616161; }
-        input[type="number"], select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 8px; font-size: 0.9rem; width: 100%; }
+        input[type="text"], input[type="number"], select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; }
+        input[type="text"] { font-family: monospace; }
+        input.error { border-color: var(--danger-color); }
         
         button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: background-color 0.3s; }
         button:hover { background-color: #1976d2; }
@@ -73,25 +75,33 @@
 </head>
 <body>
 <div class="container">
-    <h2>Decimal Search Root-Finder</h2>
-    <p class="info">This tool demonstrates the Bisection Method for finding a root of an equation <strong>f(x) = 0</strong>. Choose a function and an interval [a, b] where the function's sign changes, then step through the process to see how the interval is narrowed to find the solution.</p>
+    <h2>Decimal Search (Bisection Method) Root-Finder</h2>
+    <p class="info">This tool demonstrates the Bisection Method. Load an example or enter your own function `f(x)`, choose an interval `[a, b]` where the function's sign changes, and step through to find the root where `f(x) = 0`.</p>
     
     <div class="controls">
-        <div class="control-group">
-            <label for="function-select">Choose a function f(x):</label>
-            <select id="function-select"></select>
+        <div class="control-group full-width">
+            <label for="example-select">Load an Example:</label>
+            <select id="example-select"></select>
+        </div>
+        <div class="control-group full-width">
+            <label for="function-input">Enter function f(x):</label>
+            <input type="text" id="function-input">
         </div>
         <div class="control-group">
             <label for="a-input">Interval Start (a):</label>
-            <input type="number" id="a-input" value="-1">
+            <input type="number" id="a-input">
         </div>
         <div class="control-group">
             <label for="b-input">Interval End (b):</label>
-            <input type="number" id="b-input" value="2">
+            <input type="number" id="b-input">
         </div>
         <div class="control-group">
-            <label for="tolerance-input">Tolerance:</label>
-            <input type="number" id="tolerance-input" value="0.0001" step="0.0001">
+            <label for="plot-min-input">Plot Range Min:</label>
+            <input type="number" id="plot-min-input">
+        </div>
+        <div class="control-group">
+            <label for="plot-max-input">Plot Range Max:</label>
+            <input type="number" id="plot-max-input">
         </div>
     </div>
 
@@ -101,13 +111,13 @@
         <button id="start-btn">Start Search</button>
         <button id="step-btn" class="secondary-button" disabled>Step</button>
         <button id="animate-btn" class="secondary-button" disabled>Animate</button>
-        <button id="reset-btn" class="danger-button" disabled>Reset</button>
+        <button id="reset-btn" class="danger-button">Reset</button>
     </div>
 
     <div class="log-container">
         <table id="log-table">
             <thead>
-                <tr><th>Iteration</th><th>a</th><th>b</th><th>Midpoint (m)</th><th>f(m)</th><th>New Interval Width</th></tr>
+                <tr><th>Iteration</th><th>a</th><th>b</th><th>Midpoint (m)</th><th>f(m)</th><th>Interval Width</th></tr>
             </thead>
             <tbody></tbody>
         </table>
@@ -116,26 +126,28 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- FUNCTIONS TO SOLVE ---
-    const FUNCTIONS = {
-        "x³ - x - 2": { fn: x => Math.pow(x, 3) - x - 2, range: [-2, 3] },
-        "x² - 3": { fn: x => x*x - 3, range: [0, 3] },
-        "cos(x) - x": { fn: x => Math.cos(x) - x, range: [-2, 2] },
-        "eˣ - 5x": { fn: x => Math.exp(x) - 5*x, range: [0, 3]}
+    // --- PRE-DEFINED EXAMPLES ---
+    const EXAMPLES = {
+        "x^3 - x - 2": { f_string: "x^3 - x - 2", range: [-2, 3], a: 1, b: 2 },
+        "x^2 - 3": { f_string: "x^2 - 3", range: [0, 3], a: 1, b: 2 },
+        "cos(x) - x": { f_string: "cos(x) - x", range: [-2, 2], a: 0, b: 1 },
+        "e^x - 5*x": { f_string: "exp(x) - 5*x", range: [-1, 4], a: 2, b: 3 },
     };
 
     // --- STATE & DOM REFS ---
     let state = {
-        f: null, a: 0, b: 0, m: 0,
+        f_compiled: null, a: 0, b: 0, m: 0,
         iteration: 0, tolerance: 0.0001,
         log: [], isRunning: false,
-        animationInterval: null
+        animationInterval: null, plotRange: [-1, 3]
     };
 
-    const functionSelect = document.getElementById('function-select');
+    const exampleSelect = document.getElementById('example-select');
+    const functionInput = document.getElementById('function-input');
     const aInput = document.getElementById('a-input');
     const bInput = document.getElementById('b-input');
-    const toleranceInput = document.getElementById('tolerance-input');
+    const plotMinInput = document.getElementById('plot-min-input');
+    const plotMaxInput = document.getElementById('plot-max-input');
     const startBtn = document.getElementById('start-btn');
     const stepBtn = document.getElementById('step-btn');
     const animateBtn = document.getElementById('animate-btn');
@@ -145,35 +157,59 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- CORE LOGIC ---
     function initialize() {
-        Object.keys(FUNCTIONS).forEach(name => {
+        Object.keys(EXAMPLES).forEach(name => {
             const option = document.createElement('option');
             option.value = name;
             option.textContent = name;
-            functionSelect.appendChild(option);
+            exampleSelect.appendChild(option);
         });
         
-        functionSelect.addEventListener('change', resetAndPlot);
-        aInput.addEventListener('change', resetAndPlot);
-        bInput.addEventListener('change', resetAndPlot);
-        toleranceInput.addEventListener('change', () => { state.tolerance = parseFloat(toleranceInput.value); });
+        exampleSelect.addEventListener('change', loadExample);
+        functionInput.addEventListener('change', updateFunction);
+        aInput.addEventListener('change', reset);
+        bInput.addEventListener('change', reset);
+        plotMinInput.addEventListener('change', reset);
+        plotMaxInput.addEventListener('change', reset);
         
         startBtn.addEventListener('click', startSearch);
         stepBtn.addEventListener('click', performStep);
         animateBtn.addEventListener('click', toggleAnimation);
-        resetBtn.addEventListener('click', resetAndPlot);
+        resetBtn.addEventListener('click', reset);
         
-        resetAndPlot();
+        loadExample();
+    }
+
+    function loadExample() {
+        const example = EXAMPLES[exampleSelect.value];
+        functionInput.value = example.f_string;
+        aInput.value = example.a;
+        bInput.value = example.b;
+        plotMinInput.value = example.range[0];
+        plotMaxInput.value = example.range[1];
+        updateFunction();
+    }
+
+    function updateFunction() {
+        const funcString = functionInput.value;
+        functionInput.classList.remove('error');
+        try {
+            state.f_compiled = math.compile(funcString);
+            reset();
+        } catch (e) {
+            functionInput.classList.add('error');
+            alert(`Invalid function syntax: ${e.message}`);
+            state.f_compiled = null;
+        }
     }
     
-    function resetAndPlot() {
+    function reset() {
         stopAnimation();
         state.isRunning = false;
         state.iteration = 0;
         state.log = [];
         state.a = parseFloat(aInput.value);
         state.b = parseFloat(bInput.value);
-        state.tolerance = parseFloat(toleranceInput.value);
-        state.f = FUNCTIONS[functionSelect.value].fn;
+        state.plotRange = [parseFloat(plotMinInput.value), parseFloat(plotMaxInput.value)];
 
         updateButtons();
         renderLog();
@@ -181,11 +217,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startSearch() {
-        const fa = state.f(state.a);
-        const fb = state.f(state.b);
-
-        if (fa * fb >= 0) {
-            alert("The function must have opposite signs at the interval endpoints (f(a) * f(b) < 0). Please choose a different interval.");
+        if (!state.f_compiled) return;
+        reset();
+        try {
+            const fa = state.f_compiled.evaluate({x: state.a});
+            const fb = state.f_compiled.evaluate({x: state.b});
+            if (fa * fb >= 0) {
+                alert("The function must have opposite signs at the interval endpoints (f(a) * f(b) < 0). Please choose a different interval.");
+                return;
+            }
+        } catch (e) {
+            alert(`Error evaluating function at endpoints: ${e.message}`);
             return;
         }
         
@@ -200,24 +242,16 @@ document.addEventListener('DOMContentLoaded', () => {
             updateButtons();
             return false;
         }
-
         state.iteration++;
-        const fa = state.f(state.a);
+        const fa = state.f_compiled.evaluate({x: state.a});
         state.m = (state.a + state.b) / 2;
-        const fm = state.f(state.m);
+        const fm = state.f_compiled.evaluate({x: state.m});
 
-        state.log.push({
-            iter: state.iteration, a: state.a, b: state.b,
-            m: state.m, fm: fm, width: Math.abs(state.b - state.a)
-        });
+        state.log.push({ iter: state.iteration, a: state.a, b: state.b, m: state.m, fm: fm, width: Math.abs(state.b - state.a) });
 
-        if (Math.abs(fm) < 1e-12) { // Virtually zero
-            state.b = state.m; // Found exact root
-        } else if (fa * fm < 0) {
-            state.b = state.m; // Root is in the left half
-        } else {
-            state.a = state.m; // Root is in the right half
-        }
+        if (Math.abs(fm) < 1e-12) state.b = state.a = state.m;
+        else if (fa * fm < 0) state.b = state.m;
+        else state.a = state.m;
         
         renderLog();
         updatePlotAnnotations();
@@ -231,16 +265,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleAnimation() {
-        if (state.animationInterval) {
-            stopAnimation();
-        } else {
+        if (state.animationInterval) stopAnimation();
+        else {
             animateBtn.textContent = "Stop";
             animateBtn.classList.add('danger-button');
-            state.animationInterval = setInterval(() => {
-                if (!performStep()) {
-                    stopAnimation();
-                }
-            }, 600);
+            state.animationInterval = setInterval(() => { if (!performStep()) stopAnimation(); }, 600);
         }
     }
     
@@ -251,73 +280,47 @@ document.addEventListener('DOMContentLoaded', () => {
         animateBtn.classList.remove('danger-button');
     }
 
-    // --- RENDERING & PLOTTING ---
     function updateButtons() {
-        startBtn.disabled = state.isRunning;
+        startBtn.disabled = !state.f_compiled || state.isRunning;
         stepBtn.disabled = !state.isRunning;
         animateBtn.disabled = !state.isRunning;
-        resetBtn.disabled = !state.isRunning && state.iteration === 0;
     }
     
     function renderLog() {
         logTableBody.innerHTML = '';
         state.log.forEach(row => {
-            const tr = logTableBody.insertRow(0); // Insert at top
-            tr.innerHTML = `
-                <td>${row.iter}</td>
-                <td>${row.a.toFixed(5)}</td>
-                <td>${row.b.toFixed(5)}</td>
-                <td>${row.m.toFixed(5)}</td>
-                <td>${row.fm.toExponential(3)}</td>
-                <td>${row.width.toExponential(3)}</td>
-            `;
+            const tr = logTableBody.insertRow(0);
+            tr.innerHTML = `<td>${row.iter}</td><td>${row.a.toFixed(5)}</td><td>${row.b.toFixed(5)}</td>
+                <td>${row.m.toFixed(5)}</td><td>${row.fm.toExponential(3)}</td><td>${row.width.toExponential(3)}</td>`;
         });
     }
 
     function plotFunction() {
-        const funcData = FUNCTIONS[functionSelect.value];
-        const range = funcData.range;
-        const xValues = [];
-        const yValues = [];
+        if (!state.f_compiled) { Plotly.purge(plotContainer); return; }
+        const range = state.plotRange;
+        const xValues = [], yValues = [];
         const stepSize = (range[1] - range[0]) / 400;
 
         for (let x = range[0]; x <= range[1]; x += stepSize) {
-            xValues.push(x);
-            yValues.push(funcData.fn(x));
+            try {
+                const y = state.f_compiled.evaluate({x: x});
+                if(isFinite(y)) { xValues.push(x); yValues.push(y); }
+            } catch {}
         }
         
-        const layout = {
-            title: `Plot of f(x) = ${functionSelect.value}`,
-            xaxis: { title: 'x', gridcolor: '#e0e0e0', zerolinecolor: '#9e9e9e' },
-            yaxis: { title: 'f(x)', gridcolor: '#e0e0e0', zerolinecolor: '#9e9e9e' },
-            paper_bgcolor: 'rgba(0,0,0,0)',
-            plot_bgcolor: '#ffffff',
-            margin: { l: 50, r: 25, t: 40, b: 40 },
-            shapes: []
-        };
-
-        Plotly.newPlot(plotContainer, [{ x: xValues, y: yValues, mode: 'lines', line: { color: 'royalblue' } }], layout, {responsive: true, displaylogo: false});
+        Plotly.newPlot(plotContainer, [{ x: xValues, y: yValues, mode: 'lines', line: { color: 'royalblue' } }], {
+            title: `Plot of f(x) = ${functionInput.value}`,
+            xaxis: { title: 'x', gridcolor: '#e0e0e0', zerolinecolor: '#9e9e9e', range: range },
+            yaxis: { title: 'y', gridcolor: '#e0e0e0', zerolinecolor: '#9e9e9e' },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: '#ffffff',
+            margin: { l: 50, r: 25, t: 40, b: 40 }, shapes: []
+        }, {responsive: true, displaylogo: false});
     }
     
     function updatePlotAnnotations() {
         const shapes = [
-            // Highlighted interval region
-            {
-                type: 'rect', layer: 'below',
-                xref: 'x', yref: 'paper',
-                x0: state.a, y0: 0,
-                x1: state.b, y1: 1,
-                fillcolor: 'rgba(21, 101, 192, 0.1)',
-                line: { width: 0 }
-            },
-            // Midpoint line
-            {
-                type: 'line', layer: 'above',
-                xref: 'x', yref: 'paper',
-                x0: state.m, y0: 0,
-                x1: state.m, y1: 1,
-                line: { color: 'crimson', width: 2, dash: 'dot' }
-            }
+            { type: 'rect', layer: 'below', xref: 'x', yref: 'paper', x0: state.a, y0: 0, x1: state.b, y1: 1, fillcolor: 'rgba(21, 101, 192, 0.1)', line: { width: 0 } },
+            { type: 'line', layer: 'above', xref: 'x', yref: 'paper', x0: state.m, y0: 0, x1: state.m, y1: 1, line: { color: 'crimson', width: 2, dash: 'dot' } }
         ];
         Plotly.relayout(plotContainer, { shapes: shapes });
     }
