@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Multiplication Web</title>
+    <title>Multiplication Strategy Explorer</title>
     <style>
         :root {
             --primary-color: #1565c0;
@@ -67,9 +67,7 @@
             background-color: var(--unknown-bg);
             color: var(--primary-color);
         }
-        .grid-button.unknown:hover {
-            background-color: #f0f0f0;
-        }
+        .grid-button.unknown:hover { background-color: #f0f0f0; }
         .grid-button.known {
             background-color: var(--known-bg);
             border-color: var(--known-border);
@@ -82,57 +80,64 @@
             box-shadow: 0 0 0 2px var(--primary-color);
             background-color: #e3f2fd;
         }
+        .flash {
+            animation: flash-animation 1s;
+        }
+        @keyframes flash-animation {
+            50% { background-color: #fffde7; border-color: #fdd835; }
+        }
         
-        .strategy-panel {
+        #strategy-panel {
             text-align: center;
             padding: 1.5rem;
             background-color: var(--light-gray);
             border-radius: 6px;
             margin-bottom: 1.5rem;
         }
-        .strategy-panel p {
-            font-weight: 600;
-            margin: 0 0 1rem;
-            color: var(--dark-gray);
-        }
-        .strategy-panel .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-        }
-        .strategy-panel button {
+        #strategy-panel p { font-weight: 600; margin: 0 0 1rem; color: var(--dark-gray); }
+        #strategy-panel .button-group { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        #strategy-panel button {
             background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
+            color: white; border: none; padding: 10px 15px;
+            border-radius: 4px; cursor: pointer; font-size: 0.9rem;
         }
-        .strategy-panel button.purple { background-color: #6a1b9a; }
-        .strategy-panel button.purple:hover { background-color: #7b1fa2; }
+        #strategy-panel button.purple { background-color: #6a1b9a; }
+        #strategy-panel button.purple:hover { background-color: #7b1fa2; }
+        
+        .quiz-area { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--medium-gray); }
+        .quiz-area p { font-weight: normal; font-family: monospace; font-size: 1rem; }
+        .quiz-area input {
+            width: 80px;
+            padding: 8px;
+            font-size: 1.1rem;
+            text-align: center;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            margin: 0 0.5rem;
+        }
         
         .message-area {
             text-align: center;
             font-weight: 600;
             min-height: 1.6em;
             color: var(--primary-color);
+            transition: color 0.3s;
         }
+        .message-area.error { color: var(--danger-color); }
+
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>Multiplication Web</h2>
-    <p class="info">Click on a question mark `?` to select a multiplication fact you want to solve. Then, use a strategy to unlock it. Unlock all the facts!</p>
+    <h2>Multiplication Strategy Explorer</h2>
+    <p class="info">Click a `?` to solve a multiplication fact. Then, use one of the strategies to unlock the answer!</p>
     
     <div id="grid-container" class="grid-container"></div>
     
     <div id="strategy-panel" style="display: none;">
         <p id="strategy-title"></p>
-        <div class="button-group">
-            <button id="nearby-btn">Use Nearby Fact</button>
-            <button id="distributive-btn" class="purple">Use Distributive Property</button>
-        </div>
+        <div id="strategy-buttons" class="button-group"></div>
+        <div id="quiz-area"></div>
     </div>
 
     <p id="message-area" class="message-area"></p>
@@ -140,7 +145,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- STATE & CONFIG ---
     const GRID_SIZE = 12;
     const initialUnlocked = new Set([
         ...Array.from({length: GRID_SIZE}, (_,j)=>`1x${j+1}`),
@@ -152,65 +156,98 @@ document.addEventListener('DOMContentLoaded', () => {
     let state = {
         known: withPairs(initialUnlocked),
         selectedCell: null, // { i, j, key }
-        message: 'Select a `?` to begin.'
+        message: 'Select a `?` to begin.',
+        activeStrategyData: null, // { type, answer, ... }
     };
 
-    // --- DOM REFS ---
     const gridContainer = document.getElementById('grid-container');
     const strategyPanel = document.getElementById('strategy-panel');
     const strategyTitle = document.getElementById('strategy-title');
+    const strategyButtons = document.getElementById('strategy-buttons');
+    const quizArea = document.getElementById('quiz-area');
     const messageArea = document.getElementById('message-area');
-    const nearbyBtn = document.getElementById('nearby-btn');
-    const distributiveBtn = document.getElementById('distributive-btn');
 
-    // --- HELPERS ---
     function withPairs(set) {
         const res = new Set(set);
-        set.forEach(key => {
-            const [a, b] = key.split('x');
-            res.add(`${b}x${a}`);
-        });
+        set.forEach(key => { const [a, b] = key.split('x'); res.add(`${b}x${a}`); });
         return res;
     }
 
-    // --- CORE LOGIC ---
     function handleCellClick(cellData) {
         if (state.known.has(cellData.key)) return;
         state.selectedCell = cellData;
         state.message = '';
+        state.activeStrategyData = null;
         render();
     }
 
     function unlock(key) {
+        const [i, j] = key.split('x');
         state.known = withPairs(new Set([...state.known, key]));
         state.selectedCell = null;
-        state.message = '🎉 Great job! Fact unlocked.';
+        state.activeStrategyData = null;
+        state.message = `🎉 Fact ${i} × ${j} unlocked!`;
         render();
+        // Flash the commutative pair
+        const commutativeCell = gridContainer.querySelector(`[data-key="${j}x${i}"]`);
+        if (commutativeCell) {
+            commutativeCell.classList.add('flash');
+            setTimeout(() => commutativeCell.classList.remove('flash'), 1000);
+        }
     }
 
-    function useNearbyFact() {
-        if (!state.selectedCell) return;
-        const { i, j } = state.selectedCell;
-        const prevKey = `${i}x${j - 1}`;
-        if (state.known.has(prevKey)) {
+    function checkAnswer() {
+        if (!state.activeStrategyData) return;
+        const userInput = document.getElementById('quiz-input');
+        const answer = parseInt(userInput.value);
+        if (answer === state.activeStrategyData.answer) {
             unlock(state.selectedCell.key);
         } else {
-            state.message = `You need to know ${i} × ${j - 1} first.`;
+            state.message = 'Not quite! Try calculating again.';
             renderMessage();
         }
     }
 
-    function useDistributiveProp() {
-        if (!state.selectedCell) return;
+    function presentQuiz(quiz) {
+        state.activeStrategyData = quiz;
+        state.message = '';
+        quizArea.innerHTML = `
+            <p>${quiz.prompt}</p>
+            <div style="margin-top: 0.5rem;">
+                ${quiz.calculation} = 
+                <input type="number" id="quiz-input" autofocus />
+                <button id="check-answer-btn">Check</button>
+            </div>
+        `;
+        document.getElementById('check-answer-btn').addEventListener('click', checkAnswer);
+        document.getElementById('quiz-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+    }
+
+    function setupNearbyStrategy() {
         const { i, j } = state.selectedCell;
-        for (let k = 1; k < j; k++) {
-            if (state.known.has(`${i}x${k}`) && state.known.has(`${i}x${j - k}`)) {
-                unlock(state.selectedCell.key);
-                return;
-            }
-        }
-        state.message = 'Cannot find two known facts that add up to this one.';
-        renderMessage();
+        const prevKey = `${i}x${j - 1}`;
+        const fact1 = i * (j - 1);
+        presentQuiz({
+            type: 'nearby',
+            answer: fact1 + i,
+            prompt: `We know <strong>${i} × ${j - 1} = ${fact1}</strong>.`,
+            calculation: `<strong>${fact1} + ${i}</strong>`
+        });
+    }
+
+    function setupDistributiveStrategy(parts) {
+        const { i, j } = state.selectedCell;
+        const [k1, k2] = parts;
+        const fact1 = i * k1;
+        const fact2 = i * k2;
+        presentQuiz({
+            type: 'distributive',
+            answer: fact1 + fact2,
+            prompt: `Since ${j} = ${k1} + ${k2}, we can solve this by adding <strong>(${i} × ${k1}) + (${i} × ${k2})</strong>.`,
+            calculation: `<strong>${fact1} + ${fact2}</strong>`
+        });
     }
 
     // --- RENDERING ---
@@ -222,44 +259,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderGrid() {
         gridContainer.innerHTML = '';
-        // Create headers
-        gridContainer.appendChild(document.createElement('div')); // Top-left corner
+        gridContainer.appendChild(document.createElement('div'));
         for (let i = 1; i <= GRID_SIZE; i++) {
             const header = document.createElement('div');
-            header.className = 'grid-header';
-            header.textContent = i;
+            header.className = 'grid-header'; header.textContent = i;
             gridContainer.appendChild(header);
         }
-        // Create grid
         for (let i = 1; i <= GRID_SIZE; i++) {
             const header = document.createElement('div');
-            header.className = 'grid-header';
-            header.textContent = i;
+            header.className = 'grid-header'; header.textContent = i;
             gridContainer.appendChild(header);
             for (let j = 1; j <= GRID_SIZE; j++) {
                 const key = `${i}x${j}`;
-                const cellData = { i, j, key };
                 const button = document.createElement('button');
                 button.className = 'grid-button';
+                button.dataset.key = key;
                 
                 const isKnown = state.known.has(key);
                 button.classList.add(isKnown ? 'known' : 'unknown');
                 button.disabled = isKnown;
                 button.textContent = isKnown ? i * j : '?';
                 
-                if (state.selectedCell?.key === key) {
-                    button.classList.add('selected');
-                }
+                if (state.selectedCell?.key === key) button.classList.add('selected');
                 
-                button.addEventListener('click', () => handleCellClick(cellData));
+                button.addEventListener('click', () => handleCellClick({ i, j, key }));
                 gridContainer.appendChild(button);
             }
         }
     }
 
     function renderStrategyPanel() {
+        quizArea.innerHTML = '';
         if (state.selectedCell) {
             strategyTitle.textContent = `How can we find ${state.selectedCell.i} × ${state.selectedCell.j}?`;
+            strategyButtons.innerHTML = '';
+
+            // Check for Nearby Fact strategy
+            const { i, j } = state.selectedCell;
+            const prevKey = `${i}x${j - 1}`;
+            if (j > 1 && state.known.has(prevKey)) {
+                const btn = document.createElement('button');
+                btn.textContent = 'Use Nearby Fact';
+                btn.addEventListener('click', setupNearbyStrategy);
+                strategyButtons.appendChild(btn);
+            }
+
+            // Check for Distributive Property strategy
+            for (let k = 1; k < j / 2 + 1; k++) {
+                if (state.known.has(`${i}x${k}`) && state.known.has(`${i}x${j - k}`)) {
+                    const btn = document.createElement('button');
+                    btn.textContent = `Break into (${i}x${k}) + (${i}x${j-k})`;
+                    btn.className = 'purple';
+                    btn.addEventListener('click', () => setupDistributiveStrategy([k, j - k]));
+                    strategyButtons.appendChild(btn);
+                    break; // Only show one distributive option for simplicity
+                }
+            }
+
             strategyPanel.style.display = 'block';
         } else {
             strategyPanel.style.display = 'none';
@@ -268,12 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function renderMessage() {
         messageArea.textContent = state.message;
+        messageArea.className = state.message.startsWith('🎉') ? 'message-area' : 'message-area error';
     }
     
     // --- INITIALIZATION ---
-    nearbyBtn.addEventListener('click', useNearbyFact);
-    distributiveBtn.addEventListener('click', useDistributiveProp);
-    
     render();
 });
 </script>
