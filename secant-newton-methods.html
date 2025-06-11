@@ -33,7 +33,11 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
             overflow: hidden;
+            padding: 1.5rem;
         }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;}
+        
         .tabs {
             display: flex;
             background-color: var(--light-gray);
@@ -49,11 +53,9 @@
             content: ''; position: absolute; bottom: -2px; left: 0;
             width: 100%; height: 2px; background-color: var(--primary-color);
         }
-        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content { display: none; padding: 1.5rem 0 0; } /* Adjusted padding */
         .tab-content.active { display: block; }
-        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
-        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;}
-        
+
         .controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -88,14 +90,34 @@
 </head>
 <body>
 <div class="container">
+    <h2>Advanced Root-Finding Methods</h2>
+    
+    <div class="controls">
+        <div class="control-group full-width">
+            <label for="example-select">Load an Example Problem f(x) = 0</label>
+            <select id="example-select"></select>
+        </div>
+        <div class="control-group full-width">
+            <label for="function-input">Or, Enter Your Own Function f(x):</label>
+            <input type="text" id="function-input">
+        </div>
+        <div class="control-group">
+            <label for="plot-min-input">Plot Range Min:</label>
+            <input type="number" id="plot-min-input">
+        </div>
+        <div class="control-group">
+            <label for="plot-max-input">Plot Range Max:</label>
+            <input type="number" id="plot-max-input">
+        </div>
+    </div>
+
     <div class="tabs">
         <button class="tab-button active" onclick="switchTab('secant')">Secant Method</button>
         <button class="tab-button" onclick="switchTab('newton')">Newton-Raphson Method</button>
     </div>
 
     <section id="secant-tab" class="tab-content active">
-        <h2>Secant Method</h2>
-        <p class="info">This method finds a root by drawing a secant line through the two most recent guess points (x<sub>n-1</sub>, x<sub>n</sub>) and finding its x-intercept. It requires two initial guesses but does not need to bracket the root.</p>
+        <p class="info">This method finds a root by drawing a secant line through the two most recent guess points (x<sub>n-1</sub>, x<sub>n</sub>) and finding its x-intercept. It requires two initial guesses.</p>
         
         <div class="controls">
             <div class="control-group">
@@ -114,6 +136,7 @@
             <button id="secant-start-btn">Start Iteration</button>
             <button id="secant-step-btn" class="secondary-button" disabled>Step</button>
             <button id="secant-animate-btn" class="secondary-button" disabled>Animate</button>
+            <button id="secant-reset-btn" class="danger-button">Reset</button>
         </div>
 
         <div class="log-container" style="margin-top: 1rem;">
@@ -125,8 +148,7 @@
     </section>
 
     <section id="newton-tab" class="tab-content">
-        <h2>Newton-Raphson Method</h2>
-        <p class="info">This method finds a root by drawing a tangent line at the current guess (x<sub>n</sub>) and finding its x-intercept. It is very fast but requires the function's derivative, f'(x), and can fail if f'(x) is close to zero.</p>
+        <p class="info">This method finds a root by drawing a tangent line at the current guess (x<sub>n</sub>) and finding its x-intercept. It is very fast but requires the function's derivative, f'(x).</p>
         
          <div class="controls">
             <div class="control-group">
@@ -141,6 +163,7 @@
             <button id="newton-start-btn">Start Iteration</button>
             <button id="newton-step-btn" class="secondary-button" disabled>Step</button>
             <button id="newton-animate-btn" class="secondary-button" disabled>Animate</button>
+            <button id="newton-reset-btn" class="danger-button">Reset</button>
         </div>
 
         <div class="log-container" style="margin-top: 1rem;">
@@ -150,25 +173,6 @@
             </table>
         </div>
     </section>
-
-    <div class="controls" style="margin-top: 1.5rem;">
-        <div class="control-group full-width">
-            <label for="example-select">Load an Example Problem f(x) = 0</label>
-            <select id="example-select"></select>
-        </div>
-        <div class="control-group full-width">
-            <label for="function-input">Or, Enter Your Own Function f(x):</label>
-            <input type="text" id="function-input">
-        </div>
-        <div class="control-group">
-            <label for="plot-min-input">Plot Range Min:</label>
-            <input type="number" id="plot-min-input">
-        </div>
-        <div class="control-group">
-            <label for="plot-max-input">Plot Range Max:</label>
-            <input type="number" id="plot-max-input">
-        </div>
-    </div>
 </div>
 
 <script>
@@ -183,18 +187,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- STATE & DOM REFS ---
     let state = {
-        f_compiled: null, f_prime_compiled: null, plotRange: [],
+        f_string: '', f_compiled: null, f_prime_compiled: null, plotRange: [],
         secant: { x0: 1, x1: 2, log: [], isRunning: false, animationInterval: null },
         newton: { x0: 1, log: [], isRunning: false, animationInterval: null }
     };
     
-    // Shared Controls
     const exampleSelect = document.getElementById('example-select');
     const functionInput = document.getElementById('function-input');
     const plotMinInput = document.getElementById('plot-min-input');
     const plotMaxInput = document.getElementById('plot-max-input');
     
-    // Secant Method Elements
     const secantPlot = document.getElementById('secant-plot-container');
     const secantLogBody = document.querySelector('#secant-log-table tbody');
     const secantX0Input = document.getElementById('secant-x0-input');
@@ -202,14 +204,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const secantStartBtn = document.getElementById('secant-start-btn');
     const secantStepBtn = document.getElementById('secant-step-btn');
     const secantAnimateBtn = document.getElementById('secant-animate-btn');
+    const secantResetBtn = document.getElementById('secant-reset-btn');
     
-    // Newton-Raphson Method Elements
     const newtonPlot = document.getElementById('newton-plot-container');
     const newtonLogBody = document.querySelector('#newton-log-table tbody');
     const newtonX0Input = document.getElementById('newton-x0-input');
     const newtonStartBtn = document.getElementById('newton-start-btn');
     const newtonStepBtn = document.getElementById('newton-step-btn');
     const newtonAnimateBtn = document.getElementById('newton-animate-btn');
+    const newtonResetBtn = document.getElementById('newton-reset-btn');
 
     
     // --- CORE LOGIC ---
@@ -221,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
             exampleSelect.appendChild(option);
         });
         
-        // Listeners
         exampleSelect.addEventListener('change', loadExample);
         functionInput.addEventListener('change', updateFunction);
         plotMinInput.addEventListener('change', updatePlotRanges);
@@ -232,11 +234,13 @@ document.addEventListener('DOMContentLoaded', () => {
         secantStartBtn.addEventListener('click', startSecant);
         secantStepBtn.addEventListener('click', performSecantStep);
         secantAnimateBtn.addEventListener('click', () => toggleAnimation('secant'));
+        secantResetBtn.addEventListener('click', () => reset('secant'));
 
         newtonX0Input.addEventListener('input', () => state.newton.x0 = parseFloat(newtonX0Input.value));
         newtonStartBtn.addEventListener('click', startNewton);
         newtonStepBtn.addEventListener('click', performNewtonStep);
         newtonAnimateBtn.addEventListener('click', () => toggleAnimation('newton'));
+        newtonResetBtn.addEventListener('click', () => reset('newton'));
         
         loadExample();
     }
@@ -295,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const start = document.getElementById(`${method}-start-btn`);
         const step = document.getElementById(`${method}-step-btn`);
         const animate = document.getElementById(`${method}-animate-btn`);
-        
         start.disabled = !state.f_compiled || s.isRunning;
         step.disabled = !s.isRunning;
         animate.disabled = !s.isRunning;
@@ -315,25 +318,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function performSecantStep() {
         if (!state.secant.isRunning) return false;
         const log = state.secant.log;
-        const x_prev = log[log.length - 2];
-        const x_curr = log[log.length - 1];
-
-        const f_prev = state.f_compiled.evaluate({x: x_prev});
-        const f_curr = state.f_compiled.evaluate({x: x_curr});
-
+        if (log.length < 2) return false;
+        const x_prev = log[log.length - 2], x_curr = log[log.length - 1];
+        const f_prev = state.f_compiled.evaluate({x: x_prev}), f_curr = state.f_compiled.evaluate({x: x_curr});
+        if(Math.abs(f_curr - f_prev) < 1e-9) { stopAnimation('secant'); return false; }
         const x_next = x_curr - f_curr * (x_curr - x_prev) / (f_curr - f_prev);
-        
-        if (isNaN(x_next) || !isFinite(x_next) || log.length > 50) {
-            stopAnimation('secant'); return false;
-        }
+        if (isNaN(x_next) || !isFinite(x_next) || log.length > 50) { stopAnimation('secant'); return false; }
 
         log.push(x_next);
         renderLog('secant');
         updatePlotAnnotations('secant');
 
-        if (Math.abs(x_next - x_curr) < 1e-7) {
-            stopAnimation('secant'); return false;
-        }
+        if (Math.abs(x_next - x_curr) < 1e-7) { stopAnimation('secant'); return false; }
         return true;
     }
     
@@ -352,28 +348,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!state.newton.isRunning) return false;
         const log = state.newton.log;
         const x_curr = log[log.length - 1].x;
-        
         const f_curr = state.f_compiled.evaluate({x: x_curr});
         const f_prime_curr = state.f_prime_compiled.evaluate({x: x_curr});
 
-        if (Math.abs(f_prime_curr) < 1e-9) {
-            alert("Derivative is zero or close to zero. Newton's method fails.");
-            stopAnimation('newton'); return false;
-        }
-        
+        if (Math.abs(f_prime_curr) < 1e-9) { alert("Derivative is zero. Method fails."); stopAnimation('newton'); return false; }
         const x_next = x_curr - f_curr / f_prime_curr;
-        
-        if (isNaN(x_next) || !isFinite(x_next) || log.length > 50) {
-            stopAnimation('newton'); return false;
-        }
+        if (isNaN(x_next) || !isFinite(x_next) || log.length > 50) { stopAnimation('newton'); return false; }
 
         log.push({ x: x_next, fx: f_curr, f_prime_x: f_prime_curr });
         renderLog('newton');
         updatePlotAnnotations('newton');
         
-        if (Math.abs(x_next - x_curr) < 1e-7) {
-            stopAnimation('newton'); return false;
-        }
+        if (Math.abs(x_next - x_curr) < 1e-7) { stopAnimation('newton'); return false; }
         return true;
     }
 
@@ -404,10 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const log = state[method].log;
         body.innerHTML = '';
         if (method === 'secant') {
-            log.forEach((x, i) => {
-                const tr = body.insertRow(0);
-                tr.innerHTML = `<td>${i}</td><td>${x.toFixed(6)}</td>`;
-            });
+            log.forEach((x, i) => { body.insertRow(0).innerHTML = `<td>${i}</td><td>${x.toFixed(6)}</td>`; });
         } else { // Newton
              log.forEach((row, i) => {
                 const tr = body.insertRow(0);
@@ -419,7 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function plotFunction(method) {
-        if (!state.f_compiled) return;
+        const plotEl = document.getElementById(`${method}-plot-container`);
+        if (!state.f_compiled) { Plotly.purge(plotEl); return; }
         const xValues = [], yValues = [];
         const stepSize = (state.plotRange[1] - state.plotRange[0]) / 400;
 
@@ -430,7 +414,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch {}
         }
         
-        const plotEl = document.getElementById(`${method}-plot-container`);
         Plotly.newPlot(plotEl, [{ x: xValues, y: yValues, mode: 'lines', line: { color: 'royalblue' } }], {
             title: `Plot of f(x) = ${functionInput.value}`,
             xaxis: { title: 'x', gridcolor: '#e0e0e0', zerolinecolor: '#9e9e9e', range: state.plotRange },
@@ -444,20 +427,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const log = state[method].log;
         if (log.length < 1) return;
         const shapes = [];
+        const plotEl = document.getElementById(`${method}-plot-container`);
 
         if(method === 'secant' && log.length >= 2) {
             const x_prev = log[log.length-2], x_curr = log[log.length-1];
             const f_prev = state.f_compiled.evaluate({x: x_prev}), f_curr = state.f_compiled.evaluate({x: x_curr});
             shapes.push({type: 'line', layer: 'above', xref: 'x', yref: 'y', x0: x_prev, y0: f_prev, x1: x_curr, y1: f_curr, line: { color: 'rgba(76, 175, 80, 0.7)', width: 2 }});
-        } else if (method === 'newton') {
-            const x_curr = log[log.length-1].x;
+        } else if (method === 'newton' && log.length >=2) {
+            const x_curr = log[log.length-2].x, x_next = log[log.length-1].x;
             const f_curr = state.f_compiled.evaluate({x: x_curr});
-            const f_prime_curr = state.f_prime_compiled.evaluate({x: x_curr});
-            // Tangent line goes from (x_curr, f_curr) to its x-intercept (x_next, 0)
-            const x_next = x_curr - f_curr / f_prime_curr;
             shapes.push({type: 'line', layer: 'above', xref: 'x', yref: 'y', x0: x_curr, y0: f_curr, x1: x_next, y1: 0, line: { color: 'rgba(255, 152, 0, 0.8)', width: 2 }});
         }
-        Plotly.relayout(document.getElementById(`${method}-plot-container`), { shapes: shapes });
+        Plotly.relayout(plotEl, { shapes: shapes });
     }
 
     // --- INITIALIZATION & TABS ---
@@ -466,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
         document.getElementById(`${tabName}-tab`).classList.add('active');
         document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        resetAll(); // Reset state when switching tabs
+        resetAll();
     };
     
     initialize();
