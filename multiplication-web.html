@@ -6,11 +6,12 @@
     <title>Multiplication Area Puzzle</title>
     <style>
         :root {
-            --primary-color: #1565c0; /* Blue for Target */
-            --secondary-color: #2e7d32; /* Green for Start */
+            --primary-color: #1565c0;
+            --secondary-color: #2e7d32;
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
+            --text-color: #212121;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,40 +35,44 @@
             padding: 1.5rem;
             text-align: center;
         }
-        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; }
-        
-        #infoPanel, #equation {
-            padding: 1rem;
-            background-color: var(--light-gray);
-            border-radius: 6px;
-            margin: 1.5rem 0;
-            min-height: 2.5em;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--dark-gray);
+        h2 {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
         }
-        #equation {
-             font-family: monospace;
+        
+        /* ========= Grid & Header Styles ========= */
+        .grid-wrapper { display: inline-block; margin-top: 1.5rem; }
+        
+        .header, .left-header {
+            background-color: var(--medium-gray);
+            gap: 1px;
+        }
+        .header {
+            display: grid;
+            grid-template-columns: 30px repeat(12, 40px);
+        }
+        .left-header {
+            display: grid;
+            grid-template-rows: repeat(12, 40px);
         }
 
-        .grid-wrapper { display: inline-block; }
-        .header, .left-header { background-color: var(--medium-gray); }
-        .header { display: grid; grid-template-columns: 30px repeat(12, 40px); gap: 1px; text-align: center; }
-        .left-header { display: grid; grid-template-rows: repeat(12, 40px); gap: 1px; text-align: center; }
+        /* This is the corrected rule for centering */
         .header div, .left-header div {
             background-color: var(--light-gray);
+            font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
         }
-
+        
         .grid {
             display: grid;
             grid-template-columns: repeat(12, 40px);
             gap: 1px;
             background-color: var(--medium-gray);
             margin-left: 1px;
+            cursor: crosshair;
         }
         .cell {
             width: 40px;
@@ -76,33 +81,43 @@
             border: 1px solid var(--medium-gray);
             transition: background-color 0.2s;
         }
-        .cell:hover {
+         .cell:hover {
             background-color: #e3f2fd;
         }
 
-        /* Piece colors using theme */
-        .piece-red { background: rgba(21, 101, 192, 0.25); } /* Target is now Blue */
-        .piece-green{ background: rgba(46, 125, 50, 0.25); } /* Start is Green */
-        .temp-piece { background: rgba(255, 235, 59, 0.4); } /* Preview is Yellow */
+        /* ========= Piece Colors ========= */
+        .piece-red { background: rgba(21, 101, 192, 0.25); }
+        .piece-green { background: rgba(46, 125, 50, 0.25); }
+        .temp-piece { background: rgba(255, 235, 59, 0.4); }
+        
+        /* Headers highlight */
+        .row-highlight-red, .col-highlight-red { color: var(--primary-color); }
+        .row-highlight-green, .col-highlight-green { color: var(--secondary-color); }
 
-        /* Header highlights */
-        .row-highlight-red, .col-highlight-red { color: var(--primary-color); font-weight: bold; }
-        .row-highlight-green, .col-highlight-green { color: var(--secondary-color); font-weight: bold; }
-
+        /* ========= UI Panels & Buttons ========= */
+        #infoPanel, #equation {
+            padding: 1rem;
+            background-color: var(--light-gray);
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            min-height: 2.5em;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        #equation { font-family: monospace; }
         button {
-            background-color: #d32f2f;
-            color: white;
-            border: none;
+            margin-top: 1.5rem;
             padding: 10px 20px;
-            border-radius: 4px;
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            border-radius: .25rem;
             cursor: pointer;
             font-size: 1rem;
-            margin-top: 1.5rem;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
         }
-        button:hover {
-             background-color: #c62828;
-        }
+        button:hover { background-color: #c62828; }
     </style>
 </head>
 <body>
@@ -125,9 +140,6 @@
 </div>
 
 <script>
-// NOTE: This is the user's provided JavaScript, with only a minor color change.
-// The core logic remains exactly as they provided it.
-
 /******************** Utility functions ********************/
 function buildHeaders(){
     const top=document.getElementById('topHeader');
@@ -165,7 +177,6 @@ function resetVisual(){
     document.getElementById('equation').textContent='';
 }
 function highlightHeaders(rect,color){
-    // Use try/catch to prevent errors if headers aren't found
     try {
         document.querySelector(`.rowHeader[data-row='${rect.rows}']`).classList.add(`row-highlight-${color}`);
         document.querySelector(`.colHeader[data-col='${rect.cols}']`).classList.add(`col-highlight-${color}`);
@@ -180,23 +191,18 @@ window.addEventListener('DOMContentLoaded',()=>{
     const eq=document.getElementById('equation');
 
     buildHeaders();
-    // build grid cells
     for(let r=1;r<=12;r++){
         for(let c=1;c<=12;c++){
             const cell=document.createElement('div');cell.className='cell';cell.dataset.row=r;cell.dataset.col=c;grid.appendChild(cell);
         }
     }
 
-    // ===== State =====
-    let stage=0; // 0 target,1 known,2 drawing
-    let target=null, known=null, outer=null, inner=null;
-    let missing=[];
-    let hueIdx=0;
-    let drawing=false,startCell=null;
+    let stage=0, target=null, known=null, outer=null, inner=null;
+    let missing=[], hueIdx=0, drawing=false, startCell=null;
 
     const area=r=>r.rows*r.cols;
     const nested=(a,b)=>(a.rows>=b.rows&&a.cols>=b.cols)||(b.rows>=a.rows&&b.cols>=a.cols);
-    const insideOuter=cell=>outer && (+cell.dataset.row)<=outer.rows && (+cell.dataset.col)<=outer.cols && !(+cell.dataset.row)<=inner.rows && !(+cell.dataset.col)<=inner.cols;
+    const insideOuter=cell=>outer && (+cell.dataset.row)<=outer.rows && (+cell.dataset.col)<=outer.cols && !((+cell.dataset.row)<=inner.rows && (+cell.dataset.col)<=inner.cols);
 
     function computeMissing(){
         missing=[];const dr=outer.rows-inner.rows,dc=outer.cols-inner.cols;
@@ -212,10 +218,10 @@ window.addEventListener('DOMContentLoaded',()=>{
         inner=outer===target?known:target;
         resetVisual();
         fillRect(inner, inner===target?'piece-red':'piece-green');
-        outlineRect(outer, outer===target?'#1565c0':'#2e7d32'); // Using theme colors
+        outlineRect(outer, outer===target?'#1565c0':'#2e7d32');
         highlightHeaders(target,'red');highlightHeaders(known,'green');
         computeMissing();renderEquation();
-        stage=2;info.textContent='Draw the yellow piece(s) (black border) to complete the frame.';
+        stage=2;info.textContent='Draw the piece(s) to complete the frame.';
     }
 
     function previewTemp(start,cur){
@@ -234,11 +240,10 @@ window.addEventListener('DOMContentLoaded',()=>{
         const idx=missing.findIndex(p=>!p.filled&&p.rows===rect.rows&&p.cols===rect.cols&&p.startRow===rect.startRow&&p.startCol===rect.startCol);
         if(idx===-1){alert('Piece location or size incorrect');cells.forEach(c=>c.classList.remove('temp-piece'));return;}
         const col=`hsla(${(hueIdx*67)%360},100%,50%,0.55)`;hueIdx++;
-        cells.forEach(c=>{c.classList.remove('temp-piece');c.classList.add('user-piece');c.style.backgroundColor=col;c.style.border='2px solid #424242';}); // Changed border to dark gray
+        cells.forEach(c=>{c.classList.remove('temp-piece');c.classList.add('user-piece');c.style.backgroundColor=col;c.style.border='2px solid #424242';});
         missing[idx].filled=true;updateEq();if(missing.every(p=>p.filled))info.textContent='Puzzle complete!';
     }
 
-    /**** Mouse events ****/
     grid.addEventListener('mousedown',e=>{
         const cell=e.target.closest('.cell');if(!cell)return;
         if(stage===0){
