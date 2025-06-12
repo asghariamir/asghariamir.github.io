@@ -2,21 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Multiplication Area Puzzle</title>
     <style>
         :root {
-            --primary-color: #1565c0; /* Goal */
-            --secondary-color: #2e7d32; /* Start */
-            --user-color: #ff9800; /* User-drawn */
-            --goal-rgba: rgba(21, 101, 192, 0.2);
-            --start-rgba: rgba(46, 125, 50, 0.25);
-            --user-rgba: rgba(255, 152, 0, 0.3);
+            --primary-color: #1565c0; /* Blue for Target */
+            --secondary-color: #2e7d32; /* Green for Start */
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
         }
+
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
@@ -37,312 +35,226 @@
             text-align: center;
         }
         h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; }
-        p.info { color: #616161; margin-bottom: 1.5rem; }
+        
+        #infoPanel, #equation {
+            padding: 1rem;
+            background-color: var(--light-gray);
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            min-height: 2.5em;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+        }
+        #equation {
+             font-family: monospace;
+        }
 
-        .info-panel {
-            padding: 1rem; background-color: var(--light-gray); border-radius: 6px;
-            margin-bottom: 1.5rem; text-align: center; border: 1px solid var(--medium-gray);
-            min-height: 80px;
+        .grid-wrapper { display: inline-block; }
+        .header, .left-header { background-color: var(--medium-gray); }
+        .header { display: grid; grid-template-columns: 30px repeat(12, 40px); gap: 1px; text-align: center; }
+        .left-header { display: grid; grid-template-rows: repeat(12, 40px); gap: 1px; text-align: center; }
+        .header div, .left-header div {
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
-        .info-panel p { margin: 0.25rem 0; font-size: 1.1rem; }
-        .info-panel strong { font-family: monospace; font-size: 1.2rem;}
-        .goal-text { color: var(--primary-color); }
-        .start-text { color: var(--secondary-color); }
-        
-        .grid-wrapper {
-            position: relative;
+
+        .grid {
             display: grid;
-            grid-template-columns: 30px 1fr;
-            grid-template-rows: 30px 1fr;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            aspect-ratio: 1 / 1;
+            grid-template-columns: repeat(12, 40px);
+            gap: 1px;
+            background-color: var(--medium-gray);
+            margin-left: 1px;
         }
-        .headers-col { display: grid; grid-template-columns: repeat(var(--grid-size, 12), 1fr); grid-area: 1 / 2 / 2 / 3; }
-        .headers-row { display: grid; grid-template-rows: repeat(var(--grid-size, 12), 1fr); grid-area: 2 / 1 / 3 / 2; }
-        .header-cell { display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem; }
-        
-        .grid-container {
-            grid-area: 2 / 2 / 3 / 3;
-            position: relative;
-            display: grid;
-            grid-template-columns: repeat(var(--grid-size, 12), 1fr);
-            grid-template-rows: repeat(var(--grid-size, 12), 1fr);
+        .cell {
+            width: 40px;
+            height: 40px;
+            background: #fff;
             border: 1px solid var(--medium-gray);
-            cursor: crosshair;
+            transition: background-color 0.2s;
         }
-        .grid-cell {
-            border-right: 1px solid var(--medium-gray);
-            border-bottom: 1px solid var(--medium-gray);
+        .cell:hover {
+            background-color: #e3f2fd;
         }
-        
-        .overlay-container {
-            grid-area: 2 / 2 / 3 / 3;
-            display: grid;
-            grid-template-columns: repeat(var(--grid-size, 12), 1fr);
-            grid-template-rows: repeat(var(--grid-size, 12), 1fr);
-            pointer-events: none;
-        }
-        .overlay-rectangle {
-            z-index: 1;
-            grid-column: var(--c1) / calc(var(--c2) + 1);
-            grid-row: var(--r1) / calc(var(--r2) + 1);
-        }
-        .user-overlay { pointer-events: auto; cursor: pointer; }
 
-        .goal-overlay { border: 3px solid var(--primary-color); z-index: 2;}
-        .start-overlay { background-color: var(--start-rgba); border: 2px solid var(--secondary-color); }
-        .user-overlay { background-color: var(--user-rgba); border: 2px solid var(--user-color); }
-        .preview-overlay { background-color: rgba(0,0,0,0.1); border: 1px dashed var(--dark-gray); }
+        /* Piece colors using theme */
+        .piece-red { background: rgba(21, 101, 192, 0.25); } /* Target is now Blue */
+        .piece-green{ background: rgba(46, 125, 50, 0.25); } /* Start is Green */
+        .temp-piece { background: rgba(255, 235, 59, 0.4); } /* Preview is Yellow */
 
-        .action-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;}
-        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
-        .clear-btn { background-color: #d32f2f; }
-        .swap-btn { background-color: #6c757d }
+        /* Header highlights */
+        .row-highlight-red, .col-highlight-red { color: var(--primary-color); font-weight: bold; }
+        .row-highlight-green, .col-highlight-green { color: var(--secondary-color); font-weight: bold; }
+
+        button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+             background-color: #c62828;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>Multiplication Area Puzzle</h2>
-    <p class="info">Click two cells to set a puzzle frame (Goal) and a starting piece. Then, draw the missing pieces to complete the puzzle.</p>
-    
-    <div id="info-panel"><p>Select a cell to create your puzzle frame.</p></div>
+    <div id="infoPanel">Select a multiplication (rectangle) <strong>you want to find</strong>.</div>
+    <div id="equation"></div>
 
-    <div class="grid-wrapper" id="grid-wrapper">
-        <div id="col-headers" class="headers-col"></div>
-        <div id="row-headers" class="headers-row"></div>
-        <div class="grid-container" id="grid-container">
-            <div class="overlay-container" id="overlay-container"></div>
+    <div class="grid-wrapper">
+        <div>
+            <div id="topHeader" class="header"></div>
+            <div style="display:flex;">
+                <div id="leftHeader" class="left-header"></div>
+                <div id="grid" class="grid"></div>
+            </div>
         </div>
     </div>
-    
-    <div id="action-controls" class="action-controls">
-        <button id="clear-btn" class="clear-btn">Clear All</button>
-    </div>
+
+    <button onclick="location.reload()">Clear All</button>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    let state = {
-        size: 12, firstSelection: null, secondSelection: null,
-        goalCell: null, startCell: null, userRects: [],
-        isDrawing: false, drawStart: null, solutionRects: [],
-    };
+// NOTE: This is the user's provided JavaScript, with only a minor color change.
+// The core logic remains exactly as they provided it.
 
-    const gridWrapper = document.getElementById('grid-wrapper');
-    const gridContainer = document.getElementById('grid-container');
-    const overlayContainer = document.getElementById('overlay-container');
-    const infoPanel = document.getElementById('info-panel');
-    const actionControls = document.getElementById('action-controls');
-    const colHeaders = document.getElementById('col-headers');
-    const rowHeaders = document.getElementById('row-headers');
-    
-    function render() {
-        renderGrid();
-        renderOverlays();
-        renderInfoPanel();
+/******************** Utility functions ********************/
+function buildHeaders(){
+    const top=document.getElementById('topHeader');
+    const left=document.getElementById('leftHeader');
+    top.appendChild(document.createElement('div')); // blank corner
+    for(let c=1;c<=12;c++){
+        const d=document.createElement('div');d.textContent=c;d.className='colHeader';d.dataset.col=c;top.appendChild(d);
     }
-
-    function renderGrid() {
-        if (gridContainer.children.length > 1) return; // Grid already exists
-
-        gridContainer.style.setProperty('--grid-size', state.size);
-        overlayContainer.style.setProperty('--grid-size', state.size);
-        colHeaders.style.setProperty('--grid-size', state.size);
-        rowHeaders.style.setProperty('--grid-size', state.size);
-        
-        colHeaders.innerHTML = ''; rowHeaders.innerHTML = ''; gridContainer.innerHTML = '';
-        overlayContainer.innerHTML = ''; // Crucial to clear overlays here too
-
-        for (let i = 1; i <= state.size; i++) {
-            const colHead = document.createElement('div');
-            colHead.className = 'header-cell'; colHead.textContent = i;
-            colHeaders.appendChild(colHead);
-            const rowHead = document.createElement('div');
-            rowHead.className = 'header-cell'; rowHead.textContent = i;
-            rowHeaders.appendChild(rowHead);
-        }
-
-        for (let i = 0; i < state.size * state.size; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'grid-cell';
-            cell.dataset.r = Math.floor(i / state.size) + 1;
-            cell.dataset.c = (i % state.size) + 1;
-            gridContainer.appendChild(cell);
-        }
+    for(let r=1;r<=12;r++){
+        const d=document.createElement('div');d.textContent=r;d.className='rowHeader';d.dataset.row=r;left.appendChild(d);
     }
-
-    function renderOverlays() {
-        overlayContainer.innerHTML = ''; 
-        const { goalCell, startCell, userRects } = state;
-        
-        const drawRect = (rect, className, index) => {
-            const el = createRectElement(rect, className);
-            if(index !== undefined) {
-                el.dataset.index = index;
-                el.addEventListener('click', () => removeUserRect(index));
-            }
-            overlayContainer.appendChild(el);
-        };
-        
-        if (startCell) drawRect({r1:1, c1:1, r2:startCell.r, c2:startCell.c}, 'start-overlay');
-        if (goalCell) drawRect({r1:1, c1:1, r2:goalCell.r, c2:goalCell.c}, 'goal-overlay');
-        userRects.forEach((rect, i) => drawRect(rect, 'user-overlay', i));
-    }
-
-    function createRectElement({r1, c1, r2, c2}, className) {
-        const el = document.createElement('div');
-        el.className = `overlay-rectangle ${className}`;
-        el.style.gridArea = `${Math.min(r1, r2)} / ${Math.min(c1, c2)} / ${Math.max(r1, r2) + 1} / ${Math.max(c1, c2) + 1}`;
-        return el;
-    }
-
-    function renderInfoPanel() {
-        let html = '';
-        const { goalCell, startCell, solutionRects } = state;
-        if (!goalCell) {
-            html = '<p>Select a cell to create your puzzle frame.</p>';
-        } else {
-            html = `<p class="goal-text">Goal Frame: <strong>${goalCell.r} × ${goalCell.c}</strong></p>`;
-            if (!startCell) {
-                html += '<p>Now, select a cell to place your first piece.</p>';
-            } else {
-                html += `<p class="start-text">Starting Piece: <strong>${startCell.r} × ${startCell.c}</strong></p>`;
-                if (solutionRects.length > 0) {
-                     html += `<p class="relation-text">Draw the ${solutionRects.length} missing piece(s) to complete the puzzle.</p>`;
-                } else if (goalCell.r * goalCell.c === startCell.r * startCell.c) {
-                    html += `<p class="relation-text">The pieces match perfectly. Puzzle complete!</p>`;
-                } else {
-                     html += `<p class="relation-text">You've found all the pieces! The puzzle is complete.</p>`;
-                }
-            }
-        }
-        infoPanel.innerHTML = html;
-        
-        actionControls.innerHTML = '<button id="clear-btn" class="clear-btn">Clear All</button>';
-        actionControls.querySelector('#clear-btn').onclick = clearSelection;
-        if (state.firstSelection && state.secondSelection) {
-             const swapBtn = document.createElement('button');
-             swapBtn.className = 'swap-btn'; swapBtn.textContent = 'Swap Selections';
-             swapBtn.onclick = swapRoles;
-             actionControls.appendChild(swapBtn);
-        }
-    }
-    
-    function getCellFromEvent(e) {
-        const rect = gridContainer.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        if (x < 0 || x > rect.width || y < 0 || y > rect.height) return null;
-        const c = Math.floor(x / (rect.width / state.size)) + 1;
-        const r = Math.floor(y / (rect.height / state.size)) + 1;
-        return {r, c};
-    }
-
-    function determineRolesAndSolutions() {
-        state.userRects = []; state.solutionRects = [];
-        if (!state.firstSelection || !state.secondSelection) {
-            state.goalCell = state.firstSelection; state.startCell = null;
-        } else {
-            const area1 = state.firstSelection.r * state.firstSelection.c;
-            const area2 = state.secondSelection.r * state.secondSelection.c;
-            state.goalCell = area1 >= area2 ? state.firstSelection : state.secondSelection;
-            state.startCell = area1 < area2 ? state.firstSelection : state.secondSelection;
-            
-            const { r: gr, c: gc } = state.goalCell;
-            const { r: sr, c: sc } = state.startCell;
-            
-            if (gr > sr) { state.solutionRects.push({ r1: sr + 1, c1: 1, r2: gr, c2: gc }); }
-            if (gc > sc) { state.solutionRects.push({ r1: 1, c1: sc + 1, r2: sr, c2: gc }); }
-        }
-    }
-
-    function swapRoles() {
-        [state.firstSelection, state.secondSelection] = [state.secondSelection, state.firstSelection];
-        determineRolesAndSolutions(); render();
-    }
-
-    function handleCellClick(e) {
-        if (state.isDrawing) return;
-        const cell = getCellFromEvent(e);
-        if (!cell) return;
-        
-        if (!state.firstSelection || (state.firstSelection && state.secondSelection)) {
-            clearSelection(); state.firstSelection = cell;
-        } else if (state.firstSelection.r === cell.r && state.firstSelection.c === cell.c) {
-             return;
-        } else { state.secondSelection = cell; }
-        determineRolesAndSolutions();
-        render();
-    }
-    
-    function handleMouseDown(e) {
-        const cell = getCellFromEvent(e);
-        if (cell && state.goalCell && state.startCell) {
-            state.isDrawing = true; state.drawStart = cell; e.preventDefault();
-        }
-    }
-
-    function handleMouseMove(e) {
-        if (!state.isDrawing) return;
-        gridWrapper.querySelector('.preview-overlay')?.remove();
-        const cell = getCellFromEvent(e);
-        if (cell && state.drawStart) {
-            const rect = { r1: state.drawStart.r, c1: state.drawStart.c, r2: cell.r, c2: cell.c };
-            const previewEl = createRectElement(rect, 'preview-overlay');
-            overlayContainer.appendChild(previewEl);
-        }
-    }
-    
-    function handleMouseUp(e) {
-        if (!state.isDrawing) return;
-        gridWrapper.querySelector('.preview-overlay')?.remove();
-        const cell = getCellFromEvent(e);
-        if (cell && state.drawStart) {
-            const drawnRect = { 
-                r1: Math.min(state.drawStart.r, cell.r), c1: Math.min(state.drawStart.c, cell.c),
-                r2: Math.max(state.drawStart.r, cell.r), c2: Math.max(state.drawStart.c, cell.c)
-            };
-            const key = `${drawnRect.r1}-${drawnRect.c1}-${drawnRect.r2}-${drawnRect.c2}`;
-            const matchIndex = state.solutionRects.findIndex(sol => 
-                `${sol.r1}-${sol.c1}-${sol.r2}-${sol.c2}` === key );
-
-            if (matchIndex !== -1) {
-                state.userRects.push(state.solutionRects.splice(matchIndex, 1)[0]);
-            } else {
-                alert("That's not one of the missing pieces. Try again!");
-            }
-        }
-        state.isDrawing = false; state.drawStart = null;
-        render();
-    }
-    
-    function removeUserRect(indexToRemove) {
-        const removedRect = state.userRects.splice(indexToRemove, 1);
-        if (removedRect[0]) state.solutionRects.push(removedRect[0]);
-        render();
-    }
-
-    function clearSelection() {
-        state.firstSelection = null; state.secondSelection = null;
-        state.goalCell = null; state.startCell = null;
-        state.userRects = []; state.solutionRects = [];
-        render();
-    }
-    
-    gridContainer.addEventListener('click', handleCellClick);
-    gridContainer.addEventListener('mousedown', handleMouseDown);
-    gridContainer.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    overlayContainer.addEventListener('click', (e) => { // For removing user rects
-        if (e.target.classList.contains('user-overlay')) {
-            removeUserRect(parseInt(e.target.dataset.index));
+}
+function outlineRect(rect,color){
+    const th='3px solid '+color;
+    document.querySelectorAll('.cell').forEach(cell=>{
+        const r=+cell.dataset.row,c=+cell.dataset.col;
+        if(r<=rect.rows&&c<=rect.cols){
+            if(r===1)cell.style.borderTop=th;
+            if(c===1)cell.style.borderLeft=th;
+            if(r===rect.rows)cell.style.borderBottom=th;
+            if(c===rect.cols)cell.style.borderRight=th;
         }
     });
-    
-    new ResizeObserver(render).observe(gridWrapper);
-    render();
+}
+function fillRect(rect,cls){
+    document.querySelectorAll('.cell').forEach(cell=>{
+        const r=+cell.dataset.row,c=+cell.dataset.col;
+        if(r<=rect.rows&&c<=rect.cols)cell.classList.add(cls);
+    });
+}
+function resetVisual(){
+    document.querySelectorAll('.cell').forEach(cell=>{cell.className='cell';cell.style.border='';});
+    document.querySelectorAll('.rowHeader').forEach(h=>h.className='rowHeader');
+    document.querySelectorAll('.colHeader').forEach(h=>h.className='colHeader');
+    document.getElementById('equation').textContent='';
+}
+function highlightHeaders(rect,color){
+    // Use try/catch to prevent errors if headers aren't found
+    try {
+        document.querySelector(`.rowHeader[data-row='${rect.rows}']`).classList.add(`row-highlight-${color}`);
+        document.querySelector(`.colHeader[data-col='${rect.cols}']`).classList.add(`col-highlight-${color}`);
+    } catch(e) {
+        console.warn("Could not highlight headers for rect:", rect);
+    }
+}
+/******************** Main ********************/
+window.addEventListener('DOMContentLoaded',()=>{
+    const grid=document.getElementById('grid');
+    const info=document.getElementById('infoPanel');
+    const eq=document.getElementById('equation');
+
+    buildHeaders();
+    // build grid cells
+    for(let r=1;r<=12;r++){
+        for(let c=1;c<=12;c++){
+            const cell=document.createElement('div');cell.className='cell';cell.dataset.row=r;cell.dataset.col=c;grid.appendChild(cell);
+        }
+    }
+
+    // ===== State =====
+    let stage=0; // 0 target,1 known,2 drawing
+    let target=null, known=null, outer=null, inner=null;
+    let missing=[];
+    let hueIdx=0;
+    let drawing=false,startCell=null;
+
+    const area=r=>r.rows*r.cols;
+    const nested=(a,b)=>(a.rows>=b.rows&&a.cols>=b.cols)||(b.rows>=a.rows&&b.cols>=a.cols);
+    const insideOuter=cell=>outer && (+cell.dataset.row)<=outer.rows && (+cell.dataset.col)<=outer.cols && !(+cell.dataset.row)<=inner.rows && !(+cell.dataset.col)<=inner.cols;
+
+    function computeMissing(){
+        missing=[];const dr=outer.rows-inner.rows,dc=outer.cols-inner.cols;
+        if(dc>0)missing.push({rows:inner.rows,cols:dc,startRow:1,startCol:inner.cols+1,filled:false});
+        if(dr>0)missing.push({rows:dr,cols:inner.cols,startRow:inner.rows+1,startCol:1,filled:false});
+        if(dr>0&&dc>0)missing.push({rows:dr,cols:dc,startRow:inner.rows+1,startCol:inner.cols+1,filled:false});
+    }
+    function renderEquation(){const op=area(target)<area(known)?'-':'+';eq.innerHTML=`${target.rows}×${target.cols} = ${known.rows}×${known.cols} ${op} `+missing.map((_,i)=>`<span id='p${i}'>___</span>`).join(` ${op} `);}  
+    function updateEq(){missing.forEach((p,i)=>{if(p.filled){document.getElementById(`p${i}`).textContent=`${p.rows}×${p.cols}`;}});}  
+
+    function setupPuzzle(){
+        outer=area(target)>=area(known)?target:known;
+        inner=outer===target?known:target;
+        resetVisual();
+        fillRect(inner, inner===target?'piece-red':'piece-green');
+        outlineRect(outer, outer===target?'#1565c0':'#2e7d32'); // Using theme colors
+        highlightHeaders(target,'red');highlightHeaders(known,'green');
+        computeMissing();renderEquation();
+        stage=2;info.textContent='Draw the yellow piece(s) (black border) to complete the frame.';
+    }
+
+    function previewTemp(start,cur){
+        document.querySelectorAll('.temp-piece').forEach(c=>c.classList.remove('temp-piece'));
+        const sr=+start.dataset.row,sc=+start.dataset.col,er=+cur.dataset.row,ec=+cur.dataset.col;
+        const minR=Math.min(sr,er),maxR=Math.max(sr,er),minC=Math.min(sc,ec),maxC=Math.max(sc,ec);
+        for(let r=minR;r<=maxR;r++)for(let c=minC;c<=maxC;c++){
+            const cell=document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+            if(cell && insideOuter(cell))cell.classList.add('temp-piece');
+        }
+    }
+    function commitPiece(){
+        const cells=[...document.querySelectorAll('.temp-piece')];if(!cells.length)return;
+        const rs=cells.map(c=>+c.dataset.row), cs=cells.map(c=>+c.dataset.col);
+        const rect={startRow:Math.min(...rs),startCol:Math.min(...cs),rows:Math.max(...rs)-Math.min(...rs)+1,cols:Math.max(...cs)-Math.min(...cs)+1};
+        const idx=missing.findIndex(p=>!p.filled&&p.rows===rect.rows&&p.cols===rect.cols&&p.startRow===rect.startRow&&p.startCol===rect.startCol);
+        if(idx===-1){alert('Piece location or size incorrect');cells.forEach(c=>c.classList.remove('temp-piece'));return;}
+        const col=`hsla(${(hueIdx*67)%360},100%,50%,0.55)`;hueIdx++;
+        cells.forEach(c=>{c.classList.remove('temp-piece');c.classList.add('user-piece');c.style.backgroundColor=col;c.style.border='2px solid #424242';}); // Changed border to dark gray
+        missing[idx].filled=true;updateEq();if(missing.every(p=>p.filled))info.textContent='Puzzle complete!';
+    }
+
+    /**** Mouse events ****/
+    grid.addEventListener('mousedown',e=>{
+        const cell=e.target.closest('.cell');if(!cell)return;
+        if(stage===0){
+            target={rows:+cell.dataset.row,cols:+cell.dataset.col};
+            fillRect(target,'piece-red');outlineRect(target,'#1565c0');highlightHeaders(target,'red');
+            stage=1;info.textContent='Now select a multiplication you already KNOW (must nest).';
+        }else if(stage===1){
+            known={rows:+cell.dataset.row,cols:+cell.dataset.col};
+            if(!nested(target,known)){alert('Must nest with first rectangle');return;}
+            setupPuzzle();
+        }else if(stage===2&&insideOuter(cell)){
+            drawing=true;startCell=cell;previewTemp(cell,cell);
+        }
+    });
+    grid.addEventListener('mousemove',e=>{if(drawing&&stage===2){const cell=e.target.closest('.cell');if(cell)previewTemp(startCell,cell);}});
+    window.addEventListener('mouseup',()=>{if(drawing){commitPiece();drawing=false;startCell=null;}});
 });
 </script>
 </body>
