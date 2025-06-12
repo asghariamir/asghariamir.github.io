@@ -1,365 +1,331 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Multiplication Area Explorer</title>
-    <style>
-        :root {
-            --primary-color: #1565c0; /* Goal color */
-            --secondary-color: #2e7d32; /* Start color */
-            --user-color: #ff9800; /* User-drawn color */
-            --goal-rgba: rgba(21, 101, 192, 0.2);
-            --start-rgba: rgba(46, 125, 50, 0.2);
-            --user-rgba: rgba(255, 152, 0, 0.3);
-            --light-gray: #f5f5f5;
-            --medium-gray: #e0e0e0;
-            --dark-gray: #424242;
-        }
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            background-color: var(--light-gray);
-            color: var(--dark-gray);
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-        }
-        .container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            padding: 1.5rem;
-            text-align: center;
-        }
-        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; }
-        p.info { color: #616161; margin-bottom: 1.5rem; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Multiplication Area Explorer</title>
 
-        .info-panel {
-            padding: 1rem; background-color: var(--light-gray); border-radius: 6px;
-            margin-bottom: 1.5rem; text-align: center; border: 1px solid var(--medium-gray);
-            min-height: 80px;
-        }
-        .info-panel p { margin: 0.25rem 0; font-size: 1.1rem; }
-        .info-panel strong { font-family: monospace; font-size: 1.2rem;}
-        .goal-text { color: var(--primary-color); }
-        .start-text { color: var(--secondary-color); }
-        .info-panel .relation-text { font-style: italic; color: var(--dark-gray); margin-top: 0.75rem; }
+<style>
+/* ──────────── colour palette ──────────── */
+:root{
+  --goal-col:   #1565c0;                      /* blue  */
+  --start-col:  #2e7d32;                      /* green */
+  --user-col:   #ff9800;                      /* yellow*/
 
-        .grid-wrapper {
-            position: relative;
-            display: grid;
-            grid-template-columns: 30px 1fr;
-            grid-template-rows: 30px 1fr;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            aspect-ratio: 1 / 1;
-        }
-        .headers-col { display: grid; grid-template-columns: repeat(var(--grid-size, 12), 1fr); grid-area: 1 / 2 / 2 / 3; }
-        .headers-row { display: grid; grid-template-rows: repeat(var(--grid-size, 12), 1fr); grid-area: 2 / 1 / 3 / 2; }
-        .header-cell { display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem; }
-        
-        .grid-container {
-            position: relative;
-            display: grid;
-            grid-template-columns: repeat(var(--grid-size, 12), 1fr);
-            grid-template-rows: repeat(var(--grid-size, 12), 1fr);
-            border: 1px solid var(--medium-gray);
-            cursor: crosshair;
-            grid-area: 2 / 2 / 3 / 3;
-        }
-        .grid-cell {
-            border-right: 1px solid var(--medium-gray);
-            border-bottom: 1px solid var(--medium-gray);
-        }
-        
-        .overlay-container {
-            position: absolute;
-            grid-area: 2 / 2 / 3 / 3;
-            grid-template-columns: repeat(var(--grid-size, 12), 1fr);
-            grid-template-rows: repeat(var(--grid-size, 12), 1fr);
-            display: grid;
-            pointer-events: none;
-        }
-        .overlay-rectangle {
-            z-index: 1; border-radius: 2px;
-            grid-column: var(--c1) / calc(var(--c2) + 1);
-            grid-row: var(--r1) / calc(var(--r2) + 1);
-        }
-        .user-overlay { pointer-events: auto; cursor: pointer; }
+  --goal-rgba:  rgba(21,101,192,.25);
+  --start-rgba: rgba(46,125,50,.25);
+  --user-rgba:  rgba(255,152,0,.25);
 
-        .goal-overlay { background-color: var(--goal-rgba); border: 2px solid var(--primary-color); }
-        .start-overlay { background-color: var(--start-rgba); border: 2px solid var(--secondary-color); }
-        .user-overlay { background-color: var(--user-rgba); border: 2px solid var(--user-color); }
-        .preview-overlay { background-color: rgba(0,0,0,0.1); border: 1px dashed var(--dark-gray); }
-
-        .action-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;}
-        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
-        .check-btn { background-color: #4caf50; }
-        .clear-btn { background-color: #d32f2f; }
-        .swap-btn { background-color: #6c757d }
-    </style>
+  --lt-grey:#f5f5f5;
+  --md-grey:#d0d0d0;
+  --dk-grey:#444;
+  --shadow :0 4px 10px rgba(0,0,0,.08);
+}
+/* ──────────── base reset ──────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background:var(--lt-grey);
+  color:var(--dk-grey);
+  display:flex;justify-content:center;padding:1rem
+}
+/* ──────────── card wrapper ──────────── */
+.card{
+  width:100%;max-width:860px;padding:1.4rem 1.6rem;
+  background:#fff;border-radius:8px;box-shadow:var(--shadow)
+}
+h2{font-size:1.75rem;margin-bottom:.4rem;color:var(--goal-col);text-align:center}
+.tab-bar{display:flex;margin-bottom:1rem;border-bottom:2px solid var(--md-grey)}
+.tab{
+  flex:1;text-align:center;padding:.6rem 0;cursor:pointer;font-weight:500;
+  border-bottom:3px solid transparent
+}
+.tab.active{border-color:var(--goal-col);color:var(--goal-col)}
+/* ──────────── info panel ──────────── */
+.info{background:var(--lt-grey);border:1px solid var(--md-grey);
+      border-radius:6px;padding:1rem;margin-bottom:1rem;text-align:center;min-height:92px}
+.info p{margin:.25rem 0}
+.info b{font-weight:600}
+.info .eq{margin-top:.8rem;font-style:italic}
+/* ──────────── grid ──────────── */
+.wrap{position:relative;display:inline-block;cursor:crosshair}
+.box{overflow:auto}
+table{border-collapse:collapse}
+th,td{
+  width:42px;height:42px;border:1px solid var(--md-grey);
+  text-align:center;font-size:.9rem;user-select:none
+}
+th{background:var(--lt-grey);font-weight:600}
+td{background:#fff;cursor:pointer}
+/* ──────────── overlay rectangles ──────────── */
+.layer{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
+.rect{position:absolute;border-radius:2px}
+.goal  {background:var(--goal-rgba);  border:2px solid var(--goal-col)}
+.start {background:var(--start-rgba); border:2px solid var(--start-col)}
+.user  {background:var(--user-rgba);  border:2px solid var(--user-col)}
+.preview{background:rgba(0,0,0,.10);border:1px dashed var(--dk-grey)}
+/* ──────────── buttons ──────────── */
+.btn-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin-top:1.2rem}
+button{
+  border:none;border-radius:4px;padding:9px 14px;color:#fff;cursor:pointer;font-weight:500
+}
+.clear{background:#d32f2f}
+.swap {background:#6c6f75}
+.check{background:#4caf50}
+button:disabled{opacity:.5;cursor:default}
+#sentence{display:none}
+</style>
 </head>
 <body>
-<div class="container">
-    <h2>Multiplication Area Explorer</h2>
-    <p class="info">Click two cells to define a Goal and a Starting Area. Then, click and drag to draw the exact rectangle(s) that connect them.</p>
-    
-    <div id="info-panel"><p>Select a cell to begin.</p></div>
 
-    <div class="grid-wrapper" id="grid-wrapper">
-        <div id="col-headers" class="headers-col"></div>
-        <div id="row-headers" class="headers-row"></div>
-        <div class="grid-container" id="grid-container"></div>
-    </div>
-    
-    <div id="action-controls" class="action-controls">
-        <button id="clear-btn" class="clear-btn">Clear All</button>
-    </div>
+<div class="card">
+  <h2>Multiplication Area Explorer</h2>
+
+  <!-- tabs -->
+  <div class="tab-bar">
+    <div class="tab active" data-tab="visual">Visual Explorer</div>
+    <div class="tab"        data-tab="sentence">Number Sentence</div>
+  </div>
+
+  <!-- info / equation panel -->
+  <div id="info" class="info"></div>
+
+  <!-- grid -->
+  <div class="wrap" id="wrap">
+    <div class="box"  id="box"></div>
+    <div class="layer" id="layer"></div>
+  </div>
+
+  <!-- buttons -->
+  <div class="btn-bar">
+    <button class="clear" id="clear">Clear All</button>
+    <button class="swap"  id="swap" disabled>Swap Selections</button>
+    <!-- “Check” gets injected once all pieces are drawn -->
+  </div>
+
+  <!-- number-sentence tab -->
+  <div id="sentence"></div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    let state = {
-        size: 12, firstSelection: null, secondSelection: null,
-        goalCell: null, startCell: null, userRects: [],
-        isDrawing: false, drawStart: null, solutionRects: [],
-    };
+/* ──────────────────────── helpers ──────────────────────── */
+const N = 12;                                              // grid size
+const $ = id => document.getElementById(id);
+const box   = $('box');
+const layer = $('layer');
+const info  = $('info');
+const wrap  = $('wrap');
+const swapB = $('swap');
+const clearB= $('clear');
+const sentenceTab = $('sentence');
+const tabEls = document.querySelectorAll('.tab');
 
-    const gridWrapper = document.getElementById('grid-wrapper');
-    const gridContainer = document.getElementById('grid-container');
-    const infoPanel = document.getElementById('info-panel');
-    const actionControls = document.getElementById('action-controls');
-    const colHeaders = document.getElementById('col-headers');
-    const rowHeaders = document.getElementById('row-headers');
-    
-    function render() {
-        renderGrid();
-        renderOverlays();
-        renderInfoPanel();
-    }
+/* canonicalise rectangle {r1,c1,r2,c2} so r1<=r2, c1<=c2 */
+const canon = r => {
+  const r1 = Math.min(r.r1,r.r2), c1 = Math.min(r.c1,r.c2),
+        r2 = Math.max(r.r1,r.r2), c2 = Math.max(r.c1,r.c2);
+  return {r1,c1,r2,c2};
+};
 
-    function renderGrid() {
-        if (gridContainer.children.length === state.size * state.size) return;
-        
-        [gridContainer, colHeaders, rowHeaders].forEach(el => {
-            el.innerHTML = '';
-            el.style.setProperty('--grid-size', state.size);
-        });
+const area = r => (r.r2 - r.r1 + 1) * (r.c2 - r.c1 + 1);
+const sameRect = (a,b) => a.r1===b.r1&&a.c1===b.c1&&a.r2===b.r2&&a.c2===b.c2;
 
-        for (let i = 1; i <= state.size; i++) {
-            const colHead = document.createElement('div');
-            colHead.className = 'header-cell'; colHead.textContent = i;
-            colHeaders.appendChild(colHead);
-            const rowHead = document.createElement('div');
-            rowHead.className = 'header-cell'; rowHead.textContent = i;
-            rowHeaders.appendChild(rowHead);
-        }
+/* ──────────────────────── build grid ───────────────────── */
+const makeGrid = () => {
+  let h='<table id="grid"><thead><tr><th></th>';
+  for(let c=1;c<=N;c++) h+=`<th>${c}</th>`;
+  h+='</tr></thead><tbody>';
+  for(let r=1;r<=N;r++){
+    h+=`<tr><th>${r}</th>`;
+    for(let c=1;c<=N;c++) h+=`<td data-r="${r}" data-c="${c}"></td>`;
+    h+='</tr>';
+  }
+  box.innerHTML = h+'</tbody></table>';
+};
+makeGrid();
 
-        for (let i = 0; i < state.size * state.size; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'grid-cell';
-            cell.dataset.r = Math.floor(i / state.size) + 1;
-            cell.dataset.c = (i % state.size) + 1;
-            gridContainer.appendChild(cell);
-        }
-    }
+/* ──────────────────────── state ────────────────────────── */
+const S = {
+  first:null,            // first click {r,c}
+  goal:null,             // larger {r,c}
+  start:null,            // smaller {r,c}
+  solution:[],           // required transfer rectangles
+  drawn:[],              // user-accepted rectangles
+  dragging:false,
+  dragStart:null
+};
 
-    function renderOverlays() {
-        gridContainer.querySelectorAll('.overlay-rectangle').forEach(el => el.remove());
-        
-        const drawRect = (r, c, className) => gridContainer.appendChild(createRectElement({r1:1, c1:1, r2:r, c2:c}, className));
-        const drawUserRect = (rect, i) => {
-            const el = createRectElement(rect, 'user-overlay');
-            el.dataset.index = i;
-            el.addEventListener('click', () => removeUserRect(i));
-            gridContainer.appendChild(el);
-        };
-        
-        if (state.startCell) drawRect(state.startCell.r, state.startCell.c, 'start-overlay');
-        if (state.goalCell) drawRect(state.goalCell.r, state.goalCell.c, 'goal-overlay');
-        state.userRects.forEach((rect, i) => drawUserRect(rect, i));
-    }
+/* ───────────────────── overlay drawing ─────────────────── */
+const cellRect = (r,c) => {
+  const t = $('grid');
+  const td = t.querySelector(`td[data-r="${r}"][data-c="${c}"]`);
+  const base = box.getBoundingClientRect();
+  const rect = td.getBoundingClientRect();
+  return {x:rect.left-base.left,y:rect.top-base.top,w:rect.width,h:rect.height};
+};
+const extentRect = (r1,c1,r2,c2) => {
+  const {w,h} = cellRect(1,1);
+  const x0=Math.min(c1,c2)-1, y0=Math.min(r1,r2)-1;
+  return {left:x0*w, top:y0*h, width:(Math.abs(c1-c2)+1)*w, height:(Math.abs(r1-r2)+1)*h};
+};
+const addRect = (ext,cls,idx=null) => {
+  const d=document.createElement('div');
+  d.className=`rect ${cls}`;
+  d.style.cssText=`left:${ext.left}px;top:${ext.top}px;width:${ext.width}px;height:${ext.height}px`;
+  if(idx!==null){ d.dataset.idx=idx; d.style.cursor='pointer'; }
+  layer.appendChild(d);
+};
+const paint = () => {
+  layer.innerHTML='';
+  if(S.goal)  addRect(extentRect(1,1,S.goal.r,S.goal.c),'goal');
+  if(S.start) addRect(extentRect(1,1,S.start.r,S.start.c),'start');
+  S.drawn.forEach((r,i)=> addRect(extentRect(r.r1,r.c1,r.r2,r.c2),'user',i));
+};
 
-    function createRectElement({r1, c1, r2, c2}, className) {
-        const overlay = document.createElement('div');
-        overlay.className = `overlay-rectangle ${className}`;
-        overlay.style.gridArea = `${Math.min(r1, r2)} / ${Math.min(c1, c2)} / ${Math.max(r1, r2) + 1} / ${Math.max(c1, c2) + 1}`;
-        return overlay;
-    }
+/* ─────────────────── solution generation ───────────────── */
+const genSolution = () => {
+  const {goal,start}=S;
+  if(!goal||!start) return [];
+  const sol=[];
+  if(start.r < goal.r){ // vertical strip
+    sol.push({r1:start.r+1,c1:1,r2:goal.r,c2:goal.c});
+  }
+  if(start.c < goal.c){ // horizontal strip
+    sol.push({r1:1,c1:start.c+1,r2:start.r,c2:goal.c});
+  }
+  return sol.map(canon);
+};
 
-    function renderInfoPanel() {
-        let html = '';
-        const { goalCell, startCell, solutionRects, userRects } = state;
+/* ─────────────────── info / sentence panels ────────────── */
+const updateInfo = (msgEq='') =>{
+  if(!S.goal){
+    info.innerHTML='<p>Click a cell to choose your <b>Goal Area</b>.</p>'; return;
+  }
+  if(!S.start){
+    info.innerHTML=`<p>Goal Area: <b>${S.goal.r}×${S.goal.c}</b> = ${S.goal.r*S.goal.c}</p>
+                    <p>Now pick a <b>Start Area</b>.</p>`; return;
+  }
+  info.innerHTML=`<p style="color:var(--goal-col)">Goal: <b>${S.goal.r}×${S.goal.c}</b> = ${S.goal.r*S.goal.c}</p>
+                  <p style="color:var(--start-col)">Start: <b>${S.start.r}×${S.start.c}</b> = ${S.start.r*S.start.c}</p>
+                  <p>Draw the missing rectangle${S.solution.length>1?'s':''}.</p>
+                  ${msgEq}`;
+};
+const updateSentenceTab = () =>{
+  if(!S.goal||!S.start) {sentenceTab.innerHTML='';return;}
+  let terms=[`${S.start.r}×${S.start.c}`];
+  S.drawn.forEach(r=>terms.push(`${r.r2-r.r1+1}×${r.c2-r.c1+1}`));
+  const expr = `${S.goal.r}×${S.goal.c} = ${terms.join(' + ')}`;
+  const areas = `${S.goal.r*S.goal.c} = ${terms.map(t=>{
+      const [a,b]=t.split('×').map(Number);return a*b;}).join(' + ')}`;
+  sentenceTab.innerHTML=`<h3 style="margin-bottom:.5rem">Number Sentence</h3>
+     <p>${expr}</p><p>${areas}</p>`;
+};
 
-        if (!goalCell) { html = '<p>Select a cell to define the <strong>Goal Area</strong>.</p>'; } 
-        else {
-            html = `<p class="goal-text">Goal: <strong>${goalCell.r} × ${goalCell.c}</strong></p>`;
-            if (!startCell) { html += '<p>Now, select a <strong>Starting Area</strong>.</p>'; } 
-            else {
-                html += `<p class="start-text">Start: <strong>${startCell.r} × ${startCell.c}</strong></p>`;
-                if (solutionRects.length > 0) {
-                     html += `<p class="relation-text">Draw the ${solutionRects.length} missing piece(s).</p>`;
-                } else if (userRects.length > 0) {
-                     html += `<p class="relation-text">You have found all the pieces! Click "Check My Work".</p>`;
-                }
-            }
-        }
-        infoPanel.innerHTML = html;
-        
-        actionControls.innerHTML = '<button id="clear-btn" class="clear-btn">Clear All</button>';
-        actionControls.querySelector('#clear-btn').onclick = clearSelection;
-        if (state.firstSelection && state.secondSelection) {
-             const swapBtn = document.createElement('button');
-             swapBtn.className = 'swap-btn'; swapBtn.textContent = 'Swap Selections';
-             swapBtn.onclick = swapRoles;
-             actionControls.appendChild(swapBtn);
-        }
-        if (solutionRects.length === 0 && startCell) {
-            const checkBtn = document.createElement('button');
-            checkBtn.className = 'check-btn'; checkBtn.textContent = 'Check My Work';
-            checkBtn.onclick = checkWork;
-            actionControls.appendChild(checkBtn);
-        }
-    }
-    
-    function checkWork() {
-        const goalArea = state.goalCell.r * state.goalCell.c;
-        const startArea = state.startCell.r * state.startCell.c;
-        let userArea = 0;
-        state.userRects.forEach(rect => {
-            userArea += (Math.abs(rect.r1 - rect.r2) + 1) * (Math.abs(rect.c1 - rect.c2) + 1);
-        });
+/* ───────────────── buttons / tabs ──────────────────────── */
+const updateButtons = ()=>{
+  swapB.disabled = !(S.goal&&S.start);
+  // add/remove Check button
+  const bar=document.querySelector('.btn-bar');
+  bar.querySelector('.check')?.remove();
+  const solved = S.drawn.length===S.solution.length && S.solution.every(sol =>
+      S.drawn.some(d=>sameRect(d,sol)));
+  if(solved){
+    const btn=document.createElement('button');
+    btn.className='check';btn.textContent='Check My Work';
+    btn.onclick=()=>updateInfo('<span style="color:var(--user-col)">Nice! Everything matches.</span>');
+    bar.appendChild(btn);
+  }
+};
 
-        if (goalArea > startArea) {
-            if (startArea + userArea === goalArea) { alert(`Correct! You've shown that ${startArea} + ${userArea} = ${goalArea}.`); }
-            else { alert(`Not quite! Your constructed area is ${startArea + userArea}, but the goal is ${goalArea}.`); }
-        } else {
-            if (startArea - userArea === goalArea) { alert(`Correct! You've shown that ${startArea} - ${userArea} = ${goalArea}.`); }
-            else { alert(`Not quite! Your result is ${startArea - userArea}, but the goal is ${goalArea}.`); }
-        }
-    }
-    
-    function getCellFromEvent(e) {
-        const el = e.target;
-        if(el && el.classList.contains('grid-cell')) {
-            return { r: parseInt(el.dataset.r), c: parseInt(el.dataset.c) };
-        }
-        return null;
-    }
+/* ─────────────────── click-cell handling ───────────────── */
+const cellFromEl = el => el.dataset ? {r:+el.dataset.r,c:+el.dataset.c} : null;
 
-    function determineRolesAndSolutions() {
-        state.userRects = []; state.solutionRects = [];
-        if (!state.firstSelection || !state.secondSelection) {
-            state.goalCell = state.firstSelection; state.startCell = null;
-        } else {
-            const area1 = state.firstSelection.r * state.firstSelection.c;
-            const area2 = state.secondSelection.r * state.secondSelection.c;
-            state.goalCell = area1 > area2 ? state.firstSelection : state.secondSelection;
-            state.startCell = area1 > area2 ? state.secondSelection : state.firstSelection;
-            
-            const { r: gr, c: gc } = state.goalCell;
-            const { r: sr, c: sc } = state.startCell;
-            
-            if (gc > sc) { state.solutionRects.push({ r1: 1, c1: sc + 1, r2: sr, c2: gc }); }
-            if (gr > sr) { state.solutionRects.push({ r1: sr + 1, c1: 1, r2: gr, c2: gc }); }
-        }
-    }
+box.addEventListener('click',e=>{
+  const cell=cellFromEl(e.target); if(!cell) return;
 
-    function swapRoles() {
-        [state.firstSelection, state.secondSelection] = [state.secondSelection, state.firstSelection];
-        determineRolesAndSolutions(); render();
-    }
-
-    function handleCellClick(e) {
-        const cell = getCellFromEvent(e);
-        if (!cell) return;
-        
-        if (!state.firstSelection || (state.firstSelection && state.secondSelection)) {
-            clearSelection(); state.firstSelection = cell;
-        } else if (state.firstSelection.r === cell.r && state.firstSelection.c === cell.c) {
-             return; // Clicking the same cell twice does nothing
-        } else {
-            state.secondSelection = cell;
-        }
-        determineRolesAndSolutions();
-        render();
-    }
-    
-    function handleMouseDown(e) {
-        const cell = getCellFromEvent(e);
-        if (cell && state.goalCell && state.startCell) {
-            state.isDrawing = true; state.drawStart = cell; e.preventDefault();
-        }
-    }
-
-    function handleMouseMove(e) {
-        if (!state.isDrawing) return;
-        gridContainer.querySelector('.preview-overlay')?.remove();
-        const cell = getCellFromEvent(e.target);
-        if (cell && state.drawStart) {
-            const rect = { r1: state.drawStart.r, c1: state.drawStart.c, r2: cell.r, c2: cell.c };
-            const previewEl = createRectElement(rect, 'preview-overlay');
-            gridContainer.appendChild(previewEl);
-        }
-    }
-    
-    function handleMouseUp(e) {
-        if (!state.isDrawing) return;
-        gridContainer.querySelector('.preview-overlay')?.remove();
-        const cell = getCellFromEvent(e.target);
-        if (cell && state.drawStart) {
-            const drawnRect = { 
-                r1: Math.min(state.drawStart.r, cell.r), c1: Math.min(state.drawStart.c, cell.c),
-                r2: Math.max(state.drawStart.r, cell.r), c2: Math.max(state.drawStart.c, cell.c)
-            };
-            const key = `${drawnRect.r1}-${drawnRect.c1}-${drawnRect.r2}-${drawnRect.c2}`;
-            const matchIndex = state.solutionRects.findIndex(sol => 
-                `${sol.r1}-${sol.c1}-${sol.r2}-${sol.c2}` === key
-            );
-            if (matchIndex !== -1) {
-                state.userRects.push(state.solutionRects[matchIndex]);
-                state.solutionRects.splice(matchIndex, 1);
-            } else {
-                alert("That's not one of the missing pieces. Try again!");
-            }
-        }
-        state.isDrawing = false;
-        state.drawStart = null;
-        render();
-    }
-    
-    function removeUserRect(indexToRemove) {
-        const removedRect = state.userRects.splice(indexToRemove, 1);
-        if (removedRect[0]) state.solutionRects.push(removedRect[0]);
-        render();
-    }
-
-    function clearSelection() {
-        state.firstSelection = null; state.secondSelection = null;
-        state.goalCell = null; state.startCell = null;
-        state.userRects = []; state.solutionRects = [];
-        render();
-    }
-    
-    gridContainer.addEventListener('click', handleCellClick);
-    gridContainer.addEventListener('mousedown', handleMouseDown);
-    gridContainer.addEventListener('mousemove', handleMouseMove);
-    gridContainer.addEventListener('mouseup', handleMouseUp);
-    gridContainer.addEventListener('click', (e) => { // For removing user rects
-        if (e.target.classList.contains('user-overlay')) {
-            removeUserRect(parseInt(e.target.dataset.index));
-        }
-    });
-    
-    new ResizeObserver(render).observe(gridWrapper);
-    render();
+  if(!S.first){                       // very first click
+    S.first=cell; S.goal=cell; S.start=null;
+  }else if(!S.goal||!S.start){        // selecting second cell
+    const second=cell;
+    const area1=S.first.r*S.first.c;
+    const area2=second.r*second.c;
+    if(area1===area2) return;         // ignore identical area
+    if(area1>area2){ S.goal=S.first; S.start=second;}
+    else           { S.goal=second;  S.start=S.first;}
+    S.solution=genSolution();
+    S.drawn=[];
+  }else{                              // both chosen → start over with new first
+    S.first=cell; S.goal=cell; S.start=null; S.solution=[]; S.drawn=[];
+  }
+  paint(); updateInfo(); updateSentenceTab(); updateButtons();
 });
+
+/* ─────────────────── drawing rectangles ───────────────── */
+wrap.addEventListener('mousedown',e=>{
+  if(!S.goal||!S.start) return;
+  const cell=cellFromEl(e.target); if(!cell) return;
+  S.dragging=true; S.dragStart=cell;
+});
+window.addEventListener('mousemove',e=>{
+  if(!S.dragging) return;
+  layer.querySelector('.preview')?.remove();
+  const cell=cellFromEl(e.target); if(!cell) return;
+  const ext=extentRect(S.dragStart.r,S.dragStart.c,cell.r,cell.c);
+  addRect(ext,'preview');
+});
+window.addEventListener('mouseup',e=>{
+  if(!S.dragging) return;
+  layer.querySelector('.preview')?.remove();
+  const cell=cellFromEl(e.target); if(cell){
+    const candidate=canon({r1:S.dragStart.r,c1:S.dragStart.c,r2:cell.r,c2:cell.c});
+    const idx=S.solution.findIndex(sol=>sameRect(sol,candidate));
+    if(idx>-1 && !S.drawn.some(d=>sameRect(d,candidate))){
+      S.drawn.push(candidate);
+    }else{
+      alert('That rectangle isn’t one of the required pieces.');
+    }
+  }
+  S.dragging=false; S.dragStart=null;
+  paint(); updateInfo(); updateSentenceTab(); updateButtons();
+});
+
+/* remove a user rectangle on click */
+layer.addEventListener('click',e=>{
+  const idx=e.target.dataset.idx;
+  if(idx!==undefined){
+    S.drawn.splice(+idx,1);
+    paint(); updateInfo(); updateSentenceTab(); updateButtons();
+  }
+});
+
+/* ─────────────────── Clear / Swap ─────────────────────── */
+clearB.onclick = ()=>{
+  Object.assign(S,{first:null,goal:null,start:null,solution:[],drawn:[]});
+  paint();updateInfo();updateSentenceTab();updateButtons();
+};
+swapB.onclick = ()=>{
+  if(!(S.goal&&S.start))return;
+  [S.goal,S.start]=[S.start,S.goal];
+  // ensure bigger area is goal again per rule
+  if(S.start.r*S.start.c > S.goal.r*S.goal.c)
+    [S.goal,S.start]=[S.start,S.goal];
+  S.solution=genSolution(); S.drawn=[];
+  paint();updateInfo();updateSentenceTab();updateButtons();
+};
+
+/* ───────────────────── tab switching ──────────────────── */
+tabEls.forEach(tab=>{
+  tab.onclick=()=>{
+    tabEls.forEach(t=>t.classList.toggle('active',t===tab));
+    const isSentence = tab.dataset.tab==='sentence';
+    sentenceTab.style.display = isSentence?'block':'none';
+    wrap.style.display        = isSentence?'none':'inline-block';
+    updateSentenceTab();
+  };
+});
+
+updateInfo();          // initial text
+new ResizeObserver(paint).observe(wrap);
 </script>
 </body>
 </html>
