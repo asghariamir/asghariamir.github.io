@@ -291,7 +291,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         renderEquation(constants);
 
         stage = 2;
-        info.textContent = 'Draw the two frame strips. Overlap cells will show a striped pattern.';
+        info.textContent = 'Draw the two edge pieces. Squares with stripes belong to both pieces.';
     }
 
     function previewTemp(start,cur){
@@ -351,11 +351,11 @@ window.addEventListener('DOMContentLoaded',()=>{
             outlineRect(target,'#1565c0');
             highlightHeaders(target,'red');
             stage=1;
-            info.textContent='Now select a multiplication you already KNOW (must contain the red rectangle).';
+            info.textContent='Pick a multiplication you already know. One rectangle must be inside the other.';
         }else if(stage===1){
             known={rows:+cell.dataset.row, cols:+cell.dataset.col};
             if(!nested(target,known)){
-                alert('The known rectangle must contain or be contained by the first one.');
+                alert('Remember: one rectangle must sit inside the other.');
                 return;
             }
             setupPuzzle();
