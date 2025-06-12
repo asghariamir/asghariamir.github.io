@@ -40,32 +40,30 @@
             color: var(--primary-color);
             margin-bottom: 1rem;
         }
-        
         /* ========= Grid & Header Styles ========= */
         .grid-wrapper { display: inline-block; margin-top: 1.5rem; }
-        
-        .header, .left-header {
-            background-color: var(--medium-gray);
-            gap: 1px;
-        }
         .header {
             display: grid;
-            grid-template-columns: 30px repeat(12, 40px);
+            grid-template-columns: 40px repeat(12, 40px); /* corner now 40px like the rest */
+            background-color: var(--medium-gray);
+            gap: 1px;
         }
         .left-header {
             display: grid;
             grid-template-rows: repeat(12, 40px);
+            background-color: var(--medium-gray);
+            gap: 1px;
         }
-
-        /* This is the corrected rule for centering */
         .header div, .left-header div {
+            width: 40px;
+            height: 40px;
             background-color: var(--light-gray);
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 1px solid var(--medium-gray);
         }
-        
         .grid {
             display: grid;
             grid-template-columns: repeat(12, 40px);
@@ -81,19 +79,22 @@
             border: 1px solid var(--medium-gray);
             transition: background-color 0.2s;
         }
-         .cell:hover {
-            background-color: #e3f2fd;
-        }
-
+        .cell:hover { background-color: #e3f2fd; }
         /* ========= Piece Colors ========= */
-        .piece-red { background: rgba(21, 101, 192, 0.25); }
+        .piece-red   { background: rgba(21, 101, 192, 0.25); }
         .piece-green { background: rgba(46, 125, 50, 0.25); }
-        .temp-piece { background: rgba(255, 235, 59, 0.4); }
-        
+        .temp-piece  { background: rgba(255, 235, 59, 0.4);   }
+        /* ======== Overlap visual ======== */
+        .overlap-piece {
+            /* keep underlying background-color but add stripes to show sharing */
+            background-image: repeating-linear-gradient(45deg,
+                                 rgba(0, 0, 0, 0.2) 0 4px,
+                                 rgba(0, 0, 0, 0.0) 4px 8px);
+            border: 2px solid #000;
+        }
         /* Headers highlight */
-        .row-highlight-red, .col-highlight-red { color: var(--primary-color); }
+        .row-highlight-red,   .col-highlight-red   { color: var(--primary-color); }
         .row-highlight-green, .col-highlight-green { color: var(--secondary-color); }
-
         /* ========= UI Panels & Buttons ========= */
         #infoPanel, #equation {
             padding: 1rem;
@@ -142,8 +143,8 @@
 <script>
 /******************** Utility functions ********************/
 function buildHeaders(){
-    const top=document.getElementById('topHeader');
-    const left=document.getElementById('leftHeader');
+    const top = document.getElementById('topHeader');
+    const left = document.getElementById('leftHeader');
     top.appendChild(document.createElement('div')); // blank corner
     for(let c=1;c<=12;c++){
         const d=document.createElement('div');d.textContent=c;d.className='colHeader';d.dataset.col=c;top.appendChild(d);
@@ -153,113 +154,230 @@ function buildHeaders(){
     }
 }
 function outlineRect(rect,color){
-    const th='3px solid '+color;
+    const th=`3px solid ${color}`;
     document.querySelectorAll('.cell').forEach(cell=>{
-        const r=+cell.dataset.row,c=+cell.dataset.col;
-        if(r<=rect.rows&&c<=rect.cols){
-            if(r===1)cell.style.borderTop=th;
-            if(c===1)cell.style.borderLeft=th;
-            if(r===rect.rows)cell.style.borderBottom=th;
-            if(c===rect.cols)cell.style.borderRight=th;
+        const r=+cell.dataset.row, c=+cell.dataset.col;
+        if(r<=rect.rows && c<=rect.cols){
+            if(r===1)         cell.style.borderTop    = th;
+            if(c===1)         cell.style.borderLeft   = th;
+            if(r===rect.rows) cell.style.borderBottom = th;
+            if(c===rect.cols) cell.style.borderRight  = th;
         }
     });
 }
 function fillRect(rect,cls){
     document.querySelectorAll('.cell').forEach(cell=>{
-        const r=+cell.dataset.row,c=+cell.dataset.col;
-        if(r<=rect.rows&&c<=rect.cols)cell.classList.add(cls);
+        const r=+cell.dataset.row, c=+cell.dataset.col;
+        if(r<=rect.rows && c<=rect.cols) cell.classList.add(cls);
     });
 }
 function resetVisual(){
-    document.querySelectorAll('.cell').forEach(cell=>{cell.className='cell';cell.style.border='';});
+    document.querySelectorAll('.cell').forEach(cell=>{
+        cell.className='cell';
+        cell.style.border='';
+        cell.style.backgroundImage='';
+        cell.style.backgroundColor='';
+    });
     document.querySelectorAll('.rowHeader').forEach(h=>h.className='rowHeader');
     document.querySelectorAll('.colHeader').forEach(h=>h.className='colHeader');
     document.getElementById('equation').textContent='';
 }
 function highlightHeaders(rect,color){
-    try {
+    try{
         document.querySelector(`.rowHeader[data-row='${rect.rows}']`).classList.add(`row-highlight-${color}`);
         document.querySelector(`.colHeader[data-col='${rect.cols}']`).classList.add(`col-highlight-${color}`);
-    } catch(e) {
-        console.warn("Could not highlight headers for rect:", rect);
-    }
+    }catch(e){console.warn('Header highlight issue',e);}
 }
 /******************** Main ********************/
 window.addEventListener('DOMContentLoaded',()=>{
-    const grid=document.getElementById('grid');
-    const info=document.getElementById('infoPanel');
-    const eq=document.getElementById('equation');
+    const grid = document.getElementById('grid');
+    const info = document.getElementById('infoPanel');
+    const eq   = document.getElementById('equation');
 
     buildHeaders();
+    // build grid
     for(let r=1;r<=12;r++){
         for(let c=1;c<=12;c++){
-            const cell=document.createElement('div');cell.className='cell';cell.dataset.row=r;cell.dataset.col=c;grid.appendChild(cell);
+            const cell=document.createElement('div');
+            cell.className='cell';
+            cell.dataset.row=r;
+            cell.dataset.col=c;
+            grid.appendChild(cell);
         }
     }
 
     let stage=0, target=null, known=null, outer=null, inner=null;
     let missing=[], hueIdx=0, drawing=false, startCell=null;
 
-    const area=r=>r.rows*r.cols;
-    const nested=(a,b)=>(a.rows>=b.rows&&a.cols>=b.cols)||(b.rows>=a.rows&&b.cols>=a.cols);
-    const insideOuter=cell=>outer && (+cell.dataset.row)<=outer.rows && (+cell.dataset.col)<=outer.cols && !((+cell.dataset.row)<=inner.rows && (+cell.dataset.col)<=inner.cols);
+    const area   = r => r.rows*r.cols;
+    const nested = (a,b)=> (a.rows>=b.rows && a.cols>=b.cols) || (b.rows>=a.rows && b.cols>=a.cols);
+    const insideOuter = cell => outer && (+cell.dataset.row)<=outer.rows && (+cell.dataset.col)<=outer.cols && !((+cell.dataset.row)<=inner.rows && (+cell.dataset.col)<=inner.cols);
 
-    function computeMissing(){
-        missing=[];const dr=outer.rows-inner.rows,dc=outer.cols-inner.cols;
-        if(dc>0)missing.push({rows:inner.rows,cols:dc,startRow:1,startCol:inner.cols+1,filled:false});
-        if(dr>0)missing.push({rows:dr,cols:inner.cols,startRow:inner.rows+1,startCol:1,filled:false});
-        if(dr>0&&dc>0)missing.push({rows:dr,cols:dc,startRow:inner.rows+1,startCol:inner.cols+1,filled:false});
+    /**
+     * Build the list of pieces the user needs to draw (vertical & horizontal strips).
+     * Signs follow inclusion–exclusion:
+     *   If outer===known  -> subtract strips, add overlap
+     *   If outer===target -> add strips,      subtract overlap
+     * Only the strips (not the overlap) must be drawn by the user, so `missing[]`
+     * contains at most two entries.
+     */
+    function computePieces(){
+        missing = [];
+        const dr = outer.rows - inner.rows; // row difference
+        const dc = outer.cols - inner.cols; // col difference
+        const stripSign = outer===target ? +1 : -1; // ± for strips
+
+        // vertical strip (full height, dc wide)
+        if(dc>0){
+            missing.push({
+                rows: outer.rows,
+                cols: dc,
+                startRow: 1,
+                startCol: inner.cols+1,
+                filled:false,
+                sign: stripSign
+            });
+        }
+        // horizontal strip (full width, dr high)
+        if(dr>0){
+            missing.push({
+                rows: dr,
+                cols: outer.cols,
+                startRow: inner.rows+1,
+                startCol: 1,
+                filled:false,
+                sign: stripSign
+            });
+        }
+        return {dr,dc,stripSign};
     }
-    function renderEquation(){const op=area(target)<area(known)?'-':'+';eq.innerHTML=`${target.rows}×${target.cols} = ${known.rows}×${known.cols} ${op} `+missing.map((_,i)=>`<span id='p${i}'>___</span>`).join(` ${op} `);}  
-    function updateEq(){missing.forEach((p,i)=>{if(p.filled){document.getElementById(`p${i}`).textContent=`${p.rows}×${p.cols}`;}});}  
+
+    function renderEquation(constants){
+        const {dr,dc,stripSign} = constants; // pulled from computePieces()
+        let eqHTML = `${target.rows}×${target.cols} = ${known.rows}×${known.cols}`;
+
+        missing.forEach((p,i)=>{
+            const sym = p.sign>0 ? ' + ' : ' - ';
+            eqHTML += `${sym}<span id="p${i}">___</span>`;
+        });
+
+        // overlap term (only when both dr & dc > 0)
+        if(dr>0 && dc>0){
+            const sym = stripSign>0 ? ' - ' : ' + '; // opposite sign to strips
+            eqHTML += `${sym}${dr}×${dc}`;
+        }
+        eq.innerHTML = eqHTML;
+    }
+
+    function updateEq(){
+        missing.forEach((p,i)=>{
+            if(p.filled){
+                document.getElementById(`p${i}`).textContent = `${p.rows}×${p.cols}`;
+            }
+        });
+    }
 
     function setupPuzzle(){
-        outer=area(target)>=area(known)?target:known;
-        inner=outer===target?known:target;
+        outer = area(target)>=area(known)? target : known; // bigger rectangle
+        inner = outer===target ? known : target;           // smaller rectangle
+
         resetVisual();
         fillRect(inner, inner===target?'piece-red':'piece-green');
-        outlineRect(outer, outer===target?'#1565c0':'#2e7d32');
-        highlightHeaders(target,'red');highlightHeaders(known,'green');
-        computeMissing();renderEquation();
-        stage=2;info.textContent='Draw the piece(s) to complete the frame.';
+        outlineRect(outer, outer===target ? '#1565c0' : '#2e7d32');
+        highlightHeaders(target,'red');
+        highlightHeaders(known,'green');
+
+        const constants = computePieces();
+        renderEquation(constants);
+
+        stage = 2;
+        info.textContent = 'Draw the two frame strips. Overlap cells will show a striped pattern.';
     }
 
     function previewTemp(start,cur){
         document.querySelectorAll('.temp-piece').forEach(c=>c.classList.remove('temp-piece'));
-        const sr=+start.dataset.row,sc=+start.dataset.col,er=+cur.dataset.row,ec=+cur.dataset.col;
-        const minR=Math.min(sr,er),maxR=Math.max(sr,er),minC=Math.min(sc,ec),maxC=Math.max(sc,ec);
-        for(let r=minR;r<=maxR;r++)for(let c=minC;c<=maxC;c++){
-            const cell=document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
-            if(cell && insideOuter(cell))cell.classList.add('temp-piece');
-        }
-    }
-    function commitPiece(){
-        const cells=[...document.querySelectorAll('.temp-piece')];if(!cells.length)return;
-        const rs=cells.map(c=>+c.dataset.row), cs=cells.map(c=>+c.dataset.col);
-        const rect={startRow:Math.min(...rs),startCol:Math.min(...cs),rows:Math.max(...rs)-Math.min(...rs)+1,cols:Math.max(...cs)-Math.min(...cs)+1};
-        const idx=missing.findIndex(p=>!p.filled&&p.rows===rect.rows&&p.cols===rect.cols&&p.startRow===rect.startRow&&p.startCol===rect.startCol);
-        if(idx===-1){alert('Piece location or size incorrect');cells.forEach(c=>c.classList.remove('temp-piece'));return;}
-        const col=`hsla(${(hueIdx*67)%360},100%,50%,0.55)`;hueIdx++;
-        cells.forEach(c=>{c.classList.remove('temp-piece');c.classList.add('user-piece');c.style.backgroundColor=col;c.style.border='2px solid #424242';});
-        missing[idx].filled=true;updateEq();if(missing.every(p=>p.filled))info.textContent='Puzzle complete!';
+        const sr=+start.dataset.row, sc=+start.dataset.col,
+              er=+cur.dataset.row,   ec=+cur.dataset.col;
+        const minR=Math.min(sr,er), maxR=Math.max(sr,er),
+              minC=Math.min(sc,ec), maxC=Math.max(sc,ec);
+        for(let r=minR;r<=maxR;r++)
+            for(let c=minC;c<=maxC;c++){
+                const cell=document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+                if(cell && insideOuter(cell)) cell.classList.add('temp-piece');
+            }
     }
 
+    function commitPiece(){
+        const cells=[...document.querySelectorAll('.temp-piece')];
+        if(!cells.length) return;
+
+        const rs=cells.map(c=>+c.dataset.row), cs=cells.map(c=>+c.dataset.col);
+        const rect={
+            startRow:Math.min(...rs),
+            startCol:Math.min(...cs),
+            rows:Math.max(...rs)-Math.min(...rs)+1,
+            cols:Math.max(...cs)-Math.min(...cs)+1
+        };
+        const idx=missing.findIndex(p=>!p.filled && p.rows===rect.rows && p.cols===rect.cols && p.startRow===rect.startRow && p.startCol===rect.startCol);
+        if(idx===-1){
+            alert('Piece location or size incorrect');
+            cells.forEach(c=>c.classList.remove('temp-piece'));
+            return;
+        }
+        const col = `hsla(${(hueIdx*67)%360},100%,50%,0.55)`; hueIdx++;
+        cells.forEach(c=>{
+            c.classList.remove('temp-piece');
+            if(c.classList.contains('user-piece')){
+                // already part of another strip => mark as shared
+                c.classList.add('overlap-piece');
+            }else{
+                c.classList.add('user-piece');
+                c.style.backgroundColor = col;
+            }
+        });
+        missing[idx].filled = true;
+        updateEq();
+        if(missing.every(p=>p.filled)) info.textContent = 'Puzzle complete! Striped square shows shared area.';
+    }
+
+    /*************** Interaction handling ***************/
     grid.addEventListener('mousedown',e=>{
-        const cell=e.target.closest('.cell');if(!cell)return;
+        const cell = e.target.closest('.cell');
+        if(!cell) return;
+
         if(stage===0){
-            target={rows:+cell.dataset.row,cols:+cell.dataset.col};
-            fillRect(target,'piece-red');outlineRect(target,'#1565c0');highlightHeaders(target,'red');
-            stage=1;info.textContent='Now select a multiplication you already KNOW (must nest).';
+            target={rows:+cell.dataset.row, cols:+cell.dataset.col};
+            fillRect(target,'piece-red');
+            outlineRect(target,'#1565c0');
+            highlightHeaders(target,'red');
+            stage=1;
+            info.textContent='Now select a multiplication you already KNOW (must contain the red rectangle).';
         }else if(stage===1){
-            known={rows:+cell.dataset.row,cols:+cell.dataset.col};
-            if(!nested(target,known)){alert('Must nest with first rectangle');return;}
+            known={rows:+cell.dataset.row, cols:+cell.dataset.col};
+            if(!nested(target,known)){
+                alert('The known rectangle must contain or be contained by the first one.');
+                return;
+            }
             setupPuzzle();
-        }else if(stage===2&&insideOuter(cell)){
-            drawing=true;startCell=cell;previewTemp(cell,cell);
+        }else if(stage===2 && insideOuter(cell)){
+            drawing=true;
+            startCell=cell;
+            previewTemp(cell,cell);
         }
     });
-    grid.addEventListener('mousemove',e=>{if(drawing&&stage===2){const cell=e.target.closest('.cell');if(cell)previewTemp(startCell,cell);}});
-    window.addEventListener('mouseup',()=>{if(drawing){commitPiece();drawing=false;startCell=null;}});
+    grid.addEventListener('mousemove',e=>{
+        if(drawing && stage===2){
+            const cell=e.target.closest('.cell');
+            if(cell) previewTemp(startCell,cell);
+        }
+    });
+    window.addEventListener('mouseup',()=>{
+        if(drawing){
+            commitPiece();
+            drawing=false;
+            startCell=null;
+        }
+    });
 });
 </script>
 </body>
