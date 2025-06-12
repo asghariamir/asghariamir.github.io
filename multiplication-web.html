@@ -320,7 +320,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         };
         const idx=missing.findIndex(p=>!p.filled && p.rows===rect.rows && p.cols===rect.cols && p.startRow===rect.startRow && p.startCol===rect.startCol);
         if(idx===-1){
-            alert('Piece location or size incorrect');
+            alert('That piece doesn’t work. Try again.');
             cells.forEach(c=>c.classList.remove('temp-piece'));
             return;
         }
