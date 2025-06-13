@@ -79,11 +79,11 @@
             </div>
             <div class="control-group">
                 <label for="a-input">Interval Start (a):</label>
-                <input type="number" id="a-input" value="0">
+                <input type="text" id="a-input" value="0">
             </div>
             <div class="control-group">
                 <label for="b-input">Interval End (b):</label>
-                <input type="number" id="b-input" value="5">
+                <input type="text" id="b-input" value="5">
             </div>
             <div class="control-group full-width">
                 <label for="n-slider">Subintervals (n): <span id="n-label">10</span></label>
@@ -119,7 +119,7 @@
 
     <section id="error-tab" class="tab-content">
         <h2>Error Analysis</h2>
-        <p class="info">Compare the performance of each method. Note how the error for Midpoint and Trapezoid rules decreases proportionally to 1/n², while Simpson's rule error decreases much faster, proportionally to 1/n⁴.</p>
+        <p class="info">Investigate how the approximation error changes as the number of rectangles (n) increases. For the Midpoint and Trapezoid rules, the error is expected to decrease proportionally to 1/n². Simpson's rule error decreases much faster, proportionally to 1/n⁴.</p>
         <button id="run-error-analysis-btn">Run Error Analysis</button>
         <div style="position: relative; height: 400px; margin-top: 1.5rem;">
             <canvas id="error-chart"></canvas>
@@ -137,7 +137,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const EXAMPLES = {
-        "x^3 - 2x^2 + 5": { f_string: "x^3 - 2x^2 + 5", a: 0, b: 5 },
+        "x^2": { f_string: "x^2", a: 0, b: 5 },
         "sin(x)": { f_string: "sin(x)", a: 0, b: "pi" },
         "exp(-x^2)": { f_string: "exp(-x^2)", a: -2, b: 2 },
         "1 / (1 + x^2)": { f_string: "1 / (1 + x^2)", a: -5, b: 5},
@@ -150,117 +150,131 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'midpoint'
     };
 
-    const DOM = {};
-    for (const id of ['example-select', 'function-input', 'a-input', 'b-input', 'n-slider', 'n-label', 'plot-explorer', 'true-integral-val', 'approx-label', 'approx-val', 'error-val', 'run-error-analysis-btn', 'error-chart', 'error-table']) {
-        DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
-    }
-    document.getElementsByName('method').forEach(radio => {
-        radio.addEventListener('change', e => { state.method = e.target.value; updateAll(); });
-    });
+    // --- DOM REFS (Robust, explicit assignment) ---
+    const exampleSelect = document.getElementById('example-select');
+    const functionInput = document.getElementById('function-input');
+    const aInput = document.getElementById('a-input');
+    const bInput = document.getElementById('b-input');
+    const nSlider = document.getElementById('n-slider');
+    const nLabel = document.getElementById('n-label');
+    const plotExplorer = document.getElementById('plot-explorer');
+    const trueIntegralVal = document.getElementById('true-integral-val');
+    const approxLabel = document.getElementById('approx-label');
+    const approxVal = document.getElementById('approx-val');
+    const errorVal = document.getElementById('error-val');
+    const runErrorAnalysisBtn = document.getElementById('run-error-analysis-btn');
+    const errorChartCanvas = document.getElementById('error-chart');
+    const errorTable = document.getElementById('error-table');
+    const methodRadios = document.getElementsByName('method');
     let errorChartInstance;
 
     function initialize() {
         Object.keys(EXAMPLES).forEach(name => {
-            const option = new DOM.exampleSelect.constructor.Option(name, name);
-            DOM.exampleSelect.appendChild(option);
+            const option = new Option(name, name); // Standard way to create option
+            exampleSelect.appendChild(option);
         });
         
-        DOM.exampleSelect.addEventListener('change', loadExample);
-        DOM.functionInput.addEventListener('change', updateFunction);
-        DOM.aInput.addEventListener('change', updateAll);
-        DOM.bInput.addEventListener('change', updateAll);
-        DOM.nSlider.addEventListener('input', updateAll);
-        DOM.runErrorAnalysisBtn.addEventListener('click', runErrorAnalysis);
+        exampleSelect.addEventListener('change', loadExample);
+        functionInput.addEventListener('change', updateFunction);
+        aInput.addEventListener('change', updateAll);
+        bInput.addEventListener('change', updateAll);
+        nSlider.addEventListener('input', updateAll);
+        runErrorAnalysisBtn.addEventListener('click', runErrorAnalysis);
+        methodRadios.forEach(radio => {
+            radio.addEventListener('change', e => { state.method = e.target.value; updateAll(); });
+        });
         
         loadExample();
     }
 
     function loadExample() {
-        const example = EXAMPLES[DOM.exampleSelect.value];
-        DOM.functionInput.value = example.f_string;
-        DOM.aInput.value = example.a;
-        DOM.bInput.value = example.b;
+        const example = EXAMPLES[exampleSelect.value];
+        functionInput.value = example.f_string;
+        aInput.value = example.a;
+        bInput.value = example.b;
         updateFunction();
     }
 
     function updateFunction() {
-        DOM.functionInput.classList.remove('error');
+        functionInput.classList.remove('error');
         try {
-            state.compiledFunc = math.compile(DOM.functionInput.value);
-            state.a = math.evaluate(DOM.aInput.value);
-            state.b = math.evaluate(DOM.bInput.value);
-            state.trueIntegral = calculateMidpoint(10000); 
+            state.compiledFunc = math.compile(functionInput.value);
+            updateAll(); // Update everything after a new function is compiled
         } catch (e) {
-            DOM.functionInput.classList.add('error');
+            functionInput.classList.add('error');
             alert(`Invalid function syntax: ${e.message}`);
             state.compiledFunc = null;
         }
-        updateAll();
     }
 
     function updateAll() {
         if (!state.compiledFunc) return;
-        state.a = math.evaluate(DOM.aInput.value);
-        state.b = math.evaluate(DOM.bInput.value);
-        let nValue = parseInt(DOM.nSlider.value);
+        try {
+            state.a = math.evaluate(aInput.value);
+            state.b = math.evaluate(bInput.value);
+        } catch (e) {
+            alert(`Invalid interval value: ${e.message}`); return;
+        }
+        
+        // Calculate a high-precision value for the "true" integral whenever function or interval changes
+        state.trueIntegral = calculateMidpoint(10000); 
+
+        let nValue = parseInt(nSlider.value);
         if (state.method === 'simpson' && nValue % 2 !== 0) {
-            nValue = nValue > 1 ? nValue - 1 : 2; // Ensure n is even for Simpson's
-            DOM.nSlider.value = nValue;
+            nValue = nValue > 1 ? nValue - 1 : 2; 
+            nSlider.value = nValue;
         }
         state.n = nValue;
-        DOM.nLabel.textContent = state.n;
+        nLabel.textContent = state.n;
         
         let approximation = 0;
         switch(state.method) {
             case 'midpoint':
                 approximation = calculateMidpoint(state.n);
-                DOM.approxLabel.textContent = 'Midpoint Approximation';
+                approxLabel.textContent = 'Midpoint Approximation';
                 break;
             case 'trapezoid':
                 approximation = calculateTrapezoid(state.n);
-                DOM.approxLabel.textContent = 'Trapezoid Approximation';
+                approxLabel.textContent = 'Trapezoid Approximation';
                 break;
             case 'simpson':
                 approximation = calculateSimpson(state.n);
-                DOM.approxLabel.textContent = "Simpson's Approximation";
+                approxLabel.textContent = "Simpson's Approximation";
                 break;
         }
         
         const error = Math.abs(state.trueIntegral - approximation);
 
-        DOM.trueIntegralVal.textContent = state.trueIntegral.toFixed(6);
-        DOM.approxVal.textContent = approximation.toFixed(6);
-        DOM.errorVal.textContent = error.toExponential(4);
+        trueIntegralVal.textContent = state.trueIntegral.toFixed(6);
+        approxVal.textContent = approximation.toFixed(6);
+        errorVal.textContent = error.toExponential(4);
 
         drawExplorerPlot();
     }
     
-    // --- CALCULATION FUNCTIONS ---
     function f(x) {
         try { return state.compiledFunc.evaluate({x: x}); } catch { return NaN; }
     }
     function calculateMidpoint(n, a = state.a, b = state.b) {
-        const h = (b - a) / n;
-        let sum = 0;
+        const h = (b - a) / n; let sum = 0;
         for (let i = 0; i < n; i++) sum += f(a + (i + 0.5) * h);
         return sum * h;
     }
     function calculateTrapezoid(n, a = state.a, b = state.b) {
-        const h = (b - a) / n;
-        let sum = (f(a) + f(b)) / 2;
+        const h = (b - a) / n; let sum = (f(a) + f(b)) / 2;
         for (let i = 1; i < n; i++) sum += f(a + i * h);
         return sum * h;
     }
     function calculateSimpson(n, a = state.a, b = state.b) {
-        if (n % 2 !== 0) return NaN; // Simpson's rule requires even n
-        const h = (b - a) / n;
-        let sum = f(a) + f(b);
+        if (n % 2 !== 0) return NaN;
+        const h = (b - a) / n; let sum = f(a) + f(b);
         for (let i = 1; i < n; i += 2) sum += 4 * f(a + i * h);
         for (let i = 2; i < n - 1; i += 2) sum += 2 * f(a + i * h);
         return sum * h / 3;
     }
 
-    // --- PLOTTING ---
+    function drawExplorerPlot() { /* ... same as before ... */ } // Functions below this line are unchanged
+    
     function drawExplorerPlot() {
         if (!state.compiledFunc) return;
         
@@ -291,11 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
              for (let i = 0; i < state.n; i += 2) {
                 const x0 = state.a + i * h, x1 = state.a + (i + 1) * h, x2 = state.a + (i + 2) * h;
                 const y0 = f(x0), y1 = f(x1), y2 = f(x2);
-                
-                // Lagrange polynomial for parabola
-                const parabola = x => y0 * (x - x1) * (x - x2) / ((x0 - x1) * (x0 - x2)) + 
-                                       y1 * (x - x0) * (x - x2) / ((x1 - x0) * (x1 - x2)) + 
-                                       y2 * (x - x0) * (x - x1) / ((x2 - x0) * (x2 - x1));
+                const parabola = x => y0 * (x - x1) * (x - x2) / ((x0 - x1) * (x0 - x2)) + y1 * (x - x0) * (x - x2) / ((x1 - x0) * (x1 - x2)) + y2 * (x - x0) * (x - x1) / ((x2 - x0) * (x2 - x1));
                 const px = [], py = [];
                 for(let j = 0; j <= 10; j++) {
                     const x = x0 + j * (x2 - x0) / 10;
@@ -305,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        Plotly.newPlot(DOM.plotExplorer, [
+        Plotly.newPlot(plotExplorer, [
             { x: x_func, y: y_func, mode: 'lines', name: 'f(x)', line: { color: 'grey', width: 2 } },
             ...parabola_traces
         ], {
@@ -320,21 +330,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function runErrorAnalysis() {
         if (!state.compiledFunc) return;
-        const results = { midpoint: [], trapezoid: [], simpson: [] };
+        const errorData = { midpoint: [], trapezoid: [], simpson: [] };
         const n_values = [2, 4, 6, 8, 10, 20, 30, 50, 80, 100, 150, 200];
         
         n_values.forEach(n => {
-            results.midpoint.push({ n, error: Math.abs(state.trueIntegral - calculateMidpoint(n)) });
-            results.trapezoid.push({ n, error: Math.abs(state.trueIntegral - calculateTrapezoid(n)) });
-            results.simpson.push({ n, error: Math.abs(state.trueIntegral - calculateSimpson(n)) });
+            errorData.midpoint.push({ n, error: Math.abs(state.trueIntegral - calculateMidpoint(n)) });
+            errorData.trapezoid.push({ n, error: Math.abs(state.trueIntegral - calculateTrapezoid(n)) });
+            errorData.simpson.push({ n, error: Math.abs(state.trueIntegral - calculateSimpson(n)) });
         });
         
-        renderErrorTable(n_values, results);
-        drawErrorChart(results);
+        renderErrorTable(n_values, errorData);
+        drawErrorChart(errorData);
     }
     
     function renderErrorTable(n_values, data) {
-        const tbody = DOM.errorTable.tBodies[0];
+        const tbody = errorTable.tBodies[0];
         tbody.innerHTML = '';
         n_values.forEach((n, i) => {
             tbody.insertRow().innerHTML = `<td>${n}</td>
@@ -347,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function drawErrorChart(data) {
         if (errorChartInstance) errorChartInstance.destroy();
         
-        errorChartInstance = new Chart(DOM.errorChart, {
+        errorChartInstance = new Chart(errorChartCanvas, {
             type: 'line',
             data: {
                 labels: data.midpoint.map(d => Math.log10(d.n)),
