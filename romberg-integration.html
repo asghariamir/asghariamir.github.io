@@ -70,11 +70,11 @@
         </div>
         <div class="control-group">
             <label for="a-input">Interval Start (a):</label>
-            <input type="number" id="a-input" value="0">
+            <input type="text" id="a-input" value="0">
         </div>
         <div class="control-group">
             <label for="b-input">Interval End (b):</label>
-            <input type="number" id="b-input" value="2">
+            <input type="text" id="b-input" value="2">
         </div>
         <div class="control-group">
             <label for="depth-slider">Table Depth (k): <span id="depth-label">5</span></label>
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const EXAMPLES = {
         "sin(x) [0, π]": { f_string: "sin(x)", a: 0, b: "pi" },
         "exp(x) [0, 1]": { f_string: "exp(x)", a: 0, b: "1" },
-        "4 / (1 + x^2) [0, 1]": { f_string: "4 / (1 + x^2)", a: 0, b: "1"}, // Should -> pi
+        "4 / (1 + x^2) [0, 1]": { f_string: "4 / (1 + x^2)", a: 0, b: "1"},
     };
     
     let state = {
@@ -121,28 +121,38 @@ document.addEventListener('DOMContentLoaded', () => {
         trueIntegral: null, rombergTable: [], currentLevel: 0
     };
 
-    const DOM = {};
-    for (const id of ['example-select', 'function-input', 'a-input', 'b-input', 'depth-slider', 'depth-label', 'generate-btn', 'extrapolate-btn', 'true-integral-val', 'best-estimate-val', 'error-val', 'romberg-container']) {
-        DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
-    }
+    // --- DOM REFS (Robust, explicit assignment) ---
+    const exampleSelect = document.getElementById('example-select');
+    const functionInput = document.getElementById('function-input');
+    const aInput = document.getElementById('a-input');
+    const bInput = document.getElementById('b-input');
+    const depthSlider = document.getElementById('depth-slider');
+    const depthLabel = document.getElementById('depth-label');
+    const generateBtn = document.getElementById('generate-btn');
+    const extrapolateBtn = document.getElementById('extrapolate-btn');
+    const trueIntegralVal = document.getElementById('true-integral-val');
+    const bestEstimateVal = document.getElementById('best-estimate-val');
+    const errorVal = document.getElementById('error-val');
+    const rombergContainer = document.getElementById('romberg-container');
     
     function initialize() {
         Object.keys(EXAMPLES).forEach(name => {
-            const option = new DOM.exampleSelect.constructor.Option(name, name);
-            DOM.exampleSelect.appendChild(option);
+            const option = new Option(name, name);
+            exampleSelect.appendChild(option);
         });
-        DOM.exampleSelect.addEventListener('change', loadExample);
-        DOM.generateBtn.addEventListener('click', generateTable);
-        DOM.extrapolateBtn.addEventListener('click', extrapolateNextLevel);
-        DOM.depthSlider.addEventListener('input', () => { DOM.depthLabel.textContent = DOM.depthSlider.value; });
+        
+        exampleSelect.addEventListener('change', loadExample);
+        generateBtn.addEventListener('click', generateTable);
+        extrapolateBtn.addEventListener('click', extrapolateNextLevel);
+        depthSlider.addEventListener('input', () => { depthLabel.textContent = depthSlider.value; });
         loadExample();
     }
 
     function loadExample() {
-        const example = EXAMPLES[DOM.exampleSelect.value];
-        DOM.functionInput.value = example.f_string;
-        DOM.aInput.value = example.a;
-        DOM.bInput.value = example.b;
+        const example = EXAMPLES[exampleSelect.value];
+        functionInput.value = example.f_string;
+        aInput.value = example.a;
+        bInput.value = example.b;
     }
 
     function f(x) {
@@ -160,15 +170,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function generateTable() {
         try {
-            state.compiledFunc = math.compile(DOM.functionInput.value);
-            state.a = math.evaluate(DOM.aInput.value);
-            state.b = math.evaluate(DOM.bInput.value);
-            state.depth = parseInt(DOM.depthSlider.value);
+            state.compiledFunc = math.compile(functionInput.value);
+            state.a = math.evaluate(aInput.value);
+            state.b = math.evaluate(bInput.value);
+            state.depth = parseInt(depthSlider.value);
         } catch (e) {
             alert(`Invalid function or range: ${e.message}`); return;
         }
         
-        state.trueIntegral = trapezoid(Math.pow(2, 12), state.a, state.b); // High-precision benchmark
+        state.trueIntegral = trapezoid(Math.pow(2, 12), state.a, state.b);
         state.rombergTable = Array(state.depth).fill(0).map(() => Array(state.depth).fill(null));
         state.currentLevel = 0;
 
@@ -177,17 +187,19 @@ document.addEventListener('DOMContentLoaded', () => {
             state.rombergTable[i][0] = trapezoid(n, state.a, state.b);
         }
 
-        DOM.extrapolateBtn.disabled = false;
+        extrapolateBtn.disabled = false;
         renderRombergTable();
         updateResultsPanel();
     }
     
-    function extrapolateNextLevel() {
+    async function extrapolateNextLevel() {
         const j = state.currentLevel + 1;
         if (j >= state.depth) {
-            DOM.extrapolateBtn.disabled = true;
+            extrapolateBtn.disabled = true;
             return;
         }
+        
+        extrapolateBtn.disabled = true;
 
         for (let i = j; i < state.depth; i++) {
             const powerOf4 = Math.pow(4, j);
@@ -196,32 +208,39 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const extrapolatedValue = (powerOf4 * R_i_j_minus_1 - R_i_minus_1_j_minus_1) / (powerOf4 - 1);
             state.rombergTable[i][j] = extrapolatedValue;
+
+            // Animate
+            const cell1 = document.getElementById(`cell-${i}-${j-1}`);
+            const cell2 = document.getElementById(`cell-${i-1}-${j-1}`);
+            cell1.classList.add('highlight');
+            cell2.classList.add('highlight');
+            await new Promise(resolve => setTimeout(resolve, 400));
+            renderRombergTable();
+            cell1.classList.remove('highlight');
+            cell2.classList.remove('highlight');
         }
         
         state.currentLevel = j;
-        renderRombergTable();
         updateResultsPanel();
 
-        if (state.currentLevel >= state.depth - 1) {
-            DOM.extrapolateBtn.disabled = true;
+        if (state.currentLevel < state.depth - 1) {
+            extrapolateBtn.disabled = false;
         }
     }
 
     function renderRombergTable() {
         let html = '<table id="romberg-table-el">';
-        // Header
         html += '<thead><tr><th>k</th><th>n=2<sup>k</sup></th><th>R(k,0)</th>';
         for(let j=1; j<state.depth; j++) html += `<th>R(k,${j})</th>`;
         html += '</tr></thead><tbody>';
 
-        // Body
         for (let i = 0; i < state.depth; i++) {
             html += `<tr><td>${i}</td><td>${Math.pow(2,i)}</td>`;
             for (let j = 0; j < state.depth; j++) {
                 const value = state.rombergTable[i][j];
                 const id = `cell-${i}-${j}`;
+                const isNew = j === state.currentLevel && i >= state.currentLevel && j > 0;
                 if (value !== null) {
-                    const isNew = j === state.currentLevel && i >= state.currentLevel;
                     html += `<td id="${id}" class="${isNew ? 'new-value' : ''}">${value.toFixed(10)}</td>`;
                 } else {
                     html += `<td id="${id}">-</td>`;
@@ -230,27 +249,18 @@ document.addEventListener('DOMContentLoaded', () => {
             html += '</tr>';
         }
         html += '</tbody></table>';
-        DOM.rombergContainer.innerHTML = html;
-        
-        // Highlight logic
-        if (state.currentLevel > 0) {
-            const j = state.currentLevel;
-            for(let i = j; i < state.depth; i++) {
-                document.getElementById(`cell-${i}-${j-1}`).classList.add('highlight');
-                document.getElementById(`cell-${i-1}-${j-1}`).classList.add('highlight');
-            }
-        }
+        rombergContainer.innerHTML = html;
     }
     
     function updateResultsPanel() {
         const bestEstimate = state.rombergTable[state.currentLevel][state.currentLevel];
-        DOM.trueIntegralVal.textContent = state.trueIntegral.toFixed(10);
+        trueIntegralVal.textContent = state.trueIntegral.toFixed(10);
         if (bestEstimate !== null) {
-            DOM.bestEstimateVal.textContent = bestEstimate.toFixed(10);
-            DOM.errorVal.textContent = Math.abs(state.trueIntegral - bestEstimate).toExponential(3);
+            bestEstimateVal.textContent = bestEstimate.toFixed(10);
+            errorVal.textContent = Math.abs(state.trueIntegral - bestEstimate).toExponential(3);
         } else {
-            DOM.bestEstimateVal.textContent = '-';
-            DOM.errorVal.textContent = '-';
+            bestEstimateVal.textContent = '-';
+            errorVal.textContent = '-';
         }
     }
     
