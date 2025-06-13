@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numerical Integration: Midpoint Rule</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --secondary-color: #c62828;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: var(--light-gray); color: var(--text-color); display: flex; justify-content: center; padding: 1rem; }
+        .container { width: 100%; max-width: 900px; margin: 0 auto; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        .tabs { display: flex; background-color: var(--light-gray); border-bottom: 2px solid var(--medium-gray); }
+        .tab-button { flex: 1; padding: 14px 10px; cursor: pointer; border: none; background-color: transparent; font-size: 1rem; color: var(--dark-gray); position: relative; transition: color 0.3s; }
+        .tab-button.active { color: var(--primary-color); font-weight: 600; }
+        .tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background-color: var(--primary-color); }
+        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content.active { display: block; }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+        p.info { color: #616161; margin-bottom: 1.5rem; }
+        h3 { font-size: 1.25rem; color: var(--dark-gray); margin-top: 1.5rem; margin-bottom: 1rem; border-top: 1px solid var(--medium-gray); padding-top: 1.5rem;}
+        
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem 1.5rem; }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .full-width { grid-column: 1 / -1; }
+        
+        label { font-size: 0.9rem; font-weight: 600; color: #616161; }
+        input, select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; }
+        input[type="text"] { font-family: monospace; }
+        input.error { border-color: var(--danger-color); }
+
+        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
+        button:hover { background-color: #1976d2; }
+        
+        .plot-container { width: 100%; height: 450px; border: 1px solid var(--medium-gray); border-radius: 4px; }
+        .results-display { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; text-align: center; }
+        .result-box { background-color: var(--light-gray); padding: 1rem; border-radius: 6px; }
+        .result-box .label { font-size: 0.9rem; color: #616161; }
+        .result-box .value { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
+        .result-box .value.error { color: var(--secondary-color); }
+
+        .log-container { max-height: 400px; overflow-y: auto; border: 1px solid var(--medium-gray); border-radius: 4px; margin-top: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { border-bottom: 1px solid var(--medium-gray); padding: 8px; text-align: center; }
+        thead th { background-color: var(--light-gray); font-weight: 600; position: sticky; top: 0; z-index: 1;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('explorer')">Visual Explorer</button>
+        <button class="tab-button" onclick="switchTab('error')">Error Analysis</button>
+    </div>
+
+    <section id="explorer-tab" class="tab-content active">
+        <h2>Numerical Integration: Midpoint Rule</h2>
+        <p class="info">Approximate the area under a curve by summing the areas of rectangles. In the Midpoint Rule, the height of each rectangle is determined by the function's value at the midpoint of its base.</p>
+        
+        <div class="controls">
+            <div class="control-group full-width">
+                <label for="example-select">Load Example Function:</label>
+                <select id="example-select"></select>
+            </div>
+            <div class="control-group full-width">
+                <label for="function-input">Enter Function f(x):</label>
+                <input type="text" id="function-input">
+            </div>
+            <div class="control-group">
+                <label for="a-input">Interval Start (a):</label>
+                <input type="number" id="a-input" value="0">
+            </div>
+            <div class="control-group">
+                <label for="b-input">Interval End (b):</label>
+                <input type="number" id="b-input" value="5">
+            </div>
+            <div class="control-group full-width">
+                <label for="n-slider">Number of Rectangles (n): <span id="n-label">10</span></label>
+                <input type="range" id="n-slider" min="1" max="200" value="10">
+            </div>
+        </div>
+        
+        <div id="plot-explorer" class="plot-container"></div>
+        
+        <div class="results-display">
+            <div class="result-box">
+                <div class="label">True Integral (Area)</div>
+                <div id="true-integral-val" class="value">--</div>
+            </div>
+             <div class="result-box">
+                <div class="label">Midpoint Approximation</div>
+                <div id="approx-val" class="value">--</div>
+            </div>
+             <div class="result-box">
+                <div class="label">Absolute Error</div>
+                <div id="error-val" class="value error">--</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="error-tab" class="tab-content">
+        <h2>Error Analysis</h2>
+        <p class="info">Investigate how the approximation error changes as the number of rectangles (n) increases. For the Midpoint Rule, the error is expected to decrease proportionally to 1/n². Note the logarithmic scale on the error plot.</p>
+        <button id="run-error-analysis-btn">Run Error Analysis</button>
+        <div style="position: relative; height: 400px; margin-top: 1.5rem;">
+            <canvas id="error-chart"></canvas>
+        </div>
+        <h3>Raw Data</h3>
+        <div class="log-container">
+            <table id="error-table">
+                <thead><tr><th>n (Rectangles)</th><th>Approximation</th><th>Error</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const EXAMPLES = {
+        "x^2": { f_string: "x^2", a: 0, b: 5 },
+        "sin(x)": { f_string: "sin(x)", a: 0, b: "pi" },
+        "exp(-x^2)": { f_string: "exp(-x^2)", a: -2, b: 2 },
+        "1 / (1 + x^2)": { f_string: "1 / (1 + x^2)", a: -5, b: 5},
+    };
+    
+    let state = {
+        funcString: '', compiledFunc: null,
+        a: 0, b: 5, n: 10,
+        trueIntegral: null,
+    };
+
+    const DOM = { /* DOM refs */ };
+    for (const id of ['example-select', 'function-input', 'a-input', 'b-input', 'n-slider', 'n-label', 'plot-explorer', 'true-integral-val', 'approx-val', 'error-val', 'run-error-analysis-btn', 'error-chart', 'error-table']) {
+        DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
+    }
+    let errorChartInstance;
+
+    function initialize() {
+        Object.keys(EXAMPLES).forEach(name => {
+            const option = new DOM.exampleSelect.constructor.Option(name, name);
+            DOM.exampleSelect.appendChild(option);
+        });
+        
+        DOM.exampleSelect.addEventListener('change', loadExample);
+        DOM.functionInput.addEventListener('change', updateFunction);
+        DOM.aInput.addEventListener('change', updateAll);
+        DOM.bInput.addEventListener('change', updateAll);
+        DOM.nSlider.addEventListener('input', updateAll);
+        DOM.runErrorAnalysisBtn.addEventListener('click', runErrorAnalysis);
+        
+        loadExample();
+    }
+
+    function loadExample() {
+        const example = EXAMPLES[DOM.exampleSelect.value];
+        DOM.functionInput.value = example.f_string;
+        DOM.aInput.value = example.a;
+        DOM.bInput.value = example.b;
+        updateFunction();
+    }
+
+    function updateFunction() {
+        DOM.functionInput.classList.remove('error');
+        try {
+            state.compiledFunc = math.compile(DOM.functionInput.value);
+            // Calculate a high-precision value for the "true" integral
+            state.trueIntegral = calculateMidpoint(10000); 
+        } catch (e) {
+            DOM.functionInput.classList.add('error');
+            alert(`Invalid function syntax: ${e.message}`);
+            state.compiledFunc = null;
+        }
+        updateAll();
+    }
+
+    function updateAll() {
+        if (!state.compiledFunc) return;
+        state.a = math.evaluate(DOM.aInput.value);
+        state.b = math.evaluate(DOM.bInput.value);
+        state.n = parseInt(DOM.nSlider.value);
+        DOM.nLabel.textContent = state.n;
+        
+        const approximation = calculateMidpoint(state.n);
+        const error = Math.abs(state.trueIntegral - approximation);
+
+        DOM.trueIntegralVal.textContent = state.trueIntegral.toFixed(6);
+        DOM.approxVal.textContent = approximation.toFixed(6);
+        DOM.errorVal.textContent = error.toExponential(4);
+
+        drawExplorerPlot();
+    }
+    
+    function calculateMidpoint(n, a = state.a, b = state.b) {
+        if (!state.compiledFunc) return 0;
+        const h = (b - a) / n;
+        let sum = 0;
+        for (let i = 0; i < n; i++) {
+            const midpoint = a + (i + 0.5) * h;
+            try {
+                sum += state.compiledFunc.evaluate({x: midpoint});
+            } catch { /* ignore points outside domain */ }
+        }
+        return sum * h;
+    }
+
+    function drawExplorerPlot() {
+        if (!state.compiledFunc) return;
+        
+        const x_func = [], y_func = [];
+        const plot_step = (state.b - state.a) / 400;
+        for (let x = state.a; x <= state.b; x += plot_step) {
+            try {
+                const y = state.compiledFunc.evaluate({x: x});
+                if(isFinite(y)) { x_func.push(x); y_func.push(y); }
+            } catch {}
+        }
+
+        const h = (state.b - state.a) / state.n;
+        const shapes = [];
+        for (let i = 0; i < state.n; i++) {
+            const x0 = state.a + i * h;
+            const x1 = state.a + (i + 1) * h;
+            const mid = (x0 + x1) / 2;
+            const height = state.compiledFunc.evaluate({x: mid});
+            shapes.push({
+                type: 'rect', x0: x0, y0: 0, x1: x1, y1: height,
+                fillcolor: 'rgba(21, 101, 192, 0.4)',
+                line: { color: 'rgba(21, 101, 192, 0.8)', width: 1 }
+            });
+        }
+
+        Plotly.newPlot(DOM.plotExplorer, [
+            { x: x_func, y: y_func, mode: 'lines', name: 'f(x)', line: { color: 'grey' } },
+            { x: x_func, y: y_func, fill: 'tozeroy', mode: 'none', name: 'True Area', fillcolor: 'rgba(0,0,0,0.1)' }
+        ], {
+            title: 'Function and Midpoint Rectangles',
+            xaxis: { range: [state.a, state.b], gridcolor: '#e0e0e0' },
+            yaxis: { gridcolor: '#e0e0e0' },
+            shapes: shapes,
+            showlegend: false,
+            margin: { l: 50, r: 25, t: 40, b: 40 },
+        }, {responsive: true, displaylogo: false});
+    }
+
+    function runErrorAnalysis() {
+        if (!state.compiledFunc) return;
+        const errorData = [];
+        const n_values = [2, 4, 8, 16, 32, 64, 128, 256, 512];
+        
+        n_values.forEach(n => {
+            const approx = calculateMidpoint(n);
+            const error = Math.abs(state.trueIntegral - approx);
+            errorData.push({ n, approx, error });
+        });
+        
+        renderErrorTable(errorData);
+        drawErrorChart(errorData);
+    }
+    
+    function renderErrorTable(data) {
+        const tbody = DOM.errorTable.tBodies[0];
+        tbody.innerHTML = '';
+        data.forEach(row => {
+            tbody.insertRow().innerHTML = `<td>${row.n}</td><td>${row.approx.toFixed(6)}</td><td>${row.error.toExponential(3)}</td>`;
+        });
+    }
+
+    function drawErrorChart(data) {
+        if (errorChartInstance) errorChartInstance.destroy();
+        
+        errorChartInstance = new Chart(DOM.errorChart, {
+            type: 'line',
+            data: {
+                labels: data.map(d => Math.log(d.n)),
+                datasets: [{
+                    label: 'log(Error)',
+                    data: data.map(d => Math.log(d.error)),
+                    borderColor: 'var(--secondary-color)',
+                    backgroundColor: 'var(--secondary-color)',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: 'log(n)' } },
+                    y: { title: { display: true, text: 'log(Error)' } }
+                },
+                plugins: { title: { display: true, text: 'Log-Log Plot of Error vs. Number of Rectangles (n)', font: {size: 16} } }
+            }
+        });
+    }
+
+    window.switchTab = (tabName) => {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+    };
+    
+    initialize();
+});
+</script>
+</body>
+</html>
