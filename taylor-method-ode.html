@@ -89,29 +89,20 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- EXAMPLES with pre-calculated derivatives ---
     const EXAMPLES = {
         "y' = y": {
-            f_string: (x,y) => `y`,
             derivatives: [ (x, y) => y, (x, y) => y, (x, y) => y, (x, y) => y ],
             derivative_strings: ["y", "y", "y", "y"],
             true_solution: (x, x0, y0) => y0 * Math.exp(x - x0),
             x0: 0, y0: 1, xf: 4, h: 0.5, plotRange: { x: [0, 4.5], y: [0, 60] }
         },
         "y' = x + y": {
-            f_string: (x,y) => `x + y`,
-            derivatives: [
-                (x, y) => x + y,                   // y'
-                (x, y) => 1 + x + y,               // y'' = 1 + y'
-                (x, y) => 1 + x + y,               // y''' = y''
-                (x, y) => 1 + x + y,               // y'''' = y'''
-            ],
+            derivatives: [ (x, y) => x + y, (x, y) => 1 + x + y, (x, y) => 1 + x + y, (x, y) => 1 + x + y ],
             derivative_strings: ["x+y", "1+x+y", "1+x+y", "1+x+y"],
             true_solution: (x, x0, y0) => (y0 + x0 + 1) * Math.exp(x - x0) - x - 1,
             x0: 0, y0: 1, xf: 4, h: 0.5, plotRange: { x: [0, 4.5], y: [0, 80] }
         },
         "y' = -y": {
-            f_string: (x,y) => `-y`,
             derivatives: [ (x,y) => -y, (x,y) => y, (x,y) => -y, (x,y) => y ],
             derivative_strings: ["-y", "y", "-y", "y"],
             true_solution: (x, x0, y0) => y0 * Math.exp(-(x - x0)),
@@ -125,34 +116,40 @@ document.addEventListener('DOMContentLoaded', () => {
         h: 0.5,
     };
 
-    const DOM = {};
-    for (const id of ['example-select', 'order-slider', 'order-label', 'h-slider', 'h-label', 'plot-container', 'formula-display', 'results-display']) {
-        DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
-    }
+    const exampleSelect = document.getElementById('example-select');
+    const orderSlider = document.getElementById('order-slider');
+    const orderLabel = document.getElementById('order-label');
+    const hSlider = document.getElementById('h-slider');
+    const hLabel = document.getElementById('h-label');
+    const plotContainer = document.getElementById('plot-container');
+    const formulaDisplay = document.getElementById('formula-display');
+    const resultsDisplay = document.getElementById('results-display');
     
     function initialize() {
         Object.keys(EXAMPLES).forEach(name => {
-            DOM.exampleSelect.appendChild(new DOM.exampleSelect.constructor.Option(name, name));
+            exampleSelect.appendChild(new Option(name, name));
         });
         
-        DOM.exampleSelect.addEventListener('change', loadExample);
-        DOM.orderSlider.addEventListener('input', updateControls);
-        DOM.hSlider.addEventListener('input', updateControls);
+        exampleSelect.addEventListener('change', loadExample);
+        orderSlider.addEventListener('input', updateControls);
+        hSlider.addEventListener('input', updateControls);
         
         loadExample();
     }
 
     function loadExample() {
-        state.currentExample = EXAMPLES[DOM.exampleSelect.value];
-        DOM.hSlider.value = state.currentExample.h;
+        state.currentExample = EXAMPLES[exampleSelect.value];
+        hSlider.value = state.currentExample.h;
+        // Set sliders to default order if it exists, otherwise use current state
+        orderSlider.value = state.currentExample.order || state.order;
         updateControls();
     }
 
     function updateControls() {
-        state.order = parseInt(DOM.orderSlider.value);
-        state.h = parseFloat(DOM.hSlider.value);
-        DOM.orderLabel.textContent = state.order;
-        DOM.hLabel.textContent = state.h.toFixed(2);
+        state.order = parseInt(orderSlider.value);
+        state.h = parseFloat(hSlider.value);
+        orderLabel.textContent = state.order;
+        hLabel.textContent = state.h.toFixed(2);
         update();
     }
     
@@ -166,12 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const points = { x: [x], y: [y] };
 
         while (x < xf) {
-            let y_next = y;
-            for (let i = 1; i <= order; i++) {
-                const derivativeVal = derivatives[i-1](x, y); // derivatives[0] is y', [1] is y'', etc.
-                y_next += (Math.pow(h, i) / factorial(i)) * derivativeVal;
+            let y_step = 0;
+            for (let i = 0; i < order; i++) {
+                const derivativeVal = derivatives[i](x, y);
+                y_step += (Math.pow(h, i + 1) / factorial(i + 1)) * derivativeVal;
             }
-            y = y_next;
+            y += y_step;
             x += h;
             points.x.push(x);
             points.y.push(y);
@@ -193,8 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function getTrueSolutionPoints() {
         const { true_solution, x0, y0, xf } = state.currentExample;
         const points = { x: [], y: [] };
-        const step = (xf - x0) / 200;
-        for (let x = x0; x <= xf; x += step) {
+        const numPoints = 200;
+        const step = (xf - x0) / numPoints;
+        for (let i = 0; i <= numPoints; i++) {
+            const x = x0 + i * step;
             points.x.push(x);
             points.y.push(true_solution(x, x0, y0));
         }
@@ -203,30 +202,32 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function updateFormulaDisplay() {
         const { derivative_strings } = state.currentExample;
-        const { order, h } = state;
-        let formula = "y_next = y";
+        const { order } = state;
+        let formula = "y_i+1 = y_i";
         for (let i = 1; i <= order; i++) {
-            formula += ` + (h^${i}/${i}!) * (${derivative_strings[i-1]})`;
+            const term = `(h^${i}/${i}!)`;
+            const deriv = `(${derivative_strings[i-1]})`;
+            formula += ` + ${term} * ${deriv}`;
         }
-        DOM.formulaDisplay.textContent = formula.replace(/\^1/g, ''); // Clean up h^1
+        formulaDisplay.textContent = formula.replace(/\^1/g, '').replace(/1!/g, '1');
     }
 
     function updateResultsDisplay(trueSol, approxSol) {
         const finalApproxY = approxSol.y[approxSol.y.length - 1];
         const finalTrueY = trueSol.y[trueSol.y.length - 1];
         const error = Math.abs(finalTrueY - finalApproxY);
-        DOM.resultsDisplay.innerHTML = `Final Error at x=${state.currentExample.xf}: <span class="value">${error.toExponential(3)}</span>`;
+        resultsDisplay.innerHTML = `Final Error at x=${state.currentExample.xf.toFixed(1)}: <span class="value">${error.toExponential(3)}</span>`;
     }
 
     function drawPlot(trueSol, approxSol) {
-        Plotly.newPlot(DOM.plotContainer, [
+        Plotly.newPlot(plotContainer, [
             { ...trueSol, mode: 'lines', name: 'True Solution', line: { color: 'var(--dark-gray)', width: 2, dash: 'dot' } },
             { ...approxSol, mode: 'lines+markers', name: 'Taylor Approximation', line: { color: 'var(--primary-color)', width: 3 }, marker: {size: 6} },
         ], {
             title: 'Taylor Method vs. True Solution',
             xaxis: { title: 'x', range: state.currentExample.plotRange.x, gridcolor: '#e0e0e0' },
             yaxis: { title: 'y', range: state.currentExample.plotRange.y, gridcolor: '#e0e0e0' },
-            legend: { x: 0.01, y: 0.99 },
+            legend: { x: 0.01, y: 0.99, bgcolor: 'rgba(255,255,255,0.6)' },
             margin: { l: 50, r: 25, t: 40, b: 40 },
         }, {responsive: true, displaylogo: false});
     }
