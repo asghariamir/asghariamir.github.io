@@ -104,28 +104,33 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let state = { compiledFunc: null };
 
-    const DOM = {};
-    for (const id of ['example-select', 'function-input', 'x0-input', 'y0-input', 'x-final-input', 'h-input', 'solve-btn', 'solution-plot', 'error-plot']) {
-        DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
-    }
+    const exampleSelect = document.getElementById('example-select');
+    const functionInput = document.getElementById('function-input');
+    const x0Input = document.getElementById('x0-input');
+    const y0Input = document.getElementById('y0-input');
+    const xFinalInput = document.getElementById('x-final-input');
+    const hInput = document.getElementById('h-input');
+    const solveBtn = document.getElementById('solve-btn');
+    const solutionPlot = document.getElementById('solution-plot');
+    const errorPlot = document.getElementById('error-plot');
     
     function initialize() {
         Object.keys(EXAMPLES).forEach(name => {
-            DOM.exampleSelect.appendChild(new DOM.exampleSelect.constructor.Option(name, name));
+            exampleSelect.appendChild(new Option(name, name));
         });
         
-        DOM.exampleSelect.addEventListener('change', loadExample);
-        DOM.solveBtn.addEventListener('click', runComparison);
+        exampleSelect.addEventListener('change', loadExample);
+        solveBtn.addEventListener('click', runComparison);
         loadExample();
     }
 
     function loadExample() {
-        const ex = EXAMPLES[DOM.exampleSelect.value];
-        DOM.functionInput.value = ex.f_string;
-        DOM.x0Input.value = ex.x0;
-        DOM.y0Input.value = ex.y0;
-        DOM.xFinalInput.value = ex.xf;
-        DOM.hInput.value = ex.h;
+        const ex = EXAMPLES[exampleSelect.value];
+        functionInput.value = ex.f_string;
+        x0Input.value = ex.x0;
+        y0Input.value = ex.y0;
+        xFinalInput.value = ex.xf;
+        hInput.value = ex.h;
     }
 
     function f(x, y) {
@@ -136,27 +141,30 @@ document.addEventListener('DOMContentLoaded', () => {
     function solveODE(method, x0, y0, xf, h) {
         let x = x0, y = y0;
         const points = { x: [x], y: [y] };
-        const numSteps = Math.floor((xf - x0) / h);
-
-        for (let i = 0; i < numSteps; i++) {
+        // Use a small epsilon to handle floating point inaccuracies
+        while (x < xf - 1e-9) {
             if (!isFinite(y)) break;
+            let y_next = y;
+            const current_h = Math.min(h, xf - x); // Adjust last step size
+
             switch(method) {
                 case 'euler':
-                    y += h * f(x, y);
+                    y_next = y + current_h * f(x, y);
                     break;
                 case 'modified-euler':
-                    const y_pred = y + h * f(x, y);
-                    y += (h/2) * (f(x, y) + f(x + h, y_pred));
+                    const y_pred = y + current_h * f(x, y);
+                    y_next = y + (current_h/2) * (f(x, y) + f(x + current_h, y_pred));
                     break;
                 case 'rk4':
                     const k1 = f(x, y);
-                    const k2 = f(x + h/2, y + h*k1/2);
-                    const k3 = f(x + h/2, y + h*k2/2);
-                    const k4 = f(x + h, y + h*k3);
-                    y += (h/6) * (k1 + 2*k2 + 2*k3 + k4);
+                    const k2 = f(x + current_h/2, y + current_h*k1/2);
+                    const k3 = f(x + current_h/2, y + current_h*k2/2);
+                    const k4 = f(x + current_h, y + current_h*k3);
+                    y_next = y + (current_h/6) * (k1 + 2*k2 + 2*k3 + k4);
                     break;
             }
-            x += h;
+            y = y_next;
+            x += current_h;
             points.x.push(x);
             points.y.push(y);
         }
@@ -165,66 +173,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function runComparison() {
         try {
-            state.compiledFunc = math.compile(DOM.functionInput.value);
+            state.compiledFunc = math.compile(functionInput.value);
         } catch (e) {
             alert(`Invalid function syntax: ${e.message}`); return;
         }
 
-        const x0 = parseFloat(DOM.x0Input.value);
-        const y0 = parseFloat(DOM.y0Input.value);
-        const xf = parseFloat(DOM.xFinalInput.value);
-        const h = parseFloat(DOM.hInput.value);
+        solveBtn.textContent = 'Solving...';
+        solveBtn.disabled = true;
 
-        // 1. Calculate high-precision "true" solution
-        const true_h = h / 20; // Use a much smaller step size for benchmark
-        const trueSolution = solveODE('rk4', x0, y0, xf, true_h);
+        // Use a timeout to allow the UI to update before the potentially long calculation
+        setTimeout(() => {
+            const x0 = parseFloat(x0Input.value);
+            const y0 = parseFloat(y0Input.value);
+            const xf = parseFloat(xFinalInput.value);
+            const h = parseFloat(hInput.value);
 
-        // 2. Solve with each method using user-specified h
-        const eulerSolution = solveODE('euler', x0, y0, xf, h);
-        const modifiedEulerSolution = solveODE('modified-euler', x0, y0, xf, h);
-        const rk4Solution = solveODE('rk4', x0, y0, xf, h);
+            const true_h = h / 20; 
+            const trueSolution = solveODE('rk4', x0, y0, xf, true_h);
+            const eulerSolution = solveODE('euler', x0, y0, xf, h);
+            const modifiedEulerSolution = solveODE('modified-euler', x0, y0, xf, h);
+            const rk4Solution = solveODE('rk4', x0, y0, xf, h);
 
-        // 3. Calculate errors
-        const trueSolutionMap = new Map(trueSolution.x.map((x, i) => [x.toFixed(10), trueSolution.y[i]]));
-        const calcError = (solution) => {
-            const errors = { x: [], y: [] };
-            solution.x.forEach((x, i) => {
-                const trueY = trueSolutionMap.get(x.toFixed(10));
-                if (trueY !== undefined) {
-                    errors.x.push(x);
-                    errors.y.push(Math.max(1e-12, Math.abs(trueY - solution.y[i])));
-                }
-            });
-            return errors;
-        };
+            const trueSolutionMap = new Map(trueSolution.x.map((x, i) => [x.toPrecision(10), trueSolution.y[i]]));
+            const calcError = (solution) => {
+                const errors = { x: [], y: [] };
+                solution.x.forEach((x, i) => {
+                    const trueY = trueSolutionMap.get(x.toPrecision(10));
+                    if (trueY !== undefined) {
+                        errors.x.push(x);
+                        errors.y.push(Math.max(1e-12, Math.abs(trueY - solution.y[i])));
+                    }
+                });
+                return errors;
+            };
 
-        const eulerError = calcError(eulerSolution);
-        const modifiedEulerError = calcError(modifiedEulerSolution);
-        const rk4Error = calcError(rk4Solution);
+            const eulerError = calcError(eulerSolution);
+            const modifiedEulerError = calcError(modifiedEulerSolution);
+            const rk4Error = calcError(rk4Solution);
 
-        // 4. Plot results
-        drawSolutionPlot(trueSolution, eulerSolution, modifiedEulerSolution, rk4Solution);
-        drawErrorPlot(eulerError, modifiedEulerError, rk4Error);
+            drawSolutionPlot(trueSolution, eulerSolution, modifiedEulerSolution, rk4Solution);
+            drawErrorPlot(eulerError, modifiedEulerError, rk4Error);
+            
+            solveBtn.textContent = 'Solve & Compare';
+            solveBtn.disabled = false;
+        }, 50);
     }
 
     // --- PLOTTING ---
     function drawSolutionPlot(trueSol, euler, modEuler, rk4) {
-        Plotly.newPlot(DOM.solutionPlot, [
-            { ...trueSol, mode: 'lines', name: 'True Solution', line: { color: 'var(--true-solution-color)', width: 3, dash: 'dot' } },
-            { ...euler, mode: 'lines+markers', name: 'Euler', line: { color: 'var(--euler-color)' }, marker: {size: 5} },
-            { ...modEuler, mode: 'lines+markers', name: 'Modified Euler', line: { color: 'var(--modified-euler-color)' }, marker: {size: 5} },
-            { ...rk4, mode: 'lines+markers', name: 'RK4', line: { color: 'var(--rk4-color)' }, marker: {size: 5} },
+        Plotly.newPlot(solutionPlot, [
+            { ...trueSol, mode: 'lines', name: 'True Solution (RK4, h/20)', line: { color: 'var(--true-solution-color)', width: 3, dash: 'dot' } },
+            { ...euler, mode: 'lines+markers', name: 'Euler', line: { color: 'var(--euler-color)' }, marker: {size: 6} },
+            { ...modEuler, mode: 'lines+markers', name: 'Modified Euler', line: { color: 'var(--modified-euler-color)' }, marker: {size: 6} },
+            { ...rk4, mode: 'lines+markers', name: 'RK4', line: { color: 'var(--rk4-color)' }, marker: {size: 6} },
         ], {
             title: 'Comparison of ODE Solver Solutions',
             xaxis: { title: 'x', gridcolor: '#e0e0e0' },
             yaxis: { title: 'y', gridcolor: '#e0e0e0' },
-            legend: { x: 0.01, y: 0.99 },
+            legend: { x: 0.01, y: 0.99, bgcolor: 'rgba(255,255,255,0.6)' },
             margin: { l: 50, r: 25, t: 40, b: 40 },
         }, {responsive: true, displaylogo: false});
     }
 
     function drawErrorPlot(euler, modEuler, rk4) {
-        Plotly.newPlot(DOM.errorPlot, [
+        Plotly.newPlot(errorPlot, [
             { ...euler, mode: 'lines', name: 'Euler Error', line: { color: 'var(--euler-color)' } },
             { ...modEuler, mode: 'lines', name: 'Modified Euler Error', line: { color: 'var(--modified-euler-color)' } },
             { ...rk4, mode: 'lines', name: 'RK4 Error', line: { color: 'var(--rk4-color)' } },
@@ -232,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'Global Error vs. x',
             xaxis: { title: 'x', gridcolor: '#e0e0e0' },
             yaxis: { title: 'Error (log scale)', type: 'log', gridcolor: '#e0e0e0' },
-            legend: { x: 0.01, y: 0.99 },
+            legend: { x: 0.01, y: 0.99, bgcolor: 'rgba(255,255,255,0.6)' },
             margin: { l: 60, r: 25, t: 40, b: 40 },
         }, {responsive: true, displaylogo: false});
     }
