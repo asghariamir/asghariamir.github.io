@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ODE Step Visualizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --euler-color: #ff9800;
+            --modified-euler-color: #d32f2f;
+            --rk4-color: #4caf50;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: var(--light-gray); color: var(--dark-gray); display: flex; justify-content: center; padding: 1rem; }
+        .container { width: 100%; max-width: 900px; margin: 0 auto; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; padding: 1.5rem; }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;}
+        
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem 1.5rem; padding: 1rem; background-color: var(--light-gray); border-radius: 6px; margin-bottom: 1.5rem; }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .full-width { grid-column: 1 / -1; }
+        
+        label { font-size: 0.9rem; font-weight: 600; color: #616161; }
+        input, select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; }
+        input[type="text"] { font-family: monospace; }
+        .radio-group { display: flex; gap: 1rem; align-items: center; background: #fff; padding: 5px; border-radius: 6px; }
+        
+        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
+        
+        .plot-container { width: 100%; height: 500px; border: 1px solid var(--medium-gray); border-radius: 4px; }
+        .results-display { margin-top: 1.5rem; text-align: center; background-color: var(--light-gray); padding: 1rem; border-radius: 4px;}
+        .results-display .label { font-size: 0.9rem; color: #616161; }
+        .results-display .value { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); font-family: monospace;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>ODE Step Visualizer</h2>
+    <p class="info">See how different numerical methods take a single step to approximate the solution of a differential equation <strong>dy/dx = f(x, y)</strong>. Note how higher-order methods use more calculations within the step to achieve better accuracy.</p>
+    
+    <div class="controls">
+        <div class="control-group full-width">
+            <label for="example-select">Load Example ODE:</label>
+            <select id="example-select"></select>
+        </div>
+        <div class="control-group full-width">
+            <label for="function-input">Enter Function f(x, y):</label>
+            <input type="text" id="function-input">
+        </div>
+        <div class="control-group">
+            <label for="x0-input">Initial Point (x₀):</label>
+            <input type="number" id="x0-input" value="0" step="0.1">
+        </div>
+        <div class="control-group">
+            <label for="y0-input">Initial Point (y₀):</label>
+            <input type="number" id="y0-input" value="1" step="0.1">
+        </div>
+        <div class="control-group">
+            <label for="h-input">Step Size (h):</label>
+            <input type="number" id="h-input" value="1" step="0.1">
+        </div>
+    </div>
+    
+    <div class="control-group">
+        <label>Method to Visualize:</label>
+        <div class="radio-group">
+            <input type="radio" id="method-euler" name="method" value="euler" checked><label for="method-euler">Euler</label>
+            <input type="radio" id="method-modified-euler" name="method" value="modified-euler"><label for="method-modified-euler">Modified Euler</label>
+            <input type="radio" id="method-rk4" name="method" value="rk4"><label for="method-rk4">Runge-Kutta (RK4)</label>
+        </div>
+    </div>
+
+    <div id="plot-container" class="plot-container"></div>
+    
+    <div class="results-display">
+        <div class="label">Resulting Point (x₁, y₁)</div>
+        <div id="result-val" class="value">--</div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const EXAMPLES = {
+        "y' = y": { f_string: "y", x0: 0, y0: 1, h: 0.5, plotRange: {x:[-1, 2], y:[-1, 4]}},
+        "y' = x + y": { f_string: "x + y", x0: 0, y0: 1, h: 0.5, plotRange: {x:[-1, 2], y:[-1, 5]}},
+        "y' = sin(x)": { f_string: "sin(x)", x0: 0, y0: 0, h: 1, plotRange: {x:[-2, 2], y:[-2, 2]}},
+        "y' = -2xy": { f_string: "-2*x*y", x0: 0, y0: 1, h: 0.4, plotRange: {x:[-1, 2], y:[-1, 2]}}
+    };
+    
+    let state = { compiledFunc: null };
+
+    const DOM = {};
+    for (const id of ['example-select', 'function-input', 'x0-input', 'y0-input', 'h-input', 'plot-container', 'result-val']) {
+        DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
+    }
+    const methodRadios = document.getElementsByName('method');
+    
+    function initialize() {
+        Object.keys(EXAMPLES).forEach(name => {
+            DOM.exampleSelect.appendChild(new DOM.exampleSelect.constructor.Option(name, name));
+        });
+        
+        DOM.exampleSelect.addEventListener('change', loadExample);
+        DOM.functionInput.addEventListener('change', updateFunction);
+        [DOM.x0Input, DOM.y0Input, DOM.hInput].forEach(el => el.addEventListener('change', drawPlot));
+        methodRadios.forEach(radio => radio.addEventListener('change', drawPlot));
+        
+        loadExample();
+    }
+
+    function loadExample() {
+        const ex = EXAMPLES[DOM.exampleSelect.value];
+        DOM.functionInput.value = ex.f_string;
+        DOM.x0Input.value = ex.x0;
+        DOM.y0Input.value = ex.y0;
+        DOM.hInput.value = ex.h;
+        updateFunction();
+    }
+
+    function updateFunction() {
+        DOM.functionInput.classList.remove('error');
+        try {
+            state.compiledFunc = math.compile(DOM.functionInput.value);
+            drawPlot();
+        } catch (e) {
+            DOM.functionInput.classList.add('error');
+            alert(`Invalid function syntax: ${e.message}`);
+            state.compiledFunc = null;
+        }
+    }
+    
+    function f(x, y) {
+        if (!state.compiledFunc) return NaN;
+        try { return state.compiledFunc.evaluate({x: x, y: y}); } catch { return NaN; }
+    }
+
+    function drawPlot() {
+        if (!state.compiledFunc) return;
+        const x0 = parseFloat(DOM.x0Input.value);
+        const y0 = parseFloat(DOM.y0Input.value);
+        const h = parseFloat(DOM.hInput.value);
+        const method = document.querySelector('input[name="method"]:checked').value;
+        const range = EXAMPLES[DOM.exampleSelect.value].plotRange;
+
+        const traces = [];
+        const shapes = [];
+        let result = {};
+
+        // 1. Slope Field
+        for (let i = range.x[0]; i <= range.x[1]; i += 0.5) {
+            for (let j = range.y[0]; j <= range.y[1]; j += 0.5) {
+                const slope = f(i, j);
+                const angle = Math.atan(slope);
+                const len = 0.15;
+                shapes.push({ type: 'line', x0: i - len*Math.cos(angle), y0: j - len*Math.sin(angle), x1: i + len*Math.cos(angle), y1: j + len*Math.sin(angle), line: {color: 'rgba(0,0,0,0.2)', width: 1}});
+            }
+        }
+        
+        // 2. True solution (using high-precision RK4)
+        const trueSol = { x: [x0], y: [y0] };
+        let curX = x0, curY = y0;
+        const fine_h = 0.01;
+        for (let i = 0; i < (range.x[1] - x0) / fine_h; i++) {
+            const k1 = f(curX, curY); const k2 = f(curX + fine_h/2, curY + fine_h*k1/2);
+            const k3 = f(curX + fine_h/2, curY + fine_h*k2/2); const k4 = f(curX + fine_h, curY + fine_h*k3);
+            curY += (fine_h/6) * (k1 + 2*k2 + 2*k3 + k4); curX += fine_h;
+            trueSol.x.push(curX); trueSol.y.push(curY);
+        }
+        traces.push({ ...trueSol, mode: 'lines', name: 'True Solution', line: { color: 'rgba(0,0,0,0.4)', dash: 'dot', width: 2 } });
+        
+        // 3. Visualization for the selected method
+        if (method === 'euler') {
+            const k1 = f(x0, y0);
+            const y1 = y0 + h * k1;
+            shapes.push({ type: 'line', x0, y0, x1: x0 + h, y1: y1, line: { color: 'var(--euler-color)', width: 4 } });
+            traces.push({ x: [x0 + h], y: [y1], mode: 'markers', name: 'Euler', marker: { color: 'var(--euler-color)', size: 12 } });
+            result = { x: x0+h, y: y1};
+        } else if (method === 'modified-euler') {
+            const k1 = f(x0, y0);
+            const y1_pred = y0 + h * k1; // Predictor step
+            const k2 = f(x0 + h, y1_pred);
+            const y1 = y0 + h * (k1 + k2) / 2; // Corrector step
+            shapes.push({ type: 'line', x0, y0, x1: x0 + h, y1: y1_pred, line: { color: 'var(--modified-euler-color)', width: 1.5, dash: 'dash' }, name: 'Predictor' }); // Predictor
+            shapes.push({ type: 'line', x0, y0, x1: x0 + h, y1: y1, line: { color: 'var(--modified-euler-color)', width: 4 } }); // Corrector
+            traces.push({ x: [x0 + h], y: [y1], mode: 'markers', name: 'Modified Euler', marker: { color: 'var(--modified-euler-color)', size: 12 } });
+            result = { x: x0+h, y: y1};
+        } else if (method === 'rk4') {
+            const k1 = f(x0, y0);
+            const k2 = f(x0 + h/2, y0 + h*k1/2);
+            const k3 = f(x0 + h/2, y0 + h*k2/2);
+            const k4 = f(x0 + h, y0 + h*k3);
+            const y1 = y0 + (h/6) * (k1 + 2*k2 + 2*k3 + k4);
+            // Visualize intermediate steps
+            shapes.push({ type: 'line', x0, y0, x1: x0+h/2, y1: y0 + h*k1/2, line: { color: 'rgba(0,0,0,0.3)', width: 1, dash: 'dot' } });
+            shapes.push({ type: 'line', x0, y0, x1: x0+h/2, y1: y0 + h*k2/2, line: { color: 'rgba(0,0,0,0.3)', width: 1, dash: 'dot' } });
+            shapes.push({ type: 'line', x0, y0, x1: x0+h, y1: y0 + h*k3, line: { color: 'rgba(0,0,0,0.3)', width: 1, dash: 'dot' } });
+            // Final RK4 step
+            shapes.push({ type: 'line', x0, y0, x1: x0 + h, y1: y1, line: { color: 'var(--rk4-color)', width: 4 } });
+            traces.push({ x: [x0 + h], y: [y1], mode: 'markers', name: 'RK4', marker: { color: 'var(--rk4-color)', size: 12 } });
+            result = { x: x0+h, y: y1};
+        }
+
+        // Add starting point
+        traces.push({ x: [x0], y: [y0], mode: 'markers', name: 'Start (x₀, y₀)', marker: { color: 'black', size: 14, symbol: 'diamond' } });
+
+        DOM.resultVal.textContent = `(${result.x.toFixed(4)}, ${result.y.toFixed(4)})`;
+        
+        Plotly.newPlot(DOM.plotContainer, traces, {
+            title: 'ODE Step Visualization',
+            xaxis: { title: 'x', range: range.x, gridcolor: '#e0e0e0' },
+            yaxis: { title: 'y', range: range.y, gridcolor: '#e0e0e0' },
+            showlegend: false,
+            margin: { l: 50, r: 25, t: 40, b: 40 },
+            shapes: shapes
+        }, {responsive: true, displaylogo: false});
+    }
+    
+    initialize();
+});
+</script>
+</body>
+</html>
