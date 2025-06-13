@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romberg Integration Lab</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --secondary-color: #4caf50;
+            --danger-color: #d32f2f;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+            --highlight-bg: #fffde7;
+            --highlight-border: #fbc02d;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: var(--light-gray); color: var(--text-color); display: flex; justify-content: center; padding: 1rem; }
+        .container { width: 100%; max-width: 900px; margin: 0 auto; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; padding: 1.5rem; }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; }
+        h3 { font-size: 1.25rem; color: var(--dark-gray); margin-top: 1.5rem; margin-bottom: 1rem; border-top: 1px solid var(--medium-gray); padding-top: 1.5rem;}
+        
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem 1.5rem; padding: 1rem; background-color: var(--light-gray); border-radius: 6px; margin-bottom: 1.5rem; }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .full-width { grid-column: 1 / -1; }
+        
+        label { font-size: 0.9rem; font-weight: 600; color: #616161; }
+        input, select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; }
+        input[type="text"] { font-family: monospace; }
+        
+        .button-group { display: flex; gap: 1rem; }
+        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
+        button:hover { background-color: #1976d2; }
+        button:disabled { background-color: #bdbdbd; cursor: not-allowed; }
+        .secondary-button { background-color: var(--secondary-color); }
+        .secondary-button:hover { background-color: #388e3c; }
+
+        .results-display { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; text-align: center; }
+        .result-box { background-color: var(--light-gray); padding: 1rem; border-radius: 6px; }
+        .result-box .label { font-size: 0.9rem; color: #616161; }
+        .result-box .value { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
+        .result-box .value.error { color: var(--danger-color); }
+
+        .table-container { width: 100%; overflow-x: auto; border: 1px solid var(--medium-gray); border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { border: 1px solid var(--medium-gray); padding: 8px 12px; text-align: center; min-width: 120px; }
+        thead th { background-color: var(--light-gray); font-weight: 600; position: sticky; top: 0; }
+        td.highlight { background-color: var(--highlight-bg); border-color: var(--highlight-border); transition: background-color 0.5s ease; }
+        td.new-value { animation: fadeIn 1s ease; }
+        @keyframes fadeIn { from { background-color: var(--highlight-bg); } to { background-color: white; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Romberg Integration Lab</h2>
+    <p class="info">Explore how Richardson Extrapolation is used to improve the accuracy of the Trapezoidal Rule. Generate the first column of estimates, then repeatedly "Extrapolate" to build the Romberg table and achieve a highly accurate result.</p>
+    
+    <div class="controls">
+        <div class="control-group full-width">
+            <label for="example-select">Load Example Function:</label>
+            <select id="example-select"></select>
+        </div>
+        <div class="control-group full-width">
+            <label for="function-input">Enter Function f(x):</label>
+            <input type="text" id="function-input">
+        </div>
+        <div class="control-group">
+            <label for="a-input">Interval Start (a):</label>
+            <input type="number" id="a-input" value="0">
+        </div>
+        <div class="control-group">
+            <label for="b-input">Interval End (b):</label>
+            <input type="number" id="b-input" value="2">
+        </div>
+        <div class="control-group">
+            <label for="depth-slider">Table Depth (k): <span id="depth-label">5</span></label>
+            <input type="range" id="depth-slider" min="2" max="8" value="5">
+        </div>
+    </div>
+    
+    <div class="button-group">
+        <button id="generate-btn">Generate Table</button>
+        <button id="extrapolate-btn" class="secondary-button" disabled>Extrapolate Next Level</button>
+    </div>
+
+    <div class="results-display">
+        <div class="result-box">
+            <div class="label">True Integral (Benchmark)</div>
+            <div id="true-integral-val" class="value">--</div>
+        </div>
+         <div class="result-box">
+            <div class="label">Best Estimate</div>
+            <div id="best-estimate-val" class="value">--</div>
+        </div>
+         <div class="result-box">
+            <div class="label">Error</div>
+            <div id="error-val" class="value error">--</div>
+        </div>
+    </div>
+
+    <h3>Romberg Integration Table</h3>
+    <div id="romberg-container" class="table-container">
+        <p style="padding: 2rem; text-align: center; color: #9e9e9e;">Click "Generate Table" to begin.</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const EXAMPLES = {
+        "sin(x) [0, π]": { f_string: "sin(x)", a: 0, b: "pi" },
+        "exp(x) [0, 1]": { f_string: "exp(x)", a: 0, b: "1" },
+        "4 / (1 + x^2) [0, 1]": { f_string: "4 / (1 + x^2)", a: 0, b: "1"}, // Should -> pi
+    };
+    
+    let state = {
+        compiledFunc: null, a: 0, b: 2, depth: 5,
+        trueIntegral: null, rombergTable: [], currentLevel: 0
+    };
+
+    const DOM = {};
+    for (const id of ['example-select', 'function-input', 'a-input', 'b-input', 'depth-slider', 'depth-label', 'generate-btn', 'extrapolate-btn', 'true-integral-val', 'best-estimate-val', 'error-val', 'romberg-container']) {
+        DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
+    }
+    
+    function initialize() {
+        Object.keys(EXAMPLES).forEach(name => {
+            const option = new DOM.exampleSelect.constructor.Option(name, name);
+            DOM.exampleSelect.appendChild(option);
+        });
+        DOM.exampleSelect.addEventListener('change', loadExample);
+        DOM.generateBtn.addEventListener('click', generateTable);
+        DOM.extrapolateBtn.addEventListener('click', extrapolateNextLevel);
+        DOM.depthSlider.addEventListener('input', () => { DOM.depthLabel.textContent = DOM.depthSlider.value; });
+        loadExample();
+    }
+
+    function loadExample() {
+        const example = EXAMPLES[DOM.exampleSelect.value];
+        DOM.functionInput.value = example.f_string;
+        DOM.aInput.value = example.a;
+        DOM.bInput.value = example.b;
+    }
+
+    function f(x) {
+        try { return state.compiledFunc.evaluate({x: x}); } catch { return NaN; }
+    }
+
+    function trapezoid(n, a, b) {
+        const h = (b - a) / n;
+        let sum = (f(a) + f(b)) / 2;
+        for (let i = 1; i < n; i++) {
+            sum += f(a + i * h);
+        }
+        return sum * h;
+    }
+    
+    function generateTable() {
+        try {
+            state.compiledFunc = math.compile(DOM.functionInput.value);
+            state.a = math.evaluate(DOM.aInput.value);
+            state.b = math.evaluate(DOM.bInput.value);
+            state.depth = parseInt(DOM.depthSlider.value);
+        } catch (e) {
+            alert(`Invalid function or range: ${e.message}`); return;
+        }
+        
+        state.trueIntegral = trapezoid(Math.pow(2, 12), state.a, state.b); // High-precision benchmark
+        state.rombergTable = Array(state.depth).fill(0).map(() => Array(state.depth).fill(null));
+        state.currentLevel = 0;
+
+        for (let i = 0; i < state.depth; i++) {
+            const n = Math.pow(2, i);
+            state.rombergTable[i][0] = trapezoid(n, state.a, state.b);
+        }
+
+        DOM.extrapolateBtn.disabled = false;
+        renderRombergTable();
+        updateResultsPanel();
+    }
+    
+    function extrapolateNextLevel() {
+        const j = state.currentLevel + 1;
+        if (j >= state.depth) {
+            DOM.extrapolateBtn.disabled = true;
+            return;
+        }
+
+        for (let i = j; i < state.depth; i++) {
+            const powerOf4 = Math.pow(4, j);
+            const R_i_j_minus_1 = state.rombergTable[i][j-1];
+            const R_i_minus_1_j_minus_1 = state.rombergTable[i-1][j-1];
+            
+            const extrapolatedValue = (powerOf4 * R_i_j_minus_1 - R_i_minus_1_j_minus_1) / (powerOf4 - 1);
+            state.rombergTable[i][j] = extrapolatedValue;
+        }
+        
+        state.currentLevel = j;
+        renderRombergTable();
+        updateResultsPanel();
+
+        if (state.currentLevel >= state.depth - 1) {
+            DOM.extrapolateBtn.disabled = true;
+        }
+    }
+
+    function renderRombergTable() {
+        let html = '<table id="romberg-table-el">';
+        // Header
+        html += '<thead><tr><th>k</th><th>n=2<sup>k</sup></th><th>R(k,0)</th>';
+        for(let j=1; j<state.depth; j++) html += `<th>R(k,${j})</th>`;
+        html += '</tr></thead><tbody>';
+
+        // Body
+        for (let i = 0; i < state.depth; i++) {
+            html += `<tr><td>${i}</td><td>${Math.pow(2,i)}</td>`;
+            for (let j = 0; j < state.depth; j++) {
+                const value = state.rombergTable[i][j];
+                const id = `cell-${i}-${j}`;
+                if (value !== null) {
+                    const isNew = j === state.currentLevel && i >= state.currentLevel;
+                    html += `<td id="${id}" class="${isNew ? 'new-value' : ''}">${value.toFixed(10)}</td>`;
+                } else {
+                    html += `<td id="${id}">-</td>`;
+                }
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        DOM.rombergContainer.innerHTML = html;
+        
+        // Highlight logic
+        if (state.currentLevel > 0) {
+            const j = state.currentLevel;
+            for(let i = j; i < state.depth; i++) {
+                document.getElementById(`cell-${i}-${j-1}`).classList.add('highlight');
+                document.getElementById(`cell-${i-1}-${j-1}`).classList.add('highlight');
+            }
+        }
+    }
+    
+    function updateResultsPanel() {
+        const bestEstimate = state.rombergTable[state.currentLevel][state.currentLevel];
+        DOM.trueIntegralVal.textContent = state.trueIntegral.toFixed(10);
+        if (bestEstimate !== null) {
+            DOM.bestEstimateVal.textContent = bestEstimate.toFixed(10);
+            DOM.errorVal.textContent = Math.abs(state.trueIntegral - bestEstimate).toExponential(3);
+        } else {
+            DOM.bestEstimateVal.textContent = '-';
+            DOM.errorVal.textContent = '-';
+        }
+    }
+    
+    initialize();
+});
+</script>
+</body>
+</html>
