@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Numerical Integration: Midpoint Rule</title>
+    <title>Numerical Integration Lab</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
@@ -11,6 +11,9 @@
         :root {
             --primary-color: #1565c0;
             --secondary-color: #c62828;
+            --midpoint-color-rgba: rgba(21, 101, 192, 0.4);
+            --trapezoid-color-rgba: rgba(198, 40, 40, 0.4);
+            --simpson-color-rgba: rgba(46, 125, 50, 0.4);
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
@@ -36,8 +39,8 @@
         label { font-size: 0.9rem; font-weight: 600; color: #616161; }
         input, select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; }
         input[type="text"] { font-family: monospace; }
-        input.error { border-color: var(--danger-color); }
-
+        .radio-group { display: flex; gap: 1rem; align-items: center; background: #fff; padding: 5px; border-radius: 6px; }
+        
         button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
         button:hover { background-color: #1976d2; }
         
@@ -49,7 +52,7 @@
         .result-box .value.error { color: var(--secondary-color); }
 
         .log-container { max-height: 400px; overflow-y: auto; border: 1px solid var(--medium-gray); border-radius: 4px; margin-top: 1.5rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         th, td { border-bottom: 1px solid var(--medium-gray); padding: 8px; text-align: center; }
         thead th { background-color: var(--light-gray); font-weight: 600; position: sticky; top: 0; z-index: 1;}
     </style>
@@ -62,8 +65,8 @@
     </div>
 
     <section id="explorer-tab" class="tab-content active">
-        <h2>Numerical Integration: Midpoint Rule</h2>
-        <p class="info">Approximate the area under a curve by summing the areas of rectangles. In the Midpoint Rule, the height of each rectangle is determined by the function's value at the midpoint of its base.</p>
+        <h2>Numerical Integration Lab</h2>
+        <p class="info">Approximate the area under a curve by summing the areas of simpler shapes. Compare the accuracy of the Midpoint, Trapezoidal, and Simpson's rules.</p>
         
         <div class="controls">
             <div class="control-group full-width">
@@ -83,8 +86,16 @@
                 <input type="number" id="b-input" value="5">
             </div>
             <div class="control-group full-width">
-                <label for="n-slider">Number of Rectangles (n): <span id="n-label">10</span></label>
+                <label for="n-slider">Subintervals (n): <span id="n-label">10</span></label>
                 <input type="range" id="n-slider" min="1" max="200" value="10">
+            </div>
+            <div class="control-group full-width">
+                <label>Integration Method:</label>
+                <div class="radio-group">
+                    <input type="radio" id="method-midpoint" name="method" value="midpoint" checked><label for="method-midpoint">Midpoint</label>
+                    <input type="radio" id="method-trapezoid" name="method" value="trapezoid"><label for="method-trapezoid">Trapezoid</label>
+                    <input type="radio" id="method-simpson" name="method" value="simpson"><label for="method-simpson">Simpson's</label>
+                </div>
             </div>
         </div>
         
@@ -96,7 +107,7 @@
                 <div id="true-integral-val" class="value">--</div>
             </div>
              <div class="result-box">
-                <div class="label">Midpoint Approximation</div>
+                <div class="label" id="approx-label">Midpoint Approximation</div>
                 <div id="approx-val" class="value">--</div>
             </div>
              <div class="result-box">
@@ -108,7 +119,7 @@
 
     <section id="error-tab" class="tab-content">
         <h2>Error Analysis</h2>
-        <p class="info">Investigate how the approximation error changes as the number of rectangles (n) increases. For the Midpoint Rule, the error is expected to decrease proportionally to 1/n². Note the logarithmic scale on the error plot.</p>
+        <p class="info">Compare the performance of each method. Note how the error for Midpoint and Trapezoid rules decreases proportionally to 1/n², while Simpson's rule error decreases much faster, proportionally to 1/n⁴.</p>
         <button id="run-error-analysis-btn">Run Error Analysis</button>
         <div style="position: relative; height: 400px; margin-top: 1.5rem;">
             <canvas id="error-chart"></canvas>
@@ -116,7 +127,7 @@
         <h3>Raw Data</h3>
         <div class="log-container">
             <table id="error-table">
-                <thead><tr><th>n (Rectangles)</th><th>Approximation</th><th>Error</th></tr></thead>
+                <thead><tr><th>n</th><th>Midpoint Error</th><th>Trapezoid Error</th><th>Simpson Error</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -126,7 +137,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const EXAMPLES = {
-        "x^2": { f_string: "x^2", a: 0, b: 5 },
+        "x^3 - 2x^2 + 5": { f_string: "x^3 - 2x^2 + 5", a: 0, b: 5 },
         "sin(x)": { f_string: "sin(x)", a: 0, b: "pi" },
         "exp(-x^2)": { f_string: "exp(-x^2)", a: -2, b: 2 },
         "1 / (1 + x^2)": { f_string: "1 / (1 + x^2)", a: -5, b: 5},
@@ -136,12 +147,16 @@ document.addEventListener('DOMContentLoaded', () => {
         funcString: '', compiledFunc: null,
         a: 0, b: 5, n: 10,
         trueIntegral: null,
+        method: 'midpoint'
     };
 
-    const DOM = { /* DOM refs */ };
-    for (const id of ['example-select', 'function-input', 'a-input', 'b-input', 'n-slider', 'n-label', 'plot-explorer', 'true-integral-val', 'approx-val', 'error-val', 'run-error-analysis-btn', 'error-chart', 'error-table']) {
+    const DOM = {};
+    for (const id of ['example-select', 'function-input', 'a-input', 'b-input', 'n-slider', 'n-label', 'plot-explorer', 'true-integral-val', 'approx-label', 'approx-val', 'error-val', 'run-error-analysis-btn', 'error-chart', 'error-table']) {
         DOM[id.replace(/-./g, m => m[1].toUpperCase())] = document.getElementById(id);
     }
+    document.getElementsByName('method').forEach(radio => {
+        radio.addEventListener('change', e => { state.method = e.target.value; updateAll(); });
+    });
     let errorChartInstance;
 
     function initialize() {
@@ -172,7 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
         DOM.functionInput.classList.remove('error');
         try {
             state.compiledFunc = math.compile(DOM.functionInput.value);
-            // Calculate a high-precision value for the "true" integral
+            state.a = math.evaluate(DOM.aInput.value);
+            state.b = math.evaluate(DOM.bInput.value);
             state.trueIntegral = calculateMidpoint(10000); 
         } catch (e) {
             DOM.functionInput.classList.add('error');
@@ -186,10 +202,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!state.compiledFunc) return;
         state.a = math.evaluate(DOM.aInput.value);
         state.b = math.evaluate(DOM.bInput.value);
-        state.n = parseInt(DOM.nSlider.value);
+        let nValue = parseInt(DOM.nSlider.value);
+        if (state.method === 'simpson' && nValue % 2 !== 0) {
+            nValue = nValue > 1 ? nValue - 1 : 2; // Ensure n is even for Simpson's
+            DOM.nSlider.value = nValue;
+        }
+        state.n = nValue;
         DOM.nLabel.textContent = state.n;
         
-        const approximation = calculateMidpoint(state.n);
+        let approximation = 0;
+        switch(state.method) {
+            case 'midpoint':
+                approximation = calculateMidpoint(state.n);
+                DOM.approxLabel.textContent = 'Midpoint Approximation';
+                break;
+            case 'trapezoid':
+                approximation = calculateTrapezoid(state.n);
+                DOM.approxLabel.textContent = 'Trapezoid Approximation';
+                break;
+            case 'simpson':
+                approximation = calculateSimpson(state.n);
+                DOM.approxLabel.textContent = "Simpson's Approximation";
+                break;
+        }
+        
         const error = Math.abs(state.trueIntegral - approximation);
 
         DOM.trueIntegralVal.textContent = state.trueIntegral.toFixed(6);
@@ -199,50 +235,81 @@ document.addEventListener('DOMContentLoaded', () => {
         drawExplorerPlot();
     }
     
+    // --- CALCULATION FUNCTIONS ---
+    function f(x) {
+        try { return state.compiledFunc.evaluate({x: x}); } catch { return NaN; }
+    }
     function calculateMidpoint(n, a = state.a, b = state.b) {
-        if (!state.compiledFunc) return 0;
         const h = (b - a) / n;
         let sum = 0;
-        for (let i = 0; i < n; i++) {
-            const midpoint = a + (i + 0.5) * h;
-            try {
-                sum += state.compiledFunc.evaluate({x: midpoint});
-            } catch { /* ignore points outside domain */ }
-        }
+        for (let i = 0; i < n; i++) sum += f(a + (i + 0.5) * h);
         return sum * h;
     }
+    function calculateTrapezoid(n, a = state.a, b = state.b) {
+        const h = (b - a) / n;
+        let sum = (f(a) + f(b)) / 2;
+        for (let i = 1; i < n; i++) sum += f(a + i * h);
+        return sum * h;
+    }
+    function calculateSimpson(n, a = state.a, b = state.b) {
+        if (n % 2 !== 0) return NaN; // Simpson's rule requires even n
+        const h = (b - a) / n;
+        let sum = f(a) + f(b);
+        for (let i = 1; i < n; i += 2) sum += 4 * f(a + i * h);
+        for (let i = 2; i < n - 1; i += 2) sum += 2 * f(a + i * h);
+        return sum * h / 3;
+    }
 
+    // --- PLOTTING ---
     function drawExplorerPlot() {
         if (!state.compiledFunc) return;
         
         const x_func = [], y_func = [];
         const plot_step = (state.b - state.a) / 400;
         for (let x = state.a; x <= state.b; x += plot_step) {
-            try {
-                const y = state.compiledFunc.evaluate({x: x});
-                if(isFinite(y)) { x_func.push(x); y_func.push(y); }
-            } catch {}
+            const y_val = f(x);
+            if(isFinite(y_val)) { x_func.push(x); y_func.push(y_val); }
         }
 
         const h = (state.b - state.a) / state.n;
         const shapes = [];
-        for (let i = 0; i < state.n; i++) {
-            const x0 = state.a + i * h;
-            const x1 = state.a + (i + 1) * h;
-            const mid = (x0 + x1) / 2;
-            const height = state.compiledFunc.evaluate({x: mid});
-            shapes.push({
-                type: 'rect', x0: x0, y0: 0, x1: x1, y1: height,
-                fillcolor: 'rgba(21, 101, 192, 0.4)',
-                line: { color: 'rgba(21, 101, 192, 0.8)', width: 1 }
-            });
+        const parabola_traces = [];
+
+        if (state.method === 'midpoint') {
+            for (let i = 0; i < state.n; i++) {
+                const x0 = state.a + i * h;
+                const x1 = state.a + (i + 1) * h;
+                shapes.push({ type: 'rect', x0, y0: 0, x1, y1: f((x0 + x1) / 2), fillcolor: 'var(--midpoint-color-rgba)', line: { width: 1, color: 'var(--primary-color)' }});
+            }
+        } else if (state.method === 'trapezoid') {
+            for (let i = 0; i < state.n; i++) {
+                const x0 = state.a + i * h;
+                const x1 = state.a + (i + 1) * h;
+                shapes.push({ type: 'path', path: `M ${x0},0 L ${x0},${f(x0)} L ${x1},${f(x1)} L ${x1},0 Z`, fillcolor: 'var(--trapezoid-color-rgba)', line: { width: 1, color: 'var(--secondary-color)' }});
+            }
+        } else if (state.method === 'simpson') {
+             for (let i = 0; i < state.n; i += 2) {
+                const x0 = state.a + i * h, x1 = state.a + (i + 1) * h, x2 = state.a + (i + 2) * h;
+                const y0 = f(x0), y1 = f(x1), y2 = f(x2);
+                
+                // Lagrange polynomial for parabola
+                const parabola = x => y0 * (x - x1) * (x - x2) / ((x0 - x1) * (x0 - x2)) + 
+                                       y1 * (x - x0) * (x - x2) / ((x1 - x0) * (x1 - x2)) + 
+                                       y2 * (x - x0) * (x - x1) / ((x2 - x0) * (x2 - x1));
+                const px = [], py = [];
+                for(let j = 0; j <= 10; j++) {
+                    const x = x0 + j * (x2 - x0) / 10;
+                    px.push(x); py.push(parabola(x));
+                }
+                parabola_traces.push({x: px, y: py, fill: 'tozeroy', mode: 'lines', fillcolor: 'var(--simpson-color-rgba)', line: { color: 'green', width: 1}, showlegend: false});
+            }
         }
 
         Plotly.newPlot(DOM.plotExplorer, [
-            { x: x_func, y: y_func, mode: 'lines', name: 'f(x)', line: { color: 'grey' } },
-            { x: x_func, y: y_func, fill: 'tozeroy', mode: 'none', name: 'True Area', fillcolor: 'rgba(0,0,0,0.1)' }
+            { x: x_func, y: y_func, mode: 'lines', name: 'f(x)', line: { color: 'grey', width: 2 } },
+            ...parabola_traces
         ], {
-            title: 'Function and Midpoint Rectangles',
+            title: 'Function and Approximating Shapes',
             xaxis: { range: [state.a, state.b], gridcolor: '#e0e0e0' },
             yaxis: { gridcolor: '#e0e0e0' },
             shapes: shapes,
@@ -253,24 +320,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function runErrorAnalysis() {
         if (!state.compiledFunc) return;
-        const errorData = [];
-        const n_values = [2, 4, 8, 16, 32, 64, 128, 256, 512];
+        const results = { midpoint: [], trapezoid: [], simpson: [] };
+        const n_values = [2, 4, 6, 8, 10, 20, 30, 50, 80, 100, 150, 200];
         
         n_values.forEach(n => {
-            const approx = calculateMidpoint(n);
-            const error = Math.abs(state.trueIntegral - approx);
-            errorData.push({ n, approx, error });
+            results.midpoint.push({ n, error: Math.abs(state.trueIntegral - calculateMidpoint(n)) });
+            results.trapezoid.push({ n, error: Math.abs(state.trueIntegral - calculateTrapezoid(n)) });
+            results.simpson.push({ n, error: Math.abs(state.trueIntegral - calculateSimpson(n)) });
         });
         
-        renderErrorTable(errorData);
-        drawErrorChart(errorData);
+        renderErrorTable(n_values, results);
+        drawErrorChart(results);
     }
     
-    function renderErrorTable(data) {
+    function renderErrorTable(n_values, data) {
         const tbody = DOM.errorTable.tBodies[0];
         tbody.innerHTML = '';
-        data.forEach(row => {
-            tbody.insertRow().innerHTML = `<td>${row.n}</td><td>${row.approx.toFixed(6)}</td><td>${row.error.toExponential(3)}</td>`;
+        n_values.forEach((n, i) => {
+            tbody.insertRow().innerHTML = `<td>${n}</td>
+                <td>${data.midpoint[i].error.toExponential(3)}</td>
+                <td>${data.trapezoid[i].error.toExponential(3)}</td>
+                <td>${data.simpson[i].error.toExponential(3)}</td>`;
         });
     }
 
@@ -280,14 +350,12 @@ document.addEventListener('DOMContentLoaded', () => {
         errorChartInstance = new Chart(DOM.errorChart, {
             type: 'line',
             data: {
-                labels: data.map(d => Math.log(d.n)),
-                datasets: [{
-                    label: 'log(Error)',
-                    data: data.map(d => Math.log(d.error)),
-                    borderColor: 'var(--secondary-color)',
-                    backgroundColor: 'var(--secondary-color)',
-                    fill: false
-                }]
+                labels: data.midpoint.map(d => Math.log10(d.n)),
+                datasets: [
+                    { label: 'Midpoint log(Error)', data: data.midpoint.map(d => Math.log10(d.error)), borderColor: 'var(--primary-color)', fill: false },
+                    { label: 'Trapezoid log(Error)', data: data.trapezoid.map(d => Math.log10(d.error)), borderColor: 'var(--secondary-color)', fill: false },
+                    { label: 'Simpson log(Error)', data: data.simpson.map(d => Math.log10(d.error)), borderColor: 'green', fill: false }
+                ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
@@ -295,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     x: { title: { display: true, text: 'log(n)' } },
                     y: { title: { display: true, text: 'log(Error)' } }
                 },
-                plugins: { title: { display: true, text: 'Log-Log Plot of Error vs. Number of Rectangles (n)', font: {size: 16} } }
+                plugins: { title: { display: true, text: 'Log-Log Plot of Error vs. Number of Subintervals (n)', font: {size: 16} } }
             }
         });
     }
