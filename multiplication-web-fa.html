@@ -6,8 +6,8 @@
     <title>پازل مساحت ضرب</title>
     <style>
         :root {
-            --primary-color: #1565c0;
-            --secondary-color: #2e7d32;
+            --primary-color: #1565c0; /* Blue for Target */
+            --secondary-color: #2e7d32; /* Green for Known */
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
@@ -16,7 +16,6 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            /* Using a common font that supports Farsi well */
             font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.8;
             background-color: var(--light-gray);
@@ -35,118 +34,93 @@
             padding: 1.5rem;
             text-align: center;
         }
-        h2 {
-            font-size: 1.75rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 1rem; }
         
         .farsi-guide {
-            padding: 1rem;
-            background-color: var(--light-gray);
-            border: 1px solid var(--medium-gray);
-            border-radius: 6px;
-            margin: 1.5rem 0;
-            text-align: right;
+            padding: 1rem; background-color: var(--light-gray);
+            border: 1px solid var(--medium-gray); border-radius: 6px;
+            margin: 1.5rem 0; text-align: right;
         }
-        .farsi-guide h3 {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-            margin-bottom: 0.75rem;
-        }
-        .farsi-guide p, .farsi-guide li {
-            font-size: 1rem;
-            font-weight: normal;
-            margin-bottom: 0.5rem;
-            color: var(--dark-gray);
-        }
-        .farsi-guide li {
-            margin-right: 1.5rem; /* Indent for list items in RTL */
-        }
+        .farsi-guide h3 { font-size: 1.2rem; color: var(--primary-color); margin-bottom: 0.75rem;}
+        .farsi-guide p, .farsi-guide li { font-size: 1rem; font-weight: normal; margin-bottom: 0.5rem; }
+        .farsi-guide li { margin-right: 1.5rem; }
         
-        /* Grid styling from user's code, with theme colors */
-        .grid-wrapper { display: inline-block; margin-top: 1.5rem; }
-        .header, .left-header {
-            background-color: var(--medium-gray);
-            gap: 1px;
-        }
-        .header {
-            display: grid;
-            grid-template-columns: 40px repeat(12, 40px);
-        }
-        .left-header {
-            display: grid;
-            grid-template-rows: repeat(12, 40px);
-        }
-        .header div, .left-header div {
-            width: 40px;
-            height: 40px;
-            background-color: var(--light-gray);
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--medium-gray);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(12, 40px);
-            gap: 1px;
-            background-color: var(--medium-gray);
-            margin-right: 1px; /* Flipped for RTL */
-            cursor: crosshair;
-        }
-        .cell {
-            width: 40px;
-            height: 40px;
-            background: #fff;
-            border: 1px solid var(--medium-gray);
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .cell:hover { background-color: #e3f2fd; }
-        
-        .piece-red { background: rgba(21, 101, 192, 0.25); }
-        .piece-green { background: rgba(46, 125, 50, 0.25); }
-        .temp-piece { background: rgba(255, 235, 59, 0.4); }
-        .overlap-piece {
-            background-image: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2) 0 4px, rgba(0, 0, 0, 0) 4px 8px);
-        }
-        
-        .row-highlight-red, .col-highlight-red { color: var(--primary-color); }
-        .row-highlight-green, .col-highlight-green { color: var(--secondary-color); }
-
         #infoPanel, #equation {
-            padding: 1rem;
-            background-color: var(--light-gray);
-            border-radius: 6px;
-            margin: 1.5rem 0;
-            min-height: 2.5em;
-            font-weight: 600;
-            font-size: 1.1rem;
+            padding: 1rem; background-color: var(--light-gray);
+            border-radius: 6px; margin: 1.5rem 0; min-height: 2.5em;
+            font-weight: 600; font-size: 1.1rem; text-align: center;
         }
         #equation { font-family: monospace; text-align: center; direction: ltr; }
         
-        button {
-            margin-top: 1.5rem;
-            padding: 10px 20px;
-            background: #d32f2f;
-            color: #fff;
-            border: none;
-            border-radius: .25rem;
-            cursor: pointer;
-            font-size: 1rem;
+        .grid-wrapper {
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            grid-template-rows: 40px 1fr;
+            width: 100%;
+            max-width: 600px;
+            margin: 1.5rem auto;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            overflow: hidden;
+            aspect-ratio: 1 / 1;
+        }
+        .header-container {
+            display: grid;
+            background-color: var(--medium-gray);
+            gap: 1px;
+        }
+        #header-col-container {
+            grid-area: 1 / 2 / 2 / 3;
+            grid-template-columns: repeat(12, 1fr);
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        #header-row-container {
+            grid-area: 2 / 1 / 3 / 2;
+            grid-template-rows: repeat(12, 1fr);
+            border-right: 1px solid var(--medium-gray);
+        }
+        .header-cell {
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .grid {
+            grid-area: 2 / 2 / 3 / 3;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: repeat(12, 1fr);
+            background-color: var(--medium-gray);
+            gap: 1px;
+            cursor: crosshair;
+        }
+        .cell {
+            background-color: white;
             transition: background-color 0.2s;
+        }
+        .cell:hover { background-color: #e3f2fd; }
+        .piece-red { background: rgba(21, 101, 192, 0.25); }
+        .piece-green { background: rgba(46, 125, 50, 0.25); }
+        .temp-piece { background: rgba(255, 235, 59, 0.4); }
+        .overlap-piece { background-image: repeating-linear-gradient(45deg,rgba(0,0,0,0.2) 0 4px,rgba(0,0,0,0) 4px 8px); }
+        .user-piece { border: 2px solid var(--dark-gray); }
+        .row-highlight-red, .col-highlight-red { color: var(--primary-color); }
+        .row-highlight-green, .col-highlight-green { color: var(--secondary-color); }
+
+        button {
+            margin-top: 1.5rem; padding: 10px 20px;
+            background: #d32f2f; color: #fff; border: none;
+            border-radius: 4px; cursor: pointer;
+            font-size: 1rem; transition: background-color 0.2s;
         }
         button:hover { background-color: #c62828; }
     </style>
 </head>
 <body dir="rtl">
 <div class="container">
-    <h2>وب ضرب</h2>
+    <h2>پازل مساحت ضرب</h2>
     
     <div class="farsi-guide">
         <h3>راهنمای کوتاه (فارسی)</h3>
@@ -159,222 +133,194 @@
     </div>
 
     <div id="infoPanel">یک مستطیل (حاصل‌ضرب) را که <strong>می‌خواهید پیدا کنید</strong> انتخاب نمایید.</div>
-    <div id="equation"></div>
+    <div id="equation" class="equation"></div>
 
     <div class="grid-wrapper">
-        <div>
-            <div id="topHeader" class="header"></div>
-            <div style="display:flex;">
-                <div id="leftHeader" class="left-header"></div>
-                <div id="grid" class="grid"></div>
-            </div>
-        </div>
+        <div id="header-col-container" class="header-container header-col-container"></div>
+        <div id="header-row-container" class="header-container header-row-container"></div>
+        <div id="grid" class="grid"></div>
     </div>
 
     <button onclick="location.reload()">پاک کردن همه</button>
 </div>
 
 <script>
-// YOUR WORKING JAVASCRIPT - only text strings and number formatting have been changed.
-/******************** Utility functions ********************/
-function toFarsi(n) {
-    const farsiDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    return String(n).split('').map(digit => farsiDigits[parseInt(digit)]).join('');
-}
-
-function buildHeaders(){
-    const top = document.getElementById('topHeader');
-    const left = document.getElementById('leftHeader');
-    const corner = document.createElement('div');
-    corner.style.width = '40px'; 
-    top.appendChild(corner);
-    for(let c=1;c<=12;c++){
-        const d=document.createElement('div');d.textContent=toFarsi(c);d.className='colHeader';d.dataset.col=c;top.appendChild(d);
-    }
-    for(let r=1;r<=12;r++){
-        const d=document.createElement('div');d.textContent=toFarsi(r);d.className='rowHeader';d.dataset.row=r;left.appendChild(d);
-    }
-}
-function outlineRect(rect,color){
-    const th=`3px solid ${color}`;
-    document.querySelectorAll('.cell').forEach(cell=>{
-        const r=+cell.dataset.row, c=+cell.dataset.col;
-        cell.style.border = `1px solid var(--medium-gray)`;
-        if(r<=rect.rows && c<=rect.cols){
-            if(r===1)         cell.style.borderTop    = th;
-            if(c===1)         cell.style.borderLeft   = th;
-            if(r===rect.rows) cell.style.borderBottom = th;
-            if(c===rect.cols) cell.style.borderRight  = th;
-        }
-    });
-}
-function fillRect(rect,cls){
-    document.querySelectorAll('.cell').forEach(cell=>{
-        const r=+cell.dataset.row, c=+cell.dataset.col;
-        if(r<=rect.rows && c<=rect.cols) cell.classList.add(cls);
-    });
-}
-function resetVisual(){
-    document.querySelectorAll('.cell').forEach(cell=>{
-        cell.className='cell'; cell.style.border='';
-        cell.style.backgroundImage=''; cell.style.backgroundColor='';
-    });
-    document.querySelectorAll('.rowHeader').forEach(h=>h.className='header-cell rowHeader');
-    document.querySelectorAll('.colHeader').forEach(h=>h.className='header-cell colHeader');
-    document.getElementById('equation').textContent='';
-}
-function highlightHeaders(rect,color){
-    try{
-        document.querySelector(`.rowHeader[data-row='${rect.rows}']`).classList.add(`row-highlight-${color}`);
-        document.querySelector(`.colHeader[data-col='${rect.cols}']`).classList.add(`col-highlight-${color}`);
-    }catch(e){console.warn('Header highlight issue',e);}
-}
-/******************** Main ********************/
-window.addEventListener('DOMContentLoaded',()=>{
+window.addEventListener('DOMContentLoaded', () => {
+    // --- UTILITY FUNCTIONS ---
+    const toFarsi = n => String(n).split('').map(d => '۰۱۲۳۴۵۶۷۸۹'[d]).join('');
     const grid = document.getElementById('grid');
     const info = document.getElementById('infoPanel');
-    const eq   = document.getElementById('equation');
+    const eq = document.getElementById('equation');
+    const colHeaders = document.getElementById('header-col-container');
+    const rowHeaders = document.getElementById('header-row-container');
 
-    buildHeaders();
-    for(let r=1;r<=12;r++){
-        for(let c=1;c<=12;c++){
-            const cell=document.createElement('div');
-            cell.className='cell'; cell.dataset.row=r; cell.dataset.col=c;
-            grid.appendChild(cell);
+    function buildGridAndHeaders() {
+        grid.innerHTML = ''; colHeaders.innerHTML = ''; rowHeaders.innerHTML = '';
+        for (let i = 1; i <= 12; i++) {
+            const colHead = document.createElement('div');
+            colHead.className = 'header-cell colHeader';
+            colHead.textContent = toFarsi(i);
+            colHead.dataset.col = i;
+            colHeaders.appendChild(colHead);
+
+            const rowHead = document.createElement('div');
+            rowHead.className = 'header-cell rowHeader';
+            rowHead.textContent = toFarsi(i);
+            rowHead.dataset.row = i;
+            rowHeaders.appendChild(rowHead);
+        }
+        for (let r = 1; r <= 12; r++) {
+            for (let c = 1; c <= 12; c++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell'; cell.dataset.row = r; cell.dataset.col = c;
+                grid.appendChild(cell);
+            }
         }
     }
 
+    function outlineRect(rect, color) {
+        document.querySelectorAll('.cell').forEach(cell => {
+            const r = +cell.dataset.row, c = +cell.dataset.col;
+            if (r <= rect.rows && c <= rect.cols) {
+                if (r === 1) cell.style.borderTop = `3px solid ${color}`;
+                if (c === 1) cell.style.borderLeft = `3px solid ${color}`;
+                if (r === rect.rows) cell.style.borderBottom = `3px solid ${color}`;
+                if (c === rect.cols) cell.style.borderRight = `3px solid ${color}`;
+            }
+        });
+    }
+
+    function fillRect(rect, cls) {
+        document.querySelectorAll('.cell').forEach(cell => {
+            const r = +cell.dataset.row, c = +cell.dataset.col;
+            if (r <= rect.rows && c <= rect.cols) cell.classList.add(cls);
+        });
+    }
+
+    function resetVisual() {
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.className = 'cell'; cell.style.border = '';
+            cell.style.backgroundImage = ''; cell.style.backgroundColor = '';
+        });
+        document.querySelectorAll('.rowHeader, .colHeader').forEach(h => h.className = h.classList.contains('rowHeader') ? 'header-cell rowHeader' : 'header-cell colHeader');
+        eq.textContent = '';
+    }
+
+    function highlightHeaders(rect, color) {
+        try {
+            document.querySelector(`.rowHeader[data-row='${rect.rows}']`).classList.add(`row-highlight-${color}`);
+            document.querySelector(`.colHeader[data-col='${rect.cols}']`).classList.add(`col-highlight-${color}`);
+        } catch(e) {}
+    }
+
+    //--- MAIN LOGIC ---
     let stage=0, target=null, known=null, outer=null, inner=null;
     let missing=[], hueIdx=0, drawing=false, startCell=null;
 
-    const area   = r => r.rows*r.cols;
+    const area = r => r.rows * r.cols;
     const nested = (a,b)=> (a.rows>=b.rows && a.cols>=b.cols) || (b.rows>=a.rows && b.cols>=a.cols);
     const insideOuter = cell => outer && (+cell.dataset.row)<=outer.rows && (+cell.dataset.col)<=outer.cols && !((+cell.dataset.row)<=inner.rows && (+cell.dataset.col)<=inner.cols);
 
     function computePieces(){
         missing = [];
-        const dr = outer.rows - inner.rows;
-        const dc = outer.cols - inner.cols;
-        const stripSign = outer===target ? +1 : -1;
-        if(dc>0) missing.push({ rows: outer.rows, cols: dc, startRow: 1, startCol: inner.cols+1, filled:false, sign: stripSign });
-        if(dr>0) missing.push({ rows: dr, cols: inner.cols, startRow: inner.rows+1, startCol: 1, filled:false, sign: stripSign });
+        const dr = outer.rows - inner.rows, dc = outer.cols - inner.cols;
+        const stripSign = outer === target ? +1 : -1;
+        if(dc > 0) missing.push({ rows: outer.rows, cols: dc, startRow: 1, startCol: inner.cols + 1, filled: false, sign: stripSign });
+        if(dr > 0) missing.push({ rows: inner.rows, cols: dr, startRow: inner.rows + 1, startCol: 1, filled: false, sign: stripSign });
     }
-    
+
     function renderEquation(constants){
         const {dr,dc,stripSign} = constants;
         let eqHTML = `${toFarsi(target.rows)}×${toFarsi(target.cols)} = ${toFarsi(known.rows)}×${toFarsi(known.cols)}`;
-        missing.forEach((p,i)=>{
-            const sym = p.sign>0 ? ' + ' : ' - ';
+        missing.forEach((p, i) => {
+            const sym = p.sign > 0 ? ' + ' : ' - ';
             eqHTML += `${sym}<span id="p${i}">___</span>`;
         });
-        if(dr>0 && dc>0){
-            const sym = stripSign>0 ? ' - ' : ' + ';
+        if(dr > 0 && dc > 0){
+            const sym = stripSign > 0 ? ' - ' : ' + ';
             eqHTML += `${sym}${toFarsi(dr)}×${toFarsi(dc)}`;
         }
         eq.innerHTML = eqHTML;
     }
-    
-    function updateEq(){
-        missing.forEach((p,i)=>{
-            if(p.filled){
-                document.getElementById(`p${i}`).textContent = `${toFarsi(p.rows)}×${toFarsi(p.cols)}`;
-            }
+
+    function updateEq() {
+        missing.forEach((p, i) => {
+            if (p.filled) document.getElementById(`p${i}`).textContent = `${toFarsi(p.rows)}×${toFarsi(p.cols)}`;
         });
     }
 
-    function setupPuzzle(){
-        outer = area(target)>=area(known)? target : known;
-        inner = outer===target ? known : target;
+    function setupPuzzle() {
+        outer = area(target) >= area(known) ? target : known;
+        inner = outer === target ? known : target;
         resetVisual();
-        fillRect(inner, inner===target?'piece-red':'piece-green');
-        outlineRect(outer, outer===target ? 'var(--primary-color)' : 'var(--secondary-color)');
-        highlightHeaders(target,'red');
-        highlightHeaders(known,'green');
+        fillRect(inner, inner === target ? 'piece-red' : 'piece-green');
+        outlineRect(outer, outer === target ? 'var(--primary-color)' : 'var(--secondary-color)');
+        highlightHeaders(target, 'red');
+        highlightHeaders(known, 'green');
         const constants = computePieces();
         renderEquation(constants);
         stage = 2;
         info.textContent = 'قطعات لازم برای تکمیل قاب را بکشید.';
     }
 
-    function previewTemp(start,cur){
-        document.querySelectorAll('.temp-piece').forEach(c=>c.classList.remove('temp-piece'));
-        const sr=+start.dataset.row, sc=+start.dataset.col,
-              er=+cur.dataset.row,   ec=+cur.dataset.col;
-        const minR=Math.min(sr,er), maxR=Math.max(sr,er),
-              minC=Math.min(sc,ec), maxC=Math.max(sc,ec);
-        for(let r=minR;r<=maxR;r++)
-            for(let c=minC;c<=maxC;c++){
-                const cell=document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
-                if(cell && insideOuter(cell)) cell.classList.add('temp-piece');
-            }
+    function previewTemp(start, cur) {
+        document.querySelectorAll('.temp-piece').forEach(c => c.classList.remove('temp-piece'));
+        const sr=+start.dataset.row, sc=+start.dataset.col, er=+cur.dataset.row, ec=+cur.dataset.col;
+        const minR=Math.min(sr,er), maxR=Math.max(sr,er), minC=Math.min(sc,ec), maxC=Math.max(sc,ec);
+        for(let r=minR; r<=maxR; r++) for(let c=minC; c<=maxC; c++) {
+            const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+            if(cell && insideOuter(cell)) cell.classList.add('temp-piece');
+        }
     }
-    
-    function commitPiece(){
-        const cells=[...document.querySelectorAll('.temp-piece')];
-        if(!cells.length) return;
-        const rs=cells.map(c=>+c.dataset.row), cs=cells.map(c=>+c.dataset.col);
-        const rect={
-            startRow:Math.min(...rs), startCol:Math.min(...cs),
-            rows:Math.max(...rs)-Math.min(...rs)+1, cols:Math.max(...cs)-Math.min(...cs)+1
-        };
-        const idx=missing.findIndex(p=>!p.filled && p.rows===rect.rows && p.cols===rect.cols && p.startRow===rect.startRow && p.startCol===rect.startCol);
-        if(idx===-1){
+
+    function commitPiece() {
+        const cells = [...document.querySelectorAll('.temp-piece')];
+        if (!cells.length) return;
+        const rs = cells.map(c => +c.dataset.row), cs = cells.map(c => +c.dataset.col);
+        const rect = { startRow: Math.min(...rs), startCol: Math.min(...cs), rows: Math.max(...rs) - Math.min(...rs) + 1, cols: Math.max(...cs) - Math.min(...cs) + 1 };
+        const idx = missing.findIndex(p => !p.filled && p.rows === rect.rows && p.cols === rect.cols && p.startRow === rect.startRow && p.startCol === rect.startCol);
+        if (idx === -1) {
             alert('اندازه یا مکان قطعه نادرست است. دوباره تلاش کنید.');
-            cells.forEach(c=>c.classList.remove('temp-piece'));
+            cells.forEach(c => c.classList.remove('temp-piece'));
             return;
         }
-        const col = `hsla(${(hueIdx*67)%360},100%,50%,0.55)`; hueIdx++;
-        cells.forEach(c=>{
+        const col = `hsla(${(hueIdx * 67) % 360}, 100%, 50%, 0.55)`;
+        hueIdx++;
+        cells.forEach(c => {
             c.classList.remove('temp-piece');
-            if(c.classList.contains('user-piece')){
-                c.classList.add('overlap-piece');
-            }else{
-                c.classList.add('user-piece');
-                c.style.backgroundColor = col;
-                c.style.border = '2px solid var(--dark-gray)';
-            }
+            if (c.classList.contains('user-piece')) c.classList.add('overlap-piece');
+            else { c.classList.add('user-piece'); c.style.backgroundColor = col; }
         });
         missing[idx].filled = true;
         updateEq();
-        if(missing.every(p=>p.filled)) info.textContent = 'پازل کامل شد! مربع‌های راه‌راه نشان‌دهندهٔ ناحیهٔ مشترک هستند.';
+        if (missing.every(p => p.filled)) info.textContent = 'پازل کامل شد! مربع‌های راه‌راه ناحیهٔ مشترک را نشان می‌دهند.';
     }
 
-    grid.addEventListener('mousedown',e=>{
+    // --- INITIALIZATION & EVENTS ---
+    buildGrid();
+    grid.addEventListener('mousedown', e => {
         const cell = e.target.closest('.cell');
-        if(!cell) return;
-        if(stage===0){
-            target={rows:+cell.dataset.row, cols:+cell.dataset.col};
-            fillRect(target,'piece-red');
-            outlineRect(target,'var(--primary-color)');
-            highlightHeaders(target,'red');
-            stage=1;
-            info.innerHTML='حالا یک حاصل‌ضرب را که بلد هستید انتخاب کنید. (باید درون اولی قرار گیرد).';
-        }else if(stage===1){
-            known={rows:+cell.dataset.row, cols:+cell.dataset.col};
-            if(!nested(target,known)){
+        if (!cell) return;
+        if (stage === 0) {
+            target = { rows: +cell.dataset.row, cols: +cell.dataset.col };
+            fillRect(target, 'piece-red');
+            outlineRect(target, 'var(--primary-color)');
+            highlightHeaders(target, 'red');
+            stage = 1;
+            info.innerHTML = 'حالا یک حاصل‌ضرب را که بلد هستید انتخاب کنید. (باید کاملاً درون اولی قرار گیرد).';
+        } else if (stage === 1) {
+            known = { rows: +cell.dataset.row, cols: +cell.dataset.col };
+            if (!nested(target, known)) {
                 alert('به یاد داشته باشید: یکی از مستطیل‌ها باید درون دیگری باشد.');
                 return;
             }
             setupPuzzle();
-        }else if(stage===2 && insideOuter(cell)){
-            drawing=true;
-            startCell=cell;
-            previewTemp(cell,cell);
+        } else if (stage === 2 && insideOuter(cell)) {
+            drawing = true; startCell = cell; previewTemp(cell, cell);
         }
     });
-    grid.addEventListener('mousemove',e=>{
-        if(drawing && stage===2){
-            const cell=e.target.closest('.cell');
-            if(cell) previewTemp(startCell,cell);
-        }
-    });
-    window.addEventListener('mouseup',()=>{
-        if(drawing){
-            commitPiece();
-            drawing=false;
-            startCell=null;
-        }
-    });
+    grid.addEventListener('mousemove', e => { if (drawing && stage === 2) { const cell = e.target.closest('.cell'); if (cell) previewTemp(startCell, cell); } });
+    window.addEventListener('mouseup', () => { if (drawing) { commitPiece(); drawing = false; startCell = null; } });
 });
 </script>
 </body>
