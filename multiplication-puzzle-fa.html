@@ -2,19 +2,21 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>پازل ضرب</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>پازل مساحت ضرب</title>
     <style>
         :root {
-            --primary-color: #1565c0; /* Blue for Target */
-            --secondary-color: #2e7d32; /* Green for Known */
+            --primary-color: #1565c0; /* Goal */
+            --secondary-color: #2e7d32; /* Start */
+            --user-color: #ff9800; /* User-drawn */
+            --goal-rgba: rgba(21, 101, 192, 0.2);
+            --start-rgba: rgba(46, 125, 50, 0.25);
+            --user-rgba: rgba(255, 152, 0, 0.3);
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
         }
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.8;
@@ -34,8 +36,9 @@
             padding: 1.5rem;
             text-align: center;
         }
-        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 1rem; }
-        
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+        p.info { color: #616161; margin-bottom: 1.5rem; }
+
         .farsi-guide {
             padding: 1rem; background-color: var(--light-gray);
             border: 1px solid var(--medium-gray); border-radius: 6px;
@@ -45,85 +48,78 @@
         .farsi-guide p, .farsi-guide li { font-size: 1rem; font-weight: normal; margin-bottom: 0.5rem; }
         .farsi-guide li { margin-right: 1.5rem; }
         
-        #infoPanel, #equation {
-            padding: 1rem; background-color: var(--light-gray);
-            border-radius: 6px; margin: 1.5rem 0; min-height: 2.5em;
-            font-weight: 600; font-size: 1.1rem; text-align: center;
+        .info-panel {
+            padding: 1rem; background-color: var(--light-gray); border-radius: 6px;
+            margin-bottom: 1.5rem; text-align: center; border: 1px solid var(--medium-gray);
+            min-height: 80px;
         }
-        #equation { font-family: monospace; text-align: center; direction: ltr; }
+        .info-panel p { margin: 0.25rem 0; font-size: 1.1rem; }
+        .info-panel strong { font-family: monospace; font-size: 1.2rem;}
+        .goal-text { color: var(--primary-color); }
+        .start-text { color: var(--secondary-color); }
         
         .grid-wrapper {
+            position: relative;
             display: grid;
-            grid-template-columns: 40px 1fr;
-            grid-template-rows: 40px 1fr;
+            grid-template-columns: 30px 1fr;
+            grid-template-rows: 30px 1fr;
             width: 100%;
             max-width: 600px;
-            margin: 1.5rem auto;
-            border: 1px solid var(--medium-gray);
-            border-radius: 4px;
-            overflow: hidden;
+            margin: 0 auto;
             aspect-ratio: 1 / 1;
+            user-select: none;
         }
-        .header-container {
-            display: grid;
-            background-color: var(--medium-gray);
-            gap: 1px;
-        }
-        #header-col-container {
-            grid-area: 1 / 2 / 2 / 3;
-            grid-template-columns: repeat(12, 1fr);
-            border-bottom: 1px solid var(--medium-gray);
-        }
-        #header-row-container {
-            grid-area: 2 / 1 / 3 / 2;
-            grid-template-rows: repeat(12, 1fr);
-            border-right: 1px solid var(--medium-gray);
-        }
-        .header-cell {
-            background-color: var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .grid {
+        .grid-container {
             grid-area: 2 / 2 / 3 / 3;
+            position: relative;
             display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-template-rows: repeat(12, 1fr);
-            background-color: var(--medium-gray);
-            gap: 1px;
+            grid-template-columns: repeat(var(--grid-size, 12), 1fr);
+            grid-template-rows: repeat(var(--grid-size, 12), 1fr);
+            border: 1px solid var(--medium-gray);
             cursor: crosshair;
         }
-        .cell {
-            background-color: white;
-            transition: background-color 0.2s;
+        .headers-col { display: grid; grid-template-columns: repeat(var(--grid-size, 12), 1fr); grid-area: 1 / 2 / 2 / 3; }
+        .headers-row { display: grid; grid-template-rows: repeat(var(--grid-size, 12), 1fr); grid-area: 2 / 1 / 3 / 2; }
+        .header-cell { display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem; }
+        
+        .grid-cell {
+            border-right: 1px solid var(--medium-gray);
+            border-bottom: 1px solid var(--medium-gray);
         }
-        .cell:hover { background-color: #e3f2fd; }
-        .piece-red { background: rgba(21, 101, 192, 0.25); }
-        .piece-green { background: rgba(46, 125, 50, 0.25); }
-        .temp-piece { background: rgba(255, 235, 59, 0.4); }
-        .overlap-piece { background-image: repeating-linear-gradient(45deg,rgba(0,0,0,0.2) 0 4px,rgba(0,0,0,0) 4px 8px); }
-        .user-piece { border: 2px solid var(--dark-gray); }
-        .row-highlight-red, .col-highlight-red { color: var(--primary-color); }
-        .row-highlight-green, .col-highlight-green { color: var(--secondary-color); }
+        
+        .overlay-container {
+            position: absolute;
+            grid-area: 1 / 1 / -1 / -1; /* Cover the entire wrapper */
+            grid-template-columns: 30px repeat(var(--grid-size, 12), 1fr);
+            grid-template-rows: 30px repeat(var(--grid-size, 12), 1fr);
+            display: grid;
+            pointer-events: none;
+        }
+        .overlay-rectangle {
+            z-index: 1; border-radius: 2px;
+            grid-column: var(--c1) / calc(var(--c2) + 1);
+            grid-row: var(--r1) / calc(var(--r2) + 1);
+        }
+        .user-overlay { pointer-events: auto; cursor: pointer; }
 
-        button {
-            margin-top: 1.5rem; padding: 10px 20px;
-            background: #d32f2f; color: #fff; border: none;
-            border-radius: 4px; cursor: pointer;
-            font-size: 1rem; transition: background-color 0.2s;
-        }
-        button:hover { background-color: #c62828; }
+        .goal-overlay { background-color: var(--goal-rgba); border: 3px solid var(--primary-color); }
+        .start-overlay { background-color: var(--start-rgba); border: 2px solid var(--secondary-color); }
+        .user-overlay { background-color: var(--user-rgba); border: 2px solid var(--user-color); }
+        .preview-overlay { background-color: rgba(0,0,0,0.1); border: 1px dashed var(--dark-gray); }
+
+        .action-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;}
+        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        .check-btn { background-color: #4caf50; }
+        .clear-btn { background-color: #d32f2f; }
+        .swap-btn { background-color: #6c757d }
     </style>
 </head>
 <body dir="rtl">
 <div class="container">
-    <h2>پازل ضرب</h2>
+    <h2>پازل مساحت ضرب</h2>
     
     <div class="farsi-guide">
-        <h3>راهنمای کوتاه </h3>
+        <h3>راهنمای کوتاه (فارسی)</h3>
         <ul>
             <li>ابتدا مستطیلی را که می‌خواهید حاصل ضرب آن را پیدا کنید انتخاب کنید – با رنگ آبی نمایش داده می‌شود.</li>
             <li>سپس مستطیلی را که حاصل ضرب آن را می‌دانید انتخاب کنید؛ این مستطیل باید کاملاً درون مستطیل اول قرار بگیرد یا کاملاً آن را احاطه کند – با رنگ سبز نمایش داده می‌شود.</li>
@@ -132,195 +128,230 @@
         <p><b>مثال:</b> برای محاسبهٔ ۷×۶، ابتدا آن را انتخاب کنید. اگر ۵×۵ را بلد هستید، آن را به‌عنوان مستطیل شناخته‌شده برگزینید. سپس یک نوار ۷×۱ در پایین و یک نوار ۶×۲ در سمت راست اضافه می‌کنید؛ مربع اشتراکی ۲×۱ در گوشه به‌طور خودکار لحاظ می‌شود.</p>
     </div>
 
-    <div id="infoPanel">یک مستطیل (حاصل‌ضرب) را که <strong>می‌خواهید پیدا کنید</strong> انتخاب نمایید.</div>
-    <div id="equation" class="equation"></div>
+    <div id="infoPanel"><p>برای شروع یک خانه از جدول را برای ساختن «قاب پازل» انتخاب کنید.</p></div>
 
-    <div class="grid-wrapper">
-        <div id="header-col-container" class="header-container header-col-container"></div>
-        <div id="header-row-container" class="header-container header-row-container"></div>
-        <div id="grid" class="grid"></div>
+    <div class="grid-wrapper" id="grid-wrapper">
+        <div id="col-headers" class="headers-col"></div>
+        <div id="row-headers" class="headers-row"></div>
+        <div class="grid-container" id="grid-container"></div>
+        <div class="overlay-container" id="overlay-container"></div>
     </div>
-
-    <button onclick="location.reload()">پاک کردن همه</button>
+    
+    <div id="action-controls" class="action-controls">
+        <button id="clear-btn" class="clear-btn">پاک کردن همه</button>
+    </div>
 </div>
 
 <script>
-window.addEventListener('DOMContentLoaded', () => {
-    // --- UTILITY FUNCTIONS ---
+document.addEventListener('DOMContentLoaded', () => {
+    let state = {
+        size: 12, firstSelection: null, secondSelection: null,
+        goalCell: null, startCell: null, userRects: [],
+        isDrawing: false, drawStart: null, solutionRects: [],
+    };
+
+    const gridWrapper = document.getElementById('grid-wrapper');
+    const gridContainer = document.getElementById('grid-container');
+    const overlayContainer = document.getElementById('overlay-container');
+    const infoPanel = document.getElementById('info-panel');
+    const actionControls = document.getElementById('action-controls');
+    const colHeaders = document.getElementById('col-headers');
+    const rowHeaders = document.getElementById('row-headers');
     const toFarsi = n => String(n).split('').map(d => '۰۱۲۳۴۵۶۷۸۹'[d]).join('');
-    const grid = document.getElementById('grid');
-    const info = document.getElementById('infoPanel');
-    const eq = document.getElementById('equation');
-    const colHeaders = document.getElementById('header-col-container');
-    const rowHeaders = document.getElementById('header-row-container');
+    
+    function render() {
+        renderGrid();
+        renderOverlays();
+        renderInfoPanel();
+    }
 
-    function buildGridAndHeaders() {
-        grid.innerHTML = ''; colHeaders.innerHTML = ''; rowHeaders.innerHTML = '';
-        for (let i = 1; i <= 12; i++) {
-            const colHead = document.createElement('div');
-            colHead.className = 'header-cell colHeader';
-            colHead.textContent = toFarsi(i);
-            colHead.dataset.col = i;
-            colHeaders.appendChild(colHead);
+    function renderGrid() {
+        if (gridContainer.children.length === state.size * state.size) return;
+        
+        [gridContainer, colHeaders, rowHeaders, overlayContainer].forEach(el => {
+            el.innerHTML = '';
+            el.style.setProperty('--grid-size', state.size);
+        });
 
-            const rowHead = document.createElement('div');
-            rowHead.className = 'header-cell rowHeader';
-            rowHead.textContent = toFarsi(i);
-            rowHead.dataset.row = i;
-            rowHeaders.appendChild(rowHead);
+        for (let i = 1; i <= state.size; i++) {
+            colHeaders.appendChild(Object.assign(document.createElement('div'), {className: 'header-cell', textContent: toFarsi(i)}));
+            rowHeaders.appendChild(Object.assign(document.createElement('div'), {className: 'header-cell', textContent: toFarsi(i)}));
         }
-        for (let r = 1; r <= 12; r++) {
-            for (let c = 1; c <= 12; c++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell'; cell.dataset.row = r; cell.dataset.col = c;
-                grid.appendChild(cell);
+
+        for (let i = 0; i < state.size * state.size; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.dataset.r = Math.floor(i / state.size) + 1;
+            cell.dataset.c = (i % state.size) + 1;
+            gridContainer.appendChild(cell);
+        }
+    }
+
+    function renderOverlays() {
+        overlayContainer.innerHTML = ''; 
+        const { goalCell, startCell, userRects } = state;
+        
+        const drawRect = (r, c, className) => overlayContainer.appendChild(createRectElement({r1:1, c1:1, r2:r, c2:c}, className));
+        const drawUserRect = (rect, i) => {
+            const el = createRectElement(rect, 'user-overlay');
+            el.dataset.index = i;
+            overlayContainer.appendChild(el);
+        };
+        
+        if (startCell) drawRect(startCell.r, startCell.c, 'start-overlay');
+        if (goalCell) drawRect(goalCell.r, goalCell.c, 'goal-overlay');
+        userRects.forEach((rect, i) => drawUserRect(rect, i));
+    }
+
+    function createRectElement({r1, c1, r2, c2}, className) {
+        const el = document.createElement('div');
+        el.className = `overlay-rectangle ${className}`;
+        el.style.setProperty('--r1', Math.min(r1, r2));
+        el.style.setProperty('--c1', Math.min(c1, c2));
+        el.style.setProperty('--r2', Math.max(r1, r2));
+        el.style.setProperty('--c2', Math.max(c1, c2));
+        return el;
+    }
+
+    function renderInfoPanel() {
+        let html = '';
+        const { goalCell, startCell, solutionRects, userRects } = state;
+
+        if (!goalCell) { html = '<p>یک خانه از جدول را برای «قاب پازل» انتخاب کنید.</p>'; } 
+        else {
+            html = `<p class="goal-text">قاب هدف: <strong>${toFarsi(goalCell.r)} × ${toFarsi(goalCell.c)}</strong></p>`;
+            if (!startCell) { html += '<p>حال، یک خانه برای «قطعهٔ آغازی» انتخاب کنید.</p>'; } 
+            else {
+                html += `<p class="start-text">قطعهٔ آغازی: <strong>${toFarsi(startCell.r)} × ${toFarsi(startCell.c)}</strong></p>`;
+                if (solutionRects.length > 0) {
+                     html += `<p class="relation-text">برای تکمیل پازل، ${toFarsi(solutionRects.length)} قطعهٔ باقی‌مانده را بکشید.</p>`;
+                } else {
+                     html += `<p class="relation-text">شما همه قطعات را پیدا کردید! کارتان عالی بود.</p>`;
+                }
             }
         }
-    }
-
-    function outlineRect(rect, color) {
-        document.querySelectorAll('.cell').forEach(cell => {
-            const r = +cell.dataset.row, c = +cell.dataset.col;
-            if (r <= rect.rows && c <= rect.cols) {
-                if (r === 1) cell.style.borderTop = `3px solid ${color}`;
-                if (c === 1) cell.style.borderLeft = `3px solid ${color}`;
-                if (r === rect.rows) cell.style.borderBottom = `3px solid ${color}`;
-                if (c === rect.cols) cell.style.borderRight = `3px solid ${color}`;
-            }
-        });
-    }
-
-    function fillRect(rect, cls) {
-        document.querySelectorAll('.cell').forEach(cell => {
-            const r = +cell.dataset.row, c = +cell.dataset.col;
-            if (r <= rect.rows && c <= rect.cols) cell.classList.add(cls);
-        });
-    }
-
-    function resetVisual() {
-        document.querySelectorAll('.cell').forEach(cell => {
-            cell.className = 'cell'; cell.style.border = '';
-            cell.style.backgroundImage = ''; cell.style.backgroundColor = '';
-        });
-        document.querySelectorAll('.rowHeader, .colHeader').forEach(h => h.className = h.classList.contains('rowHeader') ? 'header-cell rowHeader' : 'header-cell colHeader');
-        eq.textContent = '';
-    }
-
-    function highlightHeaders(rect, color) {
-        try {
-            document.querySelector(`.rowHeader[data-row='${rect.rows}']`).classList.add(`row-highlight-${color}`);
-            document.querySelector(`.colHeader[data-col='${rect.cols}']`).classList.add(`col-highlight-${color}`);
-        } catch(e) {}
-    }
-
-    //--- MAIN LOGIC ---
-    let stage=0, target=null, known=null, outer=null, inner=null;
-    let missing=[], hueIdx=0, drawing=false, startCell=null;
-
-    const area = r => r.rows * r.cols;
-    const nested = (a,b)=> (a.rows>=b.rows && a.cols>=b.cols) || (b.rows>=a.rows && b.cols>=a.cols);
-    const insideOuter = cell => outer && (+cell.dataset.row)<=outer.rows && (+cell.dataset.col)<=outer.cols && !((+cell.dataset.row)<=inner.rows && (+cell.dataset.col)<=inner.cols);
-
-    function computePieces(){
-        missing = [];
-        const dr = outer.rows - inner.rows, dc = outer.cols - inner.cols;
-        const stripSign = outer === target ? +1 : -1;
-        if(dc > 0) missing.push({ rows: outer.rows, cols: dc, startRow: 1, startCol: inner.cols + 1, filled: false, sign: stripSign });
-        if(dr > 0) missing.push({ rows: inner.rows, cols: dr, startRow: inner.rows + 1, startCol: 1, filled: false, sign: stripSign });
-    }
-
-    function renderEquation(constants){
-        const {dr,dc,stripSign} = constants;
-        let eqHTML = `${toFarsi(target.rows)}×${toFarsi(target.cols)} = ${toFarsi(known.rows)}×${toFarsi(known.cols)}`;
-        missing.forEach((p, i) => {
-            const sym = p.sign > 0 ? ' + ' : ' - ';
-            eqHTML += `${sym}<span id="p${i}">___</span>`;
-        });
-        if(dr > 0 && dc > 0){
-            const sym = stripSign > 0 ? ' - ' : ' + ';
-            eqHTML += `${sym}${toFarsi(dr)}×${toFarsi(dc)}`;
+        infoPanel.innerHTML = html;
+        
+        actionControls.innerHTML = '<button id="clear-btn" class="clear-btn">پاک کردن همه</button>';
+        actionControls.querySelector('#clear-btn').onclick = clearSelection;
+        if (state.firstSelection && state.secondSelection) {
+             const swapBtn = document.createElement('button');
+             swapBtn.className = 'swap-btn'; swapBtn.textContent = 'تعویض انتخاب‌ها';
+             swapBtn.onclick = swapRoles;
+             actionControls.appendChild(swapBtn);
         }
-        eq.innerHTML = eqHTML;
+    }
+        
+    function getCellFromEvent(e) {
+        const el = e.target;
+        if(el && el.classList.contains('grid-cell')) {
+            return { r: parseInt(el.dataset.r), c: parseInt(el.dataset.c) };
+        }
+        return null;
     }
 
-    function updateEq() {
-        missing.forEach((p, i) => {
-            if (p.filled) document.getElementById(`p${i}`).textContent = `${toFarsi(p.rows)}×${toFarsi(p.cols)}`;
-        });
-    }
-
-    function setupPuzzle() {
-        outer = area(target) >= area(known) ? target : known;
-        inner = outer === target ? known : target;
-        resetVisual();
-        fillRect(inner, inner === target ? 'piece-red' : 'piece-green');
-        outlineRect(outer, outer === target ? 'var(--primary-color)' : 'var(--secondary-color)');
-        highlightHeaders(target, 'red');
-        highlightHeaders(known, 'green');
-        const constants = computePieces();
-        renderEquation(constants);
-        stage = 2;
-        info.textContent = 'قطعات لازم برای تکمیل قاب را بکشید.';
-    }
-
-    function previewTemp(start, cur) {
-        document.querySelectorAll('.temp-piece').forEach(c => c.classList.remove('temp-piece'));
-        const sr=+start.dataset.row, sc=+start.dataset.col, er=+cur.dataset.row, ec=+cur.dataset.col;
-        const minR=Math.min(sr,er), maxR=Math.max(sr,er), minC=Math.min(sc,ec), maxC=Math.max(sc,ec);
-        for(let r=minR; r<=maxR; r++) for(let c=minC; c<=maxC; c++) {
-            const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
-            if(cell && insideOuter(cell)) cell.classList.add('temp-piece');
+    function determineRolesAndSolutions() {
+        state.userRects = []; state.solutionRects = [];
+        if (!state.firstSelection || !state.secondSelection) {
+            state.goalCell = state.firstSelection; state.startCell = null;
+        } else {
+            const area1 = state.firstSelection.r * state.firstSelection.c;
+            const area2 = state.secondSelection.r * state.secondSelection.c;
+            state.goalCell = area1 >= area2 ? state.firstSelection : state.secondSelection;
+            state.startCell = area1 < area2 ? state.firstSelection : state.secondSelection;
+            
+            const { r: gr, c: gc } = state.goalCell;
+            const { r: sr, c: sc } = state.startCell;
+            
+            if (gc > sc) state.solutionRects.push({ r1: 1, c1: sc + 1, r2: sr, c2: gc });
+            if (gr > sr) state.solutionRects.push({ r1: sr + 1, c1: 1, r2: gr, c2: gc });
         }
     }
 
-    function commitPiece() {
-        const cells = [...document.querySelectorAll('.temp-piece')];
-        if (!cells.length) return;
-        const rs = cells.map(c => +c.dataset.row), cs = cells.map(c => +c.dataset.col);
-        const rect = { startRow: Math.min(...rs), startCol: Math.min(...cs), rows: Math.max(...rs) - Math.min(...rs) + 1, cols: Math.max(...cs) - Math.min(...cs) + 1 };
-        const idx = missing.findIndex(p => !p.filled && p.rows === rect.rows && p.cols === rect.cols && p.startRow === rect.startRow && p.startCol === rect.startCol);
-        if (idx === -1) {
-            alert('اندازه یا مکان قطعه نادرست است. دوباره تلاش کنید.');
-            cells.forEach(c => c.classList.remove('temp-piece'));
-            return;
-        }
-        const col = `hsla(${(hueIdx * 67) % 360}, 100%, 50%, 0.55)`;
-        hueIdx++;
-        cells.forEach(c => {
-            c.classList.remove('temp-piece');
-            if (c.classList.contains('user-piece')) c.classList.add('overlap-piece');
-            else { c.classList.add('user-piece'); c.style.backgroundColor = col; }
-        });
-        missing[idx].filled = true;
-        updateEq();
-        if (missing.every(p => p.filled)) info.textContent = 'پازل کامل شد! مربع‌های راه‌راه ناحیهٔ مشترک را نشان می‌دهند.';
+    function swapRoles() {
+        [state.firstSelection, state.secondSelection] = [state.secondSelection, state.firstSelection];
+        determineRolesAndSolutions(); render();
     }
 
-    // --- INITIALIZATION & EVENTS ---
-    buildGrid();
-    grid.addEventListener('mousedown', e => {
-        const cell = e.target.closest('.cell');
+    function handleCellClick(e) {
+        if (state.isDrawing) return;
+        const cell = getCellFromEvent(e);
         if (!cell) return;
-        if (stage === 0) {
-            target = { rows: +cell.dataset.row, cols: +cell.dataset.col };
-            fillRect(target, 'piece-red');
-            outlineRect(target, 'var(--primary-color)');
-            highlightHeaders(target, 'red');
-            stage = 1;
-            info.innerHTML = 'حالا یک حاصل‌ضرب را که بلد هستید انتخاب کنید. (باید کاملاً درون اولی قرار گیرد).';
-        } else if (stage === 1) {
-            known = { rows: +cell.dataset.row, cols: +cell.dataset.col };
-            if (!nested(target, known)) {
-                alert('به یاد داشته باشید: یکی از مستطیل‌ها باید درون دیگری باشد.');
-                return;
+        
+        if (!state.firstSelection || (state.firstSelection && state.secondSelection)) {
+            clearSelection(); state.firstSelection = cell;
+        } else if (state.firstSelection.r === cell.r && state.firstSelection.c === cell.c) {
+             return;
+        } else { state.secondSelection = cell; }
+        determineRolesAndSolutions();
+        render();
+    }
+    
+    function handleMouseDown(e) {
+        const cell = getCellFromEvent(e);
+        if (cell && state.goalCell && state.startCell) {
+            state.isDrawing = true; state.drawStart = cell; e.preventDefault();
+        }
+    }
+
+    function handleMouseMove(e) {
+        if (!state.isDrawing) return;
+        overlayContainer.querySelector('.preview-overlay')?.remove();
+        const cell = getCellFromEvent(e.target);
+        if (cell && state.drawStart) {
+            const rect = { r1: state.drawStart.r, c1: state.drawStart.c, r2: cell.r, c2: cell.c };
+            overlayContainer.appendChild(createRectElement(rect, 'preview-overlay'));
+        }
+    }
+    
+    function handleMouseUp(e) {
+        if (!state.isDrawing) return;
+        overlayContainer.querySelector('.preview-overlay')?.remove();
+        const cell = getCellFromEvent(e.target);
+        if (cell && state.drawStart) {
+            const drawnRect = { 
+                r1: Math.min(state.drawStart.r, cell.r), c1: Math.min(state.drawStart.c, cell.c),
+                r2: Math.max(state.drawStart.r, cell.r), c2: Math.max(state.drawStart.c, cell.c)
+            };
+            const key = `${drawnRect.r1}-${drawnRect.c1}-${drawnRect.r2}-${drawnRect.c2}`;
+            const matchIndex = state.solutionRects.findIndex(sol => 
+                `${sol.r1}-${sol.c1}-${sol.r2}-${sol.c2}` === key );
+
+            if (matchIndex !== -1) {
+                state.userRects.push(state.solutionRects.splice(matchIndex, 1)[0]);
+            } else {
+                alert("این قطعه صحیح نیست. دوباره تلاش کنید!");
             }
-            setupPuzzle();
-        } else if (stage === 2 && insideOuter(cell)) {
-            drawing = true; startCell = cell; previewTemp(cell, cell);
+        }
+        state.isDrawing = false; state.drawStart = null;
+        render();
+    }
+    
+    function removeUserRect(indexToRemove) {
+        const removedRect = state.userRects.splice(indexToRemove, 1);
+        if (removedRect[0]) state.solutionRects.push(removedRect[0]);
+        render();
+    }
+
+    function clearSelection() {
+        state.firstSelection = null; state.secondSelection = null;
+        state.goalCell = null; state.startCell = null;
+        state.userRects = []; state.solutionRects = [];
+        render();
+    }
+    
+    gridContainer.addEventListener('click', handleCellClick);
+    gridContainer.addEventListener('mousedown', handleMouseDown);
+    gridContainer.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    overlayContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('user-overlay')) {
+            removeUserRect(parseInt(e.target.dataset.index));
         }
     });
-    grid.addEventListener('mousemove', e => { if (drawing && stage === 2) { const cell = e.target.closest('.cell'); if (cell) previewTemp(startCell, cell); } });
-    window.addEventListener('mouseup', () => { if (drawing) { commitPiece(); drawing = false; startCell = null; } });
+    
+    new ResizeObserver(render).observe(gridWrapper);
+    render();
 });
 </script>
 </body>
