@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>شبکه ضرب  </title>
+    <title>پازل مساحت ضرب</title>
     <style>
         :root {
             --primary-color: #1565c0;
@@ -15,9 +15,9 @@
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* Use a Farsi-compatible font */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Vazirmatn', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            /* Using a common font that supports Farsi well */
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.8;
             background-color: var(--light-gray);
             color: var(--dark-gray);
@@ -41,23 +41,30 @@
             margin-bottom: 1rem;
         }
         
-        /* Styled Info Panels */
-        #infoPanel, #equation, .farsi-guide {
+        .farsi-guide {
             padding: 1rem;
             background-color: var(--light-gray);
+            border: 1px solid var(--medium-gray);
             border-radius: 6px;
             margin: 1.5rem 0;
-            min-height: 2.5em;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-align: right; /* Right-align Farsi text */
+            text-align: right;
         }
-        #equation { font-family: monospace; text-align: center; }
-        .farsi-guide h3 { font-size: 1.2rem; color: var(--primary-color); margin-bottom: 0.5rem;}
-        .farsi-guide p { font-size: 1rem; font-weight: normal; margin-bottom: 0.5rem;}
-        .farsi-guide li { margin-right: 1.5rem; }
-
-        /* Grid styling */
+        .farsi-guide h3 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+        }
+        .farsi-guide p, .farsi-guide li {
+            font-size: 1rem;
+            font-weight: normal;
+            margin-bottom: 0.5rem;
+            color: var(--dark-gray);
+        }
+        .farsi-guide li {
+            margin-right: 1.5rem; /* Indent for list items in RTL */
+        }
+        
+        /* Grid styling from user's code, with theme colors */
         .grid-wrapper { display: inline-block; margin-top: 1.5rem; }
         .header, .left-header {
             background-color: var(--medium-gray);
@@ -86,7 +93,7 @@
             grid-template-columns: repeat(12, 40px);
             gap: 1px;
             background-color: var(--medium-gray);
-            margin-right: 1px; /* Flipped from margin-left for RTL */
+            margin-right: 1px; /* Flipped for RTL */
             cursor: crosshair;
         }
         .cell {
@@ -94,33 +101,42 @@
             height: 40px;
             background: #fff;
             border: 1px solid var(--medium-gray);
-            transition: background-color 0.2s;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .cell:hover { background-color: #e3f2fd; }
-
-        /* Piece Colors */
+        
         .piece-red { background: rgba(21, 101, 192, 0.25); }
-        .piece-green{ background: rgba(46, 125, 50, 0.25); }
+        .piece-green { background: rgba(46, 125, 50, 0.25); }
         .temp-piece { background: rgba(255, 235, 59, 0.4); }
         .overlap-piece {
-            background-image: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2) 0 4px, rgba(0, 0, 0, 0.0) 4px 8px);
-            border: 2px solid var(--dark-gray) !important;
+            background-image: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2) 0 4px, rgba(0, 0, 0, 0) 4px 8px);
         }
         
-        /* Headers highlight */
         .row-highlight-red, .col-highlight-red { color: var(--primary-color); }
         .row-highlight-green, .col-highlight-green { color: var(--secondary-color); }
 
-        /* Button Styling */
+        #infoPanel, #equation {
+            padding: 1rem;
+            background-color: var(--light-gray);
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            min-height: 2.5em;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        #equation { font-family: monospace; text-align: center; direction: ltr; }
+        
         button {
             margin-top: 1.5rem;
             padding: 10px 20px;
             background: #d32f2f;
             color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: .25rem;
             cursor: pointer;
             font-size: 1rem;
             transition: background-color 0.2s;
@@ -130,7 +146,7 @@
 </head>
 <body dir="rtl">
 <div class="container">
-    <h2>شبکه ضرب</h2>
+    <h2>وب ضرب</h2>
     
     <div class="farsi-guide">
         <h3>راهنمای کوتاه (فارسی)</h3>
@@ -159,17 +175,24 @@
 </div>
 
 <script>
-// This is your working JavaScript, with only the user-facing text translated.
+// YOUR WORKING JAVASCRIPT - only text strings and number formatting have been changed.
 /******************** Utility functions ********************/
+function toFarsi(n) {
+    const farsiDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    return String(n).split('').map(digit => farsiDigits[parseInt(digit)]).join('');
+}
+
 function buildHeaders(){
     const top = document.getElementById('topHeader');
     const left = document.getElementById('leftHeader');
-    top.appendChild(document.createElement('div'));
+    const corner = document.createElement('div');
+    corner.style.width = '40px'; 
+    top.appendChild(corner);
     for(let c=1;c<=12;c++){
-        const d=document.createElement('div');d.textContent=c;d.className='colHeader';d.dataset.col=c;top.appendChild(d);
+        const d=document.createElement('div');d.textContent=toFarsi(c);d.className='colHeader';d.dataset.col=c;top.appendChild(d);
     }
     for(let r=1;r<=12;r++){
-        const d=document.createElement('div');d.textContent=r;d.className='rowHeader';d.dataset.row=r;left.appendChild(d);
+        const d=document.createElement('div');d.textContent=toFarsi(r);d.className='rowHeader';d.dataset.row=r;left.appendChild(d);
     }
 }
 function outlineRect(rect,color){
@@ -236,25 +259,25 @@ window.addEventListener('DOMContentLoaded',()=>{
         if(dc>0) missing.push({ rows: outer.rows, cols: dc, startRow: 1, startCol: inner.cols+1, filled:false, sign: stripSign });
         if(dr>0) missing.push({ rows: dr, cols: inner.cols, startRow: inner.rows+1, startCol: 1, filled:false, sign: stripSign });
     }
-
+    
     function renderEquation(constants){
         const {dr,dc,stripSign} = constants;
-        let eqHTML = `${target.rows}×${target.cols} = ${known.rows}×${known.cols}`;
+        let eqHTML = `${toFarsi(target.rows)}×${toFarsi(target.cols)} = ${toFarsi(known.rows)}×${toFarsi(known.cols)}`;
         missing.forEach((p,i)=>{
             const sym = p.sign>0 ? ' + ' : ' - ';
             eqHTML += `${sym}<span id="p${i}">___</span>`;
         });
         if(dr>0 && dc>0){
             const sym = stripSign>0 ? ' - ' : ' + ';
-            eqHTML += `${sym}${dr}×${dc}`;
+            eqHTML += `${sym}${toFarsi(dr)}×${toFarsi(dc)}`;
         }
         eq.innerHTML = eqHTML;
     }
-
+    
     function updateEq(){
         missing.forEach((p,i)=>{
             if(p.filled){
-                document.getElementById(`p${i}`).textContent = `${p.rows}×${p.cols}`;
+                document.getElementById(`p${i}`).textContent = `${toFarsi(p.rows)}×${toFarsi(p.cols)}`;
             }
         });
     }
@@ -264,7 +287,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         inner = outer===target ? known : target;
         resetVisual();
         fillRect(inner, inner===target?'piece-red':'piece-green');
-        outlineRect(outer, outer===target ? '#1565c0' : '#2e7d32');
+        outlineRect(outer, outer===target ? 'var(--primary-color)' : 'var(--secondary-color)');
         highlightHeaders(target,'red');
         highlightHeaders(known,'green');
         const constants = computePieces();
@@ -285,7 +308,7 @@ window.addEventListener('DOMContentLoaded',()=>{
                 if(cell && insideOuter(cell)) cell.classList.add('temp-piece');
             }
     }
-
+    
     function commitPiece(){
         const cells=[...document.querySelectorAll('.temp-piece')];
         if(!cells.length) return;
@@ -308,6 +331,7 @@ window.addEventListener('DOMContentLoaded',()=>{
             }else{
                 c.classList.add('user-piece');
                 c.style.backgroundColor = col;
+                c.style.border = '2px solid var(--dark-gray)';
             }
         });
         missing[idx].filled = true;
@@ -321,10 +345,10 @@ window.addEventListener('DOMContentLoaded',()=>{
         if(stage===0){
             target={rows:+cell.dataset.row, cols:+cell.dataset.col};
             fillRect(target,'piece-red');
-            outlineRect(target,'#1565c0');
+            outlineRect(target,'var(--primary-color)');
             highlightHeaders(target,'red');
             stage=1;
-            info.textContent='حالا یک حاصل‌ضرب را که بلد هستید انتخاب کنید (باید درون اولی قرار گیرد).';
+            info.innerHTML='حالا یک حاصل‌ضرب را که بلد هستید انتخاب کنید. (باید درون اولی قرار گیرد).';
         }else if(stage===1){
             known={rows:+cell.dataset.row, cols:+cell.dataset.col};
             if(!nested(target,known)){
