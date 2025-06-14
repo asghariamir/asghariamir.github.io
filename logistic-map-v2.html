@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Logistic Map & Bifurcation Explorer</title>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .main-content { padding: 1.5rem; }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center;}
+        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; max-width: 700px; margin: 0 auto 1.5rem; }
+        h3 { font-size: 1.25rem; color: var(--dark-gray); margin-top: 1.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--medium-gray); }
+
+        .tabs { display: flex; background-color: var(--light-gray); border-bottom: 2px solid var(--medium-gray); }
+        .tab-button {
+            flex: 1; padding: 14px 10px; cursor: pointer; border: none;
+            background-color: transparent; font-size: 1rem; color: var(--dark-gray);
+            position: relative; transition: color 0.3s;
+        }
+        .tab-button.active { color: var(--primary-color); font-weight: 600; }
+        .tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background-color: var(--primary-color); }
+        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content.active { display: block; }
+        
+        .row { display: flex; flex-wrap: wrap; gap: 2rem; }
+        .column { flex: 1; min-width: 300px; }
+
+        .control-group { margin-bottom: 1.5rem; }
+        .control-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #616161; font-size: 0.9rem;}
+        .control-group input[type="range"], .control-group input[type="number"] { width: 100%; }
+        .control-group output { font-weight: bold; color: var(--primary-color); }
+        
+        button {
+            padding: 10px 20px; font-size: 1rem; cursor: pointer;
+            background-color: var(--primary-color); border: none;
+            color: #fff; border-radius: 4px; transition: background-color 0.2s;
+            width: 100%;
+        }
+        button:hover { background-color: #0d47a1; }
+        
+        .plot-container { width: 100%; height: 400px; border: 1px solid var(--medium-gray); border-radius: 4px; }
+        #limitOutput {
+            border: 1px solid var(--medium-gray); background-color: var(--light-gray);
+            padding: 1rem; border-radius: 6px; font-size: 1rem;
+            color: var(--dark-gray); min-height: 40px; margin-top: 1rem;
+            text-align: center; font-weight: 600;
+        }
+        .guide-box {
+            background-color: var(--light-gray);
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        .guide-box h3 { border: none; margin-top: 0; }
+        .guide-box ul { padding-right: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+<div class="main-content">
+    <h2>Logistic Map & Bifurcation Explorer</h2>
+    <p class="info">An interactive tool to explore the behavior of the logistic map, a simple equation that can lead to complex, chaotic dynamics.</p>
+    
+    <div class="guide-box">
+        <h3>A Short Guide</h3>
+        <ul>
+            <li>The <strong>Explorer</strong> tab lets you study a single sequence. Choose a growth rate <em>r</em> and a starting value <em>x₀</em> to see how the population evolves over time and where it settles.</li>
+            <li>The <strong>Bifurcation Diagram</strong> tab shows the long-term behavior for *all* values of <em>r</em> at once, revealing the stunning fractal pattern of period-doubling and chaos.</li>
+        </ul>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-button active" data-tab="explorerTab">Explorer</button>
+        <button class="tab-button" data-tab="bifurcationTab">Bifurcation Diagram</button>
+    </div>
+
+    <div id="explorerTab" class="tab-content active">
+        <div class="row">
+            <div class="column">
+                <h3>Controls</h3>
+                <div class="control-group">
+                    <label for="rSlider">Growth Rate (r)</label>
+                    <input type="range" id="rSlider" min="0" max="4" step="0.0001" value="3.4" />
+                    <output id="rValue">3.4000</output>
+                </div>
+                <div class="control-group">
+                    <label for="x0Slider">Initial Population (x₀)</label>
+                    <input type="range" id="x0Slider" min="0" max="1" step="0.0001" value="0.5" />
+                    <output id="x0Value">0.5000</output>
+                </div>
+                <div class="control-group">
+                    <label for="nIterInput">Iterations</label>
+                    <input type="number" id="nIterInput" value="200" min="1" step="1" />
+                </div>
+                <button id="computeBtn">Compute Sequence</button>
+                <div id="limitOutput"></div>
+            </div>
+            <div class="column">
+                <h3>Sequence Plot</h3>
+                <div id="seqPlot" class="plot-container"></div>
+            </div>
+        </div>
+        <h3>Partial Bifurcation Diagram</h3>
+        <div id="partialBifPlot" class="plot-container"></div>
+    </div>
+
+    <div id="bifurcationTab" class="tab-content">
+        <h3>Full Bifurcation Diagram</h3>
+        <div class="controls">
+            <div class="control-group">
+                <label for="resRInput">Resolution (r samples)</label>
+                <input type="range" id="resRInput" min="100" max="2000" step="100" value="600" />
+                <output id="resRValue">600</output>
+            </div>
+            <div class="control-group">
+                <label for="resIterInput">Iterations per r</label>
+                <input type="range" id="resIterInput" min="100" max="2000" step="100" value="400" />
+                <output id="resIterValue">400</output>
+            </div>
+            <div class="control-group">
+                <label for="lastNInput">Points to Plot (per r)</label>
+                <input type="range" id="lastNInput" min="20" max="300" step="10" value="100" />
+                <output id="lastNValue">100</output>
+            </div>
+        </div>
+        <button id="generateBifBtn">Generate Diagram</button>
+        <div id="bifPlot" class="plot-container" style="margin-top: 1.5rem;"></div>
+    </div>
+</div>
+</div>
+<script>
+    // YOUR PROVIDED JAVASCRIPT LOGIC - UNCHANGED
+    function logisticIterate(r, x0, n) {
+        const xs = new Array(n + 1);
+        xs[0] = x0;
+        for (let i = 0; i < n; i++) {
+            xs[i + 1] = r * xs[i] * (1 - xs[i]);
+        }
+        return xs;
+    }
+
+    function approximateLimit(series, window = 20, tol = 1e-6) {
+        const length = series.length;
+        if (length < window * 2) return null;
+        const tail = series.slice(length - window);
+        const meanTail = tail.reduce((acc, v) => acc + v, 0) / window;
+        let maxDev = 0;
+        for (let val of tail) {
+            const dev = Math.abs(val - meanTail);
+            if (dev > maxDev) maxDev = dev;
+        }
+        if (maxDev < tol) {
+            return meanTail;
+        }
+        for (let p = 2; p <= 4; p++) {
+            let isPeriodic = true;
+            if (tail.length < 2 * p) continue;
+            for (let k = 0; k < p; k++) {
+                const a = tail[window - p + k];
+                const b = tail[window - 2 * p + k];
+                if (Math.abs(a - b) > tol) {
+                    isPeriodic = false;
+                    break;
+                }
+            }
+            if (isPeriodic) {
+                return tail.slice(window - p);
+            }
+        }
+        return null;
+    }
+
+    function computePartialBifurcation(rCurrent, x0, nIter) {
+        const resolution = 200;
+        const rVals = [];
+        for (let i = 0; i < resolution; i++) {
+            rVals.push((rCurrent * i) / (resolution - 1));
+        }
+        const rPlot = [];
+        const xPlot = [];
+        for (let rv of rVals) {
+            const xsTemp = logisticIterate(rv, x0, nIter);
+            const lastN = Math.min(50, xsTemp.length);
+            const tail = xsTemp.slice(xsTemp.length - lastN);
+            for (let y of tail) {
+                rPlot.push(rv);
+                xPlot.push(y);
+            }
+        }
+        return { r: rPlot, x: xPlot };
+    }
+
+    function computeFullBifurcation(resR, resIter, lastN) {
+        const rVals = [];
+        for (let i = 0; i < resR; i++) {
+            rVals.push((4 * i) / (resR - 1));
+        }
+        const rPlot = [];
+        const xPlot = [];
+        for (let rv of rVals) {
+            const xsTemp = logisticIterate(rv, 0.5, resIter);
+            const tail = xsTemp.slice(xsTemp.length - lastN);
+            for (let y of tail) {
+                rPlot.push(rv);
+                xPlot.push(y);
+            }
+        }
+        return { r: rPlot, x: xPlot };
+    }
+
+    document.querySelectorAll(".tab-button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-button").forEach((b) => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
+            btn.classList.add("active");
+            document.getElementById(btn.getAttribute("data-tab")).classList.add("active");
+        });
+    });
+
+    const rSlider = document.getElementById("rSlider");
+    const x0Slider = document.getElementById("x0Slider");
+    const nIterInput = document.getElementById("nIterInput");
+    const computeBtn = document.getElementById("computeBtn");
+    const seqPlotDiv = document.getElementById("seqPlot");
+    const limitOutputDiv = document.getElementById("limitOutput");
+    const partialBifDiv = document.getElementById("partialBifPlot");
+    const rValueLabel = document.getElementById("rValue");
+    const x0ValueLabel = document.getElementById("x0Value");
+
+    rSlider.addEventListener("input", () => { rValueLabel.value = parseFloat(rSlider.value).toFixed(4); });
+    x0Slider.addEventListener("input", () => { x0ValueLabel.value = parseFloat(x0Slider.value).toFixed(4); });
+
+    computeBtn.addEventListener("click", () => {
+        const r = parseFloat(rSlider.value);
+        const x0 = parseFloat(x0Slider.value);
+        const nIter = parseInt(nIterInput.value);
+        const xs = logisticIterate(r, x0, nIter);
+        const nArray = Array.from({ length: xs.length }, (_, i) => i);
+
+        Plotly.react(seqPlotDiv, [{ x: nArray, y: xs, mode: "lines+markers", line: { color: "var(--primary-color)"}, marker: { color: "var(--primary-color)", size: 4 },}], { margin: { t: 40, b: 40, l: 50, r: 20 }, xaxis: { title: "n" }, yaxis: { title: "xₙ", range: [0,1] } }, { responsive: true, displaylogo: false });
+        
+        const lim = approximateLimit(xs);
+        let limStr = "";
+        if (lim === null) {
+            limStr = "Chaotic or transient behavior";
+        } else if (Array.isArray(lim)) {
+            limStr = `Periodic (period ${lim.length}): [${lim.map((v) => v.toFixed(5)).join(", ")}]`;
+        } else {
+            limStr = "Fixed-point ≈ " + lim.toFixed(6);
+        }
+        limitOutputDiv.textContent = limStr;
+
+        const dataPB = computePartialBifurcation(r, x0, 100);
+        Plotly.react(partialBifDiv, [{ x: dataPB.r, y: dataPB.x, mode: "markers", type: 'scattergl', marker: { size: 1, color: "var(--primary-color)" },}], { margin: { t: 40, b: 40, l: 50, r: 20 }, xaxis: { title: "r" }, yaxis: { title: "x" } }, { responsive: true, displaylogo: false });
+    });
+
+    const resRInput = document.getElementById("resRInput");
+    const resIterInput = document.getElementById("resIterInput");
+    const lastNInput = document.getElementById("lastNInput");
+    const resRValue = document.getElementById("resRValue");
+    const resIterValue = document.getElementById("resIterValue");
+    const lastNValue = document.getElementById("lastNValue");
+    const generateBifBtn = document.getElementById("generateBifBtn");
+    const bifPlotDiv = document.getElementById("bifPlot");
+
+    resRInput.addEventListener("input", () => { resRValue.value = resRInput.value; });
+    resIterInput.addEventListener("input", () => { resIterValue.value = resIterInput.value; });
+    lastNInput.addEventListener("input", () => { lastNValue.value = lastNInput.value; });
+
+    generateBifBtn.addEventListener("click", () => {
+        generateBifBtn.textContent = 'Generating...';
+        generateBifBtn.disabled = true;
+        // Use timeout to allow UI to update
+        setTimeout(() => {
+            const resR = parseInt(resRInput.value);
+            const resIter = parseInt(resIterInput.value);
+            const lastN = parseInt(lastNInput.value);
+            const dataFB = computeFullBifurcation(resR, resIter, lastN);
+            Plotly.react(bifPlotDiv, [{ x: dataFB.r, y: dataFB.x, mode: "markers", type: 'scattergl', marker: { size: 1, color: "var(--primary-color)" },}], { margin: { t: 40, b: 40, l: 50, r: 20 }, xaxis: { title: "r", range: [0,4] }, yaxis: { title: "x" } }, { responsive: true, displaylogo: false });
+            generateBifBtn.textContent = 'Generate Diagram';
+            generateBifBtn.disabled = false;
+        }, 50);
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+        computeBtn.click();
+    });
+</script>
+</body>
+</html>
