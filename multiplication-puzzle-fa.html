@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>پازل مساحت ضرب</title>
+    <title>Multiplication Area Explorer</title>
     <style>
         :root {
             --primary-color: #1565c0; /* Goal */
@@ -18,8 +18,8 @@
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
             background-color: var(--light-gray);
             color: var(--dark-gray);
             display: flex;
@@ -39,15 +39,6 @@
         h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; }
         p.info { color: #616161; margin-bottom: 1.5rem; }
 
-        .farsi-guide {
-            padding: 1rem; background-color: var(--light-gray);
-            border: 1px solid var(--medium-gray); border-radius: 6px;
-            margin: 1.5rem 0; text-align: right;
-        }
-        .farsi-guide h3 { font-size: 1.2rem; color: var(--primary-color); margin-bottom: 0.75rem;}
-        .farsi-guide p, .farsi-guide li { font-size: 1rem; font-weight: normal; margin-bottom: 0.5rem; }
-        .farsi-guide li { margin-right: 1.5rem; }
-        
         .info-panel {
             padding: 1rem; background-color: var(--light-gray); border-radius: 6px;
             margin-bottom: 1.5rem; text-align: center; border: 1px solid var(--medium-gray);
@@ -81,7 +72,6 @@
         .headers-col { display: grid; grid-template-columns: repeat(var(--grid-size, 12), 1fr); grid-area: 1 / 2 / 2 / 3; }
         .headers-row { display: grid; grid-template-rows: repeat(var(--grid-size, 12), 1fr); grid-area: 2 / 1 / 3 / 2; }
         .header-cell { display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem; }
-        
         .grid-cell {
             border-right: 1px solid var(--medium-gray);
             border-bottom: 1px solid var(--medium-gray);
@@ -89,7 +79,7 @@
         
         .overlay-container {
             position: absolute;
-            grid-area: 1 / 1 / -1 / -1; /* Cover the entire wrapper */
+            grid-area: 1 / 1 / -1 / -1; 
             grid-template-columns: 30px repeat(var(--grid-size, 12), 1fr);
             grid-template-rows: 30px repeat(var(--grid-size, 12), 1fr);
             display: grid;
@@ -102,7 +92,7 @@
         }
         .user-overlay { pointer-events: auto; cursor: pointer; }
 
-        .goal-overlay { background-color: var(--goal-rgba); border: 3px solid var(--primary-color); }
+        .goal-overlay { border: 3px solid var(--primary-color); }
         .start-overlay { background-color: var(--start-rgba); border: 2px solid var(--secondary-color); }
         .user-overlay { background-color: var(--user-rgba); border: 2px solid var(--user-color); }
         .preview-overlay { background-color: rgba(0,0,0,0.1); border: 1px dashed var(--dark-gray); }
@@ -114,21 +104,14 @@
         .swap-btn { background-color: #6c757d }
     </style>
 </head>
-<body dir="rtl">
+<body>
 <div class="container">
-    <h2>پازل مساحت ضرب</h2>
+    <h2 id="app-title">Multiplication Area Explorer</h2>
+    <p id="app-info" class="info">Click two cells to define a Goal and a Starting Area. Then, click and drag to draw the exact rectangle(s) that connect them.</p>
     
-    <div class="farsi-guide">
-        <h3>راهنمای کوتاه (فارسی)</h3>
-        <ul>
-            <li>ابتدا مستطیلی را که می‌خواهید حاصل ضرب آن را پیدا کنید انتخاب کنید – با رنگ آبی نمایش داده می‌شود.</li>
-            <li>سپس مستطیلی را که حاصل ضرب آن را می‌دانید انتخاب کنید؛ این مستطیل باید کاملاً درون مستطیل اول قرار بگیرد یا کاملاً آن را احاطه کند – با رنگ سبز نمایش داده می‌شود.</li>
-            <li>شکاف باقی‌مانده را با کشیدن مستطیل‌ پُر کنید. معمولاً یک نوار پایین و یک نوار سمت راست کافی است؛ گاهی فقط یک قطعه لازم است. اگر گوشهٔ مشترکی به‌وجود بیاید، برنامه به‌طور خودکار آن را مدیریت می‌کند.</li>
-        </ul>
-        <p><b>مثال:</b> برای محاسبهٔ ۷×۶، ابتدا آن را انتخاب کنید. اگر ۵×۵ را بلد هستید، آن را به‌عنوان مستطیل شناخته‌شده برگزینید. سپس یک نوار ۷×۱ در پایین و یک نوار ۶×۲ در سمت راست اضافه می‌کنید؛ مربع اشتراکی ۲×۱ در گوشه به‌طور خودکار لحاظ می‌شود.</p>
-    </div>
-
-    <div id="infoPanel"><p>برای شروع یک خانه از جدول را برای ساختن «قاب پازل» انتخاب کنید.</p></div>
+    <div id="farsi-guide-box" style="display: none;"></div>
+    
+    <div id="info-panel"><p>Select a cell to begin.</p></div>
 
     <div class="grid-wrapper" id="grid-wrapper">
         <div id="col-headers" class="headers-col"></div>
@@ -138,18 +121,20 @@
     </div>
     
     <div id="action-controls" class="action-controls">
-        <button id="clear-btn" class="clear-btn">پاک کردن همه</button>
+        <button id="clear-btn" class="clear-btn">Clear All</button>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // --- STATE & CONFIG ---
     let state = {
         size: 12, firstSelection: null, secondSelection: null,
         goalCell: null, startCell: null, userRects: [],
         isDrawing: false, drawStart: null, solutionRects: [],
     };
 
+    // --- DOM REFERENCES ---
     const gridWrapper = document.getElementById('grid-wrapper');
     const gridContainer = document.getElementById('grid-container');
     const overlayContainer = document.getElementById('overlay-container');
@@ -157,8 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const actionControls = document.getElementById('action-controls');
     const colHeaders = document.getElementById('col-headers');
     const rowHeaders = document.getElementById('row-headers');
-    const toFarsi = n => String(n).split('').map(d => '۰۱۲۳۴۵۶۷۸۹'[d]).join('');
     
+    // --- LOGIC & RENDERING ---
     function render() {
         renderGrid();
         renderOverlays();
@@ -168,14 +153,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderGrid() {
         if (gridContainer.children.length === state.size * state.size) return;
         
-        [gridContainer, colHeaders, rowHeaders, overlayContainer].forEach(el => {
+        [gridContainer, colHeaders, rowHeaders].forEach(el => {
             el.innerHTML = '';
             el.style.setProperty('--grid-size', state.size);
         });
+        overlayContainer.style.setProperty('--grid-size', state.size);
 
         for (let i = 1; i <= state.size; i++) {
-            colHeaders.appendChild(Object.assign(document.createElement('div'), {className: 'header-cell', textContent: toFarsi(i)}));
-            rowHeaders.appendChild(Object.assign(document.createElement('div'), {className: 'header-cell', textContent: toFarsi(i)}));
+            colHeaders.appendChild(Object.assign(document.createElement('div'), {className: 'header-cell', textContent: i}));
+            rowHeaders.appendChild(Object.assign(document.createElement('div'), {className: 'header-cell', textContent: i}));
         }
 
         for (let i = 0; i < state.size * state.size; i++) {
@@ -189,59 +175,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderOverlays() {
         overlayContainer.innerHTML = ''; 
-        const { goalCell, startCell, userRects } = state;
         
-        const drawRect = (r, c, className) => overlayContainer.appendChild(createRectElement({r1:1, c1:1, r2:r, c2:c}, className));
-        const drawUserRect = (rect, i) => {
-            const el = createRectElement(rect, 'user-overlay');
-            el.dataset.index = i;
+        const createRect = (rect, className, index) => {
+            const el = createRectElement(rect, className);
+            if(index !== undefined) {
+                el.dataset.index = index;
+            }
             overlayContainer.appendChild(el);
         };
         
-        if (startCell) drawRect(startCell.r, startCell.c, 'start-overlay');
-        if (goalCell) drawRect(goalCell.r, goalCell.c, 'goal-overlay');
-        userRects.forEach((rect, i) => drawUserRect(rect, i));
+        if (state.startCell) createRect({r1:1, c1:1, r2:state.startCell.r, c2:state.startCell.c}, 'start-overlay');
+        if (state.goalCell) createRect({r1:1, c1:1, r2:state.goalCell.r, c2:state.goalCell.c}, 'goal-overlay');
+        state.userRects.forEach((rect, i) => createRect(rect, 'user-overlay', i));
     }
 
     function createRectElement({r1, c1, r2, c2}, className) {
         const el = document.createElement('div');
         el.className = `overlay-rectangle ${className}`;
-        el.style.setProperty('--r1', Math.min(r1, r2));
-        el.style.setProperty('--c1', Math.min(c1, c2));
-        el.style.setProperty('--r2', Math.max(r1, r2));
-        el.style.setProperty('--c2', Math.max(c1, c2));
+        const gridColStart = Math.min(c1, c2) + 1;
+        const gridColEnd = Math.max(c1, c2) + 2;
+        const gridRowStart = Math.min(r1, r2) + 1;
+        const gridRowEnd = Math.max(r1, r2) + 2;
+        el.style.gridArea = `${gridRowStart} / ${gridColStart} / ${gridRowEnd} / ${gridColEnd}`;
         return el;
     }
 
     function renderInfoPanel() {
         let html = '';
-        const { goalCell, startCell, solutionRects, userRects } = state;
+        const { goalCell, startCell, solutionRects } = state;
 
-        if (!goalCell) { html = '<p>یک خانه از جدول را برای «قاب پازل» انتخاب کنید.</p>'; } 
+        if (!goalCell) { html = '<p>Select a cell to define the <strong>Goal Area</strong>.</p>'; } 
         else {
-            html = `<p class="goal-text">قاب هدف: <strong>${toFarsi(goalCell.r)} × ${toFarsi(goalCell.c)}</strong></p>`;
-            if (!startCell) { html += '<p>حال، یک خانه برای «قطعهٔ آغازی» انتخاب کنید.</p>'; } 
+            html = `<p class="goal-text">Goal: <strong>${goalCell.r} × ${goalCell.c}</strong></p>`;
+            if (!startCell) { html += '<p>Now, select a <strong>Starting Area</strong>.</p>'; } 
             else {
-                html += `<p class="start-text">قطعهٔ آغازی: <strong>${toFarsi(startCell.r)} × ${toFarsi(startCell.c)}</strong></p>`;
+                html += `<p class="start-text">Start: <strong>${startCell.r} × ${startCell.c}</strong></p>`;
                 if (solutionRects.length > 0) {
-                     html += `<p class="relation-text">برای تکمیل پازل، ${toFarsi(solutionRects.length)} قطعهٔ باقی‌مانده را بکشید.</p>`;
+                     html += `<p class="relation-text">Draw the ${solutionRects.length} missing piece(s) to complete the puzzle.</p>`;
+                } else if (goalCell.r * goalCell.c === startCell.r * startCell.c) {
+                    html += `<p class="relation-text">The Goal and Start areas are the same!</p>`;
                 } else {
-                     html += `<p class="relation-text">شما همه قطعات را پیدا کردید! کارتان عالی بود.</p>`;
+                     html += `<p class="relation-text">You've found all the pieces! Your puzzle is complete.</p>`;
                 }
             }
         }
         infoPanel.innerHTML = html;
         
-        actionControls.innerHTML = '<button id="clear-btn" class="clear-btn">پاک کردن همه</button>';
+        actionControls.innerHTML = '<button id="clear-btn" class="clear-btn">Clear All</button>';
         actionControls.querySelector('#clear-btn').onclick = clearSelection;
         if (state.firstSelection && state.secondSelection) {
              const swapBtn = document.createElement('button');
-             swapBtn.className = 'swap-btn'; swapBtn.textContent = 'تعویض انتخاب‌ها';
+             swapBtn.className = 'swap-btn'; swapBtn.textContent = 'Swap Selections';
              swapBtn.onclick = swapRoles;
              actionControls.appendChild(swapBtn);
         }
     }
-        
+    
     function getCellFromEvent(e) {
         const el = e.target;
         if(el && el.classList.contains('grid-cell')) {
@@ -263,15 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const { r: gr, c: gc } = state.goalCell;
             const { r: sr, c: sc } = state.startCell;
             
-            if (gc > sc) state.solutionRects.push({ r1: 1, c1: sc + 1, r2: sr, c2: gc });
-            if (gr > sr) state.solutionRects.push({ r1: sr + 1, c1: 1, r2: gr, c2: gc });
+            if (gc > sc) { state.solutionRects.push({ r1: 1, c1: sc + 1, r2: sr, c2: gc }); }
+            if (gr > sr) { state.solutionRects.push({ r1: sr + 1, c1: 1, r2: gr, c2: gc }); }
         }
     }
 
-    function swapRoles() {
-        [state.firstSelection, state.secondSelection] = [state.secondSelection, state.firstSelection];
-        determineRolesAndSolutions(); render();
-    }
+    function swapRoles() { [state.firstSelection, state.secondSelection] = [state.secondSelection, state.firstSelection]; determineRolesAndSolutions(); render(); }
+    function clearSelection() { state = { ...state, firstSelection: null, secondSelection: null, goalCell: null, startCell: null, userRects: [], solutionRects: [] }; render(); }
 
     function handleCellClick(e) {
         if (state.isDrawing) return;
@@ -297,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleMouseMove(e) {
         if (!state.isDrawing) return;
         overlayContainer.querySelector('.preview-overlay')?.remove();
-        const cell = getCellFromEvent(e.target);
+        const cell = getCellFromEvent(e);
         if (cell && state.drawStart) {
             const rect = { r1: state.drawStart.r, c1: state.drawStart.c, r2: cell.r, c2: cell.c };
             overlayContainer.appendChild(createRectElement(rect, 'preview-overlay'));
@@ -307,20 +294,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleMouseUp(e) {
         if (!state.isDrawing) return;
         overlayContainer.querySelector('.preview-overlay')?.remove();
-        const cell = getCellFromEvent(e.target);
+        const cell = getCellFromEvent(e);
         if (cell && state.drawStart) {
             const drawnRect = { 
                 r1: Math.min(state.drawStart.r, cell.r), c1: Math.min(state.drawStart.c, cell.c),
                 r2: Math.max(state.drawStart.r, cell.r), c2: Math.max(state.drawStart.c, cell.c)
             };
             const key = `${drawnRect.r1}-${drawnRect.c1}-${drawnRect.r2}-${drawnRect.c2}`;
-            const matchIndex = state.solutionRects.findIndex(sol => 
-                `${sol.r1}-${sol.c1}-${sol.r2}-${sol.c2}` === key );
+            const matchIndex = state.solutionRects.findIndex(sol => `${sol.r1}-${sol.c1}-${sol.r2}-${sol.c2}` === key );
 
             if (matchIndex !== -1) {
                 state.userRects.push(state.solutionRects.splice(matchIndex, 1)[0]);
             } else {
-                alert("این قطعه صحیح نیست. دوباره تلاش کنید!");
+                alert("That's not one of the missing pieces. Try again!");
             }
         }
         state.isDrawing = false; state.drawStart = null;
@@ -330,13 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function removeUserRect(indexToRemove) {
         const removedRect = state.userRects.splice(indexToRemove, 1);
         if (removedRect[0]) state.solutionRects.push(removedRect[0]);
-        render();
-    }
-
-    function clearSelection() {
-        state.firstSelection = null; state.secondSelection = null;
-        state.goalCell = null; state.startCell = null;
-        state.userRects = []; state.solutionRects = [];
         render();
     }
     
