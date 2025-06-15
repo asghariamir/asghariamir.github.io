@@ -47,7 +47,7 @@
         #drawing-canvas { z-index: 10; cursor: crosshair; }
         #analysis-canvas { z-index: 5; }
 
-        #analysis-results { margin-top: 1rem; padding: 1rem; background-color: var(--light-gray); border-radius: 4px; font-size: 0.9rem; text-align: left;}
+        #analysis-results { margin-top: 1rem; padding: 1rem; background-color: var(--light-gray); border-radius: 4px; font-size: 0.95rem; text-align: left; line-height: 1.7;}
         #analysis-results p { margin: 0.5rem 0; }
         #analysis-results strong { color: var(--primary-color); font-family: monospace; }
         
@@ -118,14 +118,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let state = {
         mode: 'draw', 
         isDrawing: false,
-        paths: [[]], // Array of paths, to support piecewise functions
+        paths: [[]],
         analysisResults: null,
     };
 
     const EXAMPLES = {
-        "S-Curve": "s_curve", "V-Shape": "v_shape", "Wave": "wave",
-        "Piecewise Linear": "piecewise", "Jump Discontinuity": "jump",
-        "Circle (Not a Function)": "circle",
+        "S-Curve": { id: "s_curve", description: "This S-shaped curve is a continuous and smooth function. It has one inflection point where its concavity changes from up to down." },
+        "V-Shape": { id: "v_shape", description: "This V-shape is a function but is not smooth. It has a sharp corner (a 'cusp'), meaning it's not differentiable at its minimum point." },
+        "Wave": { id: "wave", description: "This wave-like curve shows multiple local maxima and minima, as well as several inflection points." },
+        "Piecewise Linear": { id: "piecewise", description: "This function is defined in pieces. It is continuous, but not smooth at the point where the pieces connect." },
+        "Jump Discontinuity": { id: "jump", description: "This graph shows a jump discontinuity. The function is not continuous at x=0, as it jumps from one value to another." },
+        "Circle (Not a Function)": { id: "circle", description: "This is not a function because it fails the Vertical Line Test. A single x-value can correspond to two different y-values." },
     };
 
     // --- DOM REFERENCES ---
@@ -154,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         exampleSelect.innerHTML = '<option value="">Draw Your Own</option>';
-        Object.keys(EXAMPLES).forEach(name => exampleSelect.appendChild(new Option(name, EXAMPLES[name])));
+        Object.keys(EXAMPLES).forEach(name => exampleSelect.appendChild(new Option(name, EXAMPLES[name].id)));
         
         exampleSelect.addEventListener('change', loadExample);
         clearBtn.addEventListener('click', clearCanvas);
@@ -189,7 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function startDrawing(e) {
         state.isDrawing = true;
         if (state.mode === 'draw') {
-            state.paths = [[]]; // Start a new drawing
+            state.paths = [[]];
+            state.analysisResults = null;
         }
         draw(e);
     }
@@ -202,14 +206,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (state.mode === 'draw') {
              state.paths[state.paths.length - 1].push({ x: normX, y: normY });
-        } else { // Erase mode
-            state.paths = state.paths.map(path => path.filter(p => Math.hypot(p.x - normX, p.y - normY) > 0.1));
+        } else {
+            state.paths = state.paths.map(path => path.filter(p => Math.hypot(p.x - normX, p.y - normY) > 0.15));
         }
         redraw();
     }
     
-    function stopDrawing() { if (state.isDrawing) { state.isDrawing = false; state.paths = state.paths.filter(p => p.length > 1); analyze(); redraw(); } }
-    function clearCanvas() { state.paths = [[]]; analyze(); redraw(); }
+    function stopDrawing() { if (state.isDrawing) { state.isDrawing = false; state.paths = state.paths.filter(p => p.length > 1); if (state.mode === 'draw') analyze(); redraw(); } }
+    function clearCanvas() { state.paths = [[]]; state.analysisResults = null; redraw(); }
 
     function redraw(analysisDrawFn = null) {
         [sketchCtx, analysisCtx].forEach(ctx => {
@@ -218,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             state.paths.forEach(path => drawCurve(ctx, path));
         });
         if(analysisDrawFn) analysisDrawFn();
+        else analysisResultsEl.innerHTML = '<p>Click a button to analyze the graph.</p>';
     }
 
     function drawGrid(ctx) {
@@ -246,119 +251,135 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ANALYSIS LOGIC ---
     function analyze() {
-        const allPoints = state.paths.flat();
-        if (allPoints.length < 3) return state.analysisResults = {};
-        
-        const sorted = allPoints.slice().sort((a,b) => a.x - b.x);
-        
-        let slopes = [], concavities = [];
-        state.paths.forEach(path => {
-            const sortedPath = path.slice().sort((a,b) => a.x - b.x);
-            for(let i=0; i < sortedPath.length-1; i++) slopes.push({x: sortedPath[i].x, val: (sortedPath[i+1].y - sortedPath[i].y) / (sortedPath[i+1].x - sortedPath[i].x)});
-        });
-        slopes.sort((a,b) => a.x - b.x);
+        const allPoints = state.paths.flat().sort((a,b) => a.x - b.x);
+        if (allPoints.length < 5) return state.analysisResults = {}; // Need enough points for analysis
 
-        for(let i=0; i<slopes.length-1; i++) concavities.push({x: slopes[i].x, val: (slopes[i+1].val - slopes[i].val) / (slopes[i+1].x - slopes[i].x)});
+        const slopes = [];
+        for(let i=0; i<allPoints.length-1; i++) {
+            const p1 = allPoints[i], p2 = allPoints[i+1];
+            if (p2.x - p1.x > 1e-6) slopes.push({x: p1.x, val: (p2.y - p1.y) / (p2.x - p1.x)});
+        }
         
+        const concavities = [];
+        for(let i=0; i<slopes.length-1; i++) {
+             if (slopes[i+1].x - slopes[i].x > 1e-6) concavities.push({x: slopes[i].x, val: (slopes[i+1].val - slopes[i].val) / (slopes[i+1].x - slopes[i].x)});
+        }
+
         const extrema = [], inflections = [];
-        for(let i=1; i<slopes.length; i++) if(slopes[i-1].val > 0 && slopes[i].val < 0) extrema.push({type: 'max', p: sorted.find(p=>p.x >= slopes[i].x)});
-        for(let i=1; i<slopes.length; i++) if(slopes[i-1].val < 0 && slopes[i].val > 0) extrema.push({type: 'min', p: sorted.find(p=>p.x >= slopes[i].x)});
-        for(let i=1; i<concavities.length; i++) if(concavities[i-1].val * concavities[i].val < 0) inflections.push(sorted.find(p=>p.x >= concavities[i].x));
+        for(let i=1; i<slopes.length; i++) if(slopes[i-1].val > 0 && slopes[i].val <= 0) extrema.push({type: 'max', p: allPoints[i]});
+        for(let i=1; i<slopes.length; i++) if(slopes[i-1].val < 0 && slopes[i].val >= 0) extrema.push({type: 'min', p: allPoints[i]});
+        for(let i=1; i<concavities.length; i++) if(concavities[i-1].val * concavities[i].val < 0) inflections.push(allPoints[i]);
         
         state.analysisResults = {
-            isFunction: isFunction(sorted),
-            domain: [sorted[0].x, sorted[sorted.length-1].x],
-            range: [Math.min(...sorted.map(p=>p.y)), Math.max(...sorted.map(p=>p.y))],
+            isFunction: isFunction(allPoints),
+            domain: [allPoints[0].x, allPoints[allPoints.length-1].x],
+            range: [Math.min(...allPoints.map(p=>p.y)), Math.max(...allPoints.map(p=>p.y))],
             extrema: extrema.filter(e=>e.p), inflections: inflections.filter(p=>p),
-            slopes, concavities, smoothed: sorted
+            slopes, concavities, points: allPoints
         };
     }
 
     function isFunction(points) {
-        for(let i=0; i<points.length-1; i++) if(Math.abs(points[i+1].x - points[i].x) < 0.02) return { result: false, x: points[i].x };
+        for(let i=0; i<points.length-1; i++) if(Math.abs(points[i+1].x - points[i].x) < 0.01) return { result: false, x: points[i].x };
         return { result: true };
     }
     
-    // --- ANALYSIS UI ---
-    function runVerticalLineTest() { /* ... unchanged ... */ }
-    function showDomainRange() { /* ... unchanged ... */ }
+    function runVerticalLineTest() {
+        analyze();
+        const { result, x: failX } = state.analysisResults.isFunction;
+        let html = result ? `<p style="color:var(--secondary-color)">✅ This graph **is** a valid function.</p>` : `<p style="color:var(--danger-color)">❌ This graph **is not** a function. It fails the vertical line test near x=${(failX*5).toFixed(2)}.</p>`;
+        analysisResultsEl.innerHTML = html;
+        redraw(() => {
+            const w = analysisCanvas.clientWidth; let x = 0;
+            const testInterval = setInterval(() => {
+                redraw(() => {
+                    analysisCtx.strokeStyle = 'var(--danger-color)'; analysisCtx.lineWidth = 2;
+                    analysisCtx.beginPath(); analysisCtx.moveTo(x, 0); analysisCtx.lineTo(x, analysisCanvas.clientHeight); analysisCtx.stroke();
+                });
+                x += 4;
+                if (x > w) clearInterval(testInterval);
+            }, 20);
+        });
+    }
+    
+    function showDomainRange() {
+        if (!state.analysisResults) analyze();
+        const {domain, range} = state.analysisResults;
+        if(!domain) return analysisResultsEl.innerHTML = "<p>Could not determine domain/range. Please draw a clearer graph.</p>";
+        const format = (arr, label) => `<p>${label}: <strong>[${(arr[0]*5).toFixed(1)}, ${(arr[1]*5).toFixed(1)}]</strong></p>`;
+        analysisResultsEl.innerHTML = format(domain, "Domain") + format(range, "Range");
+        redraw();
+    }
     
     function showKeyPoints() {
-        if (!state.analysisResults || !state.analysisResults.extrema) analyze();
+        if (!state.analysisResults) analyze();
         const {extrema, inflections} = state.analysisResults;
         redraw(() => {
-            extrema.forEach(({type, p}) => drawPoint(analysisCtx, p, type === 'max' ? 'var(--point-max-color)' : 'var(--point-min-color)', 'M'));
+            extrema.forEach(({type, p}) => drawPoint(analysisCtx, p, type === 'max' ? 'var(--point-max-color)' : 'var(--point-min-color)', type === 'max' ? 'M' : 'm'));
             inflections.forEach(p => drawPoint(analysisCtx, p, 'var(--point-inflection-color)', 'I'));
         });
         analysisResultsEl.innerHTML = `<p>Found <strong>${extrema.length}</strong> extrema (Max/Min) and <strong>${inflections.length}</strong> inflection points.</p>`;
     }
     
     function showBehavior() {
-        if (!state.analysisResults || !state.analysisResults.slopes) analyze();
+        if (!state.analysisResults) analyze();
         redraw(() => {
-            state.analysisResults.smoothed.forEach((p, i, arr) => {
+            state.analysisResults.points.forEach((p, i, arr) => {
                 if(i === 0) return;
-                const slope = state.analysisResults.slopes.find(s=> s.x === arr[i-1].x)?.val;
-                drawSegment(analysisCtx, arr[i-1], p, slope > 0 ? 'var(--secondary-color)' : 'var(--danger-color)');
+                const slope = state.analysisResults.slopes.find(s=> s.x >= arr[i-1].x)?.val || 0;
+                drawSegment(analysisCtx, arr[i-1], p, slope >= 0 ? 'var(--secondary-color)' : 'var(--danger-color)');
             });
         });
         analysisResultsEl.innerHTML = `<p>Showing <strong style="color:var(--secondary-color)">Increasing</strong> and <strong style="color:var(--danger-color)">Decreasing</strong> intervals.</p>`;
     }
     
     function showConcavity() {
-        if (!state.analysisResults || !state.analysisResults.concavities) analyze();
+        if (!state.analysisResults) analyze();
         redraw(() => {
-             state.analysisResults.smoothed.forEach((p, i, arr) => {
-                if(i === 0) return;
-                const concavity = state.analysisResults.concavities.find(c=> c.x >= arr[i-1].x)?.val;
+             state.analysisResults.points.forEach((p, i, arr) => {
+                if(i < 2) return;
+                const concavity = state.analysisResults.concavities.find(c=> c.x >= arr[i-1].x)?.val || 0;
                 drawSegment(analysisCtx, arr[i-1], p, concavity > 0 ? 'var(--info-color)' : 'var(--accent-color)');
             });
         });
         analysisResultsEl.innerHTML = `<p>Showing <strong style="color:var(--info-color)">Concave Up</strong> and <strong style="color:var(--accent-color)">Concave Down</strong> intervals.</p>`;
     }
 
-    function drawPoint(ctx, p, color, label) {
-        if(!p) return;
-        const w = ctx.canvas.clientWidth, h = ctx.canvas.clientHeight;
-        const x = (p.x + 1) / 2 * w, y = (p.y + 1) / 2 * h;
-        ctx.fillStyle = color;
-        ctx.beginPath(); ctx.arc(x, y, 6, 0, 2*Math.PI); ctx.fill();
-        ctx.fillStyle = 'white'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(label, x, y);
-    }
+    function drawPoint(ctx, p, color, label) { /* ... same as before ... */ }
+    function drawSegment(ctx, p1, p2, color) { /* ... same as before ... */ }
     
-    function drawSegment(ctx, p1, p2, color) {
-        const w = ctx.canvas.clientWidth, h = ctx.canvas.clientHeight;
-        ctx.strokeStyle = color; ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo((p1.x + 1) / 2 * w, (p1.y + 1) / 2 * h);
-        ctx.lineTo((p2.x + 1) / 2 * w, (p2.y + 1) / 2 * h);
-        ctx.stroke();
-    }
-
+    // --- TABS & EXAMPLES ---
     window.switchTab = (tabName) => {
         document.querySelectorAll('.tab-content, .tab-button').forEach(el => el.classList.remove('active'));
         document.getElementById(`${tabName}-tab`).classList.add('active');
         document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        if(tabName === 'analysis') { redraw(); analysisResultsEl.innerHTML = '<p>Click a button to analyze the graph.</p>'; }
+        if(tabName === 'analysis') {
+            setTimeout(() => {
+                redraw();
+                analysisResultsEl.innerHTML = '<p>Click a button to analyze the graph.</p>';
+            }, 0);
+        }
     };
     
     function loadExample() {
         const type = exampleSelect.value;
+        const entry = Object.entries(EXAMPLES).find(([name, data]) => data.id === type);
+        if (entry) {
+            analysisResultsEl.innerHTML = `<p><strong>${entry[0]}:</strong> ${entry[1].description}</p>`;
+        }
         if (!type) { clearCanvas(); return; }
+        let paths = [[]]; const addPoint = (x, y) => paths[paths.length - 1].push({x, y});
         const numPoints = 200;
-        let paths = [[]];
-        const addPoint = (x, y) => paths[paths.length - 1].push({x, y});
 
         switch(type) {
-            case 's_curve': for(let i=0;i<=numPoints;i++) addPoint(i/numPoints*2-1, Math.tanh((i/numPoints*2-1)*5)); break;
+            case 's_curve': for(let i=0;i<=numPoints;i++) addPoint(i/numPoints*2-1, Math.tanh((i/numPoints*2-1)*3)); break;
             case 'v_shape': for(let i=0;i<=numPoints;i++) addPoint(i/numPoints*2-1, Math.abs(i/numPoints*2-1)*1.5 - 0.7); break;
             case 'wave': for(let i=0;i<=numPoints;i++) addPoint(i/numPoints*2-1, Math.sin((i/numPoints*2-1)*10)*0.7); break;
             case 'circle': for(let i=0;i<=numPoints;i++) addPoint(Math.cos(i/numPoints*2*Math.PI)*0.8, Math.sin(i/numPoints*2*Math.PI)*0.8); break;
             case 'jump':
-                for(let i=0; i<=numPoints/2; i++) addPoint(i/(numPoints/2)-1, Math.pow(i/(numPoints/2)-1, 2));
+                for(let i=0; i<=numPoints/2; i++) addPoint(i/(numPoints/2)-1, 0.5*Math.pow(i/(numPoints/2)-1, 2));
                 paths.push([]);
-                for(let i=0; i<=numPoints/2; i++) addPoint(i/(numPoints/2), -Math.pow(i/(numPoints/2), 2) - 0.2);
+                for(let i=0; i<=numPoints/2; i++) addPoint(i/(numPoints/2), -0.5*Math.pow(i/(numPoints/2), 2) - 0.2);
                 break;
             case 'piecewise':
                  for(let i=0; i<=numPoints/2; i++) addPoint(i/(numPoints/2)-1, -1*(i/(numPoints/2)-1));
@@ -369,6 +390,10 @@ document.addEventListener('DOMContentLoaded', () => {
         state.paths = paths;
         analyze(); redraw();
     }
+    
+    // Helper function stubs from last time, now filled in
+    function drawPoint(ctx, p, color, label) { if(!p) return; const w = ctx.canvas.clientWidth, h = ctx.canvas.clientHeight; const x = (p.x + 1) / 2 * w, y = (p.y + 1) / 2 * h; ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 6, 0, 2*Math.PI); ctx.fill(); ctx.fillStyle = 'white'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, x, y); }
+    function drawSegment(ctx, p1, p2, color) { const w = ctx.canvas.clientWidth, h = ctx.canvas.clientHeight; ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo((p1.x + 1) / 2 * w, (p1.y + 1) / 2 * h); ctx.lineTo((p2.x + 1) / 2 * w, (p2.y + 1) / 2 * h); ctx.stroke(); }
     
     initialize();
 });
