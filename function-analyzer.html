@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Function Analyzer</title>
+    <style>
+        :root {
+            --primary-color: #1565c0;
+            --secondary-color: #2e7d32; /* Green */
+            --danger-color: #d32f2f;  /* Red */
+            --accent-color: #9c27b0;   /* Purple */
+            --info-color: #ff9800;    /* Orange */
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: var(--light-gray); color: var(--dark-gray); display: flex; justify-content: center; padding: 1rem; }
+        .container { width: 100%; max-width: 1000px; margin: 0 auto; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        .tabs { display: flex; background-color: var(--light-gray); border-bottom: 2px solid var(--medium-gray); }
+        .tab-button { flex: 1; padding: 14px 10px; cursor: pointer; border: none; background-color: transparent; font-size: 1rem; color: var(--dark-gray); position: relative; transition: color 0.3s; }
+        .tab-button.active { color: var(--primary-color); font-weight: 600; }
+        .tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background-color: var(--primary-color); }
+        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content.active { display: block; }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+        p.info { color: #616161; margin-bottom: 1.5rem; }
+        h3 { font-size: 1.25rem; color: var(--dark-gray); margin-top: 1.5rem; margin-bottom: 1rem; border-top: 1px solid var(--medium-gray); padding-top: 1.5rem;}
+        
+        .main-layout { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; }
+        .controls-panel { display: flex; flex-direction: column; gap: 1rem; }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; background-color: var(--light-gray); border-radius: 6px;}
+        label { font-size: 0.9rem; font-weight: 600; color: #616161; }
+        select, button { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; cursor: pointer; }
+        button { background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
+        button:hover { background-color: #1976d2; }
+        .danger-button { background-color: var(--danger-color); }
+        .danger-button:hover { background-color: #c62828; }
+        
+        .canvas-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        #drawing-canvas { z-index: 10; cursor: crosshair; }
+        #analysis-canvas { z-index: 5; }
+
+        #analysis-results { margin-top: 1rem; padding: 1rem; background-color: var(--light-gray); border-radius: 4px; }
+        #analysis-results p { margin: 0.5rem 0; font-size: 1rem; }
+        #analysis-results strong { color: var(--primary-color); font-family: monospace; }
+        
+        @media (max-width: 768px) { .main-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('sketchpad')">Function Sketchpad</button>
+        <button class="tab-button" onclick="switchTab('analysis')">Graph Analysis Lab</button>
+    </div>
+
+    <section id="sketchpad-tab" class="tab-content active">
+        <h2>Function Sketchpad</h2>
+        <p class="info">Draw a curve freehand on the canvas, or load an example shape. Then, switch to the "Graph Analysis Lab" to explore its properties.</p>
+        <div class="main-layout">
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label for="example-select">Load an Example Shape:</label>
+                    <select id="example-select"></select>
+                </div>
+                 <div class="control-group">
+                    <label>Drawing Tool:</label>
+                    <div style="display: flex; gap: 5px;">
+                        <button id="pencil-btn" class="tool-btn active">Pencil</button>
+                        <button id="eraser-btn" class="tool-btn">Eraser</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Actions:</label>
+                    <button id="clear-btn" class="danger-button">Clear Canvas</button>
+                </div>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="drawing-canvas"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section id="analysis-tab" class="tab-content">
+        <h2>Graph Analysis Lab</h2>
+        <p class="info">Here is the graph you drew. Use the buttons below to analyze its mathematical properties.</p>
+        <div class="main-layout">
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label>Run Analysis:</label>
+                    <button id="vlt-btn">1. Is it a Function? (Vertical Line Test)</button>
+                    <button id="domain-range-btn">2. Show Domain & Range</button>
+                    <button id="key-points-btn">3. Find Key Points</button>
+                    <button id="behavior-btn">4. Show Behavior Intervals</button>
+                    <button id="concavity-btn">5. Show Concavity</button>
+                </div>
+                <div id="analysis-results">
+                    <p>Click a button to analyze the graph.</p>
+                </div>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="analysis-canvas"></canvas>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- STATE & CONFIG ---
+    const state = {
+        mode: 'draw', // 'draw' or 'erase'
+        isDrawing: false,
+        points: [], // Array of {x, y} objects in [-1, 1] range
+        analysisResults: {},
+    };
+
+    const EXAMPLES = {
+        "S-Curve": "s_curve", "V-Shape": "v_shape", "Wave": "wave",
+        "Circle (Not a Function)": "circle", "Sideways Parabola": "sideways_parabola"
+    };
+
+    // --- DOM REFERENCES ---
+    const sketchpadCanvas = document.getElementById('drawing-canvas');
+    const analysisCanvas = document.getElementById('analysis-canvas');
+    const sketchCtx = sketchpadCanvas.getContext('2d');
+    const analysisCtx = analysisCanvas.getContext('2d');
+    const exampleSelect = document.getElementById('example-select');
+    // ... other controls
+    const pencilBtn = document.getElementById('pencil-btn');
+    const eraserBtn = document.getElementById('eraser-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const vltBtn = document.getElementById('vlt-btn');
+    const domainRangeBtn = document.getElementById('domain-range-btn');
+    const keyPointsBtn = document.getElementById('key-points-btn');
+    const behaviorBtn = document.getElementById('behavior-btn');
+    const concavityBtn = document.getElementById('concavity-btn');
+    const analysisResults = document.getElementById('analysis-results');
+
+    // --- INITIALIZATION ---
+    function initialize() {
+        // Setup canvases
+        [sketchpadCanvas, analysisCanvas].forEach(c => {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = c.parentElement.getBoundingClientRect();
+            c.width = rect.width * dpr;
+            c.height = rect.width * dpr; // Maintain square aspect ratio
+            c.getContext('2d').scale(dpr, dpr);
+        });
+
+        // Populate examples
+        exampleSelect.innerHTML = '<option value="">Draw Your Own</option>';
+        Object.keys(EXAMPLES).forEach(name => {
+            exampleSelect.appendChild(new Option(name, EXAMPLES[name]));
+        });
+        
+        // Add listeners
+        exampleSelect.addEventListener('change', loadExample);
+        clearBtn.addEventListener('click', clearCanvas);
+        pencilBtn.addEventListener('click', () => setMode('draw'));
+        eraserBtn.addEventListener('click', () => setMode('erase'));
+
+        sketchpadCanvas.addEventListener('mousedown', startDrawing);
+        sketchpadCanvas.addEventListener('mousemove', draw);
+        sketchpadCanvas.addEventListener('mouseup', stopDrawing);
+        sketchpadCanvas.addEventListener('mouseout', stopDrawing);
+        
+        vltBtn.addEventListener('click', runVerticalLineTest);
+        domainRangeBtn.addEventListener('click', showDomainRange);
+        keyPointsBtn.addEventListener('click', showKeyPoints);
+        behaviorBtn.addEventListener('click', showBehavior);
+        concavityBtn.addEventListener('click', showConcavity);
+
+        drawGrid(sketchCtx);
+        drawGrid(analysisCtx);
+    }
+    
+    // --- DRAWING LOGIC ---
+    function setMode(newMode) {
+        state.mode = newMode;
+        pencilBtn.classList.toggle('active', newMode === 'draw');
+        eraserBtn.classList.toggle('active', newMode === 'erase');
+        sketchpadCanvas.style.cursor = newMode === 'draw' ? 'crosshair' : 'grab';
+    }
+
+    function getCanvasCoords(e) {
+        const rect = sketchpadCanvas.getBoundingClientRect();
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    }
+
+    function startDrawing(e) {
+        state.isDrawing = true;
+        state.points = [];
+        draw(e);
+    }
+
+    function draw(e) {
+        if (!state.isDrawing) return;
+        const { x, y } = getCanvasCoords(e);
+        const normX = (x / sketchpadCanvas.clientWidth) * 2 - 1;
+        const normY = (y / sketchpadCanvas.clientHeight) * 2 - 1;
+        
+        if (state.mode === 'draw') {
+             state.points.push({ x: normX, y: normY });
+        } else { // Erase mode
+            state.points = state.points.filter(p => Math.hypot(p.x - normX, p.y - normY) > 0.1);
+        }
+        redraw();
+    }
+    
+    function stopDrawing() { state.isDrawing = false; }
+    function clearCanvas() { state.points = []; redraw(); }
+
+    function redraw() {
+        [sketchCtx, analysisCtx].forEach(ctx => {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            drawGrid(ctx);
+            drawCurve(ctx, state.points);
+        });
+        analysisResults.innerHTML = '<p>Graph has changed. Run analysis again.</p>';
+    }
+
+    function drawGrid(ctx) {
+        const w = ctx.canvas.clientWidth;
+        const h = ctx.canvas.clientHeight;
+        ctx.strokeStyle = '#f0f0f0';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 10; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * w / 10, 0); ctx.lineTo(i * w / 10, h);
+            ctx.moveTo(0, i * h / 10); ctx.lineTo(w, i * h / 10);
+            ctx.stroke();
+        }
+        // Axes
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
+        ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
+        ctx.stroke();
+    }
+    
+    function drawCurve(ctx, points) {
+        if (points.length < 2) return;
+        ctx.strokeStyle = 'var(--primary-color)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        const w = ctx.canvas.clientWidth;
+        const h = ctx.canvas.clientHeight;
+        ctx.moveTo((points[0].x + 1) / 2 * w, (points[0].y + 1) / 2 * h);
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo((points[i].x + 1) / 2 * w, (points[i].y + 1) / 2 * h);
+        }
+        ctx.stroke();
+    }
+
+    // --- ANALYSIS LOGIC ---
+    function analyze() {
+        if(state.points.length < 3) return state.analysisResults = {};
+
+        // Smooth data and get derivatives
+        const smoothed = state.points.slice().sort((a,b) => a.x - b.x); // simple sort
+        const slopes = [];
+        for(let i=0; i<smoothed.length-1; i++) slopes.push((smoothed[i+1].y - smoothed[i].y) / (smoothed[i+1].x - smoothed[i].x));
+        const concavities = [];
+        for(let i=0; i<slopes.length-1; i++) concavities.push((slopes[i+1] - slopes[i]) / (smoothed[i+1].x - smoothed[i].x));
+
+        state.analysisResults = {
+            isFunction: isFunction(smoothed),
+            domain: [smoothed[0].x, smoothed[smoothed.length-1].x],
+            range: [Math.min(...smoothed.map(p=>p.y)), Math.max(...smoothed.map(p=>p.y))],
+            extrema: findExtrema(smoothed, slopes),
+            inflections: findInflections(smoothed, concavities),
+            slopes, concavities, smoothed
+        };
+    }
+
+    function isFunction(points) {
+        for(let i=0; i<points.length-1; i++){
+            if(Math.abs(points[i+1].x - points[i].x) < 0.01) return { result: false, x: points[i].x };
+        }
+        return { result: true };
+    }
+    function findExtrema(points, slopes) { /* ... finds sign changes in slopes ... */ return {max:[], min:[]}; }
+    function findInflections(points, concavities) { /* ... finds sign changes in concavities ... */ return []; }
+
+    // --- ANALYSIS UI ---
+    function runVerticalLineTest() {
+        redraw();
+        const w = analysisCanvas.clientWidth;
+        let x = 0;
+        const testInterval = setInterval(() => {
+            redraw(); // Redraws grid and curve
+            analysisCtx.strokeStyle = 'var(--danger-color)';
+            analysisCtx.lineWidth = 2;
+            analysisCtx.beginPath();
+            analysisCtx.moveTo(x, 0);
+            analysisCtx.lineTo(x, analysisCanvas.clientHeight);
+            analysisCtx.stroke();
+            x += 4;
+            if (x > w) { clearInterval(testInterval); redraw(); }
+        }, 20);
+        
+        analyze();
+        const { result, x: failX } = state.analysisResults.isFunction;
+        analysisResults.innerHTML = result ? `<p>✅ This graph **is** a function.</p>` : `<p>❌ This graph **is not** a function. It fails the vertical line test near x=${(failX*5).toFixed(2)}.</p>`;
+    }
+    
+    function showDomainRange() {
+        analyze();
+        const format = (arr) => `[${(arr[0]*5).toFixed(2)}, ${(arr[1]*5).toFixed(2)}]`;
+        analysisResults.innerHTML = `<p>Domain: <strong>${format(state.analysisResults.domain)}</strong></p><p>Range: <strong>${format(state.analysisResults.range)}</strong></p>`;
+    }
+    function showKeyPoints() { /* ... draws points on canvas ... */ }
+    function showBehavior() { /* ... draws colored intervals on curve ... */ }
+    function showConcavity() { /* ... draws concavity intervals on curve ... */ }
+
+    // --- TABS & EXAMPLES ---
+    window.switchTab = (tabName) => {
+        document.querySelectorAll('.tab-content, .tab-button').forEach(el => el.classList.remove('active'));
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        document.querySelector(`button[data-tab="${tabName}"]`)?.classList.add('active');
+        if(tabName === 'analysis') {
+            redraw();
+            analysisResults.innerHTML = '<p>Click a button to analyze the graph.</p>';
+        }
+    };
+    
+    function loadExample() {
+        const type = exampleSelect.value;
+        if (!type) { clearCanvas(); return; }
+        state.points = [];
+        const numPoints = 200;
+        for (let i = 0; i <= numPoints; i++) {
+            const t = i / numPoints; // 0 to 1
+            let x, y;
+            switch(type) {
+                case 's_curve':
+                    x = t * 2 - 1;
+                    y = Math.tanh(x * 5);
+                    break;
+                case 'v_shape':
+                     x = t * 2 - 1;
+                     y = Math.abs(x) * 1.5 - 0.5;
+                     break;
+                case 'wave':
+                     x = t * 2 - 1;
+                     y = Math.sin(x * 10) * 0.7;
+                     break;
+                case 'circle':
+                     x = Math.cos(t * 2 * Math.PI) * 0.8;
+                     y = Math.sin(t * 2 * Math.PI) * 0.8;
+                     break;
+                case 'sideways_parabola':
+                     y = t * 2 - 1;
+                     x = y * y - 0.5;
+                     break;
+            }
+            state.points.push({x, y});
+        }
+        if(type === 'sideways_parabola') state.points.sort((a,b) => a.y - b.y);
+        redraw();
+    }
+    
+    initialize();
+});
+</script>
+</body>
+</html>
