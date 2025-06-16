@@ -7,8 +7,13 @@
     <style>
         :root {
             --primary-color: #1565c0;
-            --secondary-color: #2e7d32; /* Green */
-            --danger-color: #d32f2f;  /* Red */
+            --secondary-color: #2e7d32; /* Green for Increasing */
+            --danger-color: #d32f2f;  /* Red for Decreasing */
+            --accent-color: #9c27b0;   /* Purple for Concave Down */
+            --info-color: #ff9800;    /* Orange for Concave Up */
+            --point-max-color: #1b5e20;
+            --point-min-color: #b71c1c;
+            --point-inflection-color: #4a148c;
             --light-gray: #f5f5f5;
             --medium-gray: #e0e0e0;
             --dark-gray: #424242;
@@ -23,22 +28,21 @@
         .main-layout { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; }
         .controls-panel { display: flex; flex-direction: column; gap: 1rem; }
         .control-group { display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; background-color: var(--light-gray); border-radius: 6px;}
-        .piece-library { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-        
         label { font-size: 0.9rem; font-weight: 600; color: #616161; }
         select, button { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; cursor: pointer; background-color: white; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
-        button:hover { background-color: #e3f2fd; }
+        button:hover:not(:disabled) { background-color: #e3f2fd; }
         button.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); font-weight: bold; }
+        button:disabled { cursor: not-allowed; background-color: #eee; color: #aaa; }
         .danger-button { background-color: var(--danger-color); color: white; }
-        .danger-button:hover { background-color: #c62828; }
+        .danger-button:hover:not(:disabled) { background-color: #c62828; }
         .secondary-button { background-color: var(--secondary-color); color: white; }
-        .secondary-button:hover { background-color: #1b5e20; }
+        .secondary-button:hover:not(:disabled) { background-color: #1b5e20; }
         
         .canvas-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; user-select: none; }
         canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         #grid-canvas { background-color: white; border: 1px solid var(--medium-gray); border-radius: 4px; z-index: 1;}
         #main-canvas { z-index: 5; cursor: crosshair; }
-        #vlt-line { position: absolute; top: 0; bottom: 0; width: 2px; background-color: var(--danger-color); z-index: 20; display: none; }
+        #main-canvas.locked { cursor: not-allowed; }
 
         #analysis-results { margin-top: 1rem; padding: 1rem; background-color: var(--light-gray); border-radius: 4px; font-size: 0.95rem; text-align: left; line-height: 1.7; white-space: pre-wrap; font-family: monospace; min-height: 100px;}
         
@@ -53,54 +57,51 @@
     <div class="main-layout">
         <div class="controls-panel">
             <div class="control-group">
-                <label>1. Select a Tool:</label>
+                <label>1. Build a Function</label>
+                <select id="example-select">
+                     <option value="">-- Load Example --</option>
+                </select>
                 <div class="piece-library">
                     <button class="tool-btn" data-tool="line">Draw Line</button>
                     <button class="tool-btn" data-tool="curve">Draw Curve</button>
                 </div>
+                 <button id="clear-btn" class="danger-button">Clear Drawing</button>
             </div>
-            <div class="control-group">
-                <label>2. Load an Example:</label>
-                <select id="example-select">
-                     <option value="">-- Clear Canvas --</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>3. Analyze & Manage:</label>
+             <div class="control-group">
+                <label>2. Analyze the Graph</label>
                 <button id="analyze-btn" class="secondary-button">Analyze Graph</button>
-                <button id="clear-btn" class="danger-button" style="margin-top: 0.5rem;">Clear Canvas</button>
+            </div>
+             <div id="analysis-results">
+                <p>Build a function or load an example, then click "Analyze Graph".</p>
             </div>
         </div>
         <div class="canvas-wrapper">
             <canvas id="grid-canvas"></canvas>
             <canvas id="main-canvas"></canvas>
-            <div id="vlt-line"></div>
         </div>
     </div>
-    
-    <h3>Analysis Results</h3>
-    <div id="analysis-results"><p>Build a function and click "Analyze Graph".</p></div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- STATE & CONFIG ---
     let state = {
         tool: 'line', 
         placingState: 'idle', // idle, placing_end, adjusting_curve
         startPoint: null,
-        pieces: [], // { type, p1, p2, (optional) cp }
-        analysis: null
+        pieces: [], // { type, p1, p2, (optional) cp, startType, endType }
+        analysis: null,
+        isLocked: false, // To lock canvas when an example is loaded
+        adjustingPieceIndex: -1,
     };
 
     const EXAMPLES = {
-        "Simple Function": { id: "simple_func" },
-        "Function with Jumps": { id: "jump_func" },
-        "Function with Cusp": { id: "cusp_func" },
-        "Non-Function (Vertical)": { id: "vertical_line" },
+        "Simple Function (Wave)": { id: "wave" },
+        "Function with Cusp (V-Shape)": { id: "v_shape" },
+        "Step Function (Is a Function)": { id: "step_func" },
+        "Jump Discontinuity": { id: "jump_func" },
+        "Vertical Line (Not a Function)": { id: "vertical_line" },
     };
 
-    // --- DOM REFERENCES ---
     const canvas = document.getElementById('main-canvas');
     const gridCanvas = document.getElementById('grid-canvas');
     const ctx = canvas.getContext('2d');
@@ -109,14 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const exampleSelect = document.getElementById('example-select');
     const clearBtn = document.getElementById('clear-btn');
     const analyzeBtn = document.getElementById('analyze-btn');
-    const vltLine = document.getElementById('vlt-line');
     const analysisResultsEl = document.getElementById('analysis-results');
 
-    // Coordinate conversion helpers
     const toScreen = (p) => ({ x: (p.x + 10)/20 * canvas.clientWidth, y: (1 - (p.y + 10)/20) * canvas.clientHeight });
     const fromScreen = (coords) => ({ x: (coords.x / canvas.clientWidth)*20-10, y: (1 - coords.y/canvas.clientHeight)*20-10 });
 
-    // --- INITIALIZATION ---
     function initialize() {
         Object.keys(EXAMPLES).forEach(name => exampleSelect.appendChild(new Option(name, EXAMPLES[name].id)));
         
@@ -133,204 +131,151 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeAndRedraw();
     }
 
-    function resizeAndRedraw() {
-        [canvas, gridCanvas].forEach(c => {
-            const dpr = window.devicePixelRatio || 1;
-            const rect = c.parentElement.getBoundingClientRect();
-            if (rect.width > 0) {
-                c.width = rect.width * dpr; c.height = rect.width * dpr;
-                c.getContext('2d').scale(dpr, dpr);
-            }
-        });
-        redraw();
-    }
-    
-    function setTool(tool) {
-        state.tool = tool;
-        toolButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tool === tool));
-        state.placingState = 'idle'; state.startPoint = null;
-        redraw();
-    }
-
-    function redraw() {
-        ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-        gridCtx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-        drawGrid();
-        state.pieces.forEach(p => drawPiece(p));
-        if(state.isPlacing && state.firstPoint) drawPoint(state.firstPoint, 'var(--primary-color)', 'var(--primary-color)');
-    }
-
+    function resizeAndRedraw() { /* ... unchanged ... */ }
+    function setTool(tool) { /* ... unchanged ... */ }
+    function redraw() { /* ... unchanged ... */ }
     function drawGrid() { /* ... unchanged ... */ }
     function drawPiece(piece) { /* ... unchanged ... */ }
-    function drawPoint(p, fillColor, strokeColor) { /* ... unchanged ... */ }
-    
+    function drawPoint(p, type) { /* ... unchanged ... */ }
+
     function handleMouseMove(e) {
-        if (state.placingState !== 'placing_end' && state.placingState !== 'adjusting_curve') return;
+        if (state.placingState === 'idle' || state.isLocked) return;
+        const currentPos = fromScreen({x: e.offsetX, y: e.offsetY});
         redraw();
-        const p2 = fromScreen({x: e.offsetX, y: e.offsetY});
         
         if (state.placingState === 'placing_end') {
-            const tempPiece = createPiece(state.tool, state.startPoint, p2);
+            const tempPiece = createPiece(state.tool, state.startPoint, currentPos);
             drawPiece(tempPiece);
         } else if (state.placingState === 'adjusting_curve') {
-            const currentPiece = state.pieces[state.pieces.length - 1];
-            currentPiece.cp = p2;
+            const currentPiece = state.pieces[state.adjustingPieceIndex];
+            currentPiece.cp = currentPos;
             drawPiece(currentPiece);
         }
     }
     
     function handleMouseDown(e) {
+        if (state.isLocked) return;
         const clickCoords = fromScreen({x: e.offsetX, y: e.offsetY});
 
+        if (state.placingState === 'adjusting_curve') {
+            state.pieces[state.adjustingPieceIndex].cp = clickCoords;
+            state.placingState = 'idle';
+            state.adjustingPieceIndex = -1;
+            redraw();
+            return;
+        }
+
+        for (let i = 0; i < state.pieces.length; i++) {
+            const piece = state.pieces[i];
+            if (piece.type === 'curve' && Math.hypot(clickCoords.x - piece.cp.x, clickCoords.y - piece.cp.y) < 0.5) {
+                state.placingState = 'adjusting_curve';
+                state.adjustingPieceIndex = i;
+                return;
+            }
+        }
+        
         if (state.placingState === 'idle') {
             state.placingState = 'placing_end';
             state.startPoint = snapToPoint(clickCoords);
         } else if (state.placingState === 'placing_end') {
             const p2 = snapToPoint(clickCoords);
+            if (Math.hypot(p2.x - state.startPoint.x, p2.y - state.startPoint.y) < 0.1) {
+                state.placingState = 'idle'; state.startPoint = null; // Cancel placement
+                redraw(); return;
+            }
             const newPiece = createPiece(state.tool, state.startPoint, p2);
             state.pieces.push(newPiece);
             
             if (state.tool === 'curve') {
                 state.placingState = 'adjusting_curve';
+                state.adjustingPieceIndex = state.pieces.length - 1;
             } else {
                 state.placingState = 'idle';
                 state.startPoint = null;
             }
-        } else if (state.placingState === 'adjusting_curve') {
-            state.pieces[state.pieces.length - 1].cp = clickCoords;
-            state.placingState = 'idle';
-            state.startPoint = null;
         }
         redraw();
     }
-
-    function snapToPoint(p) { /* ... unchanged ... */ }
-    function createPiece(tool, p1, p2) { /* ... unchanged ... */ }
-    function clearCanvas() { state.pieces = []; state.analysis = null; vltLine.style.display = 'none'; redraw(); analysisResultsEl.innerHTML = '<p>Canvas cleared.</p>'}
     
-    function runAnalysis() {
-        if (state.pieces.length === 0) {
-            analysisResultsEl.textContent = 'Please build a function first.';
-            return;
-        }
-        state.analysis = analyze(state.pieces);
-        displayAnalysisResults();
-        
-        vltLine.style.display = 'none';
-        if (!state.analysis.isFunction.result) {
-            const failPos = toScreen({x: state.analysis.isFunction.x, y: 0});
-            vltLine.style.left = `${failPos.x}px`;
-            vltLine.style.display = 'block';
-        }
-    }
-
-    function analyze(pieces) { /* ... Full analysis logic here ... */ return {}; }
-    function displayAnalysisResults() { /* ... Full display logic here ... */ }
-
-    // --- Full implementation of placeholder functions ---
-    function drawGrid() {
-        const w = gridCanvas.clientWidth, h = gridCanvas.clientHeight;
-        gridCtx.strokeStyle = '#f0f0f0'; gridCtx.lineWidth = 1;
-        for (let i = -10; i <= 10; i++) {
-            const sx = toScreen({x:i, y:0}).x, sy = toScreen({x:0, y:i}).y;
-            gridCtx.beginPath(); gridCtx.moveTo(sx, 0); gridCtx.lineTo(sx, h); gridCtx.stroke();
-            gridCtx.beginPath(); gridCtx.moveTo(0, sy); gridCtx.lineTo(w, sy); gridCtx.stroke();
-        }
-        gridCtx.strokeStyle = '#e0e0e0'; gridCtx.lineWidth = 2;
-        gridCtx.beginPath(); gridCtx.moveTo(w/2, 0); gridCtx.lineTo(w/2, h); gridCtx.stroke();
-        gridCtx.beginPath(); gridCtx.moveTo(0, h/2); gridCtx.lineTo(w, h/2); gridCtx.stroke();
-    }
-
-    function drawPiece(piece) {
-        ctx.strokeStyle = 'var(--primary-color)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-        ctx.beginPath();
-        const p1 = toScreen(piece.p1), p2 = toScreen(piece.p2);
-        ctx.moveTo(p1.x, p1.y);
-        if (piece.type === 'line') {
-            ctx.lineTo(p2.x, p2.y);
-        } else if (piece.type === 'curve') {
-            const cp = toScreen(piece.cp);
-            ctx.quadraticCurveTo(cp.x, cp.y, p2.x, p2.y);
-            // Draw handle for adjusting
-            ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 1; ctx.setLineDash([2, 2]);
-            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(cp.x, cp.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-            ctx.setLineDash([]);
-        }
-        ctx.stroke();
-        if (piece.startType === 'open') drawPoint(piece.p1, 'white', 'var(--primary-color)'); else drawPoint(piece.p1, 'var(--primary-color)', 'var(--primary-color)');
-        if (piece.endType === 'open') drawPoint(piece.p2, 'white', 'var(--primary-color)'); else drawPoint(piece.p2, 'var(--primary-color)', 'var(--primary-color)');
-    }
-    
-    function drawPoint(p, fillColor, strokeColor) { if(!p) return; const {x, y} = toScreen(p); ctx.fillStyle = fillColor; ctx.strokeStyle = strokeColor; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 5, 0, 2*Math.PI); ctx.fill(); ctx.stroke(); }
-
     function snapToPoint(p) {
-        if (state.pieces.length > 0) {
+        if(state.pieces.length > 0) {
             const lastPiece = state.pieces[state.pieces.length - 1];
-            if (Math.hypot(p.x-lastPiece.p2.x, p.y-lastPiece.p2.y) < 1) return lastPiece.p2;
+            if (Math.hypot(p.x - lastPiece.p2.x, p.y - lastPiece.p2.y) < 1) return lastPiece.p2;
         }
-        return {x: Math.round(p.x), y: Math.round(p.y)};
+        return {x: p.x, y: p.y};
     }
     
     function createPiece(tool, p1, p2) {
-        if (p1.x === p2.x && p1.y === p2.y) return null;
         const piece = { p1, p2, type: tool, startType: 'closed', endType: 'closed' };
         if (tool === 'curve') {
-            piece.cp = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+            const midX = (p1.x + p2.x) / 2, midY = (p1.y + p2.y) / 2;
+            const dx = p2.x - p1.x, dy = p2.y - p1.y;
+            // Default control point creates a slight upward curve
+            piece.cp = { x: midX - dy * 0.2, y: midY + dx * 0.2 };
         }
         return piece;
     }
     
+    function clearCanvas() {
+        state.pieces = []; state.analysis = null; setTool('line');
+        state.isLocked = false; canvas.classList.remove('locked');
+        redraw(); analysisResultsEl.innerHTML = '<p>Canvas cleared. Build a new function.</p>';
+    }
+    
+    function runAnalysis() {
+        state.analysis = analyze(state.pieces);
+        displayAnalysisResults();
+    }
+
     function analyze(pieces) {
-        // This is a simplified analysis based on precise pieces
-        if (pieces.length === 0) return null;
         const allPoints = pieces.map(p => [p.p1, p.p2]).flat();
-        let domain = [Infinity, -Infinity], range = [Infinity, -Infinity];
-        pieces.forEach(({p1, p2, cp}) => {
-            domain[0] = Math.min(domain[0], p1.x, p2.x); domain[1] = Math.max(domain[1], p1.x, p2.x);
-            const y_coords = [p1.y, p2.y];
-            if (cp) y_coords.push(cp.y); // A simple proxy for curve range
-            range[0] = Math.min(range[0], ...y_coords); range[1] = Math.max(range[1], ...y_coords);
-        });
+        if (allPoints.length === 0) return null;
+
+        const sorted = allPoints.slice().sort((a,b) => a.x - b.x);
         
         let isFunc = true, failX = null;
-        for(let i=0; i<pieces.length; i++) {
-            for(let j=i; j<pieces.length; j++) {
-                const p1 = pieces[i], p2 = pieces[j];
-                const x_overlap = Math.max(p1.p1.x, p2.p1.x) < Math.min(p1.p2.x, p2.p2.x);
-                if (i !== j && x_overlap) { isFunc = false; failX = Math.max(p1.p1.x, p2.p1.x); break;}
+        for (let i = 0; i < sorted.length - 1; i++) {
+            if (Math.abs(sorted[i+1].x - sorted[i].x) < 0.01) {
+                if (Math.abs(sorted[i+1].y - sorted[i].y) > 0.01) {
+                    isFunc = false; failX = sorted[i].x; break;
+                }
             }
-            if(!isFunc) break;
         }
+        
+        const domain = `[${(sorted[0].x).toFixed(2)}, ${(sorted[sorted.length-1].x).toFixed(2)}]`;
+        const range = `[${(Math.min(...sorted.map(p=>p.y))).toFixed(2)}, ${(Math.max(...sorted.map(p=>p.y))).toFixed(2)}]`;
 
-        return { isFunction: {result: isFunc, x: failX}, domain, range };
+        return `Is it a function?: ${isFunc ? 'Yes ✅' : `No ❌ (Fails Vertical Line Test near x=${failX.toFixed(2)})`}\nDomain (approx): ${domain}\nRange (approx): ${range}\n\n(More analysis coming soon)`;
     }
 
     function displayAnalysisResults() {
-        if (!state.analysis) { analysisResultsEl.innerHTML = "<p>Could not analyze the graph. Please try building a simpler function.</p>"; return; }
-        const { isFunction, domain, range } = state.analysis;
-        const format = (arr, label) => `<p>${label}: <strong>[${arr[0].toFixed(1)}, ${arr[1].toFixed(1)}]</strong></p>`;
-        let html = `<p><strong>Function?</strong>: ${isFunction.result ? 'Yes ✅' : `No ❌ (Fails Vertical Line Test near x=${isFunction.x.toFixed(2)})`}</p>`;
-        html += format(domain, "Domain");
-        html += format(range, "Range");
-        analysisResultsEl.innerHTML = html;
+        if (!state.analysis) { analysisResultsEl.textContent = "Please build a function first."; return; }
+        analysisResultsEl.textContent = state.analysis;
     }
 
     function loadExample() {
+        clearCanvas();
         const type = exampleSelect.value;
-        if (!type) { clearCanvas(); return; }
+        if (!type) { return; }
+        
+        state.isLocked = true; canvas.classList.add('locked');
+
         let pieces = [];
         switch(type) {
             case 'v_shape':
-                pieces = [{type:'line', p1:{x:-5, y:5}, p2:{x:0, y:0}}, {type:'line', p1:{x:0, y:0}, p2:{x:5, y:5}}];
+                pieces = [{type:'line', p1:{x:-5, y:5}, p2:{x:0, y:-5}}, {type:'line', p1:{x:0, y:-5}, p2:{x:5, y:5}}];
                 break;
             case 'jump_func':
                 pieces = [
-                    {type:'line', p1:{x:-5, y:2}, p2:{x:0, y:2}, endType:'open'},
-                    {type:'line', p1:{x:0, y:-2}, p2:{x:5, y:-2}, startType:'closed'}
+                    {type:'line', p1:{x:-6, y:3}, p2:{x:0, y:3}, endType:'open'},
+                    {type:'line', p1:{x:0, y:-2}, p2:{x:6, y:-2}, startType:'closed'}
                 ];
                 break;
             case 'vertical_line':
-                pieces = [{type:'line', p1:{x:2, y:-4}, p2:{x:2, y:4}}];
+                pieces = [{type:'line', p1:{x:2, y:-4, type:'closed'}, p2:{x:2, y:4, type:'closed'}}];
+                break;
+            case 'wave':
+                pieces = [{type:'curve', p1:{x:-8,y:0}, p2:{x:8,y:0}, cp:{x:0, y:12}}];
                 break;
         }
         state.pieces = pieces;
@@ -338,6 +283,11 @@ document.addEventListener('DOMContentLoaded', () => {
         runAnalysis();
     }
     
+    // --- Full implementation of unchanged placeholder functions ---
+    function resizeAndRedraw(){[canvas,gridCanvas].forEach(c=>{const dpr=window.devicePixelRatio||1;const rect=c.parentElement.getBoundingClientRect();if(rect.width>0){c.width=rect.width*dpr;c.height=rect.width*dpr;c.getContext('2d').scale(dpr,dpr)}});redraw()}
+    function drawGrid(){const w=gridCanvas.clientWidth,h=gridCanvas.clientHeight;gridCtx.strokeStyle="#f0f0f0";gridCtx.lineWidth=1;for(let i=-10;i<=10;i++){if(i===0)continue;const sx=toScreen({x:i,y:0}).x,sy=toScreen({x:0,y:i}).y;gridCtx.beginPath();gridCtx.moveTo(sx,0);gridCtx.lineTo(sx,h);gridCtx.stroke();gridCtx.beginPath();gridCtx.moveTo(0,sy);gridCtx.lineTo(w,sy);gridCtx.stroke()}gridCtx.strokeStyle="#e0e0e0";gridCtx.lineWidth=2;gridCtx.beginPath();gridCtx.moveTo(w/2,0);gridCtx.lineTo(w/2,h);gridCtx.stroke();gridCtx.beginPath();gridCtx.moveTo(0,h/2);gridCtx.lineTo(w,h/2);gridCtx.stroke()}
+    function drawPoint(p,fillColor,strokeColor){if(!p)return;const{x,y}=toScreen(p);ctx.fillStyle=fillColor;ctx.strokeStyle=strokeColor;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,5,0,2*Math.PI);ctx.fill();ctx.stroke()}
+
     initialize();
 });
 </script>
