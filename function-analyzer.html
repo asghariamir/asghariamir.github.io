@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Interactive Function Builder & Analyzer</title>
   <style>
     :root {
@@ -12,46 +12,151 @@
       --light-gray: #f5f5f5;
       --medium-gray: #e0e0e0;
       --dark-gray: #424242;
+      --eraser-color: #d32f2f;
     }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;background:var(--light-gray);color:var(--dark-gray);display:flex;justify-content:center;padding:1rem}
-    .container{width:100%;max-width:1000px;background:#fff;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,.1);padding:1.5rem}
-    h2{font-size:1.9rem;color:var(--primary-color);margin-bottom:.5rem;font-weight:700}
-    p.info{color:#616161;margin-bottom:1.5rem}
-    .main-layout{display:grid;grid-template-columns:280px 1fr;gap:1.5rem}
-    @media(max-width:800px){.main-layout{grid-template-columns:1fr}}
-    .controls-panel{display:flex;flex-direction:column;gap:1rem}
-    .control-group{display:flex;flex-direction:column;gap:.75rem;padding:1rem;background:var(--light-gray);border-radius:6px}
-    label{font-size:.9rem;font-weight:600;color:#616161;text-align:left}
-    select,button{border:1px solid var(--medium-gray);border-radius:4px;padding:10px;font-size:1rem;cursor:pointer;background:#fff;transition:.15s}
-    button:hover:not(:disabled),select:hover:not(:disabled){background:#e3f2fd}
-    button.tool-btn.active{background:var(--primary-color);color:#fff;border-color:var(--primary-color);font-weight:600}
-    button:disabled{cursor:not-allowed;background:#eee;color:#aaa}
-    .danger-button{background:var(--danger-color);color:#fff}
-    .danger-button:hover:not(:disabled){background:#c62828}
-    .secondary-button{background:var(--secondary-color);color:#fff}
-    .secondary-button:hover:not(:disabled){background:#1b5e20}
-    .piece-library{display:flex;gap:6px;flex-wrap:wrap}
-    .canvas-wrapper{position:relative;width:100%;aspect-ratio:1/1;user-select:none}
-    canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-    #grid-canvas{background:#fff;border:1px solid var(--medium-gray);border-radius:4px;z-index:1}
-    #main-canvas{z-index:5;cursor:crosshair}
-    #main-canvas.locked{cursor:not-allowed}
-    #analysis-results{margin-top:1rem;padding:1rem;background:var(--light-gray);border-radius:4px;font-size:.95rem;line-height:1.7;white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;min-height:140px}
+    html, body { height: 100%; }
+    body {
+      min-height: 100vh;
+      font-family: system-ui, sans-serif;
+      background: var(--light-gray);
+      color: var(--dark-gray);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      width: 98vw; max-width: 1100px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.09);
+      padding: 1.5rem 2.5vw 2rem 2.5vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: auto;
+    }
+    h2 {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: .5rem;
+      font-weight: 700;
+    }
+    p.info {
+      color: #616161;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .main-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 2rem;
+      width: 100%;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    @media (max-width:900px) {
+      .main-layout { flex-direction: column; align-items: center; }
+    }
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      min-width: 250px;
+      max-width: 350px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: .95rem;
+      padding: 1.2rem;
+      background: var(--light-gray);
+      border-radius: 8px;
+    }
+    label {
+      font-size: .99rem;
+      font-weight: 600;
+      color: #616161;
+      text-align: left;
+    }
+    select,button {
+      border: 1px solid var(--medium-gray);
+      border-radius: 4px;
+      padding: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #fff;
+      transition: .15s;
+    }
+    button:hover:not(:disabled), select:hover:not(:disabled) { background: #e3f2fd }
+    button.tool-btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: 600 }
+    button.eraser-btn.active { background: var(--danger-color); color: #fff; }
+    button:disabled { cursor: not-allowed; background: #eee; color: #aaa }
+    .danger-button { background: var(--danger-color); color: #fff }
+    .danger-button:hover:not(:disabled) { background: #c62828 }
+    .secondary-button { background: var(--secondary-color); color: #fff }
+    .secondary-button:hover:not(:disabled) { background: #1b5e20 }
+    .piece-library { display: flex; gap: 8px; flex-wrap: wrap }
+    .canvas-center-wrapper {
+      display: flex; align-items: center; justify-content: center;
+      min-width: 340px; min-height: 340px;
+      background: transparent;
+      position: relative;
+    }
+    .canvas-wrapper {
+      display: flex; align-items: center; justify-content: center;
+      width: 360px; height: 360px; /* square always */
+      min-width: 320px; min-height: 320px;
+      max-width: 90vw; max-height: 80vw;
+      aspect-ratio: 1/1;
+      position: relative;
+      background: transparent;
+      margin: 0 auto;
+      user-select: none;
+    }
+    @media (max-width:600px) {
+      .canvas-wrapper, .canvas-center-wrapper { width: 97vw; height: 97vw; min-width: 0; min-height: 0; }
+    }
+    canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100% }
+    #grid-canvas { background: #fff; border: 1px solid var(--medium-gray); border-radius: 8px; z-index: 1 }
+    #main-canvas { z-index: 5; cursor: crosshair }
+    #main-canvas.locked { cursor: not-allowed }
+    #main-canvas.eraser-cursor { cursor: pointer; }
+    #analysis-results {
+      margin-top: 1rem; padding: 1rem 0.5rem 1rem 1.2rem;
+      background: var(--light-gray);
+      border-radius: 6px;
+      font-size: .99rem; line-height: 1.7; white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      min-height: 140px;
+    }
+    .endpoints-modal {
+      position: fixed; z-index: 100; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      background: #fff; border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      padding: 2rem 2.5rem; min-width: 270px;
+    }
+    .endpoints-modal label { font-size: 1rem; margin-bottom: 0.2em; }
+    .endpoints-modal select { margin-bottom: 1.1em; }
+    .endpoints-modal .ep-btn { margin-right: 0.7em; }
+    .endpoints-overlay { position: fixed; inset: 0; z-index: 99; background: rgba(0,0,0,0.09); }
   </style>
 </head>
 <body>
 <div class="container">
 <h2>Interactive Function Builder</h2>
-<p class="info">Build a piece‑wise function, then click <strong>Analyze Graph</strong> for a full report (domain, range, monotonicity, concavity, etc.).</p>
+<p class="info">Build or analyze graphs: intervals use proper mathematical notation.<br>No formulas are displayed; only graphs and English descriptions.</p>
 <div class="main-layout">
   <div class="controls-panel">
     <div class="control-group">
-      <label>1. Build a Function</label>
-      <select id="example-select"><option value="">-- Start with Example --</option></select>
+      <label>1. Build a Graph</label>
+      <select id="example-select">
+        <option value="">-- Start with Example --</option>
+      </select>
       <div class="piece-library" style="margin-top:.5rem">
         <button class="tool-btn" data-tool="line">Draw Line</button>
         <button class="tool-btn" data-tool="curve">Draw Curve</button>
+        <button class="eraser-btn" id="eraser-btn" title="Erase pieces">&#128465; Eraser</button>
       </div>
       <button id="clear-btn" class="danger-button" style="margin-top:.5rem">Clear Drawing</button>
     </div>
@@ -61,66 +166,464 @@
     </div>
     <div id="analysis-results">Draw or load an example, then analyze…</div>
   </div>
-  <div class="canvas-wrapper">
-    <canvas id="grid-canvas"></canvas>
-    <canvas id="main-canvas"></canvas>
+  <div class="canvas-center-wrapper">
+    <div class="canvas-wrapper">
+      <canvas id="grid-canvas"></canvas>
+      <canvas id="main-canvas"></canvas>
+    </div>
   </div>
 </div>
 </div>
+<!-- Modal for endpoint selection -->
+<div id="endpoints-overlay" class="endpoints-overlay" style="display:none"></div>
+<div id="endpoints-modal" class="endpoints-modal" style="display:none">
+  <label for="start-type">Start Point:</label>
+  <select id="start-type">
+    <option value="closed">Closed (●)</option>
+    <option value="open">Open (○)</option>
+    <option value="-infty">-∞ (x→-∞)</option>
+  </select>
+  <label for="end-type">End Point:</label>
+  <select id="end-type">
+    <option value="closed">Closed (●)</option>
+    <option value="open">Open (○)</option>
+    <option value="+infty">+∞ (x→+∞)</option>
+  </select>
+  <div style="text-align:right;">
+    <button class="ep-btn secondary-button" id="endpoint-ok">OK</button>
+    <button class="ep-btn danger-button" id="endpoint-cancel">Cancel</button>
+  </div>
+</div>
 <script>
-/********************  GLOBAL CONSTANTS  ********************/
-const WORLD_MIN=-10,WORLD_MAX=10,SAMPLE_PTS=120,TOL_X=0.025,TOL_Y=0.05;
-/********************  UTILITIES  ***************************/
+const WORLD_MIN=-8,WORLD_MAX=8,SAMPLE_PTS=220,TOL_X=0.011,TOL_Y=0.07;
 const U={
-  toScreen:(p,cv)=>({x:(p.x-WORLD_MIN)/(WORLD_MAX-WORLD_MIN)*cv.width,y:(WORLD_MAX-p.y)/(WORLD_MAX-WORLD_MIN)*cv.height}),
-  fromScreen:(c,cv)=>({x:WORLD_MIN+c.x/cv.width*(WORLD_MAX-WORLD_MIN),y:WORLD_MAX-c.y/cv.height*(WORLD_MAX-WORLD_MIN)}),
+  toScreen:(p,cv)=>{
+    return {
+      x: (p.x-WORLD_MIN)/(WORLD_MAX-WORLD_MIN)*cv.width,
+      y: (WORLD_MAX-p.y)/(WORLD_MAX-WORLD_MIN)*cv.height
+    }
+  },
+  fromScreen:(c,cv)=>({
+    x: WORLD_MIN+c.x/cv.width*(WORLD_MAX-WORLD_MIN),
+    y: WORLD_MAX-c.y/cv.height*(WORLD_MAX-WORLD_MIN)
+  }),
   dist:(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),
-  snap:(p,pieces,thr=0.3)=>{for(const pe of pieces){for(const ep of[pe.p1,pe.p2])if(U.dist(p,ep)<thr)return ep;}return p;},
+  snap:(p,pieces,thr=0.3)=>{
+    for(const pe of pieces){for(const ep of[pe.p1,pe.p2])if(U.dist(p,ep)<thr)return ep;}
+    return p;
+  },
   bez:(a,b,c,t)=>(1-t)*(1-t)*a+2*(1-t)*t*b+t*t*c
 };
-/********************  STATE  *******************************/
-const state={tool:'line',placing:'idle',pStart:null,pieces:[],locked:false,analysis:null};
-/********************  CANVAS SETUP  ************************/
+const state={
+  tool:'line',placing:'idle',pStart:null,
+  pieces:[],locked:false,analysis:null,_pendingPiece:null,eraserMode:false
+};
 const gridCv=document.getElementById('grid-canvas'),mainCv=document.getElementById('main-canvas');
 const gCtx=gridCv.getContext('2d'),mCtx=mainCv.getContext('2d');
-function resize(){const sz=gridCv.parentElement.getBoundingClientRect().width,dpr=window.devicePixelRatio||1;[gridCv,mainCv].forEach(cv=>{cv.style.width=cv.style.height=sz+'px';cv.width=cv.height=sz*dpr;cv.getContext('2d').scale(dpr,dpr);});drawAll();}
+function resize(){
+  const box = gridCv.parentElement.getBoundingClientRect();
+  const sz = Math.min(box.width, box.height);
+  const dpr=window.devicePixelRatio||1;
+  [gridCv,mainCv].forEach(cv=>{
+    cv.style.width=cv.style.height=sz+'px';
+    cv.width=cv.height=sz*dpr;
+    cv.getContext('2d').setTransform(1,0,0,1,0,0);
+    cv.getContext('2d').scale(dpr,dpr);
+  });
+  drawAll();
+}
 window.addEventListener('resize',resize);resize();
-/********************  DRAW GRID  ***************************/
-function drawGrid(){const w=gridCv.width/(devicePixelRatio||1),h=gridCv.height/(devicePixelRatio||1);gCtx.clearRect(0,0,w,h);gCtx.lineWidth=1;gCtx.strokeStyle='#f0f0f0';for(let i=-9;i<=9;i++){const xs=U.toScreen({x:i,y:0},gridCv).x,ys=U.toScreen({x:0,y:i},gridCv).y;gCtx.beginPath();gCtx.moveTo(xs,0);gCtx.lineTo(xs,h);gCtx.stroke();gCtx.beginPath();gCtx.moveTo(0,ys);gCtx.lineTo(w,ys);gCtx.stroke();}gCtx.lineWidth=2;gCtx.strokeStyle='#bdbdbd';const xAx=U.toScreen({x:0,y:0},gridCv).y,yAx=U.toScreen({x:0,y:0},gridCv).x;gCtx.beginPath();gCtx.moveTo(0,xAx);gCtx.lineTo(w,xAx);gCtx.stroke();gCtx.beginPath();gCtx.moveTo(yAx,0);gCtx.lineTo(yAx,h);gCtx.stroke();}
-/********************  DRAW PIECES  *************************/
-function drawEndpoint(p,closed){const {x,y}=U.toScreen(p,mainCv);mCtx.fillStyle=closed?'var(--primary-color)':'#fff';mCtx.strokeStyle='var(--primary-color)';mCtx.lineWidth=2;mCtx.beginPath();mCtx.arc(x,y,5,0,Math.PI*2);mCtx.fill();mCtx.stroke();}
-function drawPiece(pe){mCtx.strokeStyle='var(--primary-color)';mCtx.lineWidth=3;mCtx.lineCap='round';mCtx.beginPath();const s=U.toScreen(pe.p1,mainCv),e=U.toScreen(pe.p2,mainCv);mCtx.moveTo(s.x,s.y);if(pe.type==='line')mCtx.lineTo(e.x,e.y);else{const c=U.toScreen(pe.cp,mainCv);mCtx.quadraticCurveTo(c.x,c.y,e.x,e.y);}mCtx.stroke();drawEndpoint(pe.p1,pe.startType==='closed');drawEndpoint(pe.p2,pe.endType==='closed');}
-function drawAll(){drawGrid();mCtx.clearRect(0,0,mainCv.width,mainCv.height);state.pieces.forEach(drawPiece);if(state.analysis&&!state.analysis.isFunc){mCtx.strokeStyle='var(--danger-color)';mCtx.lineWidth=2;const sx=U.toScreen({x:state.analysis.failX,y:0},mainCv).x;mCtx.beginPath();mCtx.moveTo(sx,0);mCtx.lineTo(sx,mainCv.height);mCtx.stroke();}}
-/********************  EVENT HANDLERS  **********************/
-mainCv.addEventListener('mousedown',e=>{if(state.locked)return;const rect=mainCv.getBoundingClientRect(),p=U.fromScreen({x:(e.clientX-rect.left)*(devicePixelRatio||1),y:(e.clientY-rect.top)*(devicePixelRatio||1)},mainCv);if(state.placing==='idle'){state.placing='placing';state.pStart=U.snap(p,state.pieces);}else{const p2=U.snap(p,state.pieces);if(U.dist(p2,state.pStart)<0.05){state.placing='idle';state.pStart=null;drawAll();return;}state.pieces.push(makePiece(state.tool,state.pStart,p2));state.placing='idle';state.pStart=null;drawAll();}});
-mainCv.addEventListener('mousemove',e=>{if(state.placing!=='placing'||state.locked)return;drawAll();const rect=mainCv.getBoundingClientRect(),p=U.fromScreen({x:(e.clientX-rect.left)*(devicePixelRatio||1),y:(e.clientY-rect.top)*(devicePixelRatio||1)},mainCv);drawPiece(makePiece(state.tool,state.pStart,p));});
-function makePiece(type,p1,p2){const obj={type,p1,p2,startType:'closed',endType:'closed'};if(type==='curve'){const mid={x:(p1.x+p2.x)/2,y:(p1.y+p2.y)/2},dx=p2.x-p1.x,dy=p2.y-p1.y;obj.cp={x:mid.x-dy*0.5,y:mid.y+dx*0.5};}return obj;}
-/********************  ANALYSIS  ***************************/
-function samplePiece(pe){const pts=[];const n=SAMPLE_PTS;for(let i=0;i<=n;i++){const t=i/n;if(pe.type==='line'){pts.push({x:pe.p1.x+t*(pe.p2.x-pe.p1.x),y:pe.p1.y+t*(pe.p2.y-pe.p1.y)});}else{pts.push({x:U.bez(pe.p1.x,pe.cp.x,pe.p2.x,t),y:U.bez(pe.p1.y,pe.cp.y,pe.p2.y,t)});} }return pts;}
-function analyze(){if(!state.pieces.length)return null;let samples=[];state.pieces.forEach(pe=>samples=samples.concat(samplePiece(pe)));samples.sort((a,b)=>a.x-b.x);
-// vertical line test
-let isFunc=true,failX=null;for(let i=0;i<samples.length;i++){const x0=samples[i].x;const bucket=samples.filter(pt=>Math.abs(pt.x-x0)<TOL_X);const ys=[...new Set(bucket.map(pt=>pt.y.toFixed(3)))];if(ys.length>1){isFunc=false;failX=x0;break;}}
-// domain & range
-const xs=samples.map(p=>p.x),ys=samples.map(p=>p.y);const domain=[Math.min(...xs),Math.max(...xs)],range=[Math.min(...ys),Math.max(...ys)];
-// first derivative
-const slopes=samples.map((p,i)=>i>0?(p.y-samples[i-1].y)/(p.x-samples[i-1].x):null).slice(1);
-const second=slopes.map((s,i)=>i>0?(s-slopes[i-1])/(samples[i+1].x-samples[i].x):null).slice(1);
-function classify(arr,labels,threshold){const intervals={};labels.forEach(l=>intervals[l]=[]);let curLabel=null,start=xs[0];for(let i=0;i<arr.length;i++){const val=arr[i];let lbl='const';if(val>threshold)lbl='inc';else if(val<-threshold)lbl='dec';if(curLabel===null)curLabel=lbl;else if(lbl!==curLabel){intervals[curLabel].push([start,samples[i].x]);curLabel=lbl;start=samples[i].x;}}intervals[curLabel].push([start,xs[xs.length-1]]);return intervals;}
-const mono=classify(slopes,['inc','dec','const'],0.03);
-function classify2(arr,threshold){const res={up:[],down:[],linear:[]};let cur=null,start=samples[1].x;for(let i=0;i<arr.length;i++){const v=arr[i];let label='linear';if(v>threshold)label='up';else if(v<-threshold)label='down';if(cur===null)cur=label;else if(cur!==label){res[cur].push([start,samples[i+1].x]);cur=label;start=samples[i+1].x;}}res[cur].push([start,xs[xs.length-1]]);return res;}
-const conc=classify2(second,0.02);
-function fmt(intervals){return intervals.map(r=>`(${r[0].toFixed(2)}, ${r[1].toFixed(2)})`).join(' ∪ ');} // open intervals
-return{isFunc,failX,domain:`[${domain[0].toFixed(2)}, ${domain[1].toFixed(2)}]`,range:`[${range[0].toFixed(2)}, ${range[1].toFixed(2)}]`,inc:fmt(mono.inc),dec:fmt(mono.dec),constI:fmt(mono.const),cup:fmt(conc.up),cdown:fmt(conc.down)};}
-function buildReport(r){if(!r)return'Please draw something first.';let txt=`Is it a function?  : ${r.isFunc?'Yes ✅':`No ❌ (fails near x≈${r.failX.toFixed(2)})`}\nDomain            : ${r.domain}\nRange             : ${r.range}`;if(r.isFunc){txt+=`\nIncreasing on     : ${r.inc||'—'}\nDecreasing on     : ${r.dec||'—'}\nConstant on       : ${r.constI||'—'}\nConcave up on     : ${r.cup||'—'}\nConcave down on   : ${r.cdown||'—'}`;}return txt;}
-/********************  UI CONTROLS  ************************/
+function drawGrid(){
+  const w=gridCv.width/(devicePixelRatio||1),h=gridCv.height/(devicePixelRatio||1);
+  gCtx.clearRect(0,0,w,h);
+  gCtx.lineWidth=1;gCtx.strokeStyle='#f0f0f0';
+  for(let i=WORLD_MIN+1;i<WORLD_MAX;i++){
+    const xs=U.toScreen({x:i,y:0},gridCv).x,ys=U.toScreen({x:0,y:i},gridCv).y;
+    gCtx.beginPath();gCtx.moveTo(xs,0);gCtx.lineTo(xs,h);gCtx.stroke();
+    gCtx.beginPath();gCtx.moveTo(0,ys);gCtx.lineTo(w,ys);gCtx.stroke();
+  }
+  // Axes: use exact transform of (0,0)
+  const zero = U.toScreen({x:0,y:0},gridCv);
+  gCtx.lineWidth=2;gCtx.strokeStyle='#bdbdbd';
+  gCtx.beginPath();gCtx.moveTo(0,zero.y);gCtx.lineTo(w,zero.y);gCtx.stroke();
+  gCtx.beginPath();gCtx.moveTo(zero.x,0);gCtx.lineTo(zero.x,h);gCtx.stroke();
+}
+function drawEndpoint(p,type){
+  const {x,y}=U.toScreen(p,mainCv);
+  mCtx.save();
+  if(type==='-infty'){
+    mCtx.strokeStyle='var(--primary-color)';
+    mCtx.lineWidth=3;
+    mCtx.beginPath();
+    mCtx.moveTo(x+18,y);
+    mCtx.lineTo(x-10,y);
+    mCtx.lineTo(x-7,y-7);
+    mCtx.moveTo(x-10,y);
+    mCtx.lineTo(x-7,y+7);
+    mCtx.stroke();
+    mCtx.font="bold 14px sans-serif";
+    mCtx.fillStyle='var(--primary-color)';
+    mCtx.textAlign="right";
+    mCtx.fillText("-∞",x-13,y-10);
+    mCtx.restore();
+    return;
+  }
+  if(type==='+infty'){
+    mCtx.strokeStyle='var(--primary-color)';
+    mCtx.lineWidth=3;
+    mCtx.beginPath();
+    mCtx.moveTo(x-18,y);
+    mCtx.lineTo(x+10,y);
+    mCtx.lineTo(x+7,y-7);
+    mCtx.moveTo(x+10,y);
+    mCtx.lineTo(x+7,y+7);
+    mCtx.stroke();
+    mCtx.font="bold 14px sans-serif";
+    mCtx.fillStyle='var(--primary-color)';
+    mCtx.textAlign="left";
+    mCtx.fillText("+∞",x+13,y-10);
+    mCtx.restore();
+    return;
+  }
+  mCtx.strokeStyle='var(--primary-color)';
+  mCtx.lineWidth=2;
+  mCtx.beginPath();
+  mCtx.arc(x,y,7,0,Math.PI*2);
+  if(type==='closed'){mCtx.fillStyle='var(--primary-color)';mCtx.fill();}
+  else{mCtx.fillStyle='#fff';mCtx.fill();}
+  mCtx.stroke();
+  mCtx.restore();
+}
+function drawPiece(pe,highlighted){
+  mCtx.save();
+  mCtx.strokeStyle=highlighted?'var(--eraser-color)':'var(--primary-color)';
+  mCtx.lineWidth=3;mCtx.lineCap='round';
+  mCtx.beginPath();
+  let s=U.toScreen(pe.p1,mainCv),e=U.toScreen(pe.p2,mainCv);
+  if(pe.type==='line')mCtx.moveTo(s.x,s.y),mCtx.lineTo(e.x,e.y);
+  else{const c=U.toScreen(pe.cp,mainCv);mCtx.moveTo(s.x,s.y);mCtx.quadraticCurveTo(c.x,c.y,e.x,e.y);}
+  mCtx.stroke();
+  drawEndpoint(pe.p1,pe.startType);
+  drawEndpoint(pe.p2,pe.endType);
+  mCtx.restore();
+}
+function drawAll(highlightedIndex){
+  drawGrid();mCtx.clearRect(0,0,mainCv.width,mainCv.height);
+  state.pieces.forEach((pe,idx)=>drawPiece(pe,highlightedIndex===idx));
+  if(state.analysis&&!state.analysis.isFunc){
+    mCtx.strokeStyle='var(--danger-color)';mCtx.lineWidth=2;
+    const sx=U.toScreen({x:state.analysis.failX,y:0},mainCv).x;
+    mCtx.beginPath();mCtx.moveTo(sx,0);mCtx.lineTo(sx,mainCv.height);mCtx.stroke();
+  }
+}
+function showEndpointsModal(onOK,onCancel){
+  document.getElementById('endpoints-overlay').style.display='';
+  document.getElementById('endpoints-modal').style.display='';
+  document.getElementById('start-type').value='closed';
+  document.getElementById('end-type').value='closed';
+  document.getElementById('endpoint-ok').onclick=()=>{
+    document.getElementById('endpoints-overlay').style.display='none';
+    document.getElementById('endpoints-modal').style.display='none';
+    onOK(document.getElementById('start-type').value,document.getElementById('end-type').value);
+  };
+  document.getElementById('endpoint-cancel').onclick=()=>{
+    document.getElementById('endpoints-overlay').style.display='none';
+    document.getElementById('endpoints-modal').style.display='none';
+    if(onCancel)onCancel();
+  };
+}
+mainCv.addEventListener('mousedown',e=>{
+  if(state.locked)return;
+  if(state.eraserMode){
+    const rect=mainCv.getBoundingClientRect();
+    const p=U.fromScreen({x:(e.clientX-rect.left)*(devicePixelRatio||1),y:(e.clientY-rect.top)*(devicePixelRatio||1)},mainCv);
+    let minDist=Infinity,idx=-1;
+    state.pieces.forEach((piece,i)=>{
+      const d1=U.dist(p,piece.p1),d2=U.dist(p,piece.p2);
+      const d=Math.min(d1,d2);
+      if(d<minDist && d<0.7){minDist=d;idx=i;}
+    });
+    if(idx>-1){
+      state.pieces.splice(idx,1);
+      drawAll();
+    }
+    return;
+  }
+  const rect=mainCv.getBoundingClientRect(),p=U.fromScreen({x:(e.clientX-rect.left)*(devicePixelRatio||1),y:(e.clientY-rect.top)*(devicePixelRatio||1)},mainCv);
+  if(state.placing==='idle'){
+    state.placing='placing';state.pStart=U.snap(p,state.pieces);
+  }else{
+    const p2=U.snap(p,state.pieces);
+    if(U.dist(p2,state.pStart)<0.05){state.placing='idle';state.pStart=null;drawAll();return;}
+    state._pendingPiece={type:state.tool,p1:state.pStart,p2:p2};
+    showEndpointsModal(
+      (startType,endType)=>{
+        const piece=makePiece(state.tool,state.pStart,p2);
+        piece.startType=startType; piece.endType=endType;
+        if(startType==='-infty') piece.p1={x:WORLD_MIN,y:piece.p1.y};
+        if(endType==='+infty') piece.p2={x:WORLD_MAX,y:piece.p2.y};
+        state.pieces.push(piece);
+        state.placing='idle';state.pStart=null;state._pendingPiece=null;
+        drawAll();
+      },
+      ()=>{
+        state.placing='idle';state.pStart=null;state._pendingPiece=null;drawAll();
+      }
+    );
+  }
+});
+mainCv.addEventListener('mousemove',e=>{
+  if(state.placing!=='placing'||state.locked)return;drawAll();
+  const rect=mainCv.getBoundingClientRect(),p=U.fromScreen({x:(e.clientX-rect.left)*(devicePixelRatio||1),y:(e.clientY-rect.top)*(devicePixelRatio||1)},mainCv);
+  drawPiece(Object.assign(makePiece(state.tool,state.pStart,p),{startType:'closed',endType:'closed'}));
+});
+mainCv.addEventListener('mousemove',e=>{
+  if(state.eraserMode){
+    const rect=mainCv.getBoundingClientRect();
+    const p=U.fromScreen({x:(e.clientX-rect.left)*(devicePixelRatio||1),y:(e.clientY-rect.top)*(devicePixelRatio||1)},mainCv);
+    let idx=-1, minDist=Infinity;
+    state.pieces.forEach((piece,i)=>{
+      const d=Math.min(U.dist(p,piece.p1),U.dist(p,piece.p2));
+      if(d<minDist && d<0.7){minDist=d;idx=i;}
+    });
+    drawAll(idx);
+  }
+});
+function makePiece(type,p1,p2){
+  const obj={type,p1:Object.assign({},p1),p2:Object.assign({},p2),startType:'closed',endType:'closed'};
+  if(type==='curve'){
+    const mid={x:(p1.x+p2.x)/2,y:(p1.y+p2.y)/2},dx=p2.x-p1.x,dy=p2.y-p1.y;
+    obj.cp={x:mid.x-dy*0.5,y:mid.y+dx*0.5};
+  }
+  return obj;
+}
+function samplePiece(pe){
+  const pts=[];const n=SAMPLE_PTS;
+  let x1=pe.p1.x, x2=pe.p2.x;
+  if(pe.startType==='-infty') x1=WORLD_MIN;
+  if(pe.endType==='+infty') x2=WORLD_MAX;
+  for(let i=0;i<=n;i++){
+    const t=i/n;
+    let x = x1+t*(x2-x1), y;
+    if(pe.type==='line')
+      y=pe.p1.y+t*(pe.p2.y-pe.p1.y);
+    else{
+      let pt={
+        x:U.bez(pe.p1.x,pe.cp.x,pe.p2.x,t),
+        y:U.bez(pe.p1.y,pe.cp.y,pe.p2.y,t)
+      };
+      x=pt.x;y=pt.y;
+    }
+    pts.push({x,y});
+  }
+  return pts;
+}
+
+// GROUP BY X (WITHIN TOL_X), MAP TO ALL y-values and meta
+function groupSamplesByX(samples) {
+  let buckets = [];
+  for (let pt of samples) {
+    let found = false;
+    for (let b of buckets) {
+      if (Math.abs(b.x - pt.x) < TOL_X) { b.pts.push(pt); found = true; break; }
+    }
+    if (!found) buckets.push({ x: pt.x, pts: [pt] });
+  }
+  return buckets;
+}
+
+function analyze() {
+  if (!state.pieces.length) return null;
+
+  // Collect all sampled points (from all pieces), sort by x
+  let samples = [];
+  state.pieces.forEach(pe => samples = samples.concat(samplePiece(pe)));
+  samples.sort((a, b) => a.x - b.x);
+
+  // Group points by x (within TOL_X)
+  let buckets = groupSamplesByX(samples);
+
+  // For each x, collect y-values. If >1 distinct closed y (difference > TOL_Y), not a function.
+  let isFunc = true, failX = null;
+  outer: for (let b of buckets) {
+    let closedYs = [];
+    let x = b.x;
+    for (let pt of b.pts) {
+      // Is this pt at an endpoint? If so, is that endpoint closed?
+      let closedHere = false;
+      for (let pe of state.pieces) {
+        // Endpoint
+        if ((Math.abs(pe.p1.x - x) < 1e-4 && Math.abs(pe.p1.y - pt.y) < 1e-4 && pe.startType === 'closed')
+          || (Math.abs(pe.p2.x - x) < 1e-4 && Math.abs(pe.p2.y - pt.y) < 1e-4 && pe.endType === 'closed')) {
+          closedHere = true;
+        }
+        // Interior points (not endpoint): always count as "closed" for function test
+        if (Math.abs(pe.p1.x - x) > 1e-3 && Math.abs(pe.p2.x - x) > 1e-3) {
+          if (
+            Math.abs(
+              (pt.y - (
+                pe.type === 'line'
+                  ? (pe.p1.y + (pe.p2.y - pe.p1.y) * (x - pe.p1.x) / (pe.p2.x - pe.p1.x))
+                  : pe.p1.y // curve case is only approximate here; fine for V-shape, line, vertical
+              ))
+            ) < 0.3
+          ) {
+            closedHere = true;
+          }
+        }
+      }
+      if (closedHere) closedYs.push(pt.y);
+    }
+    closedYs.sort((a, b) => a - b);
+    let nDiff = 0, last = null;
+    for (let y of closedYs) {
+      if (last === null || Math.abs(y - last) > TOL_Y) nDiff++;
+      last = y;
+      if (nDiff > 1) {
+        isFunc = false;
+        failX = x;
+        break outer;
+      }
+    }
+  }
+
+  // Intervals for domain, etc.
+  function getPieceIntervals(type="domain") {
+    return state.pieces.map(pe => {
+      let a = (pe.startType === '-infty') ? '-∞' : (pe.p1.x);
+      let b = (pe.endType === '+infty') ? '+∞' : (pe.p2.x);
+      let openA = (pe.startType !== 'closed');
+      let openB = (pe.endType !== 'closed');
+      return { a, b, openA, openB };
+    });
+  }
+  function intv(a, b, openA, openB) {
+    let sa = (a === '-∞') ? '-∞' : (+a).toFixed(2);
+    let sb = (b === '+∞') ? '+∞' : (+b).toFixed(2);
+    let l = openA ? '(' : '[';
+    let r = openB ? ')' : ']';
+    return `${l}${sa}, ${sb}${r}`;
+  }
+  function unionIntervals(intvs) {
+    return intvs.map(iv => intv(iv.a, iv.b, iv.openA, iv.openB)).join(' ∪ ');
+  }
+  const slopes = samples.map((p, i) => i > 0 ? (p.y - samples[i - 1].y) / (p.x - samples[i - 1].x) : null).slice(1);
+  const second = slopes.map((s, i) => i > 0 ? (s - slopes[i - 1]) / (samples[i + 1].x - samples[i].x) : null).slice(1);
+  function typeArr(arr, thresh) { return arr.map(v => { if (v > thresh) return 'inc'; if (v < -thresh) return 'dec'; return 'const'; }); }
+  function typeArr2(arr, thresh) { return arr.map(v => { if (v > thresh) return 'up'; if (v < -thresh) return 'down'; return 'linear'; }); }
+  const monoArr = typeArr(slopes, 0.03);
+  const cupArr = typeArr2(second, 0.02);
+  function fmtPropIntv(intvArr) { return intvArr.map(r => intv(r[0], r[1], true, true)).join(' ∪ '); }
+  function propertyIntervals(samples, propArray, type) {
+    let res = [];
+    let startIdx = null;
+    for (let i = 0; i < propArray.length; ++i) {
+      if (propArray[i] === type) {
+        if (startIdx === null) startIdx = i;
+      } else if (startIdx !== null) {
+        res.push([samples[startIdx].x, samples[i].x]);
+        startIdx = null;
+      }
+    }
+    if (startIdx !== null) res.push([samples[startIdx].x, samples[samples.length - 1].x]);
+    return res;
+  }
+  let minY = Math.min(...samples.map(s => s.y)), maxY = Math.max(...samples.map(s => s.y));
+  return {
+    isFunc, failX,
+    domain: unionIntervals(getPieceIntervals("domain")),
+    range: intv(minY, maxY, true, true),
+    inc: fmtPropIntv(propertyIntervals(samples, monoArr, 'inc')),
+    dec: fmtPropIntv(propertyIntervals(samples, monoArr, 'dec')),
+    constI: fmtPropIntv(propertyIntervals(samples, monoArr, 'const')),
+    cup: fmtPropIntv(propertyIntervals(samples, cupArr, 'up')),
+    cdown: fmtPropIntv(propertyIntervals(samples, cupArr, 'down'))
+  };
+}
+
+function buildReport(r){
+  if(!r)return'Please draw something first.';
+  let txt=`Is it a function?  : ${r.isFunc?'Yes ✅':'No ❌ (two outputs for one input near x≈'+r.failX.toFixed(2)+')'}`;
+  txt+=`\nDomain            : ${r.domain}`;
+  txt+=`\nRange             : ${r.range}`;
+  if(r.isFunc){
+    txt+=`\nIncreasing on     : ${r.inc||'—'}`;
+    txt+=`\nDecreasing on     : ${r.dec||'—'}`;
+    txt+=`\nConstant on       : ${r.constI||'—'}`;
+    txt+=`\nConcave up on     : ${r.cup||'—'}`;
+    txt+=`\nConcave down on   : ${r.cdown||'—'}`;
+  }
+  return txt;
+}
 function updatePanel(t){document.getElementById('analysis-results').textContent=t;}
-document.querySelectorAll('.tool-btn').forEach(b=>b.onclick=()=>{state.tool=b.dataset.tool;document.querySelectorAll('.tool-btn').forEach(bb=>bb.classList.remove('active'));b.classList.add('active');});
- document.getElementById('clear-btn').onclick=()=>{Object.assign(state,{pieces:[],analysis:null,locked:false});mainCv.classList.remove('locked');document.getElementById('example-select').value='';drawAll();updatePanel('Canvas cleared.');};
- document.getElementById('analyze-btn').onclick=()=>{state.analysis=analyze();drawAll();updatePanel(buildReport(state.analysis));};
-/********************  EXAMPLES  ***************************/
-const EXAMPLES={wave:[{type:'curve',p1:{x:-8,y:0},p2:{x:0,y:0},cp:{x:-4,y:6},startType:'closed',endType:'closed'},{type:'curve',p1:{x:0,y:0},p2:{x:8,y:0},cp:{x:4,y:-6},startType:'closed',endType:'closed'}],v_shape:[{type:'line',p1:{x:-5,y:5},p2:{x:0,y:-5},startType:'closed',endType:'closed'},{type:'line',p1:{x:0,y:-5},p2:{x:5,y:5},startType:'closed',endType:'closed'}],step_func:[{type:'line',p1:{x:-6,y:3},p2:{x:0,y:3},startType:'closed',endType:'open'},{type:'line',p1:{x:0,y:-2},p2:{x:6,y:-2},startType:'open',endType:'closed'}],vertical_line:[{type:'line',p1:{x:2,y:-4},p2:{x:2,y:4},startType:'closed',endType:'closed'}]};
-const names={wave:'Simple Wave',v_shape:'V‑Shape',step_func:'Step Function (valid)',vertical_line:'Vertical Line (invalid)'};const sel=document.getElementById('example-select');Object.entries(names).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v;sel.appendChild(o);});sel.onchange=e=>{const v=e.target.value;if(!v)return;state.pieces=JSON.parse(JSON.stringify(EXAMPLES[v]));state.locked=true;mainCv.classList.add('locked');state.analysis=analyze();drawAll();updatePanel(buildReport(state.analysis));};
-/********************  INIT  ******************************/
+document.querySelectorAll('.tool-btn').forEach(b=>b.onclick=()=>{
+  state.tool=b.dataset.tool;state.eraserMode=false;
+  document.querySelectorAll('.tool-btn').forEach(bb=>bb.classList.remove('active'));
+  document.getElementById('eraser-btn').classList.remove('active');
+  mainCv.classList.remove('eraser-cursor');
+  b.classList.add('active');
+});
+document.getElementById('eraser-btn').onclick=()=>{
+  state.eraserMode=!state.eraserMode;
+  document.getElementById('eraser-btn').classList.toggle('active',state.eraserMode);
+  document.querySelectorAll('.tool-btn').forEach(bb=>bb.classList.remove('active'));
+  if(state.eraserMode){
+    mainCv.classList.add('eraser-cursor');
+  } else {
+    mainCv.classList.remove('eraser-cursor');
+    drawAll();
+  }
+};
+document.getElementById('clear-btn').onclick=()=>{
+  Object.assign(state,{pieces:[],analysis:null,locked:false});mainCv.classList.remove('locked');
+  document.getElementById('example-select').value='';drawAll();updatePanel('Canvas cleared.');
+};
+document.getElementById('analyze-btn').onclick=()=>{
+  state.analysis=analyze();drawAll();updatePanel(buildReport(state.analysis));
+};
+const EXAMPLES={
+  relation_not_func:[
+    {type:'line',p1:{x:0,y:2},p2:{x:7.5,y:2},startType:'closed',endType:'closed'},
+    {type:'line',p1:{x:-7.5,y:-2},p2:{x:0,y:-2},startType:'closed',endType:'closed'}
+  ],
+  piecewise_func:[
+    {type:'line',p1:{x:-7.5,y:-2},p2:{x:0,y:-2},startType:'closed',endType:'open'},
+    {type:'line',p1:{x:0,y:2},p2:{x:7.5,y:2},startType:'closed',endType:'closed'}
+  ],
+  step_func:[
+    {type:'line',p1:{x:-7,y:2},p2:{x:0,y:2},startType:'closed',endType:'open'},
+    {type:'line',p1:{x:0,y:-2},p2:{x:7,y:-2},startType:'open',endType:'closed'}
+  ],
+  v_shape:[
+    {type:'line',p1:{x:-7,y:6},p2:{x:0,y:-6},startType:'closed',endType:'closed'},
+    {type:'line',p1:{x:0,y:-6},p2:{x:7,y:6},startType:'closed',endType:'closed'}
+  ],
+  asymptote_func:[
+    {type:'curve',p1:{x:-7.7,y:1.08},p2:{x:-1.05,y:-7.5},cp:{x:-4.4,y:-2.5},startType:'closed',endType:'open'},
+    {type:'curve',p1:{x:-0.95,y:7.5},p2:{x:7.7,y:0.7},cp:{x:4.2,y:2},startType:'open',endType:'closed'}
+  ],
+  vertical_line:[
+    {type:'line',p1:{x:0,y:-7},p2:{x:0,y:7},startType:'closed',endType:'closed'}
+  ]
+};
+const names={
+  relation_not_func:'Relation: two outputs for one input (not a function)',
+  piecewise_func:'Function: unique output for each input',
+  step_func:'Function: jumps up at x=0',
+  v_shape:'Function: V-shaped (always increasing or decreasing)',
+  asymptote_func:'Function: curve with asymptote (not defined at x = –1)',
+  vertical_line:'Vertical line (never a function)'
+};
+const sel=document.getElementById('example-select');
+Object.entries(names).forEach(([k,v])=>{
+  const o=document.createElement('option');o.value=k;o.textContent=v;sel.appendChild(o);
+});
+sel.onchange=e=>{
+  const v=e.target.value;if(!v)return;
+  state.pieces=JSON.parse(JSON.stringify(EXAMPLES[v]));
+  state.locked=true;mainCv.classList.add('locked');
+  state.analysis=analyze();drawAll();updatePanel(buildReport(state.analysis));
+};
 drawAll();document.querySelector("button[data-tool='line']").classList.add('active');
 </script>
 </body>
