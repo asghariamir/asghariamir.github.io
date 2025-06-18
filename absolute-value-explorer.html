@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absolute Value Explorer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0; /* Blue */
+            --secondary-color: #2e7d32; /* Green */
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --highlight-color: rgba(255, 0, 0, 0.2);
+            --number-line-base-color: black; /* Narrow black line */
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: var(--light-gray); color: var(--text-color); display: flex; justify-content: center; padding: 1rem; }
+        .container { width: 100%; max-width: 900px; margin: 0 auto; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        h2 { font-size: 1.75rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        p.info { color: #616161; margin-bottom: 1.5rem; text-align: center; }
+
+        .tabs { display: flex; background-color: var(--light-gray); border-bottom: 2px solid var(--medium-gray); }
+        .tab-button { flex: 1; padding: 14px 10px; cursor: pointer; border: none; background-color: transparent; font-size: 1rem; color: var(--dark-gray); position: relative; transition: color 0.3s; }
+        .tab-button.active { color: var(--primary-color); font-weight: 600; }
+        .tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background-color: var(--primary-color); }
+        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content.active { display: block; }
+
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem 1.5rem; padding: 1rem; background-color: var(--light-gray); border-radius: 6px; margin-bottom: 1.5rem; }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .full-width { grid-column: 1 / -1; }
+        .param-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        label { font-size: 0.9rem; font-weight: 600; color: #616161; }
+        input[type="range"] { width: 100%; }
+        input[type="number"], input[type="text"], select { border: 1px solid var(--medium-gray); border-radius: 4px; padding: 10px; font-size: 1rem; width: 100%; }
+        input[type="text"] { font-family: monospace; }
+        output { font-weight: bold; color: var(--primary-color); }
+
+        .plot-container { width: 100%; height: 400px; border: 1px solid var(--medium-gray); border-radius: 4px; }
+
+        .equation-display { margin-top: 1.5rem; padding: 1rem; background-color: var(--light-gray); border-radius: 6px; }
+        .equation-display p { margin: 0.5rem 0; font-family: monospace; font-size: 1.1rem; text-align: center; }
+        .equation-display strong { color: var(--primary-color); }
+
+        /* Number Line Specific Styles */
+        #number-line-canvas {
+            height: 150px;
+            display: block;
+            margin: 0 auto;
+            width: calc(100% - 2rem);
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>Absolute Value Explorer</h2>
+    <p class="info">Explore absolute values from two perspectives: as a function on a 2D graph, and as distance on a number line.</p>
+
+    <div class="tabs">
+        <button class="tab-button active" data-tab="functions">Absolute Value Functions</button>
+        <button class="tab-button" data-tab="inequalities">Absolute Value Inequalities</button>
+    </div>
+
+    <section id="functions-tab" class="tab-content active">
+        <div class="controls">
+            <div class="param-row full-width">
+                <div class="control-group">
+                    <label for="a-slider">Parameter a:</label>
+                    <input type="range" id="a-slider" min="-2" max="2" step="0.1" value="1">
+                    <output id="a-value">1.0</output>
+                </div>
+                <div class="control-group">
+                    <label for="b-slider">Parameter b:</label>
+                    <input type="range" id="b-slider" min="-5" max="5" step="0.1" value="0">
+                    <output id="b-value">0.0</output>
+                </div>
+            </div>
+            <div class="param-row full-width">
+                <div class="control-group">
+                    <label for="c-slider">Parameter c:</label>
+                    <input type="range" id="c-slider" min="-2" max="2" step="0.1" value="0">
+                    <output id="c-value">0.0</output>
+                </div>
+                <div class="control-group">
+                    <label for="d-slider">Parameter d:</label>
+                    <input type="range" id="d-slider" min="-5" max="5" step="0.1" value="0">
+                    <output id="d-value">0.0</output>
+                </div>
+            </div>
+        </div>
+        <div class="equation-display" id="function-equation-display"></div>
+        <div class="plot-container" id="function-plot"></div>
+    </section>
+
+    <section id="inequalities-tab" class="tab-content">
+        <p class="info">Define an inequality using symbols. See how the visual representation on the number line and the interval notation are linked!</p>
+        <div class="controls">
+            <div class="control-group full-width">
+                <label for="inequality-input">Enter Inequality (e.g., |x-3| &lt; 5):</label>
+                <p style="font-size: 0.85rem; color: #616161; margin-top: -10px; margin-bottom: 5px;">Valid formats: `|x-a| &lt; k`, `|x-a| ≤ k`, `|x-a| > k`, `|x-a| ≥ k`</p>
+                <input type="text" id="inequality-input" value="|x-0|<5">
+            </div>
+        </div>
+        <div class="plot-container" style="height: 150px;">
+            <canvas id="number-line-canvas"></canvas>
+        </div>
+        <div class="equation-display" id="inequality-output-display"></div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- GLOBAL CONFIG ---
+    const PLOT_RANGE_X_FUNCTIONS = [-10, 10];
+    const PLOT_RANGE_Y_FUNCTIONS = [-10, 10];
+    const NUMBER_LINE_RANGE_X = [-25, 25];
+
+    // Plotly common config
+    const plotlyConfig = {
+        xaxis: { title: 'x', range: PLOT_RANGE_X_FUNCTIONS, gridcolor: '#e0e0e0', zerolinecolor: '#888' },
+        yaxis: { title: 'y', range: PLOT_RANGE_Y_FUNCTIONS, gridcolor: '#e0e0e0', zerolinecolor: '#888', scaleanchor: 'x', scaleratio: 1 },
+        margin: { l: 50, r: 20, t: 40, b: 40 },
+        showlegend: false,
+        hovermode: false
+    };
+
+    // --- STATE MANAGEMENT ---
+    let state = {
+        currentTab: 'functions',
+        functions: { a: 1, b: 0, c: 0, d: 0 },
+        inequalities: { a: 0, k: 5, operator: '<', inputString: '|x-0|<5' },
+    };
+
+    // --- DOM REFERENCES ---
+    const functionsTab = document.getElementById('functions-tab');
+    const inequalitiesTab = document.getElementById('inequalities-tab');
+
+    // Tab 1: Functions
+    const aSlider = document.getElementById('a-slider');
+    const bSlider = document.getElementById('b-slider');
+    const cSlider = document.getElementById('c-slider');
+    const dSlider = document.getElementById('d-slider');
+    const aValue = document.getElementById('a-value');
+    const bValue = document.getElementById('b-value');
+    const cValue = document.getElementById('c-value');
+    const dValue = document.getElementById('d-value');
+    const functionPlotDiv = document.getElementById('function-plot');
+    const functionEquationDisplay = document.getElementById('function-equation-display');
+
+    // Tab 2: Inequalities
+    const inequalityInput = document.getElementById('inequality-input');
+    const numberLineCanvas = document.getElementById('number-line-canvas');
+    const numberLineCtx = numberLineCanvas.getContext('2d');
+    const inequalityOutputDisplay = document.getElementById('inequality-output-display');
+
+    // --- UTILITIES ---
+    const round = (val, dec) => parseFloat(val.toFixed(dec));
+    const parseInequality = (str) => {
+        const match = str.match(/\|x\s*([-+])?\s*([0-9.]*)?\|\s*(<|<=|>|>=)\s*([0-9.]+)/);
+        if (match) {
+            let a_val;
+            if (match[2] === undefined || match[2] === '') {
+                a_val = 0;
+            } else {
+                a_val = parseFloat(match[2]);
+                if (match[1] === '+') a_val = -a_val;
+            }
+            return { a: a_val, operator: match[3], k: parseFloat(match[4]), valid: true };
+        }
+        return { valid: false };
+    };
+
+    // --- INITIALIZATION ---
+    function initialize() {
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => switchTab(button.dataset.tab));
+        });
+
+        [aSlider, bSlider, cSlider, dSlider].forEach(slider => slider.addEventListener('input', updateFunctionState));
+        inequalityInput.addEventListener('input', updateInequalityStateFromInput);
+
+        switchTab('functions');
+        window.addEventListener('resize', () => {
+            if (state.currentTab === 'functions') Plotly.relayout(functionPlotDiv, plotlyConfig);
+            else drawNumberLine();
+        });
+    }
+
+    // --- TAB SWITCHING ---
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        document.querySelector(`.tab-button[data-tab="${tabName}"]`).classList.add('active');
+        state.currentTab = tabName;
+
+        if (tabName === 'functions') updateFunctionState();
+        else if (tabName === 'inequalities') updateInequalityStateFromInput();
+    }
+
+    // --- TAB 1: FUNCTIONS LOGIC & RENDERING ---
+    function updateFunctionState() {
+        state.functions.a = parseFloat(aSlider.value);
+        state.functions.b = parseFloat(bSlider.value);
+        state.functions.c = parseFloat(cSlider.value);
+        state.functions.d = parseFloat(dSlider.value);
+
+        aValue.value = state.functions.a.toFixed(1);
+        bValue.value = state.functions.b.toFixed(1);
+        cValue.value = state.functions.c.toFixed(1);
+        dValue.value = state.functions.d.toFixed(1);
+
+        renderFunctionPlot();
+        renderFunctionEquations();
+    }
+
+    function renderFunctionPlot() {
+        const { a, b, c, d } = state.functions;
+        const xVals = [], yVals = [];
+        for (let x = PLOT_RANGE_X_FUNCTIONS[0]; x <= PLOT_RANGE_X_FUNCTIONS[1]; x += 0.1) {
+            let y = a * Math.abs(x - b) + c * Math.abs(x - d);
+            yVals.push(y);
+            xVals.push(x);
+        }
+        Plotly.newPlot(functionPlotDiv, [{ x: xVals, y: yVals, mode: 'lines', name: 'Function', line: { color: 'var(--primary-color)' } }], plotlyConfig, { responsive: true, displaylogo: false });
+    }
+
+    function renderFunctionEquations() {
+        const { a, b, c, d } = state.functions;
+        let equation = `y = ${a.toFixed(1)}|x - ${b.toFixed(1)}|`;
+        equation += ` ${c < 0 ? c.toFixed(1) : '+' + c.toFixed(1)}|x - ${d.toFixed(1)}|`;
+        functionEquationDisplay.innerHTML = `<h3>Function Equation</h3><p><strong>${equation}</strong></p>`;
+    }
+
+    // --- TAB 2: INEQUALITIES LOGIC & RENDERING ---
+    function updateInequalityStateFromInput() {
+        state.inequalities.inputString = inequalityInput.value;
+        const parsed = parseInequality(inequalityInput.value);
+        if (parsed.valid) {
+            state.inequalities.a = parsed.a;
+            state.inequalities.k = parsed.k;
+            state.inequalities.operator = parsed.operator;
+        } else {
+            state.inequalities = { a: 0, k: 5, operator: '<', inputString: '|x-0|<5' };
+            inequalityInput.value = state.inequalities.inputString;
+        }
+        drawNumberLine();
+        updateInequalityOutputDisplay();
+    }
+
+    // Number Line Drawing
+    function drawNumberLine() {
+        const ctx = numberLineCtx;
+        numberLineCanvas.width = numberLineCanvas.clientWidth;
+        numberLineCanvas.height = numberLineCanvas.clientHeight;
+
+        const w = numberLineCanvas.width, h = numberLineCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const scale = w / (NUMBER_LINE_RANGE_X[1] - NUMBER_LINE_RANGE_X[0]);
+        const mathToPx = (val) => (val - NUMBER_LINE_RANGE_X[0]) * scale;
+        const lineY = h / 2;
+        const bandHeight = 10;
+        const dotRadius = 7;
+
+        ctx.strokeStyle = 'var(--number-line-base-color)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, lineY); ctx.lineTo(w, lineY); ctx.stroke();
+
+        ctx.font = '12px Arial'; ctx.fillStyle = '#333'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        const zeroPx = mathToPx(0);
+        ctx.beginPath(); ctx.moveTo(zeroPx, lineY - 5); ctx.lineTo(zeroPx, lineY + 5); ctx.stroke();
+        ctx.fillText('0', zeroPx, lineY + 8);
+
+        for (let i = Math.floor(NUMBER_LINE_RANGE_X[0]); i <= Math.ceil(NUMBER_LINE_RANGE_X[1]); i++) {
+            if (i !== 0) {
+                const tickPx = mathToPx(i);
+                ctx.beginPath();
+                ctx.moveTo(tickPx, lineY - 3);
+                ctx.lineTo(tickPx, lineY + 3);
+                ctx.stroke();
+            }
+        }
+
+        const { a, k, operator } = state.inequalities;
+        const leftBoundMath = a - k;
+        const rightBoundMath = a + k;
+        const leftBoundPx = mathToPx(leftBoundMath);
+        const rightBoundPx = mathToPx(rightBoundMath);
+
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
+        ctx.lineWidth = bandHeight;
+
+        if (operator === '<' || operator === '<=') {
+            ctx.beginPath(); ctx.moveTo(leftBoundPx, lineY); ctx.lineTo(rightBoundPx, lineY); ctx.stroke();
+        } else {
+            ctx.beginPath(); ctx.moveTo(mathToPx(NUMBER_LINE_RANGE_X[0]), lineY); ctx.lineTo(leftBoundPx, lineY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(rightBoundPx, lineY); ctx.lineTo(mathToPx(NUMBER_LINE_RANGE_X[1]), lineY); ctx.stroke();
+            drawArrow(ctx, mathToPx(NUMBER_LINE_RANGE_X[0]), lineY, 'left', bandHeight);
+            drawArrow(ctx, mathToPx(NUMBER_LINE_RANGE_X[1]), lineY, 'right', bandHeight);
+        }
+
+        ctx.strokeStyle = 'var(--primary-color)';
+        ctx.lineWidth = 2;
+
+        if (operator === '<' || operator === '>') {
+            ctx.beginPath(); ctx.arc(leftBoundPx, lineY, dotRadius, 0, 2 * Math.PI); ctx.stroke(); ctx.fillStyle = 'white'; ctx.fill();
+            ctx.beginPath(); ctx.arc(rightBoundPx, lineY, dotRadius, 0, 2 * Math.PI); ctx.stroke(); ctx.fillStyle = 'white'; ctx.fill();
+        } else {
+            ctx.beginPath(); ctx.arc(leftBoundPx, lineY, dotRadius, 0, 2 * Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(rightBoundPx, lineY, dotRadius, 0, 2 * Math.PI); ctx.fill();
+        }
+
+        /* --- FIX START: ensure centre point is always solid --- */
+        ctx.fillStyle = '#1565c0';            /* primary blue */
+        ctx.beginPath(); ctx.arc(mathToPx(a), lineY, 5, 0, 2 * Math.PI); ctx.fill();
+        /* --- FIX END --- */
+    }
+
+    function drawArrow(ctx, x, y, direction, bandHeight) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+        ctx.beginPath();
+        const arrowWidth = bandHeight * 0.8;
+        const arrowLength = bandHeight * 1.5;
+        if (direction === 'left') {
+            ctx.moveTo(0, 0);
+            ctx.lineTo(arrowLength, -arrowWidth / 2);
+            ctx.lineTo(arrowLength, arrowWidth / 2);
+        } else {
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-arrowLength, -arrowWidth / 2);
+            ctx.lineTo(-arrowLength, arrowWidth / 2);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function updateInequalityOutputDisplay() {
+        const { a, k, operator } = state.inequalities;
+        const left = (a - k);
+        const right = (a + k);
+        let solution = '';
+
+        const formatOp = (op) => {
+            if (op === '<=') return '≤';
+            if (op === '>=') return '≥';
+            return op;
+        };
+
+        if (operator === '<' || operator === '<=') {
+            const leftBracket = operator === '<' ? '(' : '[';
+            const rightBracket = operator === '<=' ? ']' : ')';
+            solution = `${leftBracket}${left.toFixed(2)}, ${right.toFixed(2)}${rightBracket}`;
+        } else {
+            const leftBracket = operator === '>' ? ')' : ']';
+            const rightBracket = operator === '>' ? '(' : '[';
+            solution = `(-∞, ${left.toFixed(2)}${leftBracket} ∪ ${rightBracket}${right.toFixed(2)}, +∞)`;
+        }
+        inequalityOutputDisplay.innerHTML = `<p><strong>Solution:</strong> ${solution}</p>`;
+    }
+
+    initialize();
+});
+</script>
+</body>
+</html>
