@@ -34,27 +34,30 @@
             border-radius:14px;
             box-shadow:0 4px 16px #0000000d;
             padding:1.5rem 2rem;
-            /* Added for centering content blocks */
-            display: flex;
+            display: flex; /* Centering */
             flex-direction: column;
-            align-items: center; /* Center items horizontally within the container */
+            align-items: center;
         }
         h2{
             margin-top:0;
             color: var(--blue-dark);
-            text-align: center; /* Center the heading */
-            width: 100%; /* Ensure it takes full width for centering */
+            text-align: center;
+            width: 100%;
         }
         .main-layout{
             display:flex;
             flex-wrap:wrap;
             gap:2.4rem;
             align-items:flex-start;
-            width: 100%; /* Ensure main layout takes full width to be part of flex centering */
+            width: 100%;
         }
         .panel{
             flex:1 1 500px;
             min-width:320px;
+            background: var(--surface-alt); /* Added consistent background */
+            border-radius: 8px; /* Added border-radius */
+            padding: 1rem; /* Added padding */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Added subtle shadow */
         }
         button{
             cursor:pointer;
@@ -69,38 +72,36 @@
         button:hover{filter:brightness(1.1)}
         button:active{transform:scale(0.97)}
         button:disabled{background:#ccc!important;cursor:not-allowed;filter:none}
-        
-        /* General input styling for consistency */
+
         input[type="range"], select {
             font-size:inherit;
             padding:0.3em 0.35em;
             border:1px solid #ccc;
             border-radius:4px;
             box-sizing:border-box;
-            outline: none; /* Remove outline on focus for aesthetics */
+            outline: none;
             transition: border-color 0.15s;
         }
         input[type="range"]:focus, select:focus {
-            border-color: var(--blue-dark); /* Highlight on focus */
+            border-color: var(--blue-dark);
         }
 
-        /* Specific styling for range input */
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
-            background: #f0f0f0; /* Track color */
-            height: 8px; /* Height of the track */
-            flex-grow: 1; /* Allow slider to take available space */
+            background: #f0f0f0;
+            height: 8px;
+            flex-grow: 1;
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px; /* Thumb width */
-            height: 18px; /* Thumb height */
-            border-radius: 50%; /* Make it circular */
-            background: var(--blue); /* Thumb color */
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--blue);
             cursor: pointer;
-            margin-top: -5px; /* Adjust thumb vertical position */
+            margin-top: -5px;
             box-shadow: 0 0 2px rgba(0,0,0,0.3);
             transition: background 0.15s, transform 0.15s;
         }
@@ -126,10 +127,9 @@
             transform: scale(0.95);
         }
 
-        /* Specific styling for select dropdown */
         select {
             width: 100%;
-            padding-right: 25px; /* Make space for custom arrow */
+            padding-right: 25px;
             background-color: var(--surface);
             background-image: url('data:image/svg+xml;utf8,<svg fill="%23222" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
             background-repeat: no-repeat;
@@ -147,19 +147,18 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            /* Center the controls block itself */
-            max-width: fit-content; /* Allow it to shrink to content size */
+            max-width: fit-content;
             margin-left: auto;
             margin-right: auto;
         }
-        .sliders { margin-top: 10px; width: 100%; } /* Sliders panel should fill its space */
+        .sliders { margin-top: 10px; width: 100%; }
         .slider-group {
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .slider-group label { min-width: 150px; text-align: left; } /* Ensure label text is left-aligned */
+        .slider-group label { min-width: 150px; text-align: left; }
         .slider-group span { min-width: 30px; text-align: right; font-weight: bold; }
 
         .info-panel {
@@ -172,12 +171,12 @@
             line-height: 1.6;
             width: 100%;
             box-sizing: border-box;
-            text-align: left; /* Keep text left-aligned for readability */
+            text-align: left;
         }
         .info-panel h3 {
             margin-top: 0;
             color: var(--blue-dark);
-            text-align: center; /* Center the heading within the info panel */
+            text-align: center;
         }
         .info-panel strong {
             font-weight: 600;
@@ -240,22 +239,20 @@
 
         // Helper function to format powers as superscripts
         function formatPower(base, exponent) {
-            if (exponent === 0) return base; // Don't show x^0
-            if (exponent === 1) return base; // Don't show x^1
+            if (exponent === 0) return base;
+            if (exponent === 1) return base;
             return `${base}<sup>${exponent}</sup>`;
         }
 
         // Helper function to format expressions with superscripts for display
         function formatExpressionForDisplay(expr) {
-            // Replace 'x^N' with 'x<sup>N</sup>' for N >= 2
             return expr.replace(/x\^(\d+)/g, (match, p1) => {
                 const exponent = parseInt(p1);
-                if (exponent === 0) return ''; // Remove x^0 terms as they become constants
-                if (exponent === 1) return 'x'; // x^1 is just x
+                if (exponent === 0) return '';
+                if (exponent === 1) return 'x';
                 return `x<sup>${exponent}</sup>`;
             });
         }
-
 
         // Reusable function for formatting intervals
         function formatIntervals(arr) {
@@ -291,8 +288,13 @@
             return mergedIntervals.map(i => {
                 const openChar = i.startType === 'open' ? '(' : '[';
                 const closeChar = i.endType === 'open' ? ')' : ']';
-                const startVal = (i.start === -Infinity || i.start === '-Infinity') ? '−∞' : parseFloat(i.start).toFixed(2);
-                const endVal = (i.end === Infinity || i.end === '+Infinity') ? '+∞' : parseFloat(i.end).toFixed(2);
+                let startVal = (i.start === -Infinity || i.start === '-Infinity') ? '−∞' : parseFloat(i.start).toFixed(2);
+                let endVal = (i.end === Infinity || i.end === '+Infinity') ? '+∞' : parseFloat(i.end).toFixed(2);
+
+                // Fix for -0
+                if (parseFloat(startVal) === 0) startVal = '0';
+                if (parseFloat(endVal) === 0) endVal = '0';
+
                 return `${openChar}${startVal}, ${endVal}${closeChar}`;
             }).join(' \u222A ');
         }
@@ -306,7 +308,6 @@
                 group.className = "slider-group";
 
                 const label = document.createElement("label");
-                // Use formatPower for the label text
                 label.innerHTML = `Coefficient of ${formatPower('x', i)}: `;
 
                 const input = document.createElement("input");
@@ -365,13 +366,12 @@
 
         function updateGraph() {
             const currentDegree = parseInt(degreeSelector.value);
-            const rawExpr = getPolynomialExpr(); // Get expression for math.js parsing
-            const displayExpr = formatExpressionForDisplay(rawExpr.replace(/\*/g, '')); // Format for display
+            const rawExpr = getPolynomialExpr();
+            const displayExpr = formatExpressionForDisplay(rawExpr.replace(/\*/g, ''));
 
             const node = math.parse(rawExpr);
             const f = node.compile();
 
-            // Handle constant function (degree 0) explicitly
             if (currentDegree === 0 || rawExpr === "0") {
                  const x_vals_plot = math.range(-10, 10, 0.1).toArray();
                  const y_val = (rawExpr === "0") ? 0 : parseFloat(sliders[0].value);
@@ -383,7 +383,7 @@
                  }], {
                     margin: { t: 50 },
                     title: {
-                        text: `f(x) = ${displayExpr}`, // Use formatted expression for title
+                        text: `f(x) = ${displayExpr}`,
                         y: 0.95, x: 0.5, xanchor: 'center', yanchor: 'top',
                         font: { size: 18, family: varStr('--font-family') }
                     },
@@ -405,7 +405,6 @@
                  return;
             }
 
-            // For non-constant functions, calculate derivatives
             const df_node = math.derivative(node, 'x');
             const df = df_node.compile();
             const ddf_node = math.derivative(df_node, 'x');
@@ -427,7 +426,7 @@
             }], {
                 margin: { t: 50 },
                 title: {
-                    text: `f(x) = ${displayExpr}`, // Use formatted expression for title
+                    text: `f(x) = ${displayExpr}`,
                     y: 0.95, x: 0.5, xanchor: 'center', yanchor: 'top',
                     font: { size: 18, family: varStr('--font-family') }
                 },
@@ -446,7 +445,7 @@
 
                     if ((y1 < -epsilon && y2 > epsilon) ||
                         (y1 > epsilon && y2 < -epsilon) ||
-                        (Math.abs(y1) < epsilon && Math.abs(y2) < epsilon && x2 - x1 > epsilon) // Check for flat section too
+                        (Math.abs(y1) < epsilon && Math.abs(y2) < epsilon && x2 - x1 > epsilon)
                        ) {
                         if (Math.abs(y2 - y1) > epsilon) {
                             const rootX = x1 - y1 * (x2 - x1) / (y2 - y1);
@@ -505,8 +504,7 @@
             const finalInflectionPoints = new Set();
 
             const getBehaviorSign = (x, derivativeType) => {
-                // Adjust test point if it falls exactly on a boundary or root
-                const adjustedX = x; // Math.abs(x) < epsilon ? 0 : x; // Can add specific handling for x=0 if needed
+                const adjustedX = x;
 
                 if (adjustedX < x_analysis_min - epsilon) {
                     return derivativeType === 'first' ? fPrimeEndBehaviorSignAtNegInf : fDoublePrimeEndBehaviorSignAtNegInf;
@@ -526,7 +524,6 @@
             const pointsToProcess = [...allAnalysisPoints, Infinity];
 
             for (const currentPoint of pointsToProcess) {
-                // Skip if the current point is essentially the same as the previous point
                 if (currentPoint !== Infinity && Math.abs(currentPoint - prevPoint) < epsilon) {
                     continue;
                 }
@@ -537,11 +534,11 @@
 
                 if (intervalStart === -Infinity) {
                     testX = (currentPoint === Infinity) ? 0 : currentPoint - 1;
-                    if (testX > -epsilon && testX < epsilon) testX = -1; // Avoid testX being 0 if it's the start of (-inf, 0)
+                    if (testX > -epsilon && testX < epsilon) testX = -1;
                     if (testX < x_analysis_min) testX = x_analysis_min - 1;
                 } else if (intervalEnd === Infinity) {
                     testX = intervalStart + 1;
-                    if (testX > -epsilon && testX < epsilon) testX = 1; // Avoid testX being 0 if it's the end of (0, inf)
+                    if (testX > -epsilon && testX < epsilon) testX = 1;
                     if (testX > x_analysis_max) testX = x_analysis_max + 1;
                 } else {
                     testX = (intervalStart + intervalEnd) / 2;
