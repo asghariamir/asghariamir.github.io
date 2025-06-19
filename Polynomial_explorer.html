@@ -175,27 +175,38 @@
         input[type="range"]:focus {
             outline: none;
         }
-        /* Select */
-        select {
-            width: 110px;
-            padding: 0.4em 1.7em 0.4em 0.7em;
+        /* Custom Degree Selector Buttons */
+        .degree-buttons {
+            display: flex;
+            gap: 8px; /* Spacing between buttons */
+            margin-left: 8px; /* Align with label if desired */
+        }
+        .degree-button {
+            width: 40px; /* Make it square */
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1.5px solid #c2dafc;
             border-radius: 7px;
             background: var(--surface);
             font-size: 1em;
-            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
             box-shadow: 0 1px 4px #1976d220;
-            appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg fill="%231976d2" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 0.5em center;
-            background-size: 1.3em;
-            transition: border-color 0.14s;
-            font-weight: 500;
+            color: #444;
         }
-        select:focus, select:hover {
+        .degree-button:hover {
             border-color: var(--blue-dark);
-            outline: none;
+            box-shadow: 0 2px 8px #1976d230;
+            transform: translateY(-1px);
+        }
+        .degree-button.active {
+            background: linear-gradient(90deg, var(--blue-dark) 40%, var(--blue) 100%);
+            color: #fff;
+            border-color: var(--blue-dark);
+            box-shadow: 0 2px 10px #1976d245;
         }
         /* Button */
         button {
@@ -288,7 +299,9 @@
             .panel { padding: 0.85rem 0.6rem; }
             .info-panel { padding: 0.8em 0.5em 1em 0.5em; font-size: 0.99rem;}
             .slider-group label { min-width: unset; width: 100%; font-size: 1em; }
-            select { width: 100%; min-width: unset;}
+            /* select { width: 100%; min-width: unset;} */ /* This style is now irrelevant */
+            .degree-buttons { width: 100%; justify-content: space-around; }
+            .degree-button { width: 35px; height: 35px; font-size: 0.9em; }
             .rescale-badge { top: 10px; right: 10px; font-size: 0.9em; padding: 5px 10px;}
         }
     </style>
@@ -297,14 +310,9 @@
     <div class="container">
         <h2>Interactive Polynomial Explorer</h2>
         <div class="controls">
-            <label for="degree">Select polynomial degree (1–5): </label>
-            <select id="degree">
-                <option value="1">1 (Linear)</option>
-                <option value="2">2 (Quadratic)</option>
-                <option value="3">3 (Cubic)</option>
-                <option value="4" selected>4 (Quartic)</option>
-                <option value="5">5 (Quintic)</option>
-            </select>
+            <label for="degree">Select polynomial degree: </label>
+            <div id="degree-selector-buttons" class="degree-buttons">
+                </div>
         </div>
         <div class="main-layout">
             <div class="panel">
@@ -322,12 +330,14 @@
     </div>
     <script>
         const slidersDiv = document.getElementById("sliders");
-        const degreeSelector = document.getElementById("degree");
+        // const degreeSelector = document.getElementById("degree"); // No longer a select element
+        const degreeButtonsContainer = document.getElementById("degree-selector-buttons");
         const plotDiv = document.getElementById("plot");
         const propsDiv = document.getElementById("properties");
         const rescaleBadge = document.getElementById("rescale-badge");
 
         let sliders = [];
+        let currentSelectedDegree = 4; // Default to 4 as before
 
         const varStr = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
         const epsilon = 1e-6; // Threshold for considering values close to zero
@@ -402,6 +412,35 @@
                 return `${openChar}${startVal}, ${endVal}${closeChar}`;
             }).join(' \u222A ');
         }
+
+        // --- New function to create degree buttons ---
+        function createDegreeButtons(selectedDegree) {
+            degreeButtonsContainer.innerHTML = ""; // Clear existing buttons
+            for (let i = 1; i <= 5; i++) {
+                const button = document.createElement("div");
+                button.className = "degree-button";
+                button.textContent = i;
+                button.dataset.degree = i; // Store degree value
+
+                if (i === selectedDegree) {
+                    button.classList.add("active");
+                }
+
+                button.addEventListener("click", () => {
+                    // Remove 'active' from previously active button
+                    const currentActive = document.querySelector(".degree-button.active");
+                    if (currentActive) {
+                        currentActive.classList.remove("active");
+                    }
+                    // Add 'active' to clicked button
+                    button.classList.add("active");
+                    currentSelectedDegree = parseInt(button.dataset.degree);
+                    createSliders(currentSelectedDegree);
+                });
+                degreeButtonsContainer.appendChild(button);
+            }
+        }
+        // --- End new function ---
 
         function createSliders(degree) {
             slidersDiv.innerHTML = "";
@@ -507,7 +546,8 @@
         }
 
         function updateGraph() {
-            const currentDegree = parseInt(degreeSelector.value);
+            // const currentDegree = parseInt(degreeSelector.value); // Old way
+            const currentDegree = currentSelectedDegree; // New way
             const rawExpr = getPolynomialExpr();
             const displayExpr = formatExpressionForDisplay(rawExpr.replace(/\*/g, ''));
 
@@ -764,13 +804,11 @@
             `;
         }
 
-        // Initialize
-        degreeSelector.addEventListener("change", () => {
-            createSliders(parseInt(degreeSelector.value));
+        // Initialize degree buttons and sliders
+        document.addEventListener("DOMContentLoaded", () => {
+            createDegreeButtons(currentSelectedDegree); // Initialize buttons with default active degree
+            createSliders(currentSelectedDegree); // Initialize sliders based on default degree
         });
-
-        degreeSelector.value = "4";
-        createSliders(parseInt(degreeSelector.value));
     </script>
 </body>
 </html>
