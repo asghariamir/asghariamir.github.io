@@ -275,7 +275,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>🧮 Interactive Polynomial Explorer</h2>
+        <h2>Interactive Polynomial Explorer</h2>
         <div class="controls">
             <label for="degree">Select polynomial degree (1–5): </label>
             <select id="degree">
@@ -300,7 +300,6 @@
         </div>
     </div>
     <script>
-        // (Your JavaScript: unchanged! Paste your existing code block here)
         const slidersDiv = document.getElementById("sliders");
         const degreeSelector = document.getElementById("degree");
         const plotDiv = document.getElementById("plot");
@@ -382,7 +381,8 @@
                 group.className = "slider-group";
 
                 const label = document.createElement("label");
-                label.innerHTML = `Coefficient of ${formatPower('x', i)}: `;
+                // --- THE ONLY CHANGE IS HERE: ---
+                label.innerHTML = i === 0 ? 'Constant term:' : `Coefficient of ${formatPower('x', i)}: `;
 
                 const input = document.createElement("input");
                 input.type = "range";
