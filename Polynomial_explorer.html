@@ -413,7 +413,7 @@
             updateGraph();
         }
 
-        // NEW: Helpers for root-based interval splitting
+        // Helpers for root-based interval splitting
         function getCoefficients() {
             return sliders.map(s => parseFloat(s.value)).reverse();
         }
@@ -436,6 +436,34 @@
                     .map(r => typeof r === "number" ? r : r.re)
                     .filter(x => x > -21 && x < 21); // inside analysis window
             } catch (e) { return []; }
+        }
+
+        // New: Robust interval splitting, always covers the line
+        function splitIntervalsByPoints(roots, testFunc, leadingCoef, degree) {
+            const intervals = [];
+            const points = [-Infinity, ...roots, Infinity];
+            for (let i = 0; i < points.length - 1; i++) {
+                let a = points[i], b = points[i + 1];
+                let mid;
+                if (!isFinite(a) && isFinite(b)) mid = b - 1;
+                else if (isFinite(a) && !isFinite(b)) mid = a + 1;
+                else if (!isFinite(a) && !isFinite(b)) mid = 0;
+                else mid = (a + b) / 2;
+                let sign;
+                try {
+                    sign = Math.sign(testFunc(mid));
+                    if (sign === 0) sign = Math.sign(testFunc(mid + 1e-4)) || Math.sign(testFunc(mid - 1e-4));
+                } catch (e) {
+                    if (!isFinite(mid)) {
+                        if (degree % 2 === 0) sign = Math.sign(leadingCoef);
+                        else sign = (mid === -Infinity ? -1 : 1) * Math.sign(leadingCoef);
+                    } else {
+                        sign = 0;
+                    }
+                }
+                intervals.push({ start: a, end: b, startType: 'open', endType: 'open', sign });
+            }
+            return intervals;
         }
 
         function getPolynomialExpr() {
@@ -466,6 +494,7 @@
             const displayExpr = formatExpressionForDisplay(rawExpr.replace(/\*/g, ''));
             const node = math.parse(rawExpr);
             const f = node.compile();
+
             if (currentDegree === 0 || rawExpr === "0") {
                 const x_vals_plot = math.range(-10, 10, 0.1).toArray();
                 const y_val = (rawExpr === "0") ? 0 : parseFloat(sliders[0].value);
@@ -541,91 +570,33 @@
                 yaxis: { title: 'f(x)', range: [yMin, yMax] }
             }, {responsive:true, animate: true});
 
-            // Behaviour interval splitting at all critical and inflection points
-            // (sorted, unique, within analysis window)
-            let allPoints = Array.from(
-                new Set([
-                    ...criticalPoints, ...inflectionCandidates
-                ])
-            ).filter(p => p >= x_analysis_min - epsilon && p <= x_analysis_max + epsilon)
-            .sort((a,b) => a-b);
-
-            // Always include endpoints for completeness
-            allPoints = [-Infinity, ...allPoints, Infinity];
-
-            // Function derivatives for behaviour testing
+            // Robust interval detection for monotonicity and concavity
             const df_node = math.derivative(node, 'x');
             const df = df_node.compile();
             const ddf_node = math.derivative(df_node, 'x');
             const ddf = ddf_node.compile();
-
-            // End behaviour signs for very large/small x
             const leadingCoef = coeffs[0];
-            const dLeadingCoef = dCoeffs[0];
-            const ddLeadingCoef = ddCoeffs[0];
+            const dLeadingCoef = dCoeffs[0] || 0;
+            const ddLeadingCoef = ddCoeffs[0] || 0;
 
-            // Helper: sign at far left/right
-            function getBehaviorSign(derivative, x, leading, deg) {
-                if (x === -Infinity || x < x_analysis_min - 1) {
-                    // use sign of leading coeff at -inf
-                    if (deg % 2 === 0) return Math.sign(leading);
-                    return -Math.sign(leading);
-                } else if (x === Infinity || x > x_analysis_max + 1) {
-                    return Math.sign(leading);
-                } else {
-                    try {
-                        return Math.sign(derivative.evaluate({x: x}));
-                    } catch (e) { return 0; }
-                }
-            }
+            // Increasing/decreasing intervals
+            const critPoints = Array.from(new Set(criticalPoints)).sort((a, b) => a - b);
+            const monotonicIntervals = splitIntervalsByPoints(critPoints, x => df.evaluate({ x }), dLeadingCoef, currentDegree - 1);
 
-            // Build intervals
-            const increasing = [];
-            const decreasing = [];
-            const constant = [];
-            const concaveUp = [];
-            const concaveDown = [];
+            // Concavity intervals
+            const inflectPoints = Array.from(new Set(inflectionCandidates)).sort((a, b) => a - b);
+            const concavityIntervals = splitIntervalsByPoints(inflectPoints, x => ddf.evaluate({ x }), ddLeadingCoef, currentDegree - 2);
+
+            const increasing = monotonicIntervals.filter(i => i.sign > 0);
+            const decreasing = monotonicIntervals.filter(i => i.sign < 0);
+            const constant = monotonicIntervals.filter(i => i.sign === 0);
+
+            const concaveUp = concavityIntervals.filter(i => i.sign > 0);
+            const concaveDown = concavityIntervals.filter(i => i.sign < 0);
+
+            // Inflection points: check sign change in f'' at each candidate
             const finalInflectionPoints = new Set();
-
-            for (let i = 0; i < allPoints.length-1; i++) {
-                let start = allPoints[i];
-                let end = allPoints[i+1];
-                if (start === end) continue;
-                let mid;
-                if (!isFinite(start) && isFinite(end)) mid = end - 1;
-                else if (isFinite(start) && !isFinite(end)) mid = start + 1;
-                else if (!isFinite(start) && !isFinite(end)) mid = 0;
-                else mid = (start + end) / 2;
-
-                // Check f'(x) and f''(x) at mid
-                const dy_sign = getBehaviorSign(df, mid, dLeadingCoef, currentDegree-1);
-                const ddy_sign = getBehaviorSign(ddf, mid, ddLeadingCoef, currentDegree-2);
-
-                let intervalObj = {
-                    start: start,
-                    end: end,
-                    startType: 'open',
-                    endType: 'open'
-                };
-
-                if (dy_sign > 0) {
-                    increasing.push(intervalObj);
-                } else if (dy_sign < 0) {
-                    decreasing.push(intervalObj);
-                } else {
-                    constant.push(intervalObj);
-                }
-
-                if (ddy_sign > 0) {
-                    concaveUp.push(intervalObj);
-                } else if (ddy_sign < 0) {
-                    concaveDown.push(intervalObj);
-                }
-            }
-
-            // Mark true inflection points (sign change in f'')
             for (let p of inflectionCandidates) {
-                // Evaluate left/right
                 const left = p - 1e-5;
                 const right = p + 1e-5;
                 const sign_left = Math.sign(ddf.evaluate({x:left}));
