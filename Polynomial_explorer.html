@@ -256,6 +256,25 @@
             font-weight: 700;
             color: var(--blue-dark);
         }
+        /* Badge overlay */
+        .rescale-badge {
+            position: absolute;
+            top: 28px;
+            right: 38px;
+            background: #1976d2;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1em;
+            box-shadow: 0 2px 8px #1976d265;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+            z-index: 20;
+            letter-spacing: 0.03em;
+            user-select: none;
+        }
         /* Responsive adjustments */
         @media (max-width: 950px) {
             .main-layout { flex-direction: column; gap: 1.4rem; }
@@ -270,6 +289,7 @@
             .info-panel { padding: 0.8em 0.5em 1em 0.5em; font-size: 0.99rem;}
             .slider-group label { min-width: unset; width: 100%; font-size: 1em; }
             select { width: 100%; min-width: unset;}
+            .rescale-badge { top: 10px; right: 10px; font-size: 0.9em; padding: 5px 10px;}
         }
     </style>
 </head>
@@ -290,8 +310,9 @@
             <div class="panel">
                 <div id="sliders" class="sliders"></div>
             </div>
-            <div class="panel">
+            <div class="panel" id="plot-panel" style="position:relative;">
                 <div id="plot"></div>
+                <div id="rescale-badge" class="rescale-badge">Y-axis rescaled</div>
             </div>
         </div>
         <div class="info-panel">
@@ -304,11 +325,21 @@
         const degreeSelector = document.getElementById("degree");
         const plotDiv = document.getElementById("plot");
         const propsDiv = document.getElementById("properties");
+        const rescaleBadge = document.getElementById("rescale-badge");
 
         let sliders = [];
 
         const varStr = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
         const epsilon = 1e-6; // Threshold for considering values close to zero
+
+        // Show badge overlay
+        function showRescaleBadge() {
+            rescaleBadge.style.opacity = '1';
+            clearTimeout(showRescaleBadge._timeout);
+            showRescaleBadge._timeout = setTimeout(() => {
+                rescaleBadge.style.opacity = '0';
+            }, 900);
+        }
 
         // Helper function to format powers as superscripts
         function formatPower(base, exponent) {
@@ -381,7 +412,7 @@
                 group.className = "slider-group";
 
                 const label = document.createElement("label");
-                // --- THE ONLY CHANGE IS HERE: ---
+                // Label for constant term
                 label.innerHTML = i === 0 ? 'Constant term:' : `Coefficient of ${formatPower('x', i)}: `;
 
                 const input = document.createElement("input");
@@ -451,7 +482,8 @@
                  const y_val = (rawExpr === "0") ? 0 : parseFloat(sliders[0].value);
                  const y_vals_plot = x_vals_plot.map(() => y_val);
 
-                 Plotly.newPlot(plotDiv, [{
+                 // Use fixed y-range for the zero/constant case
+                 Plotly.react(plotDiv, [{
                     x: x_vals_plot, y: y_vals_plot, mode: 'lines', name: 'f(x)',
                     line: { color: varStr('--blue') }
                  }], {
@@ -463,8 +495,8 @@
                     },
                     font: { family: varStr('--font-family'), color: '#222' },
                     xaxis: { title: 'x', range: [-10, 10] },
-                    yaxis: { title: 'f(x)' }
-                 });
+                    yaxis: { title: 'f(x)', range: [-10, 10] }
+                 }, {responsive:true, animate: true});
 
                  propsDiv.innerHTML = `
                     <strong>Function:</strong> f(x) = ${displayExpr}<br/><br/>
@@ -493,8 +525,30 @@
             const x_vals_plot = math.range(-10, 10, 0.1).toArray();
             const y_vals_plot = x_vals_plot.map(x => f.evaluate({x}));
 
+            // Determine y-axis range dynamically with sane clamping and visible changes
+            const minY = Math.min(...y_vals_plot);
+            const maxY = Math.max(...y_vals_plot);
 
-            Plotly.newPlot(plotDiv, [{
+            // Clamp the limits for sanity (e.g. between -1000, 1000)
+            let yMin = Math.max(minY, -1000);
+            let yMax = Math.min(maxY, 1000);
+
+            // Prevent very narrow y-range (flat lines)
+            if (Math.abs(yMax - yMin) < 1e-3) {
+                yMin -= 1;
+                yMax += 1;
+            }
+
+            // Detect y-limits change and show badge
+            if (typeof updateGraph.prevYMin !== 'undefined') {
+                if (Math.abs(updateGraph.prevYMin - yMin) > 0.2 || Math.abs(updateGraph.prevYMax - yMax) > 0.2) {
+                    showRescaleBadge();
+                }
+            }
+            updateGraph.prevYMin = yMin;
+            updateGraph.prevYMax = yMax;
+
+            Plotly.react(plotDiv, [{
                 x: x_vals_plot, y: y_vals_plot, mode: 'lines', name: 'f(x)',
                 line: { color: varStr('--blue') }
             }], {
@@ -506,8 +560,10 @@
                 },
                 font: { family: varStr('--font-family'), color: '#222' },
                 xaxis: { title: 'x', range: [-10, 10] },
-                yaxis: { title: 'f(x)' }
-            });
+                yaxis: { title: 'f(x)', range: [yMin, yMax] }
+            }, {responsive:true, animate: true});
+
+            // --- (the rest of your code is unchanged) ---
 
             const findRoots = (values, xCoords) => {
                 const roots = new Set();
@@ -655,7 +711,6 @@
                     }
                 }
             });
-
 
             propsDiv.innerHTML = `
                 <strong>Function:</strong> f(x) = ${displayExpr}<br/><br/>
