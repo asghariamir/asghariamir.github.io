@@ -34,16 +34,23 @@
             border-radius:14px;
             box-shadow:0 4px 16px #0000000d;
             padding:1.5rem 2rem;
+            /* Added for centering content blocks */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center items horizontally within the container */
         }
         h2{
             margin-top:0;
             color: var(--blue-dark);
+            text-align: center; /* Center the heading */
+            width: 100%; /* Ensure it takes full width for centering */
         }
         .main-layout{
             display:flex;
             flex-wrap:wrap;
             gap:2.4rem;
             align-items:flex-start;
+            width: 100%; /* Ensure main layout takes full width to be part of flex centering */
         }
         .panel{
             flex:1 1 500px;
@@ -62,17 +69,28 @@
         button:hover{filter:brightness(1.1)}
         button:active{transform:scale(0.97)}
         button:disabled{background:#ccc!important;cursor:not-allowed;filter:none}
-        select,input[type="range"] {
+        
+        /* General input styling for consistency */
+        input[type="range"], select {
             font-size:inherit;
             padding:0.3em 0.35em;
             border:1px solid #ccc;
             border-radius:4px;
             box-sizing:border-box;
-            -webkit-appearance: none; /* Remove default styling for range input */
+            outline: none; /* Remove outline on focus for aesthetics */
+            transition: border-color 0.15s;
+        }
+        input[type="range"]:focus, select:focus {
+            border-color: var(--blue-dark); /* Highlight on focus */
+        }
+
+        /* Specific styling for range input */
+        input[type="range"] {
+            -webkit-appearance: none;
             appearance: none;
             background: #f0f0f0; /* Track color */
-            outline: none;
             height: 8px; /* Height of the track */
+            flex-grow: 1; /* Allow slider to take available space */
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
@@ -84,6 +102,13 @@
             cursor: pointer;
             margin-top: -5px; /* Adjust thumb vertical position */
             box-shadow: 0 0 2px rgba(0,0,0,0.3);
+            transition: background 0.15s, transform 0.15s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--blue-dark);
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(0.95);
         }
         input[type="range"]::-moz-range-thumb {
             width: 18px;
@@ -92,19 +117,49 @@
             background: var(--blue);
             cursor: pointer;
             box-shadow: 0 0 2px rgba(0,0,0,0.3);
+            transition: background 0.15s, transform 0.15s;
         }
-        select { width: 100%; }
+        input[type="range"]::-moz-range-thumb:hover {
+            background: var(--blue-dark);
+        }
+        input[type="range"]::-moz-range-thumb:active {
+            transform: scale(0.95);
+        }
 
-        .controls { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .sliders { margin-top: 10px; }
+        /* Specific styling for select dropdown */
+        select {
+            width: 100%;
+            padding-right: 25px; /* Make space for custom arrow */
+            background-color: var(--surface);
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23222" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 5px center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            border-color: #ccc;
+        }
+        select:hover { border-color: var(--blue); }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            /* Center the controls block itself */
+            max-width: fit-content; /* Allow it to shrink to content size */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .sliders { margin-top: 10px; width: 100%; } /* Sliders panel should fill its space */
         .slider-group {
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .slider-group label { min-width: 150px; }
-        .slider-group input[type="range"] { flex-grow: 1; }
+        .slider-group label { min-width: 150px; text-align: left; } /* Ensure label text is left-aligned */
         .slider-group span { min-width: 30px; text-align: right; font-weight: bold; }
 
         .info-panel {
@@ -115,13 +170,14 @@
             border: 1px solid #e8eef8;
             font-size: 0.9rem;
             line-height: 1.6;
-            /* New positioning */
-            width: 100%; /* Take full width */
-            box-sizing: border-box; /* Include padding/border in width */
+            width: 100%;
+            box-sizing: border-box;
+            text-align: left; /* Keep text left-aligned for readability */
         }
         .info-panel h3 {
             margin-top: 0;
             color: var(--blue-dark);
+            text-align: center; /* Center the heading within the info panel */
         }
         .info-panel strong {
             font-weight: 600;
@@ -131,7 +187,6 @@
             .main-layout{flex-direction:column}
             .panel{flex-basis:auto;width:100%}
         }
-        /* Further adjustments for smaller screens if needed */
         @media(max-width:600px) {
             .container { padding: 1rem; margin: 10px auto; }
             .main-layout { gap: 1.5rem; }
@@ -152,7 +207,8 @@
                 <option value="1">1 (Linear)</option>
                 <option value="2">2 (Quadratic)</option>
                 <option value="3">3 (Cubic)</option>
-                <option value="4" selected>4 (Quartic)</option> <option value="5">5 (Quintic)</option>
+                <option value="4" selected>4 (Quartic)</option>
+                <option value="5">5 (Quintic)</option>
             </select>
         </div>
 
@@ -182,6 +238,25 @@
         const varStr = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
         const epsilon = 1e-6; // Threshold for considering values close to zero
 
+        // Helper function to format powers as superscripts
+        function formatPower(base, exponent) {
+            if (exponent === 0) return base; // Don't show x^0
+            if (exponent === 1) return base; // Don't show x^1
+            return `${base}<sup>${exponent}</sup>`;
+        }
+
+        // Helper function to format expressions with superscripts for display
+        function formatExpressionForDisplay(expr) {
+            // Replace 'x^N' with 'x<sup>N</sup>' for N >= 2
+            return expr.replace(/x\^(\d+)/g, (match, p1) => {
+                const exponent = parseInt(p1);
+                if (exponent === 0) return ''; // Remove x^0 terms as they become constants
+                if (exponent === 1) return 'x'; // x^1 is just x
+                return `x<sup>${exponent}</sup>`;
+            });
+        }
+
+
         // Reusable function for formatting intervals
         function formatIntervals(arr) {
             if (arr.length === 0) return 'None';
@@ -199,18 +274,13 @@
                     const currentEnd = current.end === Infinity ? Infinity : current.end;
                     const nextStart = next.start === -Infinity ? -Infinity : next.start;
 
-                    // Check for overlap or contiguity
-                    // If the next interval starts before or very close to the current one's end
                     if (nextStart <= currentEnd + epsilon) {
-                        // Merge by extending the current interval's end
                         current.end = Math.max(currentEnd, next.end === Infinity ? Infinity : next.end);
-                        // If the next interval's start type is 'open' and it's the same start point,
-                        // prefer 'open' for the combined interval
+                        current.endType = next.endType;
                         if (nextStart === current.start && next.startType === 'open') {
                              current.startType = 'open';
                         }
                     } else {
-                        // No overlap, push current and start new one
                         mergedIntervals.push(current);
                         current = { ...next };
                     }
@@ -224,7 +294,7 @@
                 const startVal = (i.start === -Infinity || i.start === '-Infinity') ? '−∞' : parseFloat(i.start).toFixed(2);
                 const endVal = (i.end === Infinity || i.end === '+Infinity') ? '+∞' : parseFloat(i.end).toFixed(2);
                 return `${openChar}${startVal}, ${endVal}${closeChar}`;
-            }).join(' \u222A '); // Union symbol
+            }).join(' \u222A ');
         }
 
         function createSliders(degree) {
@@ -236,16 +306,16 @@
                 group.className = "slider-group";
 
                 const label = document.createElement("label");
-                label.innerText = `Coefficient of x^${i}: `;
+                // Use formatPower for the label text
+                label.innerHTML = `Coefficient of ${formatPower('x', i)}: `;
 
                 const input = document.createElement("input");
                 input.type = "range";
                 input.min = -10;
                 input.max = 10;
                 input.step = 0.1;
-                // Set initial leading coefficient to 1, others to 0
                 input.value = (i === degree && degree !== 0) ? 1 : 0;
-                if (degree === 0) input.value = 1; // For constant function, default to 1
+                if (degree === 0) input.value = 1;
 
                 input.dataset.power = i;
 
@@ -272,7 +342,7 @@
                 let coef = parseFloat(s.value);
                 let pow = parseInt(s.dataset.power);
 
-                if (Math.abs(coef) < epsilon) return null; // Skip near-zero coefficients
+                if (Math.abs(coef) < epsilon) return null;
 
                 let termStr;
                 if (pow === 0) {
@@ -287,37 +357,35 @@
                     else termStr = `${coef}*x^${pow}`;
                 }
                 return termStr;
-            }).filter(Boolean); // Remove nulls (zero coefficient terms)
+            }).filter(Boolean);
 
-            // Join terms, replacing "+ -" with "-" for cleaner display
             return terms.length ? terms.join(" + ").replace(/\+ -/g, "- ") : "0";
         }
 
 
         function updateGraph() {
             const currentDegree = parseInt(degreeSelector.value);
-            const expr = getPolynomialExpr();
-            const node = math.parse(expr);
+            const rawExpr = getPolynomialExpr(); // Get expression for math.js parsing
+            const displayExpr = formatExpressionForDisplay(rawExpr.replace(/\*/g, '')); // Format for display
+
+            const node = math.parse(rawExpr);
             const f = node.compile();
 
             // Handle constant function (degree 0) explicitly
-            if (currentDegree === 0 || expr === "0") { // Check for "0" as well for all zero coefficients
+            if (currentDegree === 0 || rawExpr === "0") {
                  const x_vals_plot = math.range(-10, 10, 0.1).toArray();
-                 const y_val = (expr === "0") ? 0 : parseFloat(sliders[0].value); // Get coefficient for c_0 or 0
+                 const y_val = (rawExpr === "0") ? 0 : parseFloat(sliders[0].value);
                  const y_vals_plot = x_vals_plot.map(() => y_val);
 
                  Plotly.newPlot(plotDiv, [{
                     x: x_vals_plot, y: y_vals_plot, mode: 'lines', name: 'f(x)',
                     line: { color: varStr('--blue') }
                  }], {
-                    margin: { t: 50 }, // Increased top margin for title visibility
+                    margin: { t: 50 },
                     title: {
-                        text: `f(x) = ${expr.replace(/\*/g, '')}`,
-                        y: 0.95, // Adjust title vertical position
-                        x: 0.5,
-                        xanchor: 'center',
-                        yanchor: 'top',
-                        font: { size: 18 } // Make title slightly larger for visibility
+                        text: `f(x) = ${displayExpr}`, // Use formatted expression for title
+                        y: 0.95, x: 0.5, xanchor: 'center', yanchor: 'top',
+                        font: { size: 18, family: varStr('--font-family') }
                     },
                     font: { family: varStr('--font-family'), color: '#222' },
                     xaxis: { title: 'x', range: [-10, 10] },
@@ -325,7 +393,7 @@
                  });
 
                  propsDiv.innerHTML = `
-                    <strong>Function:</strong> f(x) = ${expr.replace(/\*/g, '')}<br/><br/>
+                    <strong>Function:</strong> f(x) = ${displayExpr}<br/><br/>
                     <strong>Increasing Intervals:</strong> None<br/>
                     <strong>Decreasing Intervals:</strong> None<br/>
                     <strong>Constant Intervals:</strong> [−∞, +∞]<br/>
@@ -343,14 +411,12 @@
             const ddf_node = math.derivative(df_node, 'x');
             const ddf = ddf_node.compile();
 
-            // Extended range for more robust critical/inflection point detection
             const x_analysis_min = -20;
             const x_analysis_max = 20;
-            const x_vals_full = math.range(x_analysis_min, x_analysis_max, 0.005).toArray(); // Finer step for precision
+            const x_vals_full = math.range(x_analysis_min, x_analysis_max, 0.005).toArray();
             const dy_vals_full = x_vals_full.map(x => df.evaluate({ x }));
             const ddy_vals_full = x_vals_full.map(x => ddf.evaluate({ x }));
 
-            // Filter x_vals for plotting to the visible range [-10, 10]
             const x_vals_plot = math.range(-10, 10, 0.1).toArray();
             const y_vals_plot = x_vals_plot.map(x => f.evaluate({x}));
 
@@ -359,21 +425,17 @@
                 x: x_vals_plot, y: y_vals_plot, mode: 'lines', name: 'f(x)',
                 line: { color: varStr('--blue') }
             }], {
-                margin: { t: 50 }, // Increased top margin for title visibility
+                margin: { t: 50 },
                 title: {
-                    text: `f(x) = ${expr.replace(/\*/g, '')}`,
-                    y: 0.95, // Adjust title vertical position
-                    x: 0.5,
-                    xanchor: 'center',
-                    yanchor: 'top',
-                    font: { size: 18 } // Make title slightly larger for visibility
+                    text: `f(x) = ${displayExpr}`, // Use formatted expression for title
+                    y: 0.95, x: 0.5, xanchor: 'center', yanchor: 'top',
+                    font: { size: 18, family: varStr('--font-family') }
                 },
                 font: { family: varStr('--font-family'), color: '#222' },
                 xaxis: { title: 'x', range: [-10, 10] },
                 yaxis: { title: 'f(x)' }
             });
 
-            // Helper to find roots by detecting sign changes
             const findRoots = (values, xCoords) => {
                 const roots = new Set();
                 for (let i = 0; i < values.length - 1; i++) {
@@ -382,15 +444,14 @@
                     const x1 = xCoords[i];
                     const x2 = xCoords[i+1];
 
-                    // Check for sign change or if segment is very close to zero
                     if ((y1 < -epsilon && y2 > epsilon) ||
                         (y1 > epsilon && y2 < -epsilon) ||
-                        (Math.abs(y1) < epsilon && Math.abs(y2) < epsilon)
+                        (Math.abs(y1) < epsilon && Math.abs(y2) < epsilon && x2 - x1 > epsilon) // Check for flat section too
                        ) {
-                        if (Math.abs(y2 - y1) > epsilon) { // If not flat, interpolate
+                        if (Math.abs(y2 - y1) > epsilon) {
                             const rootX = x1 - y1 * (x2 - x1) / (y2 - y1);
                             roots.add(rootX);
-                        } else { // If flat (near zero for both points), consider midpoint
+                        } else {
                             roots.add((x1 + x2) / 2);
                         }
                     }
@@ -401,43 +462,39 @@
             const criticalPoints = findRoots(dy_vals_full, x_vals_full);
             const inflectionCandidates = findRoots(ddy_vals_full, x_vals_full);
 
-            // Determine end behavior based on leading coefficients
             const leadingCoefNode = sliders.find(s => parseInt(s.dataset.power) === currentDegree);
             let leadingCoef_f = leadingCoefNode ? parseFloat(leadingCoefNode.value) : 0;
 
-            // f'(x) end behavior
             let fPrimeEndBehaviorSignAtPosInf = 0;
             let fPrimeEndBehaviorSignAtNegInf = 0;
             if (currentDegree > 0) {
                 const f_prime_leading_coef_val = currentDegree * leadingCoef_f;
                 if (Math.abs(f_prime_leading_coef_val) > epsilon) {
                     fPrimeEndBehaviorSignAtPosInf = Math.sign(f_prime_leading_coef_val);
-                    if ((currentDegree - 1) % 2 !== 0) { // If degree-1 is odd
+                    if ((currentDegree - 1) % 2 !== 0) {
                         fPrimeEndBehaviorSignAtNegInf = -fPrimeEndBehaviorSignAtPosInf;
-                    } else { // If degree-1 is even
+                    } else {
                         fPrimeEndBehaviorSignAtNegInf = fPrimeEndBehaviorSignAtPosInf;
                     }
                 }
             }
 
-            // f''(x) end behavior
             let fDoublePrimeEndBehaviorSignAtPosInf = 0;
             let fDoublePrimeEndBehaviorSignAtNegInf = 0;
             if (currentDegree > 1) {
                 const f_double_prime_leading_coef_val = currentDegree * (currentDegree - 1) * leadingCoef_f;
                 if (Math.abs(f_double_prime_leading_coef_val) > epsilon) {
                     fDoublePrimeEndBehaviorSignAtPosInf = Math.sign(f_double_prime_leading_coef_val);
-                    if ((currentDegree - 2) % 2 !== 0) { // If degree-2 is odd
+                    if ((currentDegree - 2) % 2 !== 0) {
                         fDoublePrimeEndBehaviorSignAtNegInf = -fDoublePrimeEndBehaviorSignAtPosInf;
-                    } else { // If degree-2 is even
+                    } else {
                         fDoublePrimeEndBehaviorSignAtNegInf = fDoublePrimeEndBehaviorSignAtPosInf;
                     }
                 }
             }
 
-
-            // Combine all unique critical and inflection points from analysis range
             const allAnalysisPoints = Array.from(new Set([...criticalPoints, ...inflectionCandidates]))
+                .filter(p => p >= x_analysis_min - epsilon && p <= x_analysis_max + epsilon)
                 .sort((a,b) => a-b);
 
             const increasing = [];
@@ -447,29 +504,30 @@
             const concaveDown = [];
             const finalInflectionPoints = new Set();
 
-
-            // Helper to get behavior sign at a test point
             const getBehaviorSign = (x, derivativeType) => {
-                if (x < x_analysis_min) { // Before analysis range
+                // Adjust test point if it falls exactly on a boundary or root
+                const adjustedX = x; // Math.abs(x) < epsilon ? 0 : x; // Can add specific handling for x=0 if needed
+
+                if (adjustedX < x_analysis_min - epsilon) {
                     return derivativeType === 'first' ? fPrimeEndBehaviorSignAtNegInf : fDoublePrimeEndBehaviorSignAtNegInf;
-                } else if (x > x_analysis_max) { // After analysis range
+                } else if (adjustedX > x_analysis_max + epsilon) {
                     return derivativeType === 'first' ? fPrimeEndBehaviorSignAtPosInf : fDoublePrimeEndBehaviorSignAtPosInf;
-                } else { // Within analysis range, evaluate numerically
+                } else {
                     try {
-                        if (derivativeType === 'first') return Math.sign(df.evaluate({ x }));
-                        if (derivativeType === 'second') return Math.sign(ddf.evaluate({ x }));
+                        if (derivativeType === 'first') return Math.sign(df.evaluate({ x: adjustedX }));
+                        if (derivativeType === 'second') return Math.sign(ddf.evaluate({ x: adjustedX }));
                     } catch (e) {
-                        return 0; // In case of math error
+                        return 0;
                     }
                 }
             };
 
-            // Analyze intervals
             let prevPoint = -Infinity;
-            const pointsToProcess = [...allAnalysisPoints, Infinity]; // Include infinity as the last boundary
+            const pointsToProcess = [...allAnalysisPoints, Infinity];
 
             for (const currentPoint of pointsToProcess) {
-                if (currentPoint <= prevPoint + epsilon && currentPoint !== Infinity) { // Skip duplicate or too-close points
+                // Skip if the current point is essentially the same as the previous point
+                if (currentPoint !== Infinity && Math.abs(currentPoint - prevPoint) < epsilon) {
                     continue;
                 }
 
@@ -477,13 +535,14 @@
                 const intervalEnd = currentPoint;
                 let testX;
 
-                // Pick a test point within the interval, or near the boundary for infinite intervals
                 if (intervalStart === -Infinity) {
-                    testX = currentPoint === Infinity ? 0 : currentPoint - 1; // if (.-inf,inf), test 0, else (.-inf,X) test X-1
-                    if (testX < x_analysis_min) testX = x_analysis_min - 1; // Ensure test point is outside if needed
+                    testX = (currentPoint === Infinity) ? 0 : currentPoint - 1;
+                    if (testX > -epsilon && testX < epsilon) testX = -1; // Avoid testX being 0 if it's the start of (-inf, 0)
+                    if (testX < x_analysis_min) testX = x_analysis_min - 1;
                 } else if (intervalEnd === Infinity) {
                     testX = intervalStart + 1;
-                    if (testX > x_analysis_max) testX = x_analysis_max + 1; // Ensure test point is outside if needed
+                    if (testX > -epsilon && testX < epsilon) testX = 1; // Avoid testX being 0 if it's the end of (0, inf)
+                    if (testX > x_analysis_max) testX = x_analysis_max + 1;
                 } else {
                     testX = (intervalStart + intervalEnd) / 2;
                 }
@@ -515,11 +574,9 @@
                 prevPoint = currentPoint;
             }
 
-            // Add precise inflection points - only those where ddy truly crosses zero
             inflectionCandidates.forEach(p => {
                 const y_dd_at_p = ddf.evaluate({x:p});
-                if (Math.abs(y_dd_at_p) < epsilon) { // Confirm it's actually a root
-                    // Check for a sign change around p
+                if (Math.abs(y_dd_at_p) < epsilon) {
                     const sign_left = getBehaviorSign(p - epsilon * 10, 'second');
                     const sign_right = getBehaviorSign(p + epsilon * 10, 'second');
                     if (sign_left !== sign_right && sign_left !== 0 && sign_right !== 0) {
@@ -530,7 +587,7 @@
 
 
             propsDiv.innerHTML = `
-                <strong>Function:</strong> f(x) = ${expr.replace(/\*/g, '')}<br/><br/>
+                <strong>Function:</strong> f(x) = ${displayExpr}<br/><br/>
                 <strong>Increasing Intervals:</strong> ${formatIntervals(increasing)}<br/>
                 <strong>Decreasing Intervals:</strong> ${formatIntervals(decreasing)}<br/>
                 <strong>Constant Intervals:</strong> ${formatIntervals(constant)}<br/>
@@ -546,7 +603,7 @@
             createSliders(parseInt(degreeSelector.value));
         });
 
-        degreeSelector.value = "4"; // Set default degree to 4 as in the screenshot
+        degreeSelector.value = "4";
         createSliders(parseInt(degreeSelector.value));
     </script>
 </body>
