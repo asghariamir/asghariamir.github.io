@@ -81,6 +81,7 @@
         .panel:hover {
             box-shadow: 0 8px 36px #1565c025;
         }
+        /* Controls */
         .controls {
             display: flex;
             align-items: center;
@@ -97,6 +98,7 @@
             letter-spacing: 0.01em;
             margin-right: 0.4em;
         }
+        /* Slider Section */
         .sliders {
             margin-top: 10px;
             width: 100%;
@@ -122,6 +124,7 @@
             font-size: 1.12em;
             padding-left: 0.2em;
         }
+        /* Range input - Material look */
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
@@ -168,9 +171,11 @@
             background: linear-gradient(120deg, var(--blue-dark) 60%, var(--blue) 100%);
             transform: scale(1.04);
         }
+        /* Remove outline for Firefox */
         input[type="range"]:focus {
             outline: none;
         }
+        /* Select */
         select {
             width: 110px;
             padding: 0.4em 1.7em 0.4em 0.7em;
@@ -192,6 +197,7 @@
             border-color: var(--blue-dark);
             outline: none;
         }
+        /* Button */
         button {
             cursor: pointer;
             border: none;
@@ -207,6 +213,7 @@
         button:hover { filter: brightness(1.1); box-shadow: 0 4px 18px #1976d235;}
         button:active { transform: scale(0.96); }
         button:disabled { background: #ccc !important; cursor: not-allowed; filter: none; }
+        /* Plot area */
         #plot {
             width: 100%;
             min-height: 350px;
@@ -217,6 +224,7 @@
             margin-bottom: 0.2em;
             padding: 0.2em;
         }
+        /* Info panel */
         .info-panel {
             margin-top: 22px;
             background: linear-gradient(100deg, #eaf3fd 65%, #f8fafc 100%);
@@ -248,6 +256,7 @@
             font-weight: 700;
             color: var(--blue-dark);
         }
+        /* Badge overlay */
         .rescale-badge {
             position: absolute;
             top: 28px;
@@ -266,6 +275,7 @@
             letter-spacing: 0.03em;
             user-select: none;
         }
+        /* Responsive adjustments */
         @media (max-width: 950px) {
             .main-layout { flex-direction: column; gap: 1.4rem; }
             .panel { flex-basis: auto; min-width: unset; width: 100%; }
@@ -287,12 +297,13 @@
     <div class="container">
         <h2>Interactive Polynomial Explorer</h2>
         <div class="controls">
-            <label for="degree">Select polynomial degree (1–4): </label>
+            <label for="degree">Select polynomial degree (1–5): </label>
             <select id="degree">
                 <option value="1">1 (Linear)</option>
                 <option value="2">2 (Quadratic)</option>
                 <option value="3">3 (Cubic)</option>
                 <option value="4" selected>4 (Quartic)</option>
+                <option value="5">5 (Quintic)</option>
             </select>
         </div>
         <div class="main-layout">
@@ -319,8 +330,9 @@
         let sliders = [];
 
         const varStr = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-        const epsilon = 1e-6;
+        const epsilon = 1e-6; // Threshold for considering values close to zero
 
+        // Show badge overlay
         function showRescaleBadge() {
             rescaleBadge.style.opacity = '1';
             clearTimeout(showRescaleBadge._timeout);
@@ -329,12 +341,14 @@
             }, 900);
         }
 
+        // Helper function to format powers as superscripts
         function formatPower(base, exponent) {
             if (exponent === 0) return base;
             if (exponent === 1) return base;
             return `${base}<sup>${exponent}</sup>`;
         }
 
+        // Helper function to format expressions with superscripts for display
         function formatExpressionForDisplay(expr) {
             return expr.replace(/x\^(\d+)/g, (match, p1) => {
                 const exponent = parseInt(p1);
@@ -344,6 +358,7 @@
             });
         }
 
+        // Reusable function for formatting intervals
         function formatIntervals(arr) {
             if (arr.length === 0) return 'None';
             arr.sort((a, b) => {
@@ -351,6 +366,7 @@
                 const startB = b.start === -Infinity ? -Infinity : b.start;
                 return startA - startB;
             });
+
             const mergedIntervals = [];
             if (arr.length > 0) {
                 let current = { ...arr[0] };
@@ -358,11 +374,12 @@
                     const next = arr[i];
                     const currentEnd = current.end === Infinity ? Infinity : current.end;
                     const nextStart = next.start === -Infinity ? -Infinity : next.start;
+
                     if (nextStart <= currentEnd + epsilon) {
                         current.end = Math.max(currentEnd, next.end === Infinity ? Infinity : next.end);
                         current.endType = next.endType;
                         if (nextStart === current.start && next.startType === 'open') {
-                            current.startType = 'open';
+                             current.startType = 'open';
                         }
                     } else {
                         mergedIntervals.push(current);
@@ -371,13 +388,17 @@
                 }
                 mergedIntervals.push(current);
             }
+
             return mergedIntervals.map(i => {
                 const openChar = i.startType === 'open' ? '(' : '[';
                 const closeChar = i.endType === 'open' ? ')' : ']';
                 let startVal = (i.start === -Infinity || i.start === '-Infinity') ? '−∞' : parseFloat(i.start).toFixed(2);
                 let endVal = (i.end === Infinity || i.end === '+Infinity') ? '+∞' : parseFloat(i.end).toFixed(2);
+
+                // Fix for -0
                 if (parseFloat(startVal) === 0) startVal = '0';
                 if (parseFloat(endVal) === 0) endVal = '0';
+
                 return `${openChar}${startVal}, ${endVal}${closeChar}`;
             }).join(' \u222A ');
         }
@@ -385,11 +406,15 @@
         function createSliders(degree) {
             slidersDiv.innerHTML = "";
             sliders = [];
+
             for (let i = degree; i >= 0; i--) {
                 const group = document.createElement("div");
                 group.className = "slider-group";
+
                 const label = document.createElement("label");
-                label.innerHTML = i === 0 ? 'Constant term:' : `Coefficient of ${formatPower('x', i)}: `;
+                // Label for constant term
+                label.innerHTML = i === 0 ? 'Constant term:' : `Coefficient of ${formatPower('x', i)}:`;
+
                 const input = document.createElement("input");
                 input.type = "range";
                 input.min = -10;
@@ -397,86 +422,40 @@
                 input.step = 0.1;
                 input.value = (i === degree && degree !== 0) ? 1 : 0;
                 if (degree === 0) input.value = 1;
+
                 input.dataset.power = i;
+
                 const span = document.createElement("span");
                 span.innerText = input.value;
+
                 input.oninput = () => {
                     span.innerText = input.value;
                     updateGraph();
                 };
+
                 group.appendChild(label);
                 group.appendChild(input);
                 group.appendChild(span);
                 slidersDiv.appendChild(group);
+
                 sliders.push(input);
             }
             updateGraph();
-        }
-
-        // Helpers for root-based interval splitting
-        function getCoefficients() {
-            return sliders.map(s => parseFloat(s.value)).reverse();
-        }
-        function getDerivativeCoefficients(coeffs, order = 1) {
-            let current = coeffs.slice();
-            for (let k = 0; k < order; k++) {
-                const next = [];
-                for (let i = 0; i < current.length - 1; i++) {
-                    next.push(current[i] * (current.length - i - 1));
-                }
-                current = next;
-            }
-            return current;
-        }
-        function getRealRoots(coeffs) {
-            try {
-                let roots = math.roots(coeffs);
-                return roots
-                    .filter(r => Math.abs(r.im || 0) < 1e-6)
-                    .map(r => typeof r === "number" ? r : r.re)
-                    .filter(x => x > -21 && x < 21); // inside analysis window
-            } catch (e) { return []; }
-        }
-
-        // New: Robust interval splitting, always covers the line
-        function splitIntervalsByPoints(roots, testFunc, leadingCoef, degree) {
-            const intervals = [];
-            const points = [-Infinity, ...roots, Infinity];
-            for (let i = 0; i < points.length - 1; i++) {
-                let a = points[i], b = points[i + 1];
-                let mid;
-                if (!isFinite(a) && isFinite(b)) mid = b - 1;
-                else if (isFinite(a) && !isFinite(b)) mid = a + 1;
-                else if (!isFinite(a) && !isFinite(b)) mid = 0;
-                else mid = (a + b) / 2;
-                let sign;
-                try {
-                    sign = Math.sign(testFunc(mid));
-                    if (sign === 0) sign = Math.sign(testFunc(mid + 1e-4)) || Math.sign(testFunc(mid - 1e-4));
-                } catch (e) {
-                    if (!isFinite(mid)) {
-                        if (degree % 2 === 0) sign = Math.sign(leadingCoef);
-                        else sign = (mid === -Infinity ? -1 : 1) * Math.sign(leadingCoef);
-                    } else {
-                        sign = 0;
-                    }
-                }
-                intervals.push({ start: a, end: b, startType: 'open', endType: 'open', sign });
-            }
-            return intervals;
         }
 
         function getPolynomialExpr() {
             let terms = sliders.map(s => {
                 let coef = parseFloat(s.value);
                 let pow = parseInt(s.dataset.power);
+
                 if (Math.abs(coef) < epsilon) return null;
+
                 let termStr;
                 if (pow === 0) {
                     termStr = `${coef}`;
                 } else if (pow === 1) {
-                    if (coef === 1) termStr = `x`;
-                    else if (coef === -1) termStr = `-x`;
+                    if (coef === 1) termStr = 'x';
+                    else if (coef === -1) termStr = '-x';
                     else termStr = `${coef}*x`;
                 } else {
                     if (coef === 1) termStr = `x^${pow}`;
@@ -485,24 +464,66 @@
                 }
                 return termStr;
             }).filter(Boolean);
+
             return terms.length ? terms.join(" + ").replace(/\+ -/g, "- ") : "0";
+        }
+
+        /**
+         * Bisection method for finding roots of a function.
+         * @param {math.EvalFunction} func The compiled math.js function (e.g., df, ddf).
+         * @param {number} a The left endpoint of the interval.
+         * @param {number} b The right endpoint of the interval.
+         * @param {number} tolerance The desired accuracy for the root.
+         * @param {number} maxIterations Maximum number of iterations.
+         * @returns {Array<number>} An array containing the found root, or empty if no sign change.
+         */
+        function bisectionMethod(func, a, b, tolerance = 1e-9, maxIterations = 100) {
+            let fa = func.evaluate({ x: a });
+            let fb = func.evaluate({ x: b });
+
+            // Check if a root is even likely in the interval (must have a sign change)
+            if (fa * fb > 0 && Math.abs(fa) > tolerance && Math.abs(fb) > tolerance) {
+                return []; // No sign change, or both ends are zero/very close to zero with no real change
+            }
+
+            let c;
+            for (let i = 0; i < maxIterations; i++) {
+                c = (a + b) / 2;
+                let fc = func.evaluate({ x: c });
+
+                if (Math.abs(fc) < tolerance || (b - a) / 2 < tolerance) {
+                    return [c]; // Found a root within tolerance
+                }
+
+                if (fa * fc < 0) {
+                    b = c;
+                    fb = fc;
+                } else {
+                    a = c;
+                    fa = fc;
+                }
+            }
+            return [c]; // Return the best approximation after max iterations
         }
 
         function updateGraph() {
             const currentDegree = parseInt(degreeSelector.value);
             const rawExpr = getPolynomialExpr();
             const displayExpr = formatExpressionForDisplay(rawExpr.replace(/\*/g, ''));
+
             const node = math.parse(rawExpr);
             const f = node.compile();
 
             if (currentDegree === 0 || rawExpr === "0") {
-                const x_vals_plot = math.range(-10, 10, 0.1).toArray();
-                const y_val = (rawExpr === "0") ? 0 : parseFloat(sliders[0].value);
-                const y_vals_plot = x_vals_plot.map(() => y_val);
-                Plotly.react(plotDiv, [{
+                 const x_vals_plot = math.range(-10, 10, 0.1).toArray();
+                 const y_val = (rawExpr === "0") ? 0 : parseFloat(sliders[0].value);
+                 const y_vals_plot = x_vals_plot.map(() => y_val);
+
+                 // Use fixed y-range for the zero/constant case
+                 Plotly.react(plotDiv, [{
                     x: x_vals_plot, y: y_vals_plot, mode: 'lines', name: 'f(x)',
                     line: { color: varStr('--blue') }
-                }], {
+                 }], {
                     margin: { t: 50 },
                     title: {
                         text: `f(x) = ${displayExpr}`,
@@ -512,8 +533,9 @@
                     font: { family: varStr('--font-family'), color: '#222' },
                     xaxis: { title: 'x', range: [-10, 10] },
                     yaxis: { title: 'f(x)', range: [-10, 10] }
-                }, {responsive:true, animate: true});
-                propsDiv.innerHTML = `
+                 }, {responsive:true, animate: true});
+
+                 propsDiv.innerHTML = `
                     <strong>Function:</strong> f(x) = ${displayExpr}<br/><br/>
                     <strong>Increasing Intervals:</strong> None<br/>
                     <strong>Decreasing Intervals:</strong> None<br/>
@@ -523,30 +545,39 @@
                     <strong>Concave Down:</strong> None<br/>
                     <strong>Inflection Points:</strong> None
                  `;
-                return;
+                 return;
             }
-            // math.js-based root finding for critical points and inflection points
-            const coeffs = getCoefficients();
-            const dCoeffs = getDerivativeCoefficients(coeffs, 1);
-            const ddCoeffs = getDerivativeCoefficients(coeffs, 2);
-            const criticalPoints = getRealRoots(dCoeffs);
-            const inflectionCandidates = getRealRoots(ddCoeffs);
 
-            // For plotting and for behaviour checks
+            const df_node = math.derivative(node, 'x');
+            const df = df_node.compile();
+            const ddf_node = math.derivative(df_node, 'x');
+            const ddf = ddf_node.compile();
+
             const x_analysis_min = -20;
             const x_analysis_max = 20;
+            // Increased density for initial scan to improve bisection interval finding
+            const x_vals_full = math.range(x_analysis_min, x_analysis_max, 0.001).toArray();
+            const dy_vals_full = x_vals_full.map(x => df.evaluate({ x }));
+            const ddy_vals_full = x_vals_full.map(x => ddf.evaluate({ x }));
+
             const x_vals_plot = math.range(-10, 10, 0.1).toArray();
             const y_vals_plot = x_vals_plot.map(x => f.evaluate({x}));
 
-            // y-scaling
+            // Determine y-axis range dynamically with sane clamping and visible changes
             const minY = Math.min(...y_vals_plot);
             const maxY = Math.max(...y_vals_plot);
+
+            // Clamp the limits for sanity (e.g. between -1000, 1000)
             let yMin = Math.max(minY, -1000);
             let yMax = Math.min(maxY, 1000);
+
+            // Prevent very narrow y-range (flat lines)
             if (Math.abs(yMax - yMin) < 1e-3) {
                 yMin -= 1;
                 yMax += 1;
             }
+
+            // Detect y-limits change and show badge
             if (typeof updateGraph.prevYMin !== 'undefined') {
                 if (Math.abs(updateGraph.prevYMin - yMin) > 0.2 || Math.abs(updateGraph.prevYMax - yMax) > 0.2) {
                     showRescaleBadge();
@@ -570,41 +601,156 @@
                 yaxis: { title: 'f(x)', range: [yMin, yMax] }
             }, {responsive:true, animate: true});
 
-            // Robust interval detection for monotonicity and concavity
-            const df_node = math.derivative(node, 'x');
-            const df = df_node.compile();
-            const ddf_node = math.derivative(df_node, 'x');
-            const ddf = ddf_node.compile();
-            const leadingCoef = coeffs[0];
-            const dLeadingCoef = dCoeffs[0] || 0;
-            const ddLeadingCoef = ddCoeffs[0] || 0;
+            const findRoots = (func, xCoords) => {
+                const roots = new Set();
+                const bisectionTolerance = 1e-8; // A tighter tolerance for bisection
 
-            // Increasing/decreasing intervals
-            const critPoints = Array.from(new Set(criticalPoints)).sort((a, b) => a - b);
-            const monotonicIntervals = splitIntervalsByPoints(critPoints, x => df.evaluate({ x }), dLeadingCoef, currentDegree - 1);
+                for (let i = 0; i < xCoords.length - 1; i++) {
+                    const x1 = xCoords[i];
+                    const x2 = xCoords[i+1];
+                    const y1 = func.evaluate({ x: x1 });
+                    const y2 = func.evaluate({ x: x2 });
 
-            // Concavity intervals
-            const inflectPoints = Array.from(new Set(inflectionCandidates)).sort((a, b) => a - b);
-            const concavityIntervals = splitIntervalsByPoints(inflectPoints, x => ddf.evaluate({ x }), ddLeadingCoef, currentDegree - 2);
+                    if ((y1 < -epsilon && y2 > epsilon) || (y1 > epsilon && y2 < -epsilon)) {
+                        // Sign change detected, refine with bisection
+                        const foundRoot = bisectionMethod(func, x1, x2, bisectionTolerance);
+                        foundRoot.forEach(root => roots.add(root));
+                    } else if (Math.abs(y1) < epsilon) {
+                        // Point itself is very close to a root
+                        roots.add(x1);
+                    }
+                }
+                // Check the last point in the sampled range
+                if (Math.abs(func.evaluate({ x: xCoords[xCoords.length - 1] })) < epsilon) {
+                    roots.add(xCoords[xCoords.length - 1]);
+                }
 
-            const increasing = monotonicIntervals.filter(i => i.sign > 0);
-            const decreasing = monotonicIntervals.filter(i => i.sign < 0);
-            const constant = monotonicIntervals.filter(i => i.sign === 0);
+                return Array.from(roots).sort((a,b) => a-b);
+            };
 
-            const concaveUp = concavityIntervals.filter(i => i.sign > 0);
-            const concaveDown = concavityIntervals.filter(i => i.sign < 0);
+            const criticalPoints = findRoots(df_node, x_vals_full);
+            const inflectionCandidates = findRoots(ddf_node, x_vals_full);
 
-            // Inflection points: check sign change in f'' at each candidate
-            const finalInflectionPoints = new Set();
-            for (let p of inflectionCandidates) {
-                const left = p - 1e-5;
-                const right = p + 1e-5;
-                const sign_left = Math.sign(ddf.evaluate({x:left}));
-                const sign_right = Math.sign(ddf.evaluate({x:right}));
-                if (sign_left !== sign_right && sign_left !== 0 && sign_right !== 0) {
-                    finalInflectionPoints.add(Number(p).toFixed(4));
+            const leadingCoefNode = sliders.find(s => parseInt(s.dataset.power) === currentDegree);
+            let leadingCoef_f = leadingCoefNode ? parseFloat(leadingCoefNode.value) : 0;
+
+            let fPrimeEndBehaviorSignAtPosInf = 0;
+            let fPrimeEndBehaviorSignAtNegInf = 0;
+            if (currentDegree > 0) {
+                const f_prime_leading_coef_val = currentDegree * leadingCoef_f;
+                if (Math.abs(f_prime_leading_coef_val) > epsilon) {
+                    fPrimeEndBehaviorSignAtPosInf = Math.sign(f_prime_leading_coef_val);
+                    if ((currentDegree - 1) % 2 !== 0) {
+                        fPrimeEndBehaviorSignAtNegInf = -fPrimeEndBehaviorSignAtPosInf;
+                    } else {
+                        fPrimeEndBehaviorSignAtNegInf = fPrimeEndBehaviorSignAtPosInf;
+                    }
                 }
             }
+
+            let fDoublePrimeEndBehaviorSignAtPosInf = 0;
+            let fDoublePrimeEndBehaviorSignAtNegInf = 0;
+            if (currentDegree > 1) {
+                const f_double_prime_leading_coef_val = currentDegree * (currentDegree - 1) * leadingCoef_f;
+                if (Math.abs(f_double_prime_leading_coef_val) > epsilon) {
+                    fDoublePrimeEndBehaviorSignAtPosInf = Math.sign(f_double_prime_leading_coef_val);
+                    if ((currentDegree - 2) % 2 !== 0) {
+                        fDoublePrimeEndBehaviorSignAtNegInf = -fDoublePrimeEndBehaviorSignAtPosInf;
+                    } else {
+                        fDoublePrimeEndBehaviorSignAtNegInf = fDoublePrimeEndBehaviorSignAtPosInf;
+                    }
+                }
+            }
+
+            const allAnalysisPoints = Array.from(new Set([...criticalPoints, ...inflectionCandidates]))
+                .filter(p => p >= x_analysis_min - epsilon && p <= x_analysis_max + epsilon)
+                .sort((a,b) => a-b);
+
+            const increasing = [];
+            const decreasing = [];
+            const constant = [];
+            const concaveUp = [];
+            const concaveDown = [];
+            const finalInflectionPoints = new Set();
+
+            const getBehaviorSign = (x, derivativeType) => {
+                const adjustedX = x;
+
+                if (adjustedX < x_analysis_min - epsilon) {
+                    return derivativeType === 'first' ? fPrimeEndBehaviorSignAtNegInf : fDoublePrimeEndBehaviorSignAtNegInf;
+                } else if (adjustedX > x_analysis_max + epsilon) {
+                    return derivativeType === 'first' ? fPrimeEndBehaviorSignAtPosInf : fDoublePrimeEndBehaviorSignAtPosInf;
+                } else {
+                    try {
+                        if (derivativeType === 'first') return Math.sign(df.evaluate({ x: adjustedX }));
+                        if (derivativeType === 'second') return Math.sign(ddf.evaluate({ x: adjustedX }));
+                    } catch (e) {
+                        return 0;
+                    }
+                }
+            };
+
+            let prevPoint = -Infinity;
+            const pointsToProcess = [...allAnalysisPoints, Infinity];
+
+            for (const currentPoint of pointsToProcess) {
+                if (currentPoint !== Infinity && Math.abs(currentPoint - prevPoint) < epsilon) {
+                    continue;
+                }
+
+                const intervalStart = prevPoint;
+                const intervalEnd = currentPoint;
+                let testX;
+
+                if (intervalStart === -Infinity) {
+                    testX = (currentPoint === Infinity) ? 0 : currentPoint - 1;
+                    if (testX > -epsilon && testX < epsilon) testX = -1;
+                    if (testX < x_analysis_min) testX = x_analysis_min - 1;
+                } else if (intervalEnd === Infinity) {
+                    testX = intervalStart + 1;
+                    if (testX > -epsilon && testX < epsilon) testX = 1;
+                    if (testX > x_analysis_max) testX = x_analysis_max + 1;
+                } else {
+                    testX = (intervalStart + intervalEnd) / 2;
+                }
+
+                const dy_sign = getBehaviorSign(testX, 'first');
+                const ddy_sign = getBehaviorSign(testX, 'second');
+
+                const intervalObj = {
+                    start: intervalStart,
+                    end: intervalEnd,
+                    startType: 'open',
+                    endType: 'open'
+                };
+
+                if (dy_sign > 0) {
+                    increasing.push(intervalObj);
+                } else if (dy_sign < 0) {
+                    decreasing.push(intervalObj);
+                } else {
+                    constant.push(intervalObj);
+                }
+
+                if (ddy_sign > 0) {
+                    concaveUp.push(intervalObj);
+                } else if (ddy_sign < 0) {
+                    concaveDown.push(intervalObj);
+                }
+
+                prevPoint = currentPoint;
+            }
+
+            inflectionCandidates.forEach(p => {
+                const y_dd_at_p = ddf.evaluate({x:p});
+                if (Math.abs(y_dd_at_p) < epsilon) {
+                    const sign_left = getBehaviorSign(p - epsilon * 10, 'second');
+                    const sign_right = getBehaviorSign(p + epsilon * 10, 'second');
+                    if (sign_left !== sign_right && sign_left !== 0 && sign_right !== 0) {
+                        finalInflectionPoints.add(p.toFixed(2));
+                    }
+                }
+            });
 
             propsDiv.innerHTML = `
                 <strong>Function:</strong> f(x) = ${displayExpr}<br/><br/>
@@ -618,9 +764,11 @@
             `;
         }
 
+        // Initialize
         degreeSelector.addEventListener("change", () => {
             createSliders(parseInt(degreeSelector.value));
         });
+
         degreeSelector.value = "4";
         createSliders(parseInt(degreeSelector.value));
     </script>
