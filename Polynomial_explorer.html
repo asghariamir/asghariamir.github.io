@@ -1,151 +1,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Interactive Polynomial Explorer</title>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 1000px; margin: auto; }
-    .controls { margin-bottom: 20px; }
-    .sliders { margin-top: 10px; }
-    .slider-group { margin-bottom: 10px; }
-    .info-panel { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px; }
-  </style>
+    <meta charset="UTF-8" />
+    <title>Interactive Polynomial Explorer – Smart Analysis</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <style>
+        /* Reusing styles from the first app */
+        :root{
+            --blue:#1565c0;
+            --blue-dark:#0d47a1;
+            --green:#43a047;
+            --orange:#e65100;
+            --grey:#bdbdbd;
+            --red:#d32f2f;
+            --surface:#fff;
+            --surface-alt:#f4f4fa;
+        }
+        html,body{
+            margin:0;
+            padding:0;
+            height:100%;
+            font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
+            background:var(--surface-alt);
+            color:#222;
+        }
+        .container{
+            max-width:1120px;
+            margin:20px auto;
+            background:var(--surface);
+            border-radius:14px;
+            box-shadow:0 4px 16px #0000000d;
+            padding:1.5rem 2rem;
+        }
+        h2{
+            margin-top:0;
+            color: var(--blue-dark); /* Using the dark blue for headings */
+        }
+        .main-layout{
+            display:flex;
+            flex-wrap:wrap;
+            gap:2.4rem;
+            align-items:flex-start;
+        }
+        .panel{
+            flex:1 1 500px;
+            min-width:320px;
+        }
+        button{
+            cursor:pointer;
+            border:none;
+            border-radius:6px;
+            font-size:1em;
+            padding:0.5em 1em;
+            transition:filter .15s,transform .15s;
+            background:var(--blue); /* Default button color */
+            color:#fff;
+        }
+        button:hover{filter:brightness(1.1)}
+        button:active{transform:scale(0.97)}
+        button:disabled{background:#ccc!important;cursor:not-allowed;filter:none}
+        select,input[type="range"] { /* Applied style to range input */
+            font-size:inherit;
+            padding:0.3em 0.35em;
+            border:1px solid #ccc;
+            border-radius:4px;
+            box-sizing:border-box;
+        }
+        select { width: 100%; } /* Ensure selects take full width */
+
+        .controls { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .sliders { margin-top: 10px; }
+        .slider-group {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .slider-group label { min-width: 150px; } /* Align labels */
+        .slider-group input[type="range"] { flex-grow: 1; } /* Allow slider to take available space */
+        .slider-group span { min-width: 30px; text-align: right; font-weight: bold; }
+
+        .info-panel {
+            margin-top: 20px;
+            background: var(--surface-alt); /* Lighter background for info panel */
+            padding: 1.2em;
+            border-radius: 8px;
+            border: 1px solid #e8eef8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .info-panel h3 {
+            margin-top: 0;
+            color: var(--blue-dark);
+        }
+        .info-panel strong {
+            font-weight: 600;
+            color: #333;
+        }
+        /* Media query from first app for responsiveness */
+        @media(max-width:900px){.main-layout{flex-direction:column} .panel,.canvas-wrapper{flex-basis:auto;width:100%}}
+    </style>
 </head>
 <body>
 
-  <h2>🧮 Interactive Polynomial Explorer</h2>
+    <div class="container">
+        <h2>🧮 Interactive Polynomial Explorer</h2>
 
-  <div class="controls">
-    <label for="degree">Select polynomial degree (1–5): </label>
-    <select id="degree">
-      <option value="1">1 (Linear)</option>
-      <option value="2">2 (Quadratic)</option>
-      <option value="3">3 (Cubic)</option>
-      <option value="4">4 (Quartic)</option>
-      <option value="5">5 (Quintic)</option>
-    </select>
-  </div>
+        <div class="controls">
+            <label for="degree">Select polynomial degree (1–5): </label>
+            <select id="degree">
+                <option value="1">1 (Linear)</option>
+                <option value="2">2 (Quadratic)</option>
+                <option value="3" selected>3 (Cubic)</option>
+                <option value="4">4 (Quartic)</option>
+                <option value="5">5 (Quintic)</option>
+            </select>
+        </div>
 
-  <div id="sliders" class="sliders"></div>
+        <div class="main-layout">
+            <div class="panel">
+                <div id="sliders" class="sliders"></div>
+            </div>
+            <div class="panel">
+                <div id="plot" style="width: 100%; height: 400px;"></div>
+                <div class="info-panel">
+                    <h3>📊 Polynomial Properties</h3>
+                    <div id="properties">Add coefficients to begin analysis.</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <div id="plot" style="width: 100%; height: 400px;"></div>
+    <script>
+        const slidersDiv = document.getElementById("sliders");
+        const degreeSelector = document.getElementById("degree");
+        const plotDiv = document.getElementById("plot");
+        const propsDiv = document.getElementById("properties");
 
-  <div class="info-panel">
-    <h3>📊 Polynomial Properties</h3>
-    <div id="properties"></div>
-  </div>
+        let sliders = [];
 
-  <script>
-    const slidersDiv = document.getElementById("sliders");
-    const degreeSelector = document.getElementById("degree");
-    const plotDiv = document.getElementById("plot");
-    const propsDiv = document.getElementById("properties");
+        // Helper to get CSS variables
+        const varStr = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
-    let sliders = [];
-    let coeffs = [];
+        // --- Reusable function for formatting intervals ---
+        function formatIntervals(arr) {
+            if (arr.length === 0) return 'None';
+            // Sort intervals by start point for consistent display
+            arr.sort((a, b) => a.start - b.start);
 
-    function createSliders(degree) {
-      slidersDiv.innerHTML = "";
-      sliders = [];
-      coeffs = [];
+            // Merge overlapping or contiguous intervals
+            const mergedIntervals = [];
+            if (arr.length > 0) {
+                let current = { ...arr[0] };
+                for (let i = 1; i < arr.length; i++) {
+                    const next = arr[i];
+                    // Check for overlap or contiguity (allowing small epsilon for floating point)
+                    if (next.start - current.end <= 0.1 || // Consider them contiguous if close enough
+                        (next.start <= current.end && next.startType === 'closed' && current.endType === 'closed') // Exact overlap
+                       ) {
+                        current.end = Math.max(current.end, next.end);
+                        current.endType = next.endType; // Take the "widest" type if overlapping
+                    } else {
+                        mergedIntervals.push(current);
+                        current = { ...next };
+                    }
+                }
+                mergedIntervals.push(current);
+            }
 
-      for (let i = degree; i >= 0; i--) {
-        const group = document.createElement("div");
-        group.className = "slider-group";
-        const label = document.createElement("label");
-        label.innerText = `Coefficient of x^${i}: `;
-        const input = document.createElement("input");
-        input.type = "range";
-        input.min = -10;
-        input.max = 10;
-        input.step = 0.1;
-        input.value = i === degree ? 1 : 0; // leading coefficient 1 by default
-        input.dataset.power = i;
 
-        const span = document.createElement("span");
-        span.innerText = input.value;
-
-        input.oninput = () => {
-          span.innerText = input.value;
-          updateGraph();
+            return mergedIntervals.map(i => {
+                const openChar = i.startType === 'open' ? '(' : '[';
+                const closeChar = i.endType === 'open' ? ')' : ']';
+                const startVal = i.start === -Infinity ? '-∞' : i.start.toFixed(2); // More precision for polynomial critical points
+                const endVal = i.end === Infinity ? '+∞' : i.end.toFixed(2);
+                return `${openChar}${startVal}, ${endVal}${closeChar}`;
+            }).join(' \u222A '); // Union symbol
         };
+        // --- End reusable function ---
 
-        group.appendChild(label);
-        group.appendChild(input);
-        group.appendChild(span);
-        slidersDiv.appendChild(group);
+        function createSliders(degree) {
+            slidersDiv.innerHTML = "";
+            sliders = [];
 
-        sliders.push(input);
-      }
-      updateGraph();
-    }
+            for (let i = degree; i >= 0; i--) {
+                const group = document.createElement("div");
+                group.className = "slider-group";
 
-    function getPolynomialExpr() {
-      let terms = sliders.map(s => {
-        let coef = parseFloat(s.value);
-        let pow = s.dataset.power;
-        if (coef === 0) return null;
-        if (pow === "0") return `${coef}`;
-        if (coef === 1) return `x^${pow}`;
-        if (coef === -1) return `-x^${pow}`;
-        return `${coef}*x^${pow}`;
-      }).filter(Boolean);
-      return terms.length ? terms.join(" + ") : "0";
-    }
+                const label = document.createElement("label");
+                label.innerText = `Coefficient of x^${i}: `;
 
-    function updateGraph() {
-      const expr = getPolynomialExpr();
-      const node = math.parse(expr);
-      const f = node.compile();
+                const input = document.createElement("input");
+                input.type = "range";
+                input.min = -10;
+                input.max = 10;
+                input.step = 0.1;
+                // Set initial leading coefficient to 1, others to 0
+                input.value = (i === degree && degree !== 0) ? 1 : 0;
+                if (degree === 0) input.value = 1; // For constant function, default to 1
 
-      const df = math.derivative(node, 'x').compile();
-      const ddf = math.derivative(math.derivative(node, 'x'), 'x').compile();
+                input.dataset.power = i;
 
-      const x_vals = math.range(-10, 10, 0.1).toArray();
-      const y_vals = x_vals.map(x => f.evaluate({ x }));
-      const dy = x_vals.map(x => df.evaluate({ x }));
-      const ddy = x_vals.map(x => ddf.evaluate({ x }));
+                const span = document.createElement("span");
+                span.innerText = input.value;
 
-      // Plot
-      Plotly.newPlot(plotDiv, [{
-        x: x_vals, y: y_vals, mode: 'lines', name: 'f(x)'
-      }], {
-        margin: { t: 20 }, title: `f(x) = ${expr.replace(/\*/g, '')}`
-      });
+                input.oninput = () => {
+                    span.innerText = input.value;
+                    updateGraph();
+                };
 
-      // Info panel
-      const increasing = [];
-      const decreasing = [];
-      const concaveUp = [];
-      const concaveDown = [];
-      let inflections = [];
+                group.appendChild(label);
+                group.appendChild(input);
+                group.appendChild(span);
+                slidersDiv.appendChild(group);
 
-      for (let i = 1; i < x_vals.length; i++) {
-        if (dy[i - 1] < 0 && dy[i] > 0) increasing.push(`[${x_vals[i - 1].toFixed(1)}, ${x_vals[i].toFixed(1)}]`);
-        if (dy[i - 1] > 0 && dy[i] < 0) decreasing.push(`[${x_vals[i - 1].toFixed(1)}, ${x_vals[i].toFixed(1)}]`);
-        if (Math.sign(ddy[i - 1]) !== Math.sign(ddy[i])) inflections.push(x_vals[i].toFixed(2));
-        if (ddy[i] > 0) concaveUp.push(x_vals[i]);
-        if (ddy[i] < 0) concaveDown.push(x_vals[i]);
-      }
+                sliders.push(input);
+            }
+            updateGraph();
+        }
 
-      propsDiv.innerHTML = `
-        <strong>Increasing Intervals:</strong> ${increasing.join(', ') || 'None'}<br/>
-        <strong>Decreasing Intervals:</strong> ${decreasing.join(', ') || 'None'}<br/>
-        <strong>Concave Up:</strong> x ≈ ${concaveUp.length ? concaveUp[0].toFixed(2) + "..." : "None"}<br/>
-        <strong>Concave Down:</strong> x ≈ ${concaveDown.length ? concaveDown[0].toFixed(2) + "..." : "None"}<br/>
-        <strong>Inflection Points:</strong> x ≈ ${inflections.join(', ') || 'None'}
-      `;
-    }
+        function getPolynomialExpr() {
+            let terms = sliders.map(s => {
+                let coef = parseFloat(s.value);
+                let pow = s.dataset.power;
 
-    // Initialize
-    degreeSelector.addEventListener("change", () => {
-      createSliders(parseInt(degreeSelector.value));
-    });
+                if (coef === 0) return null; // Skip zero coefficients
 
-    createSliders(parseInt(degreeSelector.value));
-  </script>
+                let termStr;
+                if (pow === "0") { // Constant term
+                    termStr = `${coef}`;
+                } else if (pow === "1") { // Linear term (x^1)
+                    if (coef === 1) termStr = `x`;
+                    else if (coef === -1) termStr = `-x`;
+                    else termStr = `${coef}*x`;
+                } else { // Higher power terms
+                    if (coef === 1) termStr = `x^${pow}`;
+                    else if (coef === -1) termStr = `-x^${pow}`;
+                    else termStr = `${coef}*x^${pow}`;
+                }
+                return termStr;
+            }).filter(Boolean); // Remove nulls
 
+            return terms.length ? terms.join(" + ").replace(/\+ -/g, "- ") : "0"; // Format to handle negative coefficients nicely
+        }
+
+
+        function updateGraph() {
+            const expr = getPolynomialExpr();
+            const node = math.parse(expr);
+            const f = node.compile();
+
+            // Handle the edge case of a constant function (degree 0)
+            if (parseInt(degreeSelector.value) === 0) {
+                 const x_vals = math.range(-10, 10, 0.1).toArray();
+                 const y_val = parseFloat(sliders[0].value); // Only one slider for c_0
+                 const y_vals = x_vals.map(() => y_val);
+
+                 Plotly.newPlot(plotDiv, [{
+                    x: x_vals, y: y_vals, mode: 'lines', name: 'f(x)',
+                    line: { color: varStr('--blue') } // Use theme color
+                 }], {
+                    margin: { t: 20 },
+                    title: `f(x) = ${expr.replace(/\*/g, '')}`,
+                    font: { family: varStr('--font-family'), color: '#222' }, // Use theme font and color
+                    xaxis: { title: 'x', range: [-10, 10] },
+                    yaxis: { title: 'f(x)' }
+                 });
+
+                 propsDiv.innerHTML = `
+                    <strong>Increasing Intervals:</strong> None<br/>
+                    <strong>Decreasing Intervals:</strong> None<br/>
+                    <strong>Constant Intervals:</strong> [-∞, +∞]<br/>
+                    <strong>Concave Up:</strong> None<br/>
+                    <strong>Concave Down:</strong> None<br/>
+                    <strong>Inflection Points:</strong> None
+                 `;
+                 return;
+            }
+
+
+            const df = math.derivative(node, 'x').compile();
+            const ddf = math.derivative(math.derivative(node, 'x'), 'x').compile();
+
+            // Higher resolution for better critical point detection
+            const x_vals = math.range(-10, 10, 0.01).toArray();
+            const y_vals = x_vals.map(x => f.evaluate({ x }));
+            const dy_vals = x_vals.map(x => df.evaluate({ x }));
+            const ddy_vals = x_vals.map(x => ddf.evaluate({ x }));
+
+            // Plot
+            Plotly.newPlot(plotDiv, [{
+                x: x_vals, y: y_vals, mode: 'lines', name: 'f(x)',
+                line: { color: varStr('--blue') } // Use theme color
+            }], {
+                margin: { t: 20 },
+                title: `f(x) = ${expr.replace(/\*/g, '')}`,
+                font: { family: varStr('--font-family'), color: '#222' }, // Use theme font and color
+                xaxis: { title: 'x', range: [-10, 10] },
+                yaxis: { title: 'f(x)' }
+            });
+
+            // Info panel
+            const increasing = [];
+            const decreasing = [];
+            const constant = []; // Added for completeness, though rare for non-zero polynomials
+            const concaveUp = [];
+            const concaveDown = [];
+            const inflectionPoints = new Set(); // Use a Set to store unique points
+
+            // Threshold for considering values close to zero (e.g., for derivatives)
+            const epsilon = 1e-6;
+
+            let currentIncreasing = null;
+            let currentDecreasing = null;
+            let currentConcaveUp = null;
+            let currentConcaveDown = null;
+            let currentConstant = null;
+
+
+            // Analyze intervals for increasing/decreasing and concavity
+            for (let i = 0; i < x_vals.length - 1; i++) {
+                const x_start = x_vals[i];
+                const x_end = x_vals[i + 1];
+                const dy_avg = (dy_vals[i] + dy_vals[i+1]) / 2; // Use average derivative over small interval
+                const ddy_avg = (ddy_vals[i] + ddy_vals[i+1]) / 2; // Use average second derivative
+
+                // Increasing/Decreasing/Constant
+                if (dy_avg > epsilon) { // Increasing
+                    if (currentIncreasing === null) currentIncreasing = { start: x_start, end: x_end, startType: 'open', endType: 'open' };
+                    else currentIncreasing.end = x_end;
+                    
+                    if (currentDecreasing !== null) { decreasing.push(currentDecreasing); currentDecreasing = null; }
+                    if (currentConstant !== null) { constant.push(currentConstant); currentConstant = null; }
+                } else if (dy_avg < -epsilon) { // Decreasing
+                    if (currentDecreasing === null) currentDecreasing = { start: x_start, end: x_end, startType: 'open', endType: 'open' };
+                    else currentDecreasing.end = x_end;
+
+                    if (currentIncreasing !== null) { increasing.push(currentIncreasing); currentIncreasing = null; }
+                    if (currentConstant !== null) { constant.push(currentConstant); currentConstant = null; }
+                } else { // Constant (close to zero derivative)
+                    if (currentConstant === null) currentConstant = { start: x_start, end: x_end, startType: 'closed', endType: 'closed' };
+                    else currentConstant.end = x_end;
+
+                    if (currentIncreasing !== null) { increasing.push(currentIncreasing); currentIncreasing = null; }
+                    if (currentDecreasing !== null) { decreasing.push(currentDecreasing); currentDecreasing = null; }
+                }
+
+                // Concavity
+                if (ddy_avg > epsilon) { // Concave Up
+                    if (currentConcaveUp === null) currentConcaveUp = { start: x_start, end: x_end, startType: 'open', endType: 'open' };
+                    else currentConcaveUp.end = x_end;
+
+                    if (currentConcaveDown !== null) { concaveDown.push(currentConcaveDown); currentConcaveDown = null; }
+                } else if (ddy_avg < -epsilon) { // Concave Down
+                    if (currentConcaveDown === null) currentConcaveDown = { start: x_start, end: x_end, startType: 'open', endType: 'open' };
+                    else currentConcaveDown.end = x_end;
+
+                    if (currentConcaveUp !== null) { concaveUp.push(currentConcaveUp); currentConcaveUp = null; }
+                }
+
+                // Inflection Points: Where ddy changes sign
+                if (i > 0 && Math.sign(ddy_vals[i-1]) !== Math.sign(ddy_vals[i]) && Math.abs(ddy_vals[i]) < 100) { // Add a reasonable bound to avoid false positives for vertical asymptotes etc.
+                    // A more precise way to find inflection point: use linear interpolation
+                    const x1 = x_vals[i-1];
+                    const x2 = x_vals[i];
+                    const y1_dd = ddy_vals[i-1];
+                    const y2_dd = ddy_vals[i];
+
+                    if (Math.abs(y1_dd - y2_dd) > epsilon) {
+                        const inflectionX = x1 - y1_dd * (x2 - x1) / (y2_dd - y1_dd);
+                        if (inflectionX >= -10 && inflectionX <= 10) { // Ensure point is within current plot range
+                             inflectionPoints.add(inflectionX.toFixed(2));
+                        }
+                    } else if (Math.abs(y1_dd) < epsilon) { // If it's near zero over a range
+                        inflectionPoints.add(x1.toFixed(2));
+                    }
+                }
+            }
+
+            // Push any remaining open intervals
+            if (currentIncreasing !== null) increasing.push(currentIncreasing);
+            if (currentDecreasing !== null) decreasing.push(currentDecreasing);
+            if (currentConstant !== null) constant.push(currentConstant);
+            if (currentConcaveUp !== null) concaveUp.push(currentConcaveUp);
+            if (currentConcaveDown !== null) concaveDown.push(currentConcaveDown);
+
+
+            propsDiv.innerHTML = `
+                <strong>Function:</strong> f(x) = ${expr.replace(/\*/g, '')}<br/><br/>
+                <strong>Increasing Intervals:</strong> ${formatIntervals(increasing)}<br/>
+                <strong>Decreasing Intervals:</strong> ${formatIntervals(decreasing)}<br/>
+                <strong>Constant Intervals:</strong> ${formatIntervals(constant)}<br/>
+                <br/>
+                <strong>Concave Up:</strong> ${formatIntervals(concaveUp)}<br/>
+                <strong>Concave Down:</strong> ${formatIntervals(concaveDown)}<br/>
+                <strong>Inflection Points:</strong> ${Array.from(inflectionPoints).sort((a,b) => parseFloat(a)-parseFloat(b)).join(', ') || 'None'}
+            `;
+        }
+
+        // Initialize
+        degreeSelector.addEventListener("change", () => {
+            createSliders(parseInt(degreeSelector.value));
+        });
+
+        // Set default degree to 3 (Cubic) as it offers more interesting analysis
+        degreeSelector.value = "3";
+        createSliders(parseInt(degreeSelector.value));
+    </script>
 </body>
 </html>
