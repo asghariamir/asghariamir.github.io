@@ -7,29 +7,29 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
     <style>
+        /* Replaced color variables with values from the first app */
         :root {
-            --blue: #1976d2;
+            --blue: #1565c0;
             --blue-dark: #0d47a1;
-            --blue-light: #e3f2fd;
             --green: #43a047;
-            --orange: #ff9800;
+            --orange: #e65100;
             --grey: #bdbdbd;
+            --red: #d32f2f;
             --surface: #fff;
-            --surface-alt: #f7f8fa;
-            --surface-accent: #ecf3fc;
-            --shadow: 0 4px 32px #0d47a125;
-            --shadow-sm: 0 2px 8px #0d47a120;
-            --radius: 18px;
-            --radius-sm: 8px;
-            --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --surface-alt: #f4f4fa;
+            --shadow: 0 4px 16px #0000000d;
+            --shadow-sm: 0 4px 16px #0000000d;
+            --radius: 14px;
+            --radius-sm: 10px;
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
         }
         html, body {
             margin: 0;
             padding: 0;
             height: 100%;
             font-family: var(--font-family);
-            background: linear-gradient(125deg, var(--surface-alt) 70%, var(--blue-light) 100%);
-            color: #1a202c;
+            background: var(--surface-alt);
+            color: #222;
         }
         .container {
             max-width: 1080px;
@@ -42,17 +42,16 @@
             flex-direction: column;
             align-items: center;
             gap: 1.6rem;
-            border: 1.5px solid #e3e6f5;
+            border: 1.5px solid #e0e0e0;
         }
         h2 {
             margin-top: 0;
-            color: var(--blue-dark);
+            color: #222;
             font-size: 2.25rem;
             letter-spacing: 0.01em;
             font-weight: 800;
-            background: linear-gradient(90deg, var(--blue-dark) 50%, var(--blue) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: unset;
             text-align: center;
             margin-bottom: 0.8rem;
             user-select: none;
@@ -68,18 +67,17 @@
         .panel {
             flex: 1 1 470px;
             min-width: 320px;
-            background: var(--surface-accent);
+            background: var(--surface);
             border-radius: var(--radius);
-            padding: 1.3rem 1.3rem 1.1rem 1.3rem;
             box-shadow: var(--shadow-sm);
             transition: box-shadow .22s;
             display: flex;
             flex-direction: column;
             align-items: stretch;
-            border: 1.5px solid #dde7fa;
+            border: 1.5px solid #e0e0e0;
         }
         .panel:hover {
-            box-shadow: 0 8px 36px #1565c025;
+            box-shadow: var(--shadow);
         }
         /* Controls */
         .controls {
@@ -88,10 +86,10 @@
             gap: 0.8rem;
             margin-bottom: 10px;
             padding: 0.5rem 1.2rem 0.5rem 1.2rem;
-            background: linear-gradient(90deg, var(--blue-light) 0%, #f9fafb 80%);
+            background: #f4f8ff;
             border-radius: var(--radius-sm);
-            box-shadow: 0 1px 4px #90caf930;
-            border: 1px solid #e0e7ef;
+            box-shadow: 0 1px 4px #0000000d;
+            border: 1px solid #e8eef8;
         }
         .controls label {
             font-weight: 500;
@@ -106,123 +104,125 @@
         .slider-group {
             margin-bottom: 18px;
             display: flex;
-            align-items: center;
-            gap: 1.2em;
+            flex-direction: column;
+            align-items: center; /* Center the label */
+            gap: 0.5em;
         }
         .slider-group label {
-            min-width: 135px;
+            width: 100%;
             font-weight: 500;
-            color: var(--blue-dark);
+            color: #222;
             font-size: 1.01em;
             letter-spacing: 0.01em;
+            text-align: center; /* Center the label text */
         }
-        .slider-group span {
-            min-width: 40px;
-            text-align: right;
-            font-weight: bold;
-            color: var(--blue);
-            font-size: 1.12em;
-            padding-left: 0.2em;
+        /* Wrapper for the slider and value display */
+        .slider-control-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 22px; /* Consistent height */
         }
         /* Range input - Material look */
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
-            width: 100%;
-            background: linear-gradient(90deg, var(--blue-light) 60%, #f0f4fc 100%);
+            width: 100%; /* Maximize slider width */
+            background: #f0f0f0;
             height: 8px;
             border-radius: 6px;
-            box-shadow: 0 2px 8px #90caf920;
+            box-shadow: 0 1px 4px #0000000d;
             outline: none;
             transition: box-shadow 0.18s;
+            flex-grow: 1;
+            margin: 0;
+            padding: 0;
         }
         input[type="range"]:focus {
-            box-shadow: 0 2px 12px #1976d250;
+            box-shadow: 0 2px 8px #0000001a;
         }
-        input[type="range"]::-webkit-slider-thumb {
+        /* Removed original thumb styling */
+        input[type="range"]::-webkit-slider-thumb,
+        input[type="range"]::-moz-range-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--blue) 60%, var(--blue-dark) 100%);
-            cursor: pointer;
-            box-shadow: 0 2px 8px #1565c045;
-            border: 2.5px solid #fff;
-            transition: background 0.18s, transform 0.12s;
+            width: 0; /* Hide the default thumb */
+            height: 0;
+            border: none;
+            background: transparent;
         }
-        input[type="range"]:focus::-webkit-slider-thumb,
-        input[type="range"]::-webkit-slider-thumb:hover {
-            background: linear-gradient(120deg, var(--blue-dark) 60%, var(--blue) 100%);
-            transform: scale(1.04);
+
+        /* Value display as the new "handle" */
+        .slider-value-display {
+            position: absolute;
+            background: var(--blue-dark);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px; /* Slightly rounded corners */
+            font-size: 0.85em;
+            font-weight: 600;
+            white-space: nowrap;
+            transform: translateX(-50%); /* Center horizontally */
+            top: -2px; /* Align with the slider track, adjusted from -20px */
+            z-index: 3;
+            pointer-events: none; /* Allows clicks/interactions to pass through to slider */
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            min-width: 30px;
+            text-align: center;
+            height: 22px; /* Same height as the original thumb */
+            line-height: 22px; /* Vertically center the text */
+            box-sizing: border-box; /* Include padding in height calculation */
         }
-        input[type="range"]::-moz-range-thumb {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--blue) 60%, var(--blue-dark) 100%);
-            cursor: pointer;
-            box-shadow: 0 2px 8px #1565c045;
-            border: 2.5px solid #fff;
-            transition: background 0.18s, transform 0.12s;
-        }
-        input[type="range"]:focus::-moz-range-thumb,
-        input[type="range"]::-moz-range-thumb:hover {
-            background: linear-gradient(120deg, var(--blue-dark) 60%, var(--blue) 100%);
-            transform: scale(1.04);
-        }
-        /* Remove outline for Firefox */
-        input[type="range"]:focus {
-            outline: none;
-        }
+
         /* Custom Degree Selector Buttons */
         .degree-buttons {
             display: flex;
-            gap: 8px; /* Spacing between buttons */
-            margin-left: 8px; /* Align with label if desired */
+            gap: 8px;
+            margin-left: 8px;
         }
         .degree-button {
-            width: 40px; /* Make it square */
+            width: 40px;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1.5px solid #c2dafc;
+            border: 1.5px solid #ddd;
             border-radius: 7px;
             background: var(--surface);
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.15s ease;
-            box-shadow: 0 1px 4px #1976d220;
-            color: #444;
+            box-shadow: 0 1px 4px #0000000d;
+            color: #222;
         }
         .degree-button:hover {
-            border-color: var(--blue-dark);
-            box-shadow: 0 2px 8px #1976d230;
+            border-color: #aaa;
+            box-shadow: 0 2px 8px #0000001a;
             transform: translateY(-1px);
         }
         .degree-button.active {
-            background: linear-gradient(90deg, var(--blue-dark) 40%, var(--blue) 100%);
+            background: var(--blue);
             color: #fff;
             border-color: var(--blue-dark);
-            box-shadow: 0 2px 10px #1976d245;
+            box-shadow: 0 2px 10px #1565c045;
         }
         /* Button */
         button {
             cursor: pointer;
             border: none;
-            border-radius: 7px;
+            border-radius: 6px;
             font-size: 1em;
-            padding: 0.57em 1.3em;
-            background: linear-gradient(90deg, var(--blue-dark) 40%, var(--blue) 100%);
+            padding: 0.5em 1em;
+            background: var(--green);
             color: #fff;
             font-weight: 600;
-            box-shadow: 0 2px 8px #1976d225;
+            box-shadow: 0 2px 8px #0000000d;
             transition: filter .12s,transform .12s, box-shadow .18s;
         }
-        button:hover { filter: brightness(1.1); box-shadow: 0 4px 18px #1976d235;}
-        button:active { transform: scale(0.96); }
+        button:hover { filter: brightness(1.1); box-shadow: 0 4px 18px #0000001a;}
+        button:active { transform: scale(0.97); }
         button:disabled { background: #ccc !important; cursor: not-allowed; filter: none; }
         /* Plot area */
         #plot {
@@ -230,18 +230,18 @@
             min-height: 350px;
             background: #fff;
             border-radius: var(--radius-sm);
-            border: 1.5px solid #d1e2fb;
-            box-shadow: 0 2px 10px #90caf930;
+            border: 1.5px solid #e0e0e0;
+            box-shadow: 0 2px 10px #0000000d;
             margin-bottom: 0.2em;
             padding: 0.2em;
         }
         /* Info panel */
         .info-panel {
             margin-top: 22px;
-            background: linear-gradient(100deg, #eaf3fd 65%, #f8fafc 100%);
+            background: #f8faff;
             padding: 1.4em 2em 1.3em 2em;
             border-radius: var(--radius);
-            border: 1.5px solid #c9daf8;
+            border: 1.5px solid #e8eef8;
             font-size: 1.01rem;
             line-height: 1.68;
             width: 100%;
@@ -249,36 +249,35 @@
             box-shadow: var(--shadow-sm);
             text-align: left;
             letter-spacing: 0.01em;
-            color: #202336;
+            color: #222;
         }
         .info-panel h3 {
             margin-top: 0;
-            color: var(--blue-dark);
+            color: #222;
             text-align: center;
             font-size: 1.27em;
             margin-bottom: 0.5em;
             font-weight: 700;
             letter-spacing: 0.02em;
-            background: linear-gradient(90deg, var(--blue-dark) 40%, var(--blue) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: unset;
         }
         .info-panel strong {
             font-weight: 700;
-            color: var(--blue-dark);
+            color: #333;
         }
         /* Badge overlay */
         .rescale-badge {
             position: absolute;
             top: 28px;
             right: 38px;
-            background: #1976d2;
+            background: var(--blue);
             color: #fff;
             padding: 6px 14px;
             border-radius: 20px;
             font-weight: 600;
             font-size: 1em;
-            box-shadow: 0 2px 8px #1976d265;
+            box-shadow: 0 2px 8px #1565c065;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.25s;
@@ -298,8 +297,7 @@
             .controls { flex-direction: column; align-items: stretch; padding: 0.7rem; }
             .panel { padding: 0.85rem 0.6rem; }
             .info-panel { padding: 0.8em 0.5em 1em 0.5em; font-size: 0.99rem;}
-            .slider-group label { min-width: unset; width: 100%; font-size: 1em; }
-            /* select { width: 100%; min-width: unset;} */ /* This style is now irrelevant */
+            .slider-group label { width: 100%; font-size: 1em; }
             .degree-buttons { width: 100%; justify-content: space-around; }
             .degree-button { width: 35px; height: 35px; font-size: 0.9em; }
             .rescale-badge { top: 10px; right: 10px; font-size: 0.9em; padding: 5px 10px;}
@@ -312,7 +310,7 @@
         <div class="controls">
             <label for="degree">Select polynomial degree: </label>
             <div id="degree-selector-buttons" class="degree-buttons">
-                </div>
+            </div>
         </div>
         <div class="main-layout">
             <div class="panel">
@@ -324,25 +322,23 @@
             </div>
         </div>
         <div class="info-panel">
-            <h3>📊 Polynomial Properties</h3>
+            <h3> Polynomial Properties</h3>
             <div id="properties">Add coefficients to begin analysis.</div>
         </div>
     </div>
     <script>
         const slidersDiv = document.getElementById("sliders");
-        // const degreeSelector = document.getElementById("degree"); // No longer a select element
         const degreeButtonsContainer = document.getElementById("degree-selector-buttons");
         const plotDiv = document.getElementById("plot");
         const propsDiv = document.getElementById("properties");
         const rescaleBadge = document.getElementById("rescale-badge");
 
         let sliders = [];
-        let currentSelectedDegree = 4; // Default to 4 as before
+        let currentSelectedDegree = 4;
 
         const varStr = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-        const epsilon = 1e-6; // Threshold for considering values close to zero
+        const epsilon = 1e-6;
 
-        // Show badge overlay
         function showRescaleBadge() {
             rescaleBadge.style.opacity = '1';
             clearTimeout(showRescaleBadge._timeout);
@@ -351,14 +347,12 @@
             }, 900);
         }
 
-        // Helper function to format powers as superscripts
         function formatPower(base, exponent) {
             if (exponent === 0) return base;
             if (exponent === 1) return base;
             return `${base}<sup>${exponent}</sup>`;
         }
 
-        // Helper function to format expressions with superscripts for display
         function formatExpressionForDisplay(expr) {
             return expr.replace(/x\^(\d+)/g, (match, p1) => {
                 const exponent = parseInt(p1);
@@ -368,7 +362,6 @@
             });
         }
 
-        // Reusable function for formatting intervals
         function formatIntervals(arr) {
             if (arr.length === 0) return 'None';
             arr.sort((a, b) => {
@@ -405,7 +398,6 @@
                 let startVal = (i.start === -Infinity || i.start === '-Infinity') ? '−∞' : parseFloat(i.start).toFixed(2);
                 let endVal = (i.end === Infinity || i.end === '+Infinity') ? '+∞' : parseFloat(i.end).toFixed(2);
 
-                // Fix for -0
                 if (parseFloat(startVal) === 0) startVal = '0';
                 if (parseFloat(endVal) === 0) endVal = '0';
 
@@ -413,26 +405,23 @@
             }).join(' \u222A ');
         }
 
-        // --- New function to create degree buttons ---
         function createDegreeButtons(selectedDegree) {
-            degreeButtonsContainer.innerHTML = ""; // Clear existing buttons
+            degreeButtonsContainer.innerHTML = "";
             for (let i = 1; i <= 5; i++) {
                 const button = document.createElement("div");
                 button.className = "degree-button";
                 button.textContent = i;
-                button.dataset.degree = i; // Store degree value
+                button.dataset.degree = i;
 
                 if (i === selectedDegree) {
                     button.classList.add("active");
                 }
 
                 button.addEventListener("click", () => {
-                    // Remove 'active' from previously active button
                     const currentActive = document.querySelector(".degree-button.active");
                     if (currentActive) {
                         currentActive.classList.remove("active");
                     }
-                    // Add 'active' to clicked button
                     button.classList.add("active");
                     currentSelectedDegree = parseInt(button.dataset.degree);
                     createSliders(currentSelectedDegree);
@@ -440,7 +429,6 @@
                 degreeButtonsContainer.appendChild(button);
             }
         }
-        // --- End new function ---
 
         function createSliders(degree) {
             slidersDiv.innerHTML = "";
@@ -451,8 +439,11 @@
                 group.className = "slider-group";
 
                 const label = document.createElement("label");
-                // Label for constant term
                 label.innerHTML = i === 0 ? 'Constant term:' : `Coefficient of ${formatPower('x', i)}:`;
+                group.appendChild(label);
+
+                const controlWrapper = document.createElement("div");
+                controlWrapper.className = "slider-control-wrapper";
 
                 const input = document.createElement("input");
                 input.type = "range";
@@ -464,20 +455,41 @@
 
                 input.dataset.power = i;
 
-                const span = document.createElement("span");
-                span.innerText = input.value;
+                const valueDisplay = document.createElement("div");
+                valueDisplay.className = "slider-value-display";
+                valueDisplay.innerText = input.value;
+
+                const updateValueDisplay = () => {
+                    const trackWidth = input.offsetWidth;
+                    // Account for the width of the display element itself to truly center it
+                    const displayWidth = valueDisplay.offsetWidth; 
+                    const value = parseFloat(input.value);
+                    const min = parseFloat(input.min);
+                    const max = parseFloat(input.max);
+
+                    const percentage = (value - min) / (max - min);
+                    // Calculate offset, subtracting half of the display element's width
+                    const offset = percentage * (trackWidth - displayWidth) + displayWidth / 2;
+
+                    valueDisplay.style.left = `${offset}px`;
+                    valueDisplay.innerText = input.value;
+                };
 
                 input.oninput = () => {
-                    span.innerText = input.value;
+                    updateValueDisplay();
                     updateGraph();
                 };
 
-                group.appendChild(label);
-                group.appendChild(input);
-                group.appendChild(span);
-                slidersDiv.appendChild(group);
+                controlWrapper.appendChild(input);
+                controlWrapper.appendChild(valueDisplay);
+                group.appendChild(controlWrapper);
 
+                slidersDiv.appendChild(group);
                 sliders.push(input);
+
+                // Initial positioning of the value display after elements are in DOM
+                // Also trigger update on load if a slider isn't at min/max initially
+                setTimeout(updateValueDisplay, 0); 
             }
             updateGraph();
         }
@@ -507,22 +519,12 @@
             return terms.length ? terms.join(" + ").replace(/\+ -/g, "- ") : "0";
         }
 
-        /**
-         * Bisection method for finding roots of a function.
-         * @param {math.EvalFunction} func The compiled math.js function (e.g., df, ddf).
-         * @param {number} a The left endpoint of the interval.
-         * @param {number} b The right endpoint of the interval.
-         * @param {number} tolerance The desired accuracy for the root.
-         * @param {number} maxIterations Maximum number of iterations.
-         * @returns {Array<number>} An array containing the found root, or empty if no sign change.
-         */
         function bisectionMethod(func, a, b, tolerance = 1e-9, maxIterations = 100) {
             let fa = func.evaluate({ x: a });
             let fb = func.evaluate({ x: b });
 
-            // Check if a root is even likely in the interval (must have a sign change)
             if (fa * fb > 0 && Math.abs(fa) > tolerance && Math.abs(fb) > tolerance) {
-                return []; // No sign change, or both ends are zero/very close to zero with no real change
+                return [];
             }
 
             let c;
@@ -531,7 +533,7 @@
                 let fc = func.evaluate({ x: c });
 
                 if (Math.abs(fc) < tolerance || (b - a) / 2 < tolerance) {
-                    return [c]; // Found a root within tolerance
+                    return [c];
                 }
 
                 if (fa * fc < 0) {
@@ -542,12 +544,11 @@
                     fa = fc;
                 }
             }
-            return [c]; // Return the best approximation after max iterations
+            return [c];
         }
 
         function updateGraph() {
-            // const currentDegree = parseInt(degreeSelector.value); // Old way
-            const currentDegree = currentSelectedDegree; // New way
+            const currentDegree = currentSelectedDegree;
             const rawExpr = getPolynomialExpr();
             const displayExpr = formatExpressionForDisplay(rawExpr.replace(/\*/g, ''));
 
@@ -555,15 +556,14 @@
             const f = node.compile();
 
             if (currentDegree === 0 || rawExpr === "0") {
-                 const x_vals_plot = math.range(-10, 10, 0.1).toArray();
-                 const y_val = (rawExpr === "0") ? 0 : parseFloat(sliders[0].value);
-                 const y_vals_plot = x_vals_plot.map(() => y_val);
+                const x_vals_plot = math.range(-10, 10, 0.1).toArray();
+                const y_val = (rawExpr === "0") ? 0 : parseFloat(sliders[0].value);
+                const y_vals_plot = x_vals_plot.map(() => y_val);
 
-                 // Use fixed y-range for the zero/constant case
-                 Plotly.react(plotDiv, [{
+                Plotly.react(plotDiv, [{
                     x: x_vals_plot, y: y_vals_plot, mode: 'lines', name: 'f(x)',
                     line: { color: varStr('--blue') }
-                 }], {
+                }], {
                     margin: { t: 50 },
                     title: {
                         text: `f(x) = ${displayExpr}`,
@@ -573,9 +573,9 @@
                     font: { family: varStr('--font-family'), color: '#222' },
                     xaxis: { title: 'x', range: [-10, 10] },
                     yaxis: { title: 'f(x)', range: [-10, 10] }
-                 }, {responsive:true, animate: true});
+                }, {responsive:true, animate: true});
 
-                 propsDiv.innerHTML = `
+                propsDiv.innerHTML = `
                     <strong>Function:</strong> f(x) = ${displayExpr}<br/><br/>
                     <strong>Increasing Intervals:</strong> None<br/>
                     <strong>Decreasing Intervals:</strong> None<br/>
@@ -584,8 +584,8 @@
                     <strong>Concave Up:</strong> None<br/>
                     <strong>Concave Down:</strong> None<br/>
                     <strong>Inflection Points:</strong> None
-                 `;
-                 return;
+                `;
+                return;
             }
 
             const df_node = math.derivative(node, 'x');
@@ -595,7 +595,6 @@
 
             const x_analysis_min = -20;
             const x_analysis_max = 20;
-            // Increased density for initial scan to improve bisection interval finding
             const x_vals_full = math.range(x_analysis_min, x_analysis_max, 0.001).toArray();
             const dy_vals_full = x_vals_full.map(x => df.evaluate({ x }));
             const ddy_vals_full = x_vals_full.map(x => ddf.evaluate({ x }));
@@ -603,21 +602,17 @@
             const x_vals_plot = math.range(-10, 10, 0.1).toArray();
             const y_vals_plot = x_vals_plot.map(x => f.evaluate({x}));
 
-            // Determine y-axis range dynamically with sane clamping and visible changes
             const minY = Math.min(...y_vals_plot);
             const maxY = Math.max(...y_vals_plot);
 
-            // Clamp the limits for sanity (e.g. between -1000, 1000)
             let yMin = Math.max(minY, -1000);
             let yMax = Math.min(maxY, 1000);
 
-            // Prevent very narrow y-range (flat lines)
             if (Math.abs(yMax - yMin) < 1e-3) {
                 yMin -= 1;
                 yMax += 1;
             }
 
-            // Detect y-limits change and show badge
             if (typeof updateGraph.prevYMin !== 'undefined') {
                 if (Math.abs(updateGraph.prevYMin - yMin) > 0.2 || Math.abs(updateGraph.prevYMax - yMax) > 0.2) {
                     showRescaleBadge();
@@ -643,7 +638,7 @@
 
             const findRoots = (func, xCoords) => {
                 const roots = new Set();
-                const bisectionTolerance = 1e-8; // A tighter tolerance for bisection
+                const bisectionTolerance = 1e-8;
 
                 for (let i = 0; i < xCoords.length - 1; i++) {
                     const x1 = xCoords[i];
@@ -652,15 +647,12 @@
                     const y2 = func.evaluate({ x: x2 });
 
                     if ((y1 < -epsilon && y2 > epsilon) || (y1 > epsilon && y2 < -epsilon)) {
-                        // Sign change detected, refine with bisection
                         const foundRoot = bisectionMethod(func, x1, x2, bisectionTolerance);
                         foundRoot.forEach(root => roots.add(root));
                     } else if (Math.abs(y1) < epsilon) {
-                        // Point itself is very close to a root
                         roots.add(x1);
                     }
                 }
-                // Check the last point in the sampled range
                 if (Math.abs(func.evaluate({ x: xCoords[xCoords.length - 1] })) < epsilon) {
                     roots.add(xCoords[xCoords.length - 1]);
                 }
@@ -804,10 +796,28 @@
             `;
         }
 
-        // Initialize degree buttons and sliders
         document.addEventListener("DOMContentLoaded", () => {
-            createDegreeButtons(currentSelectedDegree); // Initialize buttons with default active degree
-            createSliders(currentSelectedDegree); // Initialize sliders based on default degree
+            // Ensure degree buttons are created and currentSelectedDegree is set
+            createDegreeButtons(currentSelectedDegree); 
+            // Then, create sliders based on the (now correctly set) default degree
+            createSliders(currentSelectedDegree); 
+            
+            // Re-calculate slider value positions on window resize
+            window.addEventListener('resize', () => {
+                sliders.forEach(slider => {
+                    const valueDisplay = slider.parentElement.querySelector('.slider-value-display');
+                    if (valueDisplay) {
+                        const trackWidth = slider.offsetWidth;
+                        const displayWidth = valueDisplay.offsetWidth; 
+                        const value = parseFloat(slider.value);
+                        const min = parseFloat(slider.min);
+                        const max = parseFloat(slider.max);
+                        const percentage = (value - min) / (max - min);
+                        const offset = percentage * (trackWidth - displayWidth) + displayWidth / 2;
+                        valueDisplay.style.left = `${offset}px`;
+                    }
+                });
+            });
         });
     </script>
 </body>
