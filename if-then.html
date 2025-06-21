@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>  
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -34,7 +34,19 @@
     .interactive-block {text-align: center; margin-bottom: 1.6em;}
     .interactive-block h3 { font-size: 1.13rem; color: var(--primary); margin-bottom: .13em;}
     .interactive-instruct { font-size: 1.03em; color: #444; margin-bottom: 1.2em; margin-top:.7em;}
-    .vennBox { aspect-ratio: 1/1; width: 330px; max-width: 96vw; margin: 0 auto; border: 1px solid #d0d0d0; border-radius: 6px; background: #fff; }
+    .vennBox {
+      aspect-ratio: 1/1;
+      width: 330px;
+      height: 330px;
+      max-width: 96vw;
+      max-height: 96vw;
+      margin: 0 auto;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      background: #fff;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
     .vennBox.locked {cursor:default; filter: grayscale(.65) brightness(0.97);}
     .fail-region{ cursor:pointer; opacity:0; pointer-events:all; transition: opacity 0.15s;}
     .fail-region.visible{ opacity:1;}
@@ -269,6 +281,7 @@ function addFailPatternDef(svg){
 }
 
 // --- FIXED HOVER SHADING LOGIC ---
+// Only this function is changed!
 function buildInteractiveVenn(targetId, failRegion, locked, hoverActive, onHover, onLock, circlesCoincide) {
   const wrap = document.getElementById(targetId);
   wrap.innerHTML = '';
@@ -276,8 +289,10 @@ function buildInteractiveVenn(targetId, failRegion, locked, hoverActive, onHover
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(svgNS, 'svg');
   svg.setAttribute('viewBox', '-1 -1 2 2');
-  svg.setAttribute('width', 330);
-  svg.setAttribute('height', 330);
+  svg.setAttribute('width', '100%');
+  svg.setAttribute('height', '100%');
+  svg.style.width = '100%';
+  svg.style.height = '100%';
 
   let RP = circlesCoincide ? 0.62 : 0.40, RQ = 0.62;
   // Outer Q
