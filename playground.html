@@ -126,7 +126,18 @@ $('resetAdd').onclick=()=>{$('bAdd').value='';$('ansAdd').value='';$('feedAdd').
 const leftM=$('leftMul'), rightM=$('rightMul');
 function drawAMul(){leftM.innerHTML='';rightM.innerHTML='';const a=clamp(parseInt($('aMul').value||0,10),-4,4);if(a!==0){const col=document.createElement('div');col.className='col';if(a>0){for(let i=0;i<a;i++)col.appendChild(makeSq('blue'));rightM.appendChild(col);}else{for(let i=0;i<-a;i++)col.appendChild(makeSq('red'));leftM.appendChild(col);}}updateMulAns();}
 $('aMul').oninput=drawAMul;drawAMul();
-$('flipMul').onclick=()=>{[...rightM.children].forEach(col=>{col.querySelectorAll('.sq.blue').forEach(s=>s.classList.replace('blue','red'));leftM.appendChild(col);});[...leftM.children].forEach(col=>{col.querySelectorAll('.sq.red').forEach(s=>s.classList.replace('red','blue'));rightM.appendChild(col);});updateMulAns();};
+$('flipMul').onclick = () => {
+      // Swap sides and invert colours regardless of current state
+      const colsRight = [...rightM.children];
+      const colsLeft  = [...leftM.children];
+      const invert = col => col.querySelectorAll('.sq').forEach(s => {
+        s.classList.toggle('blue');
+        s.classList.toggle('red');
+      });
+      colsRight.forEach(col => { invert(col); leftM.appendChild(col); });
+      colsLeft.forEach(col  => { invert(col); rightM.appendChild(col); });
+      updateMulAns();
+    };
 $('repMul').onclick=()=>{const src=rightM.children.length?rightM:leftM;if(!src.children.length)return;src.appendChild(src.children[0].cloneNode(true));updateMulAns();};
 function updateMulAns(){const net=rightM.querySelectorAll('.sq.blue').length-leftM.querySelectorAll('.sq.red').length;$('ansMul').value=net;}
 $('submitMul').onclick=()=>{updateMulAns();const a=parseInt($('aMul').value||0,10);const b=parseInt($('bMul').value||0,10);const expected=a*b;const actual=parseInt($('ansMul').value||0,10);const f=$('feedMul');f.className='result '+(actual===expected?'ok':'err');f.textContent=actual===expected?'✔ Correct!':'✖ Try again…';};
