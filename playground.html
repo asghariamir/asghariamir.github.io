@@ -1,864 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Interactive Polynomial Explorer – Smart Analysis</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
-    <style>
-        /* Replaced color variables with values from the first app */
-        :root {
-            --blue: #1565c0; /* Changed from #1976d2 */
-            --blue-dark: #0d47a1;
-            --green: #43a047;
-            --orange: #e65100; /* Changed from #ff9800 */
-            --grey: #bdbdbd;
-            --red: #d32f2f; /* Added, as it's used in the first app's scheme */
-            --surface: #fff;
-            --surface-alt: #f4f4fa; /* Changed from #f7f8fa */
-
-            /* Removed these as they were specific to the second app's original scheme */
-            /* --blue-light: #e3f2fd; */
-            /* --surface-accent: #ecf3fc; */
-
-            /* Adjusted shadows to match the first app's more subtle shadow */
-            --shadow: 0 4px 16px #0000000d; /* Changed from 0 4px 32px #0d47a125 */
-            --shadow-sm: 0 4px 16px #0000000d; /* Changed from 0 2px 8px #0d47a120, aligned with primary shadow */
-
-            /* Adjusted border-radius values to match the first app's scheme */
-            --radius: 14px; /* Changed from 18px */
-            --radius-sm: 10px; /* Changed from 8px, using 10px for consistency with canvas in first app */
-
-            /* Updated font-family to match the first app */
-            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; /* Changed from 'Inter', ... */
-        }
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: var(--font-family);
-            /* Updated background to match first app's plain background */
-            background: var(--surface-alt); /* Changed from linear-gradient */
-            /* Updated main text color to match first app */
-            color: #222; /* Changed from #1a202c */
-        }
-        .container {
-            max-width: 1080px;
-            margin: 2rem auto;
-            background: var(--surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 2.2rem 2.2rem 1.7rem 2.2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.6rem;
-            /* Updated border color to match general borders in first app */
-            border: 1.5px solid #e0e0e0; /* Changed from #e3e6f5 */
-        }
-        h2 {
-            margin-top: 0;
-            /* Updated color to match first app's dark text and general heading style */
-            color: #222; /* Changed from var(--blue-dark) and removed gradient text fill */
-            font-size: 2.25rem;
-            letter-spacing: 0.01em;
-            font-weight: 800;
-            /* Removed gradient background clip and text fill */
-            -webkit-background-clip: unset;
-            -webkit-text-fill-color: unset;
-            text-align: center;
-            margin-bottom: 0.8rem;
-            user-select: none;
-        }
-        .main-layout {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2.2rem;
-            align-items: stretch;
-            width: 100%;
-            justify-content: center;
-        }
-        .panel {
-            flex: 1 1 470px;
-            min-width: 320px;
-            /* Updated background to match first app's main surface color */
-            background: var(--surface); /* Changed from var(--surface-accent) */
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
-            transition: box-shadow .22s;
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            /* Updated border color to match general borders in first app */
-            border: 1.5px solid #e0e0e0; /* Changed from #dde7fa */
-        }
-        .panel:hover {
-            /* Updated hover shadow to be consistent with new shadow variable */
-            box-shadow: var(--shadow); /* Changed from 0 8px 36px #1565c025 */
-        }
-        /* Controls */
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 10px;
-            padding: 0.5rem 1.2rem 0.5rem 1.2rem;
-            /* Updated background to match the table header/analysis results in first app */
-            background: #f4f8ff; /* Changed from linear-gradient(90deg, var(--blue-light) 0%, #f9fafb 80%) */
-            border-radius: var(--radius-sm);
-            /* Updated shadow to match first app's general light shadow, or removed for simpler look */
-            box-shadow: 0 1px 4px #0000000d; /* Changed from 0 1px 4px #90caf930 */
-            /* Updated border color to match general table/analysis borders in first app */
-            border: 1px solid #e8eef8; /* Changed from #e0e7ef */
-        }
-        .controls label {
-            font-weight: 500;
-            letter-spacing: 0.01em;
-            margin-right: 0.4em;
-        }
-        /* Slider Section */
-        .sliders {
-            margin-top: 10px;
-            width: 100%;
-        }
-        .slider-group {
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 1.2em;
-        }
-        .slider-group label {
-            min-width: 135px; /* REVERTED: Restored original min-width */
-            font-weight: 500;
-            /* Updated color to match main text color in first app */
-            color: #222; /* Changed from var(--blue-dark) */
-            font-size: 1.01em;
-            letter-spacing: 0.01em;
-        }
-        .slider-group span {
-            min-width: 40px;
-            text-align: right;
-            font-weight: bold;
-            /* Updated color to match primary blue in first app */
-            color: var(--blue); /* Changed from var(--blue) */
-            padding-left: 0.2em; /* REVERTED: Restored original padding-left */
-            font-size: 1.12em;
-        }
-        /* Range input - Material look */
-        input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            /* Updated background to match the general light background feel of the first app */
-            background: #f0f0f0; /* Changed from linear-gradient(90deg, var(--blue-light) 60%, #f0f4fc 100%) */
-            height: 8px;
-            border-radius: 6px;
-            /* Updated shadow to be consistent with first app's light shadows */
-            box-shadow: 0 1px 4px #0000000d; /* Changed from 0 2px 8px #90caf920 */
-            outline: none;
-            transition: box-shadow 0.18s;
-        }
-        input[type="range"]:focus {
-            /* Updated focus shadow to be consistent with first app's light shadows and selected items */
-            box-shadow: 0 2px 8px #0000001a; /* Changed from 0 2px 12px #1976d250 */
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            /* Updated thumb background to match primary blue and dark blue */
-            background: var(--blue); /* Changed from linear-gradient(135deg, var(--blue) 60%, var(--blue-dark) 100%) */
-            cursor: pointer;
-            /* Updated thumb shadow */
-            box-shadow: 0 2px 8px #1565c045;
-            /* Kept border for contrast */
-            border: 2.5px solid #fff;
-            transition: background 0.18s, transform 0.12s;
-        }
-        input[type="range"]:focus::-webkit-slider-thumb,
-        input[type="range"]::-webkit-slider-thumb:hover {
-            /* Updated thumb hover background to match dark blue for a subtle active state */
-            background: var(--blue-dark); /* Changed from linear-gradient(120deg, var(--blue-dark) 60%, var(--blue) 100%) */
-            transform: scale(1.04);
-        }
-        input[type="range"]::-moz-range-thumb {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            /* Updated thumb background to match primary blue and dark blue */
-            background: var(--blue); /* Changed from linear-gradient(135deg, var(--blue) 60%, var(--blue-dark) 100%) */
-            cursor: pointer;
-            /* Updated thumb shadow */
-            box-shadow: 0 2px 8px #1565c045;
-            /* Kept border for contrast */
-            border: 2.5px solid #fff;
-            transition: background 0.18s, transform 0.12s;
-        }
-        input[type="range"]:focus::-moz-range-thumb,
-        input[type="range"]::-moz-range-thumb:hover {
-            /* Updated thumb hover background to match dark blue for a subtle active state */
-            background: var(--blue-dark); /* Changed from linear-gradient(120deg, var(--blue-dark) 60%, var(--blue) 100%) */
-            transform: scale(1.04);
-        }
-        /* Remove outline for Firefox */
-        input[type="range"]:focus {
-            outline: none;
-        }
-        /* Custom Degree Selector Buttons */
-        .degree-buttons {
-            display: flex;
-            gap: 8px; /* Spacing between buttons */
-            margin-left: 8px; /* Align with label if desired */
-        }
-        .degree-button {
-            width: 40px; /* Make it square */
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* Updated border to match table borders in first app */
-            border: 1.5px solid #ddd; /* Changed from #c2dafc */
-            border-radius: 7px;
-            background: var(--surface);
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            /* Updated shadow to be consistent with first app's light shadows */
-            box-shadow: 0 1px 4px #0000000d; /* Changed from 0 1px 4px #1976d220 */
-            /* Updated text color to match main text in first app */
-            color: #222; /* Changed from #444 */
-        }
-        .degree-button:hover {
-            /* Updated border color to match a slightly darker grey for hover */
-            border-color: #aaa; /* Changed from var(--blue-dark) */
-            /* Updated hover shadow to be consistent with first app's light shadows */
-            box-shadow: 0 2px 8px #0000001a; /* Changed from 0 2px 8px #1976d230 */
-            transform: translateY(-1px);
-        }
-        .degree-button.active {
-            /* Updated active background to match primary blue and dark blue from first app */
-            background: var(--blue); /* Changed from linear-gradient(90deg, var(--blue-dark) 40%, var(--blue) 100%) */
-            color: #fff;
-            border-color: var(--blue-dark);
-            /* Updated active shadow */
-            box-shadow: 0 2px 10px #1565c045; /* Changed from 0 2px 10px #1976d245 */
-        }
-        /* Button */
-        button {
-            cursor: pointer;
-            border: none;
-            border-radius: 6px; /* Changed from 7px for consistency with first app's buttons */
-            font-size: 1em;
-            padding: 0.5em 1em; /* Changed from 0.57em 1.3em for consistency with first app's buttons */
-            /* Updated background to match secondary button in first app (green) for 'Add Segment' equivalent */
-            background: var(--green); /* Changed from linear-gradient(90deg, var(--blue-dark) 40%, var(--blue) 100%) */
-            color: #fff;
-            font-weight: 600;
-            /* Updated shadow to match first app's subtle shadows */
-            box-shadow: 0 2px 8px #0000000d; /* Changed from 0 2px 8px #1976d225 */
-            transition: filter .12s,transform .12s, box-shadow .18s;
-        }
-        button:hover { filter: brightness(1.1); box-shadow: 0 4px 18px #0000001a;} /* Updated hover shadow */
-        button:active { transform: scale(0.97); } /* Changed from 0.96 for consistency */
-        button:disabled { background: #ccc !important; cursor: not-allowed; filter: none; }
-        /* Plot area */
-        #plot {
-            width: 100%;
-            min-height: 350px;
-            background: #fff;
-            border-radius: var(--radius-sm);
-            /* Updated border to match grid canvas border in first app */
-            border: 1.5px solid #e0e0e0; /* Changed from #d1e2fb */
-            /* Updated shadow to match first app's subtle shadows */
-            box-shadow: 0 2px 10px #0000000d; /* Changed from 0 2px 10px #90caf930 */
-            margin-bottom: 0.2em;
-            padding: 0.2em;
-        }
-        /* Info panel */
-        .info-panel {
-            margin-top: 22px;
-            /* Updated background to match analysis results in first app */
-            background: #f8faff; /* Changed from linear-gradient(100deg, #eaf3fd 65%, #f8fafc 100%) */
-            padding: 1.4em 2em 1.3em 2em;
-            border-radius: var(--radius);
-            /* Updated border to match analysis results border in first app */
-            border: 1.5px solid #e8eef8; /* Changed from 1.5px solid #c9daf8 */
-            font-size: 1.01rem;
-            line-height: 1.68;
-            width: 100%;
-            box-sizing: border-box;
-            box-shadow: var(--shadow-sm);
-            text-align: left;
-            letter-spacing: 0.01em;
-            /* Updated text color to match dark grey in first app's analysis results */
-            color: #222; /* Changed from #202336 */
-        }
-        .info-panel h3 {
-            margin-top: 0;
-            /* Updated color to match dark text in first app */
-            color: #222; /* Changed from var(--blue-dark) and removed gradient text fill */
-            text-align: center;
-            font-size: 1.27em;
-            margin-bottom: 0.5em;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            /* Removed gradient background clip and text fill */
-            -webkit-background-clip: unset;
-            -webkit-text-fill-color: unset;
-        }
-        .info-panel strong {
-            font-weight: 700;
-            /* Updated color to match strong text in analysis results in first app */
-            color: #333; /* Changed from var(--blue-dark) */
-        }
-        /* Badge overlay */
-        .rescale-badge {
-            position: absolute;
-            top: 28px;
-            right: 38px;
-            /* Updated background to match primary blue from first app */
-            background: var(--blue); /* Changed from #1976d2 */
-            color: #fff;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 1em;
-            /* Updated shadow to match first app's subtle shadows */
-            box-shadow: 0 2px 8px #1565c065; /* Changed from 0 2px 8px #1976d265 */
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s;
-            z-index: 20;
-            letter-spacing: 0.03em;
-            user-select: none;
-        }
-        /* Responsive adjustments */
-        @media (max-width: 950px) {
-            .main-layout { flex-direction: column; gap: 1.4rem; }
-            .panel { flex-basis: auto; min-width: unset; width: 100%; }
-        }
-        @media (max-width: 600px) {
-            .container { padding: 1.2rem 0.3rem 0.6rem 0.3rem; margin: 7px auto; }
-            h2 { font-size: 1.45rem; }
-            .main-layout { gap: 1.05rem; }
-            .controls { flex-direction: column; align-items: stretch; padding: 0.7rem; }
-            .panel { padding: 0.85rem 0.6rem; }
-            .info-panel { padding: 0.8em 0.5em 1em 0.5em; font-size: 0.99rem;}
-            .slider-group label { min-width: unset; width: 100%; font-size: 1em; }
-            /* select { width: 100%; min-width: unset;} */ /* This style is now irrelevant */
-            .degree-buttons { width: 100%; justify-content: space-around; }
-            .degree-button { width: 35px; height: 35px; font-size: 0.9em; }
-            .rescale-badge { top: 10px; right: 10px; font-size: 0.9em; padding: 5px 10px;}
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integer Band – Interactive Zero‑Band Playground</title>
+  <style>
+    :root {
+      --primary: #1565c0;   /* blue  +1 */
+      --negative: #c62828;  /* red   –1 */
+      --light: #f5f5f5; --mid: #e0e0e0; --dark: #424242; --text: #212121;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--light);color:var(--text);display:flex;justify-content:center;align-items:center;min-height:100vh;padding:1rem}
+    .container{width:100%;max-width:840px;background:#fff;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.1);padding:1.7rem 2rem}
+    h2{text-align:center;font-size:1.9rem;color:var(--primary);margin-bottom:.35rem}
+    p.sub{text-align:center;font-size:.95rem;color:var(--dark);margin-bottom:1rem}
+    .tabs{display:flex;justify-content:center;gap:.6rem;margin-bottom:1rem}
+    .tab-btn{border:none;border-radius:4px 4px 0 0;background:var(--mid);padding:.45rem 1.25rem;font-size:.95rem;cursor:pointer}
+    .tab-btn.active{background:var(--primary);color:#fff}
+    .tab{display:none}.tab.active{display:block}
+    .eq{display:flex;justify-content:center;align-items:center;gap:.45rem;flex-wrap:wrap;margin-bottom:.7rem}
+    .eq input[type="number"],.eq input[readonly]{width:4.6rem;padding:.36rem .4rem;font-size:1rem;border:1px solid var(--mid);border-radius:4px;background:var(--light);text-align:center}
+    .eq input[readonly]{background:#fff;font-weight:600;width:5.4rem}
+    .eq span{font-size:1.26rem;font-weight:600}
+    .eq button{background:var(--primary);color:#fff;border:none;padding:.43rem 1.1rem;border-radius:4px;font-size:.92rem;cursor:pointer}
+    .toggle-op{background:#fff;color:var(--dark);border:1px solid var(--mid)}
+    .band-wrap{display:flex;justify-content:center;gap:1rem;margin:1rem 0}
+    .side{display:grid;grid-auto-columns:max-content;grid-auto-flow:column;align-items:end;gap:.6rem;width:240px;min-height:260px;border:1px dashed var(--mid);border-radius:3px;padding-bottom:.5rem}
+    .band-line{width:4px;background:var(--dark);min-height:260px;border-radius:2px}
+    .col{display:flex;flex-direction:column-reverse;align-items:center;gap:2px}
+    .sq{width:28px;height:28px;border:1px solid var(--mid);border-radius:4px;cursor:grab}
+    .sq.blue{background:var(--primary)}
+    .sq.red{background:var(--negative)}
+    .sq:active{cursor:grabbing}
+    .no-drop{cursor:not-allowed!important}
+    .pots{display:flex;justify-content:center;gap:1.5rem;margin-top:.2rem}
+    .pot{display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:4px;width:120px;min-height:72px;border:2px solid var(--mid);border-radius:6px;padding:6px;position:relative}
+    .pot-label{position:absolute;top:-1.2rem;left:50%;transform:translateX(-50%);font-size:.8rem;color:var(--dark)}
+    .result{text-align:center;margin-top:.7rem;font-size:1.2rem;font-weight:600}
+    .ok{color:green;animation:flash .8s ease-in-out}
+    .err{color:var(--negative);animation:shake .5s ease-in-out}
+    @keyframes flash{0%{opacity:0}50%{opacity:1}}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Interactive Polynomial Explorer</h2>
-        <div class="controls">
-            <label for="degree">Select polynomial degree: </label>
-            <div id="degree-selector-buttons" class="degree-buttons">
-            </div>
-        </div>
-        <div class="main-layout">
-            <div class="panel">
-                <div id="sliders" class="sliders"></div>
-            </div>
-            <div class="panel" id="plot-panel" style="position:relative;">
-                <div id="plot"></div>
-                <div id="rescale-badge" class="rescale-badge">Y-axis rescaled</div>
-            </div>
-        </div>
-        <div class="info-panel">
-            <h3>📊 Polynomial Properties</h3>
-            <div id="properties">Add coefficients to begin analysis.</div>
-        </div>
+  <div class="container">
+    <h2>Integer Band Playground</h2>
+    <p class="sub">Pick <strong>a</strong>, then <strong>b</strong>. In <em>Multiply</em>, use <em>Flip</em> and click <em>Replicate</em> until your array matches the product before <em>Submit</em>.</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="addTab">Add / Subtract</button>
+      <button class="tab-btn" data-tab="mulTab">Multiply</button>
     </div>
-    <script>
-        const slidersDiv = document.getElementById("sliders");
-        // const degreeSelector = document.getElementById("degree"); // No longer a select element
-        const degreeButtonsContainer = document.getElementById("degree-selector-buttons");
-        const plotDiv = document.getElementById("plot");
-        const propsDiv = document.getElementById("properties");
-        const rescaleBadge = document.getElementById("rescale-badge");
 
-        let sliders = [];
-        let currentSelectedDegree = 4; // Default to 4 as before
-
-        const varStr = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-        const epsilon = 1e-6; // Threshold for considering values close to zero
-
-        // Show badge overlay
-        function showRescaleBadge() {
-            rescaleBadge.style.opacity = '1';
-            clearTimeout(showRescaleBadge._timeout);
-            showRescaleBadge._timeout = setTimeout(() => {
-                rescaleBadge.style.opacity = '0';
-            }, 900);
-        }
-
-        // Helper function to format powers as superscripts
-        function formatPower(base, exponent) {
-            if (exponent === 0) return base;
-            if (exponent === 1) return base;
-            return `${base}<sup>${exponent}</sup>`;
-        }
-
-        // Helper function to format expressions with superscripts for display
-        function formatExpressionForDisplay(expr) {
-            return expr.replace(/x\^(\d+)/g, (match, p1) => {
-                const exponent = parseInt(p1);
-                if (exponent === 0) return '';
-                if (exponent === 1) return 'x';
-                return `x<sup>${exponent}</sup>`;
-            });
-        }
-
-        // Reusable function for formatting intervals
-        function formatIntervals(arr) {
-            if (arr.length === 0) return 'None';
-            arr.sort((a, b) => {
-                const startA = a.start === -Infinity ? -Infinity : a.start;
-                const startB = b.start === -Infinity ? -Infinity : b.start;
-                return startA - startB;
-            });
-
-            const mergedIntervals = [];
-            if (arr.length > 0) {
-                let current = { ...arr[0] };
-                for (let i = 1; i < arr.length; i++) {
-                    const next = arr[i];
-                    const currentEnd = current.end === Infinity ? Infinity : current.end;
-                    const nextStart = next.start === -Infinity ? -Infinity : next.start;
-
-                    if (nextStart <= currentEnd + epsilon) {
-                        current.end = Math.max(currentEnd, next.end === Infinity ? Infinity : next.end);
-                        current.endType = next.endType;
-                        if (nextStart === current.start && next.startType === 'open') {
-                             current.startType = 'open';
-                        }
-                    } else {
-                        mergedIntervals.push(current);
-                        current = { ...next };
-                    }
-                }
-                mergedIntervals.push(current);
-            }
-
-            return mergedIntervals.map(i => {
-                const openChar = i.startType === 'open' ? '(' : '[';
-                const closeChar = i.endType === 'open' ? ')' : ']';
-                let startVal = (i.start === -Infinity || i.start === '-Infinity') ? '−∞' : parseFloat(i.start).toFixed(2);
-                let endVal = (i.end === Infinity || i.end === '+Infinity') ? '+∞' : parseFloat(i.end).toFixed(2);
-
-                // Fix for -0
-                if (parseFloat(startVal) === 0) startVal = '0';
-                if (parseFloat(endVal) === 0) endVal = '0';
-
-                return `${openChar}${startVal}, ${endVal}${closeChar}`;
-            }).join(' \u222A ');
-        }
-
-        // --- New function to create degree buttons ---
-        function createDegreeButtons(selectedDegree) {
-            degreeButtonsContainer.innerHTML = ""; // Clear existing buttons
-            for (let i = 1; i <= 5; i++) {
-                const button = document.createElement("div");
-                button.className = "degree-button";
-                button.textContent = i;
-                button.dataset.degree = i; // Store degree value
-
-                if (i === selectedDegree) {
-                    button.classList.add("active");
-                }
-
-                button.addEventListener("click", () => {
-                    // Remove 'active' from previously active button
-                    const currentActive = document.querySelector(".degree-button.active");
-                    if (currentActive) {
-                        currentActive.classList.remove("active");
-                    }
-                    // Add 'active' to clicked button
-                    button.classList.add("active");
-                    currentSelectedDegree = parseInt(button.dataset.degree);
-                    createSliders(currentSelectedDegree);
-                });
-                degreeButtonsContainer.appendChild(button);
-            }
-        }
-        // --- End new function ---
-
-        function createSliders(degree) {
-            slidersDiv.innerHTML = "";
-            sliders = [];
-
-            for (let i = degree; i >= 0; i--) {
-                const group = document.createElement("div");
-                group.className = "slider-group";
-
-                const label = document.createElement("label");
-                // Label for constant term
-                label.innerHTML = i === 0 ? 'Constant term:' : `Coefficient of ${formatPower('x', i)}:`;
-
-                const input = document.createElement("input");
-                input.type = "range";
-                input.min = -10;
-                input.max = 10;
-                input.step = 0.1;
-                input.value = (i === degree && degree !== 0) ? 1 : 0;
-                if (degree === 0) input.value = 1;
-
-                input.dataset.power = i;
-
-                const span = document.createElement("span");
-                span.innerText = input.value;
-
-                input.oninput = () => {
-                    span.innerText = input.value;
-                    updateGraph();
-                };
-
-                group.appendChild(label);
-                group.appendChild(input);
-                group.appendChild(span);
-                slidersDiv.appendChild(group);
-
-                sliders.push(input);
-            }
-            updateGraph();
-        }
-
-        function getPolynomialExpr() {
-            let terms = sliders.map(s => {
-                let coef = parseFloat(s.value);
-                let pow = parseInt(s.dataset.power);
-
-                if (Math.abs(coef) < epsilon) return null;
-
-                let termStr;
-                if (pow === 0) {
-                    termStr = `${coef}`;
-                } else if (pow === 1) {
-                    if (coef === 1) termStr = 'x';
-                    else if (coef === -1) termStr = '-x';
-                    else termStr = `${coef}*x`;
-                } else {
-                    if (coef === 1) termStr = `x^${pow}`;
-                    else if (coef === -1) termStr = `-x^${pow}`;
-                    else termStr = `${coef}*x^${pow}`;
-                }
-                return termStr;
-            }).filter(Boolean);
-
-            return terms.length ? terms.join(" + ").replace(/\+ -/g, "- ") : "0";
-        }
-
-        /**
-         * Bisection method for finding roots of a function.
-         * @param {math.EvalFunction} func The compiled math.js function (e.g., df, ddf).
-         * @param {number} a The left endpoint of the interval.
-         * @param {number} b The right endpoint of the interval.
-         * @param {number} tolerance The desired accuracy for the root.
-         * @param {number} maxIterations Maximum number of iterations.
-         * @returns {Array<number>} An array containing the found root, or empty if no sign change.
-         */
-        function bisectionMethod(func, a, b, tolerance = 1e-9, maxIterations = 100) {
-            let fa = func.evaluate({ x: a });
-            let fb = func.evaluate({ x: b });
-
-            // Check if a root is even likely in the interval (must have a sign change)
-            if (fa * fb > 0 && Math.abs(fa) > tolerance && Math.abs(fb) > tolerance) {
-                return []; // No sign change, or both ends are zero/very close to zero with no real change
-            }
-
-            let c;
-            for (let i = 0; i < maxIterations; i++) {
-                c = (a + b) / 2;
-                let fc = func.evaluate({ x: c });
-
-                if (Math.abs(fc) < tolerance || (b - a) / 2 < tolerance) {
-                    return [c]; // Found a root within tolerance
-                }
-
-                if (fa * fc < 0) {
-                    b = c;
-                    fb = fc;
-                } else {
-                    a = c;
-                    fa = fc;
-                }
-            }
-            return [c]; // Return the best approximation after max iterations
-        }
-
-        function updateGraph() {
-            // const currentDegree = parseInt(degreeSelector.value); // Old way
-            const currentDegree = currentSelectedDegree; // New way
-            const rawExpr = getPolynomialExpr();
-            const displayExpr = formatExpressionForDisplay(rawExpr.replace(/\*/g, ''));
-
-            const node = math.parse(rawExpr);
-            const f = node.compile();
-
-            if (currentDegree === 0 || rawExpr === "0") {
-                const x_vals_plot = math.range(-10, 10, 0.1).toArray();
-                const y_val = (rawExpr === "0") ? 0 : parseFloat(sliders[0].value);
-                const y_vals_plot = x_vals_plot.map(() => y_val);
-
-                // Use fixed y-range for the zero/constant case
-                Plotly.react(plotDiv, [{
-                    x: x_vals_plot, y: y_vals_plot, mode: 'lines', name: 'f(x)',
-                    line: { color: varStr('--blue') }
-                }], {
-                    margin: { t: 50 },
-                    title: {
-                        text: `f(x) = ${displayExpr}`,
-                        y: 0.95, x: 0.5, xanchor: 'center', yanchor: 'top',
-                        font: { size: 18, family: varStr('--font-family') }
-                    },
-                    font: { family: varStr('--font-family'), color: '#222' },
-                    xaxis: { title: 'x', range: [-10, 10] },
-                    yaxis: { title: 'f(x)', range: [-10, 10] }
-                }, {responsive:true, animate: true});
-
-                propsDiv.innerHTML = `
-                    <strong>Function:</strong> f(x) = ${displayExpr}<br/><br/>
-                    <strong>Increasing Intervals:</strong> None<br/>
-                    <strong>Decreasing Intervals:</strong> None<br/>
-                    <strong>Constant Intervals:</strong> [−∞, +∞]<br/>
-                    <br/>
-                    <strong>Concave Up:</strong> None<br/>
-                    <strong>Concave Down:</strong> None<br/>
-                    <strong>Inflection Points:</strong> None
-                `;
-                return;
-            }
-
-            const df_node = math.derivative(node, 'x');
-            const df = df_node.compile();
-            const ddf_node = math.derivative(df_node, 'x');
-            const ddf = ddf_node.compile();
-
-            const x_analysis_min = -20;
-            const x_analysis_max = 20;
-            // Increased density for initial scan to improve bisection interval finding
-            const x_vals_full = math.range(x_analysis_min, x_analysis_max, 0.001).toArray();
-            const dy_vals_full = x_vals_full.map(x => df.evaluate({ x }));
-            const ddy_vals_full = x_vals_full.map(x => ddf.evaluate({ x }));
-
-            const x_vals_plot = math.range(-10, 10, 0.1).toArray();
-            const y_vals_plot = x_vals_plot.map(x => f.evaluate({x}));
-
-            // Determine y-axis range dynamically with sane clamping and visible changes
-            const minY = Math.min(...y_vals_plot);
-            const maxY = Math.max(...y_vals_plot);
-
-            // Clamp the limits for sanity (e.g. between -1000, 1000)
-            let yMin = Math.max(minY, -1000);
-            let yMax = Math.min(maxY, 1000);
-
-            // Prevent very narrow y-range (flat lines)
-            if (Math.abs(yMax - yMin) < 1e-3) {
-                yMin -= 1;
-                yMax += 1;
-            }
-
-            // Detect y-limits change and show badge
-            if (typeof updateGraph.prevYMin !== 'undefined') {
-                if (Math.abs(updateGraph.prevYMin - yMin) > 0.2 || Math.abs(updateGraph.prevYMax - yMax) > 0.2) {
-                    showRescaleBadge();
-                }
-            }
-            updateGraph.prevYMin = yMin;
-            updateGraph.prevYMax = yMax;
-
-            Plotly.react(plotDiv, [{
-                x: x_vals_plot, y: y_vals_plot, mode: 'lines', name: 'f(x)',
-                line: { color: varStr('--blue') }
-            }], {
-                margin: { t: 50 },
-                title: {
-                    text: `f(x) = ${displayExpr}`,
-                    y: 0.95, x: 0.5, xanchor: 'center', yanchor: 'top',
-                    font: { size: 18, family: varStr('--font-family') }
-                },
-                font: { family: varStr('--font-family'), color: '#222' },
-                xaxis: { title: 'x', range: [-10, 10] },
-                yaxis: { title: 'f(x)', range: [yMin, yMax] }
-            }, {responsive:true, animate: true});
-
-            const findRoots = (func, xCoords) => {
-                const roots = new Set();
-                const bisectionTolerance = 1e-8; // A tighter tolerance for bisection
-
-                for (let i = 0; i < xCoords.length - 1; i++) {
-                    const x1 = xCoords[i];
-                    const x2 = xCoords[i+1];
-                    const y1 = func.evaluate({ x: x1 });
-                    const y2 = func.evaluate({ x: x2 });
-
-                    if ((y1 < -epsilon && y2 > epsilon) || (y1 > epsilon && y2 < -epsilon)) {
-                        // Sign change detected, refine with bisection
-                        const foundRoot = bisectionMethod(func, x1, x2, bisectionTolerance);
-                        foundRoot.forEach(root => roots.add(root));
-                    } else if (Math.abs(y1) < epsilon) {
-                        // Point itself is very close to a root
-                        roots.add(x1);
-                    }
-                }
-                // Check the last point in the sampled range
-                if (Math.abs(func.evaluate({ x: xCoords[xCoords.length - 1] })) < epsilon) {
-                    roots.add(xCoords[xCoords.length - 1]);
-                }
-
-                return Array.from(roots).sort((a,b) => a-b);
-            };
-
-            const criticalPoints = findRoots(df_node, x_vals_full);
-            const inflectionCandidates = findRoots(ddf_node, x_vals_full);
-
-            const leadingCoefNode = sliders.find(s => parseInt(s.dataset.power) === currentDegree);
-            let leadingCoef_f = leadingCoefNode ? parseFloat(leadingCoefNode.value) : 0;
-
-            let fPrimeEndBehaviorSignAtPosInf = 0;
-            let fPrimeEndBehaviorSignAtNegInf = 0;
-            if (currentDegree > 0) {
-                const f_prime_leading_coef_val = currentDegree * leadingCoef_f;
-                if (Math.abs(f_prime_leading_coef_val) > epsilon) {
-                    fPrimeEndBehaviorSignAtPosInf = Math.sign(f_prime_leading_coef_val);
-                    if ((currentDegree - 1) % 2 !== 0) {
-                        fPrimeEndBehaviorSignAtNegInf = -fPrimeEndBehaviorSignAtPosInf;
-                    } else {
-                        fPrimeEndBehaviorSignAtNegInf = fPrimeEndBehaviorSignAtPosInf;
-                    }
-                }
-            }
-
-            let fDoublePrimeEndBehaviorSignAtPosInf = 0;
-            let fDoublePrimeEndBehaviorSignAtNegInf = 0;
-            if (currentDegree > 1) {
-                const f_double_prime_leading_coef_val = currentDegree * (currentDegree - 1) * leadingCoef_f;
-                if (Math.abs(f_double_prime_leading_coef_val) > epsilon) {
-                    fDoublePrimeEndBehaviorSignAtPosInf = Math.sign(f_double_prime_leading_coef_val);
-                    if ((currentDegree - 2) % 2 !== 0) {
-                        fDoublePrimeEndBehaviorSignAtNegInf = -fDoublePrimeEndBehaviorSignAtPosInf;
-                    } else {
-                        fDoublePrimeEndBehaviorSignAtNegInf = fDoublePrimeEndBehaviorSignAtPosInf;
-                    }
-                }
-            }
-
-            const allAnalysisPoints = Array.from(new Set([...criticalPoints, ...inflectionCandidates]))
-                .filter(p => p >= x_analysis_min - epsilon && p <= x_analysis_max + epsilon)
-                .sort((a,b) => a-b);
-
-            const increasing = [];
-            const decreasing = [];
-            const constant = [];
-            const concaveUp = [];
-            const concaveDown = [];
-            const finalInflectionPoints = new Set();
-
-            const getBehaviorSign = (x, derivativeType) => {
-                const adjustedX = x;
-
-                if (adjustedX < x_analysis_min - epsilon) {
-                    return derivativeType === 'first' ? fPrimeEndBehaviorSignAtNegInf : fDoublePrimeEndBehaviorSignAtNegInf;
-                } else if (adjustedX > x_analysis_max + epsilon) {
-                    return derivativeType === 'first' ? fPrimeEndBehaviorSignAtPosInf : fDoublePrimeEndBehaviorSignAtPosInf;
-                } else {
-                    try {
-                        if (derivativeType === 'first') return Math.sign(df.evaluate({ x: adjustedX }));
-                        if (derivativeType === 'second') return Math.sign(ddf.evaluate({ x: adjustedX }));
-                    } catch (e) {
-                        return 0;
-                    }
-                }
-            };
-
-            let prevPoint = -Infinity;
-            const pointsToProcess = [...allAnalysisPoints, Infinity];
-
-            for (const currentPoint of pointsToProcess) {
-                if (currentPoint !== Infinity && Math.abs(currentPoint - prevPoint) < epsilon) {
-                    continue;
-                }
-
-                const intervalStart = prevPoint;
-                const intervalEnd = currentPoint;
-                let testX;
-
-                if (intervalStart === -Infinity) {
-                    testX = (currentPoint === Infinity) ? 0 : currentPoint - 1;
-                    if (testX > -epsilon && testX < epsilon) testX = -1;
-                    if (testX < x_analysis_min) testX = x_analysis_min - 1;
-                } else if (intervalEnd === Infinity) {
-                    testX = intervalStart + 1;
-                    if (testX > -epsilon && testX < epsilon) testX = 1;
-                    if (testX > x_analysis_max) testX = x_analysis_max + 1;
-                } else {
-                    testX = (intervalStart + intervalEnd) / 2;
-                }
-
-                const dy_sign = getBehaviorSign(testX, 'first');
-                const ddy_sign = getBehaviorSign(testX, 'second');
-
-                const intervalObj = {
-                    start: intervalStart,
-                    end: intervalEnd,
-                    startType: 'open',
-                    endType: 'open'
-                };
-
-                if (dy_sign > 0) {
-                    increasing.push(intervalObj);
-                } else if (dy_sign < 0) {
-                    decreasing.push(intervalObj);
-                } else {
-                    constant.push(intervalObj);
-                }
-
-                if (ddy_sign > 0) {
-                    concaveUp.push(intervalObj);
-                } else if (ddy_sign < 0) {
-                    concaveDown.push(intervalObj);
-                }
-
-                prevPoint = currentPoint;
-            }
-
-            inflectionCandidates.forEach(p => {
-                const y_dd_at_p = ddf.evaluate({x:p});
-                if (Math.abs(y_dd_at_p) < epsilon) {
-                    const sign_left = getBehaviorSign(p - epsilon * 10, 'second');
-                    const sign_right = getBehaviorSign(p + epsilon * 10, 'second');
-                    if (sign_left !== sign_right && sign_left !== 0 && sign_right !== 0) {
-                        finalInflectionPoints.add(p.toFixed(2));
-                    }
-                }
-            });
-
-            propsDiv.innerHTML = `
-                <strong>Function:</strong> f(x) = ${displayExpr}<br/><br/>
-                <strong>Increasing Intervals:</strong> ${formatIntervals(increasing)}<br/>
-                <strong>Decreasing Intervals:</strong> ${formatIntervals(decreasing)}<br/>
-                <strong>Constant Intervals:</strong> ${formatIntervals(constant)}<br/>
-                <br/>
-                <strong>Concave Up:</strong> ${formatIntervals(concaveUp)}<br/>
-                <strong>Concave Down:</strong> ${formatIntervals(concaveDown)}<br/>
-                <strong>Inflection Points:</strong> ${Array.from(finalInflectionPoints).sort((a,b) => parseFloat(a)-parseFloat(b)).join(', ') || 'None'}
-            `;
-        }
-
-        // Initialize degree buttons and sliders
-        document.addEventListener("DOMContentLoaded", () => {
-            createDegreeButtons(currentSelectedDegree); // Initialize buttons with default active degree
-            createSliders(currentSelectedDegree); // Initialize sliders based on default degree
-        });
-    </script>
+    <!-- ADD / SUBTRACT -->
+    <section id="addTab" class="tab active">
+      <div class="eq">
+        <input id="aAdd" type="number" min="-9" max="9" value="3" />
+        <button id="opToggle" class="toggle-op" aria-label="toggle plus minus">+</button>
+        <input id="bAdd" type="number" min="-9" max="9" value="2" />
+        <span>=</span>
+        <input id="ansAdd" readonly placeholder="?" />
+        <button id="doneAdd">Done</button>
+        <button id="resetAdd" style="background:var(--dark)">Reset</button>
+      </div>
+      <div class="band-wrap">
+        <div class="side" id="leftAdd"></div>
+        <div class="band-line"></div>
+        <div class="side" id="rightAdd"></div>
+      </div>
+      <div class="pots">
+        <div class="pot" id="bluePot"><span class="pot-label">Blue (+1)</span></div>
+        <div class="pot" id="redPot"><span class="pot-label">Red (–1)</span></div>
+      </div>
+      <div id="feedAdd" class="result"></div>
+    </section>
+
+    <!-- MULTIPLY -->
+    <section id="mulTab" class="tab">
+      <div class="eq">
+        <input id="aMul" type="number" min="-4" max="4" value="2" />
+        <span>×</span>
+        <input id="bMul" type="number" min="-4" max="4" value="-3" />
+        <span>=</span>
+        <input id="ansMul" readonly placeholder="?" />
+        <button id="flipMul">Flip</button>
+        <button id="repMul">Replicate</button>
+        <button id="submitMul">Submit</button>
+        <button id="resetMul" style="background:var(--dark)">Reset</button>
+      </div>
+      <div class="band-wrap">
+        <div class="side" id="leftMul"></div>
+        <div class="band-line"></div>
+        <div class="side" id="rightMul"></div>
+      </div>
+      <div id="feedMul" class="result"></div>
+    </section>
+  </div>
+
+<script>
+const $=id=>document.getElementById(id);
+const makeSq=c=>{const d=document.createElement('div');d.className='sq '+c;d.draggable=true;return d};
+const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+/* Tabs */
+document.querySelectorAll('.tab-btn').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));$(btn.dataset.tab).classList.add('active');});
+/******** ADD / SUB ********/
+const leftA=$('leftAdd'), rightA=$('rightAdd'), bluePot=$('bluePot'), redPot=$('redPot');
+let dragEl=null;
+const replenish=(pot,col)=>{while(pot.children.length<6)pot.appendChild(makeSq(col));};
+replenish(bluePot,'blue');replenish(redPot,'red');
+function allow(e){e.preventDefault();}
+function dropFactory(target,isRight){return e=>{e.preventDefault();if(!dragEl)return;const blue=dragEl.classList.contains('blue');if(target.classList.contains('pot')||(blue&&isRight)||(!blue&&!isRight)){target.appendChild(dragEl);updateAddAns();replenish(bluePot,'blue');replenish(redPot,'red');}else{dragEl.classList.add('no-drop');setTimeout(()=>dragEl.classList.remove('no-drop'),300);}}}
+[bluePot,redPot,leftA,rightA].forEach(el=>{el.ondragover=allow});
+bluePot.ondrop=dropFactory(bluePot,false);redPot.ondrop=dropFactory(redPot,false);leftA.ondrop=dropFactory(leftA,false);rightA.ondrop=dropFactory(rightA,true);
+document.body.addEventListener('dragstart',e=>{if(e.target.classList.contains('sq'))dragEl=e.target});document.body.addEventListener('dragend',()=>{dragEl=null});
+function drawAAdd(){leftA.innerHTML='';rightA.innerHTML='';const a=clamp(parseInt($('aAdd').value||0,10),-9,9);if(a!==0){const col=document.createElement('div');col.className='col';if(a>0){for(let i=0;i<a;i++)col.appendChild(makeSq('blue'));rightA.appendChild(col);}else{for(let i=0;i<-a;i++)col.appendChild(makeSq('red'));leftA.appendChild(col);}}updateAddAns();}
+$('aAdd').oninput=drawAAdd;drawAAdd();
+$('opToggle').onclick=()=>{$('opToggle').textContent=$('opToggle').textContent==='+'?'−':'+'};
+function cancelPairs(){const reds=[...leftA.querySelectorAll('.sq.red')];const blues=[...rightA.querySelectorAll('.sq.blue')];const m=Math.min(reds.length,blues.length);for(let i=0;i<m;i++){reds[i].remove();blues[i].remove();}}
+function updateAddAns(){const net=rightA.querySelectorAll('.sq.blue').length-leftA.querySelectorAll('.sq.red').length;$('ansAdd').value=net;}
+$('doneAdd').onclick=()=>{cancelPairs();updateAddAns();const a=parseInt($('aAdd').value||0,10);const b=parseInt($('bAdd').value||0,10);const op=$('opToggle').textContent==='+'?1:-1;const expected=a+op*b;const actual=parseInt($('ansAdd').value||0,10);const f=$('feedAdd');f.className='result '+(actual===expected?'ok':'err');f.textContent=actual===expected?'✔ Correct!':'✖ Try again…';}
+$('resetAdd').onclick=()=>{$('bAdd').value='';$('ansAdd').value='';$('feedAdd').textContent='';drawAAdd();}
+/******** MULTIPLY ********/
+const leftM=$('leftMul'), rightM=$('rightMul');
+function drawAMul(){leftM.innerHTML='';rightM.innerHTML='';const a=clamp(parseInt($('aMul').value||0,10),-4,4);if(a!==0){const col=document.createElement('div');col.className='col';if(a>0){for(let i=0;i<a;i++)col.appendChild(makeSq('blue'));rightM.appendChild(col);}else{for(let i=0;i<-a;i++)col.appendChild(makeSq('red'));leftM.appendChild(col);}}updateMulAns();}
+$('aMul').oninput=drawAMul;drawAMul();
+$('flipMul').onclick=()=>{[...rightM.children].forEach(col=>{col.querySelectorAll('.sq.blue').forEach(s=>s.classList.replace('blue','red'));leftM.appendChild(col);});[...leftM.children].forEach(col=>{col.querySelectorAll('.sq.red').forEach(s=>s.classList.replace('red','blue'));rightM.appendChild(col);});updateMulAns();};
+$('repMul').onclick=()=>{const src=rightM.children.length?rightM:leftM;if(!src.children.length)return;src.appendChild(src.children[0].cloneNode(true));updateMulAns();};
+function updateMulAns(){const net=rightM.querySelectorAll('.sq.blue').length-leftM.querySelectorAll('.sq.red').length;$('ansMul').value=net;}
+$('submitMul').onclick=()=>{updateMulAns();const a=parseInt($('aMul').value||0,10);const b=parseInt($('bMul').value||0,10);const expected=a*b;const actual=parseInt($('ansMul').value||0,10);const f=$('feedMul');f.className='result '+(actual===expected?'ok':'err');f.textContent=actual===expected?'✔ Correct!':'✖ Try again…';};
+$('resetMul').onclick=()=>{$('ansMul').value='';$('feedMul').textContent='';drawAMul();};
+</script>
 </body>
 </html>
