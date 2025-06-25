@@ -5,23 +5,47 @@
 <title>Interactive Trig‑Explorer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-:root{--blue:#1565c0;--red:#d32f2f;--gray:#d0d0d0;--lite:#fafafa;--purple:#6a1b9a}
+:root{--blue:#1565c0;--red:#d32f2f;--gray:#d0d0d0;--lite:#fafafa;--purple:#6a1b9a;--blue-light:#e3f2fd;--red-light:#ffebee;--purple-light:#f3e5f5}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--lite);color:#222;min-height:100vh;display:flex;flex-direction:column;line-height:1.5}
-nav{background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(135deg, #fafafa 0%, #f0f4f8 100%);color:#222;min-height:100vh;display:flex;flex-direction:column;line-height:1.5}
+nav{background:linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);box-shadow:0 4px 12px rgba(0,0,0,.1);border-bottom:1px solid rgba(21,101,192,.1)}
 nav ul{display:flex;list-style:none}
-nav button{flex:1;padding:1rem;border:none;background:none;border-bottom:4px solid transparent;font-size:1rem;cursor:pointer}
-nav button[aria-selected="true"]{border-color:var(--blue);font-weight:600}
-main{flex:1;padding:1rem;display:flex;justify-content:center}
-.tab{display:none;width:100%;max-width:960px;background:#fff;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,.1);padding:1rem}
-.tab.active{display:block}
-h2{font-size:1.3rem;color:var(--blue);margin-bottom:.5rem}
-canvas{background:var(--lite);border:1px solid var(--gray);border-radius:4px;touch-action:none}
-.output{margin-top:.5rem;font-family:monospace}
-.pills{display:flex;gap:.5rem;margin-bottom:.5rem}
-.pill{padding:.25rem .8rem;border:1px solid var(--blue);border-radius:16px;font-size:.9rem;cursor:pointer;user-select:none}
-.pill.active{background:var(--blue);color:#fff}
-label{font-size:.85rem}
+nav button{flex:1;padding:1.2rem;border:none;background:none;border-bottom:4px solid transparent;font-size:1rem;cursor:pointer;transition:all 0.3s ease;position:relative;font-weight:500}
+nav button:hover{background:rgba(21,101,192,.05);transform:translateY(-1px)}
+nav button[aria-selected="true"]{border-color:var(--blue);font-weight:600;background:rgba(21,101,192,.08)}
+nav button[aria-selected="true"]::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg, var(--blue), var(--purple));border-radius:0 0 2px 2px}
+main{flex:1;padding:1.5rem;display:flex;justify-content:center}
+.tab{display:none;width:100%;max-width:1000px;background:linear-gradient(135deg, #ffffff 0%, #fdfdfd 100%);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);padding:1.5rem;border:1px solid rgba(21,101,192,.08)}
+.tab.active{display:block;animation:fadeIn 0.4s ease-in-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+h2{font-size:1.4rem;color:var(--blue);margin-bottom:1rem;font-weight:600;display:flex;align-items:center;gap:0.5rem}
+h2::before{content:'';width:4px;height:24px;background:linear-gradient(135deg, var(--blue), var(--purple));border-radius:2px}
+.intro{background:linear-gradient(135deg, var(--blue-light) 0%, rgba(227,242,253,.5) 100%);border:1px solid rgba(21,101,192,.15);border-radius:12px;padding:1rem;margin-bottom:1.5rem;font-size:0.95rem;line-height:1.6}
+.intro h3{color:var(--blue);font-size:1.1rem;margin-bottom:0.5rem;font-weight:600}
+.intro p{margin-bottom:0.5rem}
+.intro strong{color:var(--blue)}
+canvas{background:linear-gradient(135deg, #ffffff 0%, var(--lite) 100%);border:2px solid rgba(21,101,192,.1);border-radius:8px;touch-action:none;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:box-shadow 0.3s ease}
+canvas:hover{box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.output{margin-top:1rem;font-family:monospace;background:rgba(21,101,192,.04);padding:0.75rem;border-radius:8px;border-left:4px solid var(--blue);font-size:0.9rem}
+.pills{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.pill{padding:.4rem 1rem;border:2px solid var(--blue);border-radius:20px;font-size:.9rem;cursor:pointer;user-select:none;transition:all 0.3s ease;font-weight:500;background:rgba(255,255,255,.8)}
+.pill:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(21,101,192,.2)}
+.pill.active{background:linear-gradient(135deg, var(--blue), var(--purple));color:#fff;transform:translateY(-1px);box-shadow:0 4px 12px rgba(21,101,192,.3)}
+label{font-size:.9rem;font-weight:500;color:#555;display:flex;align-items:center;gap:0.5rem}
+input[type="range"]{appearance:none;background:transparent;cursor:pointer;flex:1}
+input[type="range"]::-webkit-slider-track{background:linear-gradient(90deg, rgba(21,101,192,.2), rgba(21,101,192,.4));height:6px;border-radius:3px}
+input[type="range"]::-webkit-slider-thumb{appearance:none;height:20px;width:20px;border-radius:50%;background:linear-gradient(135deg, var(--blue), var(--purple));cursor:pointer;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+input[type="range"]::-moz-range-track{background:linear-gradient(90deg, rgba(21,101,192,.2), rgba(21,101,192,.4));height:6px;border-radius:3px;border:none}
+input[type="range"]::-moz-range-thumb{height:20px;width:20px;border-radius:50%;background:linear-gradient(135deg, var(--blue), var(--purple));cursor:pointer;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.slider-container{display:flex;align-items:center;gap:1rem;margin-top:1rem;max-width:440px;background:rgba(255,255,255,.6);padding:1rem;border-radius:12px;border:1px solid rgba(21,101,192,.1)}
+.angle-value{font-family:monospace;width:60px;text-align:right;font-size:.9rem;font-weight:600;color:var(--blue)}
+select{padding:0.5rem 1rem;border:2px solid var(--blue);border-radius:8px;background:white;font-size:0.9rem;cursor:pointer;transition:all 0.3s ease}
+select:hover{border-color:var(--purple);box-shadow:0 2px 8px rgba(21,101,192,.1)}
+select:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(21,101,192,.1)}
+input[type="checkbox"]{accent-color:var(--blue);transform:scale(1.1)}
+.canvas-group{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;justify-content:center}
+.deg-rad-container{display:flex;gap:1.5rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
+.checkbox-container{margin-bottom:1rem;padding:0.75rem;background:rgba(255,255,255,.6);border-radius:8px;border:1px solid rgba(21,101,192,.1)}
 </style>
 </head>
 <body>
@@ -33,30 +57,67 @@ label{font-size:.85rem}
 </ul></nav>
 <main>
 <section id="tri" class="tab">
-  <h2>Right Triangle</h2>
-  <canvas id="triC" width="440" height="320"></canvas>
-  <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; max-width: 440px;">
-    <label for="angleSlider" style="font-size: .9rem;">Angle of Interest:</label>
-    <input type="range" id="angleSlider" min="0" max="90" step="0.1" style="flex: 1;">
-    <span id="angleValue" style="font-family: monospace; width: 50px; text-align: right; font-size: .9rem;"></span>
-  </div>
-  <div id="triO" class="output"></div>
+  <h2>Right Triangle</h2>
+  <div class="intro">
+    <h3>Fundamental Trigonometric Ratios</h3>
+    <p>This tab explores the fundamental trigonometric ratios (sine, cosine, tangent) in the context of a right-angled triangle.</p>
+    <p><strong>How to use:</strong> Drag the slider to change the angle of interest and observe how the side lengths and their ratios change.</p>
+  </div>
+  <canvas id="triC" width="440" height="320"></canvas>
+  <div class="slider-container">
+    <label for="angleSlider">Angle of Interest:</label>
+    <input type="range" id="angleSlider" min="0" max="90" step="0.1">
+    <span id="angleValue" class="angle-value"></span>
+  </div>
+  <div id="triO" class="output"></div>
 </section>
-<section id="unit" class="tab"><h2>Unit Circle</h2>
-  <div class="pills" id="ratios"><span class="pill active" data-r="sin">sin</span><span class="pill" data-r="cos">cos</span><span class="pill" data-r="tan">tan</span></div>
-  <canvas id="unitC" width="420" height="420"></canvas>
-  <canvas id="wheelC" width="120" height="120" style="margin-top:.5rem"></canvas>
-  <div id="unitO" class="output"></div>
+<section id="unit" class="tab">
+  <h2>Unit Circle</h2>
+  <div class="intro">
+    <h3>Beyond Right-Angled Triangles</h3>
+    <p>The Unit Circle extends trigonometry beyond right-angled triangles to any angle. It's the foundation for understanding periodic functions. The circle has a radius of 1.</p>
+    <p><strong>How to use:</strong> Drag the point on the large circle or the smaller wheel. Click the 'sin', 'cos', and 'tan' pills to visualize their values.</p>
+  </div>
+  <div class="pills" id="ratios">
+    <span class="pill active" data-r="sin">sin</span>
+    <span class="pill" data-r="cos">cos</span>
+    <span class="pill" data-r="tan">tan</span>
+  </div>
+  <canvas id="unitC" width="420" height="420"></canvas>
+  <canvas id="wheelC" width="120" height="120" style="margin-top:.5rem"></canvas>
+  <div id="unitO" class="output"></div>
 </section>
-<section id="deg" class="tab"><h2>Degrees ↔ Radians</h2>
-<label><input type="checkbox" id="negChk"> use CW (negative)</label>
-<div style="display:flex;gap:1rem;margin-top:.5rem">
-  <canvas id="degC" width="350" height="350"></canvas>
-  <canvas id="radC" width="350" height="350"></canvas>
-</div></section>
-<section id="graph" class="tab active"><h2>Graph</h2>
-<select id="gFn"><option value="sin">sin</option><option value="cos">cos</option><option value="tan">tan</option></select>
-<div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:.5rem;justify-content:center"><canvas id="gUC" width="310" height="310"></canvas><canvas id="gPlot" width="640" height="320"></canvas></div>
+<section id="deg" class="tab">
+  <h2>Degrees ↔ Radians</h2>
+  <div class="intro">
+    <h3>Two Units for Measuring Angles</h3>
+    <p>This tab helps visualize the relationship between Degrees and Radians, the two primary units for measuring angles. An angle of <code>1π</code> radians is equivalent to a 180° rotation.</p>
+    <p><strong>How to use:</strong> Drag the point on either circle to see the corresponding angles. Use the checkbox to switch between counter-clockwise (positive) and clockwise (negative) angles.</p>
+  </div>
+  <div class="checkbox-container">
+    <label><input type="checkbox" id="negChk"> use CW (negative)</label>
+  </div>
+  <div class="deg-rad-container">
+    <canvas id="degC" width="350" height="350"></canvas>
+    <canvas id="radC" width="350" height="350"></canvas>
+  </div>
+</section>
+<section id="graph" class="tab active">
+  <h2>Graph</h2>
+  <div class="intro">
+    <h3>From Circle to Wave Functions</h3>
+    <p>This tab shows how the trigonometric values from the unit circle unfold into continuous wave functions.</p>
+    <p><strong>How to use:</strong> Use the dropdown to select a function. Drag the point on the unit circle to see how its position corresponds to a point on the graph.</p>
+  </div>
+  <select id="gFn">
+    <option value="sin">sin</option>
+    <option value="cos">cos</option>
+    <option value="tan">tan</option>
+  </select>
+  <div class="canvas-group">
+    <canvas id="gUC" width="310" height="310"></canvas>
+    <canvas id="gPlot" width="640" height="320"></canvas>
+  </div>
 </section>
 </main>
 <script>
@@ -65,8 +126,8 @@ const TAU = Math.PI*2, SNAP=0.04, COMM=[...Array(24)].map((_,i)=>i*Math.PI/12);
 let angle=Math.PI/6; // global shared state
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const snap=a=>COMM.find(c=>Math.abs(a-c)<SNAP)||a,
-      clr=ctx=>ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height),
-      circ=(ctx,x,y,r)=>{ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();};
+      clr=ctx=>ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height),
+      circ=(ctx,x,y,r)=>{ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();};
 const renders={}, updateAll=()=>Object.values(renders).forEach(f=>f());
 /***** navigation *****/
 $$('nav button').forEach(btn=>btn.onclick=()=>{ $$("nav button").forEach(b=>b.ariaSelected=false); btn.ariaSelected=true; $$('.tab').forEach(tab=>tab.classList.toggle('active',tab.id===btn.dataset.tab));});
