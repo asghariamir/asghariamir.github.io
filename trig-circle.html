@@ -32,18 +32,27 @@ label{font-size:.85rem}
 <li><button data-tab="graph">Graph</button></li>
 </ul></nav>
 <main>
-<section id="tri" class="tab active"><h2>Right Triangle</h2><canvas id="triC" width="440" height="320"></canvas><div id="triO" class="output"></div></section>
+<section id="tri" class="tab active">
+  <h2>Right Triangle</h2>
+  <canvas id="triC" width="440" height="320"></canvas>
+  <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; max-width: 440px;">
+    <label for="angleSlider" style="font-size: .9rem;">Angle of Interest:</label>
+    <input type="range" id="angleSlider" min="0" max="90" step="0.1" style="flex: 1;">
+    <span id="angleValue" style="font-family: monospace; width: 50px; text-align: right; font-size: .9rem;"></span>
+  </div>
+  <div id="triO" class="output"></div>
+</section>
 <section id="unit" class="tab"><h2>Unit Circle</h2>
-  <div class="pills" id="ratios"><span class="pill active" data-r="sin">sin</span><span class="pill" data-r="cos">cos</span><span class="pill" data-r="tan">tan</span></div>
-  <canvas id="unitC" width="420" height="420"></canvas>
-  <canvas id="wheelC" width="120" height="120" style="margin-top:.5rem"></canvas>
-  <div id="unitO" class="output"></div>
+  <div class="pills" id="ratios"><span class="pill active" data-r="sin">sin</span><span class="pill" data-r="cos">cos</span><span class="pill" data-r="tan">tan</span></div>
+  <canvas id="unitC" width="420" height="420"></canvas>
+  <canvas id="wheelC" width="120" height="120" style="margin-top:.5rem"></canvas>
+  <div id="unitO" class="output"></div>
 </section>
 <section id="deg" class="tab"><h2>Degrees ↔ Radians</h2>
 <label><input type="checkbox" id="negChk"> use CW (negative)</label>
 <div style="display:flex;gap:1rem;margin-top:.5rem">
-  <canvas id="degC" width="350" height="350"></canvas>
-  <canvas id="radC" width="350" height="350"></canvas>
+  <canvas id="degC" width="350" height="350"></canvas>
+  <canvas id="radC" width="350" height="350"></canvas>
 </div></section>
 <section id="graph" class="tab"><h2>Graph</h2>
 <select id="gFn"><option value="sin">sin</option><option value="cos">cos</option><option value="tan">tan</option></select>
@@ -56,19 +65,28 @@ const TAU = Math.PI*2, SNAP=0.04, COMM=[...Array(24)].map((_,i)=>i*Math.PI/12);
 let angle=Math.PI/6; // global shared state
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const snap=a=>COMM.find(c=>Math.abs(a-c)<SNAP)||a,
-      clr=ctx=>ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height),
-      circ=(ctx,x,y,r)=>{ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();};
+      clr=ctx=>ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height),
+      circ=(ctx,x,y,r)=>{ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();};
 const renders={}, updateAll=()=>Object.values(renders).forEach(f=>f());
 /***** navigation *****/
 $$('nav button').forEach(btn=>btn.onclick=()=>{ $$("nav button").forEach(b=>b.ariaSelected=false); btn.ariaSelected=true; $$('.tab').forEach(tab=>tab.classList.toggle('active',tab.id===btn.dataset.tab));});
 /***** Triangle tab *****/
-(()=>{const cvs=triC,ctx=cvs.getContext('2d');const base={x:40,y:cvs.height-20},diam=360,R=diam/2,center={x:base.x+R,y:base.y};let dragging=false;
+(()=>{const cvs=triC,ctx=cvs.getContext('2d');const base={x:40,y:cvs.height-20},diam=360,R=diam/2,center={x:base.x+R,y:base.y};
+const slider=$('#angleSlider'),angleValueSpan=$('#angleValue');
 const point=a=>({x:center.x+R*Math.cos(Math.PI-a),y:center.y-R*Math.sin(Math.PI-a)});
 function protractor(){ctx.strokeStyle='rgba(0,0,0,.15)';for(let d=0;d<=90;d+=10){const a=d*Math.PI/180;ctx.beginPath();ctx.moveTo(base.x,base.y);ctx.lineTo(base.x+40*Math.cos(a),base.y-40*Math.sin(a));ctx.stroke();}ctx.strokeStyle='#000';}
-function draw(){clr(ctx);const p=point(((angle%TAU)+TAU)%Math.PI);ctx.beginPath();ctx.moveTo(base.x,base.y);ctx.lineTo(p.x,p.y);ctx.lineTo(base.x+diam,base.y);ctx.closePath();ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,5,0,TAU);ctx.fill();protractor();triO.innerHTML=`sin=${Math.sin(angle).toFixed(3)}<br>cos=${Math.cos(angle).toFixed(3)}<br>tan=${Math.tan(angle).toFixed(3)}`;}
-function move(e){if(!dragging) return;const r=cvs.getBoundingClientRect();const dx=e.clientX-r.left-center.x,dy=center.y-(e.clientY-r.top);const a=Math.atan2(dy,dx);if(a<=0||a>=Math.PI) return;angle=snap(a);draw();updateAll();}
-cvs.onpointerdown=e=>{dragging=true;move(e);};window.addEventListener('pointermove',move);window.addEventListener('pointerup',()=>dragging=false);
-renders.tri=draw;draw();})();
+function draw(){clr(ctx);const p=point(((angle%TAU)+TAU)%Math.PI);ctx.beginPath();ctx.moveTo(base.x,base.y);ctx.lineTo(p.x,p.y);ctx.lineTo(base.x+diam,base.y);ctx.closePath();ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,5,0,TAU);ctx.fill();protractor();
+const cornerAngleRad=angle/2;const targetAngleRad=(Math.PI/2)-cornerAngleRad;const targetAngleDeg=(targetAngleRad*180/Math.PI).toFixed(1);
+triO.innerHTML=`sin(${targetAngleDeg}°) = ${Math.sin(targetAngleRad).toFixed(3)}<br>cos(${targetAngleDeg}°) = ${Math.cos(targetAngleRad).toFixed(3)}<br>tan(${targetAngleDeg}°) = ${Math.tan(targetAngleRad).toFixed(3)}`;
+angleValueSpan.textContent=`${targetAngleDeg}°`;}
+function setup(){const initialCornerAngleRad=angle/2;const initialTargetAngleRad=(Math.PI/2)-initialCornerAngleRad;const initialTargetAngleDeg=initialTargetAngleRad*180/Math.PI;
+slider.value=initialTargetAngleDeg;
+draw();}
+slider.addEventListener('input',()=>{const targetAngleDeg=parseFloat(slider.value);const targetAngleRad=targetAngleDeg*Math.PI/180;
+const cornerAngleRad=(Math.PI/2)-targetAngleRad;
+angle=2*cornerAngleRad;
+draw();updateAll();});
+renders.tri=setup;setup();})();
 /***** Unit Circle tab *****/
 (()=>{const cvs=unitC,ctx=cvs.getContext('2d');const wheel=wheelC,wctx=wheel.getContext('2d');const cx=cvs.width/2,r=cx-40;let dragging=false,dragCanvas=null,prevRaw=0;
 const pills=$$('#ratios .pill'),active=new Set(['sin']);pills.forEach(p=>p.onclick=()=>{p.classList.toggle('active');(p.classList.contains('active')?active.add:active.delete).call(active,p.dataset.r);draw();});
@@ -89,8 +107,8 @@ const aFrom=(e,cv)=>{const r=cv.getBoundingClientRect();return Math.atan2(cv.hei
 function move(e){if(!dragging) return;angle=snap(aFrom(e,dragging==='deg'?degC:radC));draw();updateAll();}
 degC.onpointerdown=e=>{dragging='deg';move(e);};radC.onpointerdown=e=>{dragging='rad';move(e);};window.addEventListener('pointermove',move);window.addEventListener('pointerup',()=>dragging=null);neg.onchange=draw;renders.deg=draw;draw();})();
 /***** Graph tab *****/
-(()=>{const uc=gUC,uctx=uc.getContext('2d');const gp=gPlot,gx=gp.getContext('2d');const CC=uc.width/2,R=CC-30;let dragging=false;const range=[-2*Math.PI,2*Math.PI];
-function drawUC(){clr(uctx);uctx.lineWidth=1;uctx.strokeStyle='#000';circ(uctx,CC,CC,R);uctx.strokeStyle='#bbb';uctx.beginPath();uctx.moveTo(CC-R-20,CC);uctx.lineTo(CC+R+20,CC);uctx.moveTo(CC,CC-R-20);uctx.lineTo(CC,CC+R+20);uctx.stroke();uctx.font='14px sans-serif';uctx.fillStyle='#222';uctx.textAlign='left';uctx.fillText('cos',CC+R+5,CC+5);uctx.textAlign='center';uctx.fillText('sin',CC,CC-R-10);const px=CC+R*Math.cos(angle),py=CC-R*Math.sin(angle);uctx.fillStyle='#000';uctx.beginPath();uctx.arc(px,py,5,0,TAU);uctx.fill();uctx.lineWidth=3;const fn=gFn.value;if(fn==='sin'){uctx.strokeStyle='#d32f2f';uctx.beginPath();uctx.moveTo(CC,CC);uctx.lineTo(CC,py);uctx.stroke();}else if(fn==='cos'){uctx.strokeStyle='#1565c0';uctx.beginPath();uctx.moveTo(CC,CC);uctx.lineTo(px,CC);uctx.stroke();}else{const tx=CC+R,tan_y=CC-R*Math.tan(angle);uctx.lineWidth=1;uctx.strokeStyle='#bbb';uctx.beginPath();uctx.moveTo(tx,CC-R-20);uctx.lineTo(tx,CC+R+20);uctx.stroke();uctx.textAlign='left';uctx.font='14px sans-serif';uctx.fillStyle='#222';uctx.fillText('tan',tx-10,CC-R-5);uctx.strokeStyle='rgba(0,0,0,0.5)';uctx.setLineDash([4,4]);uctx.beginPath();uctx.moveTo(CC,CC);uctx.lineTo(tx,tan_y);uctx.stroke();uctx.setLineDash([]);uctx.strokeStyle='#6a1b9a';uctx.lineWidth=3;uctx.beginPath();uctx.moveTo(tx,CC);uctx.lineTo(tx,tan_y);uctx.stroke();}}
+(()=>{const uc=gUC,uctx=uc.getContext('2d');const gp=gPlot,gx=gp.getContext('2d');const CC=uc.width/2,R=CC-30;let dragging=false;
+function drawUC(){clr(uctx);uctx.lineWidth=1;uctx.strokeStyle='#000';circ(uctx,CC,CC,R);uctx.strokeStyle='#bbb';uctx.beginPath();uctx.moveTo(CC-R-20,CC);uctx.lineTo(CC+R+20,CC);uctx.moveTo(CC,CC-R-20);uctx.lineTo(CC,CC+R+20);uctx.stroke();uctx.font='14px sans-serif';uctx.fillStyle='#222';uctx.textAlign='left';uctx.fillText('cos',CC+R+5,CC+5);uctx.textAlign='center';uctx.fillText('sin',CC,CC-R-10);const px=CC+R*Math.cos(angle),py=CC-R*Math.sin(angle);uctx.fillStyle='#000';ctx.beginPath();ctx.arc(px,py,5,0,TAU);uctx.fill();uctx.lineWidth=3;const fn=gFn.value;if(fn==='sin'){uctx.strokeStyle='#d32f2f';uctx.beginPath();uctx.moveTo(CC,CC);uctx.lineTo(CC,py);uctx.stroke();}else if(fn==='cos'){uctx.strokeStyle='#1565c0';uctx.beginPath();ctx.moveTo(CC,CC);ctx.lineTo(px,CC);uctx.stroke();}else{const tx=CC+R,tan_y=CC-R*Math.tan(angle);uctx.lineWidth=1;uctx.strokeStyle='#bbb';uctx.beginPath();ctx.moveTo(tx,CC-R-20);uctx.lineTo(tx,CC+R+20);ctx.stroke();uctx.textAlign='left';uctx.font='14px sans-serif';uctx.fillStyle='#222';uctx.fillText('tan',tx-10,CC-R-5);uctx.strokeStyle='rgba(0,0,0,0.5)';uctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(CC,CC);ctx.lineTo(tx,tan_y);ctx.stroke();uctx.setLineDash([]);uctx.strokeStyle='#6a1b9a';uctx.lineWidth=3;ctx.beginPath();ctx.moveTo(tx,CC);ctx.lineTo(tx,tan_y);ctx.stroke();}}
 function plot(){gx.clearRect(0,0,gp.width,gp.height);const [x0,x1]=range,w=gp.width,h=gp.height,sx=w/(x1-x0),sy=h/2*0.9,ox=-x0*sx,oy=h/2;gx.strokeStyle='#bbb';gx.beginPath();gx.moveTo(0,oy);gx.lineTo(w,oy);gx.moveTo(ox,0);gx.lineTo(ox,h);gx.stroke();const fn=gFn.value,F={sin:Math.sin,cos:Math.cos,tan:Math.tan}[fn];gx.beginPath();let first=true;for(let x=x0;x<=x1;x+=0.02){let y=F(x);if(!isFinite(y)){first=true;continue;}const px=ox+x*sx,py=oy-y*sy;if(first){gx.moveTo(px,py);first=false;}else gx.lineTo(px,py);}gx.strokeStyle='var(--blue)';gx.stroke();if(fn==='tan'){gx.strokeStyle='#aaa';gx.setLineDash([4,4]);for(let k=Math.ceil(x0/(Math.PI/2));k<=Math.floor(x1/(Math.PI/2));k++){if(k%2===0) continue;const px=ox+k*Math.PI/2*sx;gx.beginPath();gx.moveTo(px,0);gx.lineTo(px,h);gx.stroke();}gx.setLineDash([]);}const vx=ox+angle*sx,vy=oy-F(angle)*sy;gx.fillStyle='var(--red)';gx.beginPath();gx.arc(vx,vy,5,0,TAU);gx.fill();gx.strokeStyle='var(--red)';if(fn==='sin'||fn==='tan'){gx.beginPath();gx.moveTo(vx,vy);gx.lineTo(vx,oy);gx.stroke();}else{gx.beginPath();gx.moveTo(vx,vy);gx.lineTo(ox,vy);gx.stroke();}}
 function redraw(){drawUC();plot();}
 function getA(e){const rect=uc.getBoundingClientRect();return Math.atan2(CC-(e.clientY-rect.top),(e.clientX-rect.left)-CC);}
