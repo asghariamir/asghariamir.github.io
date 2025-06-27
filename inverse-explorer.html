@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inverse Explorer – Concept</title>
+<style>
+  :root {
+    --primary-color: #1565c0; /* Blue */
+    --light-gray:  #f5f5f5;
+    --medium-gray: #e0e0e0;
+    --dark-gray:   #424242;
+    --text-color:  #212121;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.6;background:var(--light-gray);color:var(--text-color);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:2rem 1rem}
+  .container{width:100%;max-width:960px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,.1);padding:1.5rem}
+  h2{text-align:center;font-size:1.8rem;color:var(--primary-color);margin-bottom:.6rem}
+  p.intro{text-align:center;font-size:1.05rem;color:var(--dark-gray);margin-bottom:1rem}
+  .func-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-bottom:1.25rem}
+  .func-buttons button{border:1px solid var(--primary-color);background:none;color:var(--primary-color);padding:.4rem .8rem;font-size:1rem;border-radius:4px;cursor:pointer;transition:background .2s,color .2s}
+  .func-buttons button.selected{background:var(--primary-color);color:#fff}
+  .graphs{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:1.5rem;justify-items:center;margin-bottom:1.25rem}
+  canvas{background:#fff;border:1px solid var(--medium-gray);border-radius:4px}
+  @media(max-width:600px){.graphs{grid-template-columns:1fr}}
+  .slider-wrap{display:flex;justify-content:center;align-items:center;gap:.8rem;margin-bottom:1.5rem}
+  .slider-wrap input[type=range]{width:60%}
+  .slider-wrap span{font-weight:600}
+  #toggleInfo{display:block;margin:0 auto .5rem;background:var(--primary-color);color:#fff;border:none;padding:.4rem .8rem;border-radius:4px;cursor:pointer}
+  #infoBox{border:1px solid var(--medium-gray);background:var(--light-gray);border-radius:6px;padding:1rem;font-size:1rem}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Inverse Explorer – Concept</h2>
+  <p class="intro">Left – usual mapping (<em>x</em>→<em>y</em>). Right – start from a chosen <em>y</em> and list every <em>x</em> that gives that output. A function is invertible iff each horizontal line meets the graph once.</p>
+
+  <div class="func-buttons" id="funcButtons">
+    <button data-func="linear1">y = x&nbsp;+&nbsp;1</button>
+    <button data-func="linear2">y = 3x</button>
+    <button data-func="square">y = x²</button>
+    <button data-func="cube">y = x³</button>
+    <button data-func="sine">y = sin&nbsp;x</button>
+  </div>
+
+  <div class="graphs">
+    <canvas id="leftGraph" width="400" height="400"></canvas>
+    <canvas id="rightGraph" width="400" height="400"></canvas>
+  </div>
+
+  <div class="slider-wrap">
+    <label>y-value:</label>
+    <input type="range" id="ySlider" min="-5" max="5" step="0.1" value="1" />
+    <span id="yVal">1.0</span>
+  </div>
+
+  <button id="toggleInfo">Hide summary</button>
+  <div id="infoBox"><p id="infoText"></p></div>
+</div>
+
+<script>
+/************ Config & helpers ************/
+const CANVAS=400,R=6;let funcId='linear1';
+const cx=x=>CANVAS/2+x*CANVAS/(2*R),cy=y=>CANVAS/2-y*CANVAS/(2*R);
+function f(x,id){switch(id){case'linear1':return x+1;case'linear2':return 3*x;case'square':return x*x;case'cube':return x*x*x;case'sine':return Math.sin(x);default:return x}}
+function invX(y,id){switch(id){case'linear1':return[y-1];case'linear2':return[y/3];case'square':return y<0?[]:[Math.sqrt(y),-Math.sqrt(y)];case'cube':return[Math.cbrt(y)];case'sine':{if(Math.abs(y)>1)return[];const r=[],b=Math.asin(y),P=2*Math.PI,kMax=Math.ceil((R+Math.PI)/P)+1;for(let k=-kMax;k<=kMax;k++){const s1=b+P*k,s2=Math.PI-b+P*k;if(s1>=-R&&s1<=R)r.push(s1);if(s2>=-R&&s2<=R)r.push(s2)}return r.sort((a,b)=>a-b)}default:return[y]}}
+/************ Canvas utils ************/
+function clear(ctx){ctx.clearRect(0,0,CANVAS,CANVAS)}
+function axes(ctx){ctx.strokeStyle='#999';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,CANVAS/2);ctx.lineTo(CANVAS,CANVAS/2);ctx.stroke();ctx.beginPath();ctx.moveTo(CANVAS/2,0);ctx.lineTo(CANVAS/2,CANVAS);ctx.stroke()}
+function dashed(ctx,x1,y1,x2,y2){ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([])}
+/************ Plot ************/
+function plotFunc(ctx,id){ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();let first=true;for(let x=-R;x<=R;x+=0.025){const y=f(x,id);const px=cx(x),py=cy(y);if(first){ctx.moveTo(px,py);first=false}else ctx.lineTo(px,py)}ctx.stroke()}
+function plotInv(ctx,id){ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();let first=true;for(let t=-R;t<=R;t+=0.025){const y=f(t,id);const px=cx(y),py=cy(t);if(first){ctx.moveTo(px,py);first=false}else ctx.lineTo(px,py)}ctx.stroke()}
+/************ Render ************/
+const slider=document.getElementById('ySlider'),yValSpan=document.getElementById('yVal');
+function render(){const yVal=parseFloat(slider.value);yValSpan.textContent=yVal.toFixed(1);
+  /* left */
+  const lctx=document.getElementById('leftGraph').getContext('2d');clear(lctx);axes(lctx);plotFunc(lctx,funcId);
+  lctx.strokeStyle='#1565c0';lctx.lineWidth=4;lctx.beginPath();lctx.moveTo(cx(0),cy(0));lctx.lineTo(cx(0),cy(yVal));lctx.stroke();
+  const xs=invX(yVal,funcId);lctx.strokeStyle='#d32f2f';lctx.fillStyle='#d32f2f';if(funcId==='sine'){dashed(lctx,0,cy(yVal),CANVAS,cy(yVal));}else if(xs.length===1){dashed(lctx,cx(0),cy(yVal),cx(xs[0]),cy(yVal));}else if(xs.length>1){dashed(lctx,cx(Math.min(...xs)),cy(yVal),cx(Math.max(...xs)),cy(yVal));}xs.forEach(x=>{lctx.beginPath();lctx.arc(cx(x),cy(yVal),4,0,2*Math.PI);lctx.fill()});
+  /* right */
+  const rctx=document.getElementById('rightGraph').getContext('2d');clear(rctx);axes(rctx);plotInv(rctx,funcId);
+  rctx.strokeStyle='#1565c0';rctx.lineWidth=4;rctx.beginPath();rctx.moveTo(cx(0),cy(0));rctx.lineTo(cx(yVal),cy(0));rctx.stroke();
+  rctx.strokeStyle='#d32f2f';rctx.fillStyle='#d32f2f';if(funcId==='square'&&xs.length){dashed(rctx,cx(yVal),cy(Math.min(...xs)),cx(yVal),cy(Math.max(...xs)));xs.forEach(x=>{rctx.beginPath();rctx.arc(cx(yVal),cy(x),4,0,2*Math.PI);rctx.fill()})}else if(funcId==='sine'){dashed(rctx,cx(yVal),0,cx(yVal),CANVAS);}else if(xs.length){const xChosen=xs.reduce((p,c)=>Math.abs(c)<Math.abs(p)?c:p);dashed(rctx,cx(yVal),cy(0),cx(yVal),cy(xChosen));rctx.beginPath();rctx.arc(cx(yVal),cy(xChosen),4,0,2*Math.PI);rctx.fill()}
+  /* summary */
+  const invertible=(( )=>{for(let t=-R;t<=R;t+=R/60){if(invX(t,funcId).length>1)return false}return true})();
+  document.getElementById('infoText').innerHTML=invertible?'Every horizontal line intersects once ⇒ <strong>invertible</strong>.':'Some horizontal lines intersect more than once ⇒ <strong>not invertible</strong>.';
+}
+/************ Events ************/
+[...document.querySelectorAll('#funcButtons button')].forEach((btn,i)=>{btn.addEventListener('click',()=>{document.querySelectorAll('#funcButtons button').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');funcId=btn.dataset.func;render()});if(i===0)btn.classList.add('selected')});
+slider.addEventListener('input',render);
+const toggleBtn=document.getElementById('toggleInfo');toggleBtn.addEventListener('click',()=>{const box=document.getElementById('infoBox');const hidden=box.style.display==='none';box.style.display=hidden?'block':'none';toggleBtn.textContent=hidden?'Hide summary':'Show summary'});
+/* initial */render();
+</script>
+</body>
+</html>
