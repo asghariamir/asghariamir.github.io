@@ -3,94 +3,384 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Inverse Explorer – Concept</title>
+<title>Inverse Explorer</title>
 <style>
   :root {
-    --primary-color: #1565c0; /* Blue */
-    --light-gray:  #f5f5f5;
-    --medium-gray: #e0e0e0;
-    --dark-gray:   #424242;
-    --text-color:  #212121;
+    --primary: #1565c0; /* Blue */
+    --red: #d32f2f;     /* Red */
+    --green: #4caf50;
+    --light: #f5f5f5;
+    --mid: #e0e0e0;
+    --dark: #424242;
+    --text: #212121;
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.6;background:var(--light-gray);color:var(--text-color);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:2rem 1rem}
-  .container{width:100%;max-width:960px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,.1);padding:1.5rem}
-  h2{text-align:center;font-size:1.8rem;color:var(--primary-color);margin-bottom:.6rem}
-  p.intro{text-align:center;font-size:1.05rem;color:var(--dark-gray);margin-bottom:1rem}
-  .func-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-bottom:1.25rem}
-  .func-buttons button{border:1px solid var(--primary-color);background:none;color:var(--primary-color);padding:.4rem .8rem;font-size:1rem;border-radius:4px;cursor:pointer;transition:background .2s,color .2s}
-  .func-buttons button.selected{background:var(--primary-color);color:#fff}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.6;background:var(--light);color:var(--text);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:2rem 1rem}
+  .container{width:100%;max-width:1080px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,.1);padding:1.5rem}
+  h2{text-align:center;font-size:1.8rem;color:var(--primary);margin-bottom:.6rem}
+  p.intro{text-align:center; max-width: 800px; margin: 0 auto 1.2rem; font-size:1.05rem;}
+  .tab-row{display:flex;flex-wrap: wrap; gap:.3rem;justify-content:center;margin-bottom:1.2rem}
+  .tab-btn{border:none;background:var(--mid);color:var(--dark);padding:.4rem 1.1rem;border-radius:6px 6px 0 0;font-size:1.1rem;cursor:pointer;transition:.2s;font-weight:600}
+  .tab-btn.selected{background:#fff;color:var(--primary);border-bottom:3px solid var(--primary)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .func-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-bottom:1.2rem}
+  .func-buttons button{border:1px solid var(--primary);background:none;color:var(--primary);padding:.4rem .8rem;font-size:1rem;border-radius:4px;cursor:pointer;transition:background .2s,color .2s}
+  .func-buttons button.selected{background:var(--primary);color:#fff}
   .graphs{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:1.5rem;justify-items:center;margin-bottom:1.25rem}
-  canvas{background:#fff;border:1px solid var(--medium-gray);border-radius:4px}
+  .graph-item { text-align: center; }
+  .graph-item h4 { margin-bottom: 0.5rem; color: var(--dark); font-size: 1.1rem; min-height: 25px; }
+  canvas{background:#fff;border:1px solid var(--mid);border-radius:4px}
   @media(max-width:600px){.graphs{grid-template-columns:1fr}}
   .slider-wrap{display:flex;justify-content:center;align-items:center;gap:.8rem;margin-bottom:1.5rem}
   .slider-wrap input[type=range]{width:60%}
   .slider-wrap span{font-weight:600}
-  #toggleInfo{display:block;margin:0 auto .5rem;background:var(--primary-color);color:#fff;border:none;padding:.4rem .8rem;border-radius:4px;cursor:pointer}
-  #infoBox{border:1px solid var(--medium-gray);background:var(--light-gray);border-radius:6px;padding:1rem;font-size:1rem}
+  .infoBox{border:1px solid var(--mid);background:var(--light);border-radius:6px;padding:1.2rem;font-size:1.05rem; line-height: 1.7;}
+  .infoBox h3 { color: var(--primary); margin-bottom: 0.5rem; text-align: center;}
+  .infoBox p { margin-bottom: 0.5rem;}
+  .infoBox code { background-color: #e0e0e0; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', Courier, monospace;}
 </style>
 </head>
 <body>
 <div class="container">
-  <h2>Inverse Explorer – Concept</h2>
-  <p class="intro">Left – usual mapping (<em>x</em>→<em>y</em>). Right – start from a chosen <em>y</em> and list every <em>x</em> that gives that output. A function is invertible iff each horizontal line meets the graph once.</p>
-
-  <div class="func-buttons" id="funcButtons">
-    <button data-func="linear1">y = x&nbsp;+&nbsp;1</button>
-    <button data-func="linear2">y = 3x</button>
-    <button data-func="square">y = x²</button>
-    <button data-func="cube">y = x³</button>
-    <button data-func="sine">y = sin&nbsp;x</button>
+  <div class="tab-row">
+    <button class="tab-btn selected" data-tab="concept">Concept</button>
+    <button class="tab-btn" data-tab="algebra">Algebra</button>
+    <button class="tab-btn" data-tab="famous">Famous Pairs</button>
   </div>
 
-  <div class="graphs">
-    <canvas id="leftGraph" width="400" height="400"></canvas>
-    <canvas id="rightGraph" width="400" height="400"></canvas>
+  <div class="tab-content active" id="tab-concept">
+    <h2>Inverse Explorer</h2>
+    <p class="intro">
+      This explorer helps you see if a function is invertible. <strong>Start with the left graph.</strong> Use the slider to pick a 'y' value, shown by the thick blue line on the y-axis. A red dotted line is drawn horizontally. Where does it hit the function? If it hits more than once, the function is not invertible.
+      <br><strong>The right graph</strong> shows what happens if we swap the axes: the blue line moves to the x-axis and the red line becomes vertical. This is the graph of the function's inverse relation.
+    </p>
+    <div class="func-buttons" id="funcButtonsConcept">
+      <button data-func="linear1">$y = x + 1$</button>
+      <button data-func="linear2">$y = 2x$</button>
+      <button data-func="square">$y = x^2$</button>
+      <button data-func="cube">$y = x^3$</button>
+      <button data-func="sine">$y = \sin(x)$</button>
+    </div>
+    <div class="graphs">
+      <div class="graph-item">
+        <h4 id="captionLeftConcept"></h4>
+        <canvas id="leftGraphConcept" width="400" height="400"></canvas>
+      </div>
+      <div class="graph-item">
+        <h4 id="captionRightConcept"></h4>
+        <canvas id="rightGraphConcept" width="400" height="400"></canvas>
+      </div>
+    </div>
+    <div class="slider-wrap">
+      <label>y-value:</label>
+      <input type="range" id="ySliderConcept" min="-5" max="5" step="0.1" value="2" />
+      <span id="yValConcept">2.0</span>
+    </div>
+    <div class="infoBox" id="infoBoxConcept"></div>
   </div>
 
-  <div class="slider-wrap">
-    <label>y-value:</label>
-    <input type="range" id="ySlider" min="-5" max="5" step="0.1" value="1" />
-    <span id="yVal">1.0</span>
+  <div class="tab-content" id="tab-algebra">
+    <h2>Finding the Inverse: The Algebra</h2>
+    <p class="intro">Here we apply the concept from the first tab to functions that have a clear inverse. The visualization is the same, but now we focus on the algebraic steps used to find the inverse function formula.</p>
+    <div class="func-buttons" id="funcButtonsAlgebra">
+      <button data-func="linear">$y = 2x+1$</button>
+      <button data-func="square_pos">$y = x^2$ for $x \ge 0$</button>
+      <button data-func="cube_alg">$y = x^3$</button>
+    </div>
+    <div class="graphs">
+       <div class="graph-item">
+        <h4 id="captionLeftAlgebra"></h4>
+        <canvas id="leftGraphAlgebra" width="400" height="400"></canvas>
+      </div>
+      <div class="graph-item">
+        <h4 id="captionRightAlgebra"></h4>
+        <canvas id="rightGraphAlgebra" width="400" height="400"></canvas>
+      </div>
+    </div>
+    <div class="slider-wrap">
+      <label>y-value:</label>
+      <input type="range" id="ySliderAlgebra" min="-5" max="5" step="0.1" value="3" />
+      <span id="yValAlgebra">3.0</span>
+    </div>
+    <div class="infoBox" id="infoBoxAlgebra"></div>
   </div>
 
-  <button id="toggleInfo">Hide summary</button>
-  <div id="infoBox"><p id="infoText"></p></div>
+  <div class="tab-content" id="tab-famous">
+      <h2>Finding the Inverse: Famous Pairs</h2>
+      <p class="intro">Sometimes, we can't use simple algebra to find an inverse. For some very important functions, their inverses have been given special names. This tab explores these "famous pairs".</p>
+      <div class="func-buttons" id="funcButtonsFamous">
+        <button data-func="exp2">$y = 2^x$</button>
+        <button data-func="expe">$y = e^x$</button>
+        <button data-func="sin_restricted">$y = \sin(x)$ on $[-\pi/2, \pi/2]$</button>
+        <button data-func="cos_restricted">$y = \cos(x)$ on $[0, \pi]$</button>
+      </div>
+      <div class="graphs">
+        <div class="graph-item">
+          <h4 id="captionLeftFamous"></h4>
+          <canvas id="leftGraphFamous" width="400" height="400"></canvas>
+        </div>
+        <div class="graph-item">
+          <h4 id="captionRightFamous"></h4>
+          <canvas id="rightGraphFamous" width="400" height="400"></canvas>
+        </div>
+      </div>
+      <div class="slider-wrap">
+        <label>y-value:</label>
+        <input type="range" id="ySliderFamous" min="0.1" max="5" step="0.1" value="2" />
+        <span id="yValFamous">2.0</span>
+      </div>
+      <div class="infoBox" id="infoBoxFamous"></div>
+  </div>
 </div>
 
 <script>
-/************ Config & helpers ************/
-const CANVAS=400,R=6;let funcId='linear1';
-const cx=x=>CANVAS/2+x*CANVAS/(2*R),cy=y=>CANVAS/2-y*CANVAS/(2*R);
-function f(x,id){switch(id){case'linear1':return x+1;case'linear2':return 3*x;case'square':return x*x;case'cube':return x*x*x;case'sine':return Math.sin(x);default:return x}}
-function invX(y,id){switch(id){case'linear1':return[y-1];case'linear2':return[y/3];case'square':return y<0?[]:[Math.sqrt(y),-Math.sqrt(y)];case'cube':return[Math.cbrt(y)];case'sine':{if(Math.abs(y)>1)return[];const r=[],b=Math.asin(y),P=2*Math.PI,kMax=Math.ceil((R+Math.PI)/P)+1;for(let k=-kMax;k<=kMax;k++){const s1=b+P*k,s2=Math.PI-b+P*k;if(s1>=-R&&s1<=R)r.push(s1);if(s2>=-R&&s2<=R)r.push(s2)}return r.sort((a,b)=>a-b)}default:return[y]}}
-/************ Canvas utils ************/
-function clear(ctx){ctx.clearRect(0,0,CANVAS,CANVAS)}
-function axes(ctx){ctx.strokeStyle='#999';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,CANVAS/2);ctx.lineTo(CANVAS,CANVAS/2);ctx.stroke();ctx.beginPath();ctx.moveTo(CANVAS/2,0);ctx.lineTo(CANVAS/2,CANVAS);ctx.stroke()}
-function dashed(ctx,x1,y1,x2,y2){ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([])}
-/************ Plot ************/
-function plotFunc(ctx,id){ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();let first=true;for(let x=-R;x<=R;x+=0.025){const y=f(x,id);const px=cx(x),py=cy(y);if(first){ctx.moveTo(px,py);first=false}else ctx.lineTo(px,py)}ctx.stroke()}
-function plotInv(ctx,id){ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();let first=true;for(let t=-R;t<=R;t+=0.025){const y=f(t,id);const px=cx(y),py=cy(t);if(first){ctx.moveTo(px,py);first=false}else ctx.lineTo(px,py)}ctx.stroke()}
-/************ Render ************/
-const slider=document.getElementById('ySlider'),yValSpan=document.getElementById('yVal');
-function render(){const yVal=parseFloat(slider.value);yValSpan.textContent=yVal.toFixed(1);
-  /* left */
-  const lctx=document.getElementById('leftGraph').getContext('2d');clear(lctx);axes(lctx);plotFunc(lctx,funcId);
-  lctx.strokeStyle='#1565c0';lctx.lineWidth=4;lctx.beginPath();lctx.moveTo(cx(0),cy(0));lctx.lineTo(cx(0),cy(yVal));lctx.stroke();
-  const xs=invX(yVal,funcId);lctx.strokeStyle='#d32f2f';lctx.fillStyle='#d32f2f';if(funcId==='sine'){dashed(lctx,0,cy(yVal),CANVAS,cy(yVal));}else if(xs.length===1){dashed(lctx,cx(0),cy(yVal),cx(xs[0]),cy(yVal));}else if(xs.length>1){dashed(lctx,cx(Math.min(...xs)),cy(yVal),cx(Math.max(...xs)),cy(yVal));}xs.forEach(x=>{lctx.beginPath();lctx.arc(cx(x),cy(yVal),4,0,2*Math.PI);lctx.fill()});
-  /* right */
-  const rctx=document.getElementById('rightGraph').getContext('2d');clear(rctx);axes(rctx);plotInv(rctx,funcId);
-  rctx.strokeStyle='#1565c0';rctx.lineWidth=4;rctx.beginPath();rctx.moveTo(cx(0),cy(0));rctx.lineTo(cx(yVal),cy(0));rctx.stroke();
-  rctx.strokeStyle='#d32f2f';rctx.fillStyle='#d32f2f';if(funcId==='square'&&xs.length){dashed(rctx,cx(yVal),cy(Math.min(...xs)),cx(yVal),cy(Math.max(...xs)));xs.forEach(x=>{rctx.beginPath();rctx.arc(cx(yVal),cy(x),4,0,2*Math.PI);rctx.fill()})}else if(funcId==='sine'){dashed(rctx,cx(yVal),0,cx(yVal),CANVAS);}else if(xs.length){const xChosen=xs.reduce((p,c)=>Math.abs(c)<Math.abs(p)?c:p);dashed(rctx,cx(yVal),cy(0),cx(yVal),cy(xChosen));rctx.beginPath();rctx.arc(cx(yVal),cy(xChosen),4,0,2*Math.PI);rctx.fill()}
-  /* summary */
-  const invertible=(( )=>{for(let t=-R;t<=R;t+=R/60){if(invX(t,funcId).length>1)return false}return true})();
-  document.getElementById('infoText').innerHTML=invertible?'Every horizontal line intersects once ⇒ <strong>invertible</strong>.':'Some horizontal lines intersect more than once ⇒ <strong>not invertible</strong>.';
+  // MathJax Configuration
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+// =======================================================================
+// =============== GLOBAL SETUP AND UTILITIES ============================
+// =======================================================================
+const CANVAS = 400, R = 6;
+const C_BLUE = '#1565c0', C_RED = '#d32f2f';
+
+const cx = x => CANVAS / 2 + x * CANVAS / (2 * R);
+const cy = y => CANVAS / 2 - y * CANVAS / (2 * R);
+
+function clear(ctx) { ctx.clearRect(0, 0, CANVAS, CANVAS); }
+function axes(ctx) {
+  ctx.strokeStyle = '#999'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, cy(0)); ctx.lineTo(CANVAS, cy(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx(0), 0); ctx.lineTo(cx(0), CANVAS); ctx.stroke();
 }
-/************ Events ************/
-[...document.querySelectorAll('#funcButtons button')].forEach((btn,i)=>{btn.addEventListener('click',()=>{document.querySelectorAll('#funcButtons button').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');funcId=btn.dataset.func;render()});if(i===0)btn.classList.add('selected')});
-slider.addEventListener('input',render);
-const toggleBtn=document.getElementById('toggleInfo');toggleBtn.addEventListener('click',()=>{const box=document.getElementById('infoBox');const hidden=box.style.display==='none';box.style.display=hidden?'block':'none';toggleBtn.textContent=hidden?'Hide summary':'Show summary'});
-/* initial */render();
+function dashed(ctx, x1, y1, x2, y2, color) {
+  ctx.save();
+  ctx.strokeStyle = color; ctx.setLineDash([5, 5]);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  ctx.restore();
+}
+
+// Universal plotting function
+function plot(ctx, func, isInverse, xRange = [-R, R]) {
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 2.5; ctx.beginPath();
+  let first = true;
+  for (let x = xRange[0]; x <= xRange[1]; x += 0.025) {
+    const y = func(x);
+    if (Math.abs(y) > R * 1.1) { first = true; continue; }
+    const px = isInverse ? cx(y) : cx(x);
+    const py = isInverse ? cy(x) : cy(y);
+    if (first) { ctx.moveTo(px, py); first = false; }
+    else { ctx.lineTo(px, py); }
+  }
+  ctx.stroke();
+}
+
+// Tab navigation
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    setTimeout(() => MathJax.typesetPromise(), 10); // Re-render LaTeX on tab change
+  };
+});
+
+
+// =======================================================================
+// ========================= CONCEPT TAB LOGIC ===========================
+// =======================================================================
+{
+  const slider = document.getElementById('ySliderConcept');
+  const yValSpan = document.getElementById('yValConcept');
+  const lctx = document.getElementById('leftGraphConcept').getContext('2d');
+  const rctx = document.getElementById('rightGraphConcept').getContext('2d');
+  const infoBox = document.getElementById('infoBoxConcept');
+  const captionL = document.getElementById('captionLeftConcept');
+  const captionR = document.getElementById('captionRightConcept');
+  let funcId = 'linear1';
+
+  captionL.textContent = "Viewing the Function from the y-axis";
+  captionR.textContent = "Graphing the y-values as inputs";
+
+  const funcs = {
+    linear1: x => x + 1,
+    linear2: x => 2 * x,
+    square: x => x * x,
+    cube: x => x * x * x,
+    sine: x => Math.sin(x) * (R/2),
+  };
+  const invFuncs = {
+    linear1: y => [y - 1],
+    linear2: y => [y / 2],
+    square: y => y < 0 ? [] : [Math.sqrt(y), -Math.sqrt(y)],
+    cube: y => [Math.cbrt(y)],
+    sine: y => {
+      const scaledY = y / (R/2); if (Math.abs(scaledY) > 1) return []; const r = [], b = Math.asin(scaledY), P = 2 * Math.PI, kMax = Math.ceil(R / P) + 1;
+      for (let k = -kMax; k <= kMax; k++) {
+        const s1 = b + P * k, s2 = Math.PI - b + P * k;
+        if (s1 >= -R && s1 <= R) r.push(s1); if (s2 >= -R && s2 <= R) r.push(s2);
+      } return r;
+    }
+  };
+
+  function render() {
+    const yVal = parseFloat(slider.value); yValSpan.textContent = yVal.toFixed(1);
+    const currentFunc = funcs[funcId]; const currentInv = invFuncs[funcId];
+    
+    clear(lctx); axes(lctx); plot(lctx, currentFunc, false);
+    lctx.strokeStyle = C_BLUE; lctx.lineWidth = 4; lctx.beginPath(); lctx.moveTo(cx(0), cy(0)); lctx.lineTo(cx(0), cy(yVal)); lctx.stroke();
+    dashed(lctx, 0, cy(yVal), CANVAS, cy(yVal), C_RED);
+    const xs = currentInv(yVal);
+    xs.forEach(x => { lctx.fillStyle = '#000'; lctx.beginPath(); lctx.arc(cx(x), cy(yVal), 6, 0, 2 * Math.PI); lctx.fill(); });
+
+    clear(rctx); axes(rctx); plot(rctx, currentFunc, true);
+    rctx.strokeStyle = C_BLUE; rctx.lineWidth = 4; rctx.beginPath(); rctx.moveTo(cx(0), cy(0)); rctx.lineTo(cx(yVal), cy(0)); rctx.stroke();
+    dashed(rctx, cx(yVal), 0, cx(yVal), CANVAS, C_RED);
+    xs.forEach(x => { rctx.fillStyle = '#000'; rctx.beginPath(); rctx.arc(cx(yVal), cy(x), 6, 0, 2 * Math.PI); rctx.fill(); });
+
+    let isTrulyInvertible = true;
+    for(let testY = -R; testY <= R; testY += 0.2) { if (currentInv(testY).length > 1) { isTrulyInvertible = false; break; } }
+    if (isTrulyInvertible) { infoBox.innerHTML = `<h3>The function is invertible</h3><p>For every 'y' value, the horizontal red line intersects the graph <strong>only once</strong>.</p>`; } 
+    else { infoBox.innerHTML = `<h3>The function is not invertible</h3><p>For some 'y' values, the horizontal red line intersects the graph <strong>more than once</strong>.</p>`; }
+  }
+  
+  document.querySelectorAll('#funcButtonsConcept button').forEach(btn => btn.addEventListener('click', (e) => {
+    document.querySelectorAll('#funcButtonsConcept button').forEach(b => b.classList.remove('selected'));
+    e.currentTarget.classList.add('selected'); funcId = e.currentTarget.dataset.func;
+    if (funcId === 'square') { slider.min = 0; if (parseFloat(slider.value) < 0) slider.value = 2; } else { slider.min = -5; }
+    slider.max = 5; render();
+  }));
+  slider.addEventListener('input', render); document.querySelector('#funcButtonsConcept button[data-func="linear1"]').classList.add('selected'); render();
+}
+
+// =======================================================================
+// ========================= ALGEBRA TAB LOGIC ===========================
+// =======================================================================
+{
+  const slider = document.getElementById('ySliderAlgebra');
+  const yValSpan = document.getElementById('yValAlgebra');
+  const lctx = document.getElementById('leftGraphAlgebra').getContext('2d');
+  const rctx = document.getElementById('rightGraphAlgebra').getContext('2d');
+  const infoBox = document.getElementById('infoBoxAlgebra');
+  const captionL = document.getElementById('captionLeftAlgebra');
+  const captionR = document.getElementById('captionRightAlgebra');
+  let funcId = 'linear';
+
+  const funcs = { linear: x => 2 * x + 1, square_pos: x => x * x, cube_alg: x => x * x * x, };
+  const invFuncs = { linear: y => (y - 1) / 2, square_pos: y => Math.sqrt(y), cube_alg: y => Math.cbrt(y), };
+  const xRanges = { linear: [-R, R], square_pos: [0, R], cube_alg: [-R, R], };
+  const formulas = {
+    linear: { solved: '$x = \\frac{y-1}{2}$', inv: '$y = \\frac{x-1}{2}$' },
+    square_pos: { solved: '$x = \\sqrt{y}$', inv: '$y = \\sqrt{x}$' },
+    cube_alg: { solved: '$x = \\sqrt[3]{y}$', inv: '$y = \\sqrt[3]{x}$' },
+  };
+  const infoContent = {
+    linear: `<h3>Steps for $y = 2x+1$</h3><p><b>1. Start with function:</b> &nbsp; $y = 2x + 1$</p><p><b>2. Solve for $x$:</b> &nbsp; $y - 1 = 2x \\implies x = \\frac{y - 1}{2}$</p><p><b>3. Swap $x$ and $y$:</b> &nbsp; $y = \\frac{x - 1}{2}$</p>`,
+    square_pos: `<h3>Steps for $y = x^2, \\; x \\ge 0$</h3><p><b>1. Start with function:</b> &nbsp; $y = x^2$</p><p><b>2. Solve for $x$:</b> &nbsp; $\\sqrt{y} = x$. We take the positive root because the domain was restricted to $x \\ge 0$.</p><p><b>3. Swap $x$ and $y$:</b> &nbsp; $y = \\sqrt{x}$</p>`,
+    cube_alg: `<h3>Steps for $y = x^3$</h3><p><b>1. Start with function:</b> &nbsp; $y = x^3$</p><p><b>2. Solve for $x$:</b> &nbsp; $\\sqrt[3]{y} = x$</p><p><b>3. Swap $x$ and $y$:</b> &nbsp; $y = \\sqrt[3]{x}$</p>`,
+  };
+  
+  function render() {
+    const yVal = parseFloat(slider.value); yValSpan.textContent = yVal.toFixed(1);
+    const currentFunc = funcs[funcId]; const currentInv = invFuncs[funcId]; const xVal = currentInv(yVal);
+
+    clear(lctx); axes(lctx); plot(lctx, currentFunc, false, xRanges[funcId]);
+    lctx.strokeStyle = C_BLUE; lctx.lineWidth = 4; lctx.beginPath(); lctx.moveTo(cx(0), cy(0)); lctx.lineTo(cx(0), cy(yVal)); lctx.stroke();
+    dashed(lctx, cx(xVal), cy(yVal), 0, cy(yVal), C_RED);
+    lctx.fillStyle = '#000'; lctx.beginPath(); lctx.arc(cx(xVal), cy(yVal), 6, 0, 2 * Math.PI); lctx.fill();
+    
+    clear(rctx); axes(rctx); plot(rctx, currentInv, false, xRanges[funcId]);
+    rctx.strokeStyle = C_BLUE; rctx.lineWidth = 4; rctx.beginPath(); rctx.moveTo(cx(0), cy(0)); rctx.lineTo(cx(yVal), cy(0)); rctx.stroke();
+    dashed(rctx, cx(yVal), cy(xVal), cx(yVal), cy(0), C_RED); 
+    rctx.fillStyle = '#000'; rctx.beginPath(); rctx.arc(cx(yVal), cy(xVal), 6, 0, 2 * Math.PI); rctx.fill();
+      
+    infoBox.innerHTML = infoContent[funcId];
+    captionL.innerHTML = formulas[funcId].solved;
+    captionR.innerHTML = formulas[funcId].inv;
+    MathJax.typesetPromise([infoBox, captionL, captionR]);
+  }
+
+  document.querySelectorAll('#funcButtonsAlgebra button').forEach(btn => btn.addEventListener('click', (e) => {
+    document.querySelectorAll('#funcButtonsAlgebra button').forEach(b => b.classList.remove('selected'));
+    e.currentTarget.classList.add('selected'); funcId = e.currentTarget.dataset.func;
+    if (funcId === 'square_pos') { slider.min = 0; if (parseFloat(slider.value) < 0) slider.value = 0; } else { slider.min = -5; }
+    slider.max = 5; render();
+  }));
+  slider.addEventListener('input', render); document.querySelector('#funcButtonsAlgebra button').classList.add('selected'); render();
+}
+
+// =======================================================================
+// ======================= FAMOUS PAIRS TAB LOGIC ========================
+// =======================================================================
+{
+  const slider = document.getElementById('ySliderFamous');
+  const yValSpan = document.getElementById('yValFamous');
+  const lctx = document.getElementById('leftGraphFamous').getContext('2d');
+  const rctx = document.getElementById('rightGraphFamous').getContext('2d');
+  const infoBox = document.getElementById('infoBoxFamous');
+  const captionL = document.getElementById('captionLeftFamous');
+  const captionR = document.getElementById('captionRightFamous');
+  let funcId = 'exp2';
+  
+  const funcs = { exp2: x => Math.pow(2, x), expe: x => Math.exp(x), sin_restricted: x => Math.sin(x), cos_restricted: x => Math.cos(x), };
+  const invFuncs = { exp2: y => Math.log2(y), expe: y => Math.log(y), sin_restricted: y => Math.asin(y), cos_restricted: y => Math.acos(y), };
+  const xRanges = { exp2: [-R, 4], expe: [-R, 4], sin_restricted: [-Math.PI / 2, Math.PI / 2], cos_restricted: [0, Math.PI], };
+  const formulas = {
+    exp2: { solved: '$x = \\log_2(y)$', inv: '$y = \\log_2(x)$' },
+    expe: { solved: '$x = \\ln(y)$', inv: '$y = \\ln(x)$' },
+    sin_restricted: { solved: '$x = \\arcsin(y)$', inv: '$y = \\arcsin(x)$' },
+    cos_restricted: { solved: '$x = \\arccos(y)$', inv: '$y = \\arccos(x)$' },
+  };
+  const infoContent = {
+    exp2: `<h3>Inverse of $y = 2^x$ is $y = \\log_2(x)$</h3><p>We cannot use simple algebra to make $x$ the subject. Instead, we define a new function called the <b>logarithm</b>. $$\\log_2(y)$$ literally means "the power you must raise 2 to, to get y".</p><p><em>Note:</em> If the base was 10, as in $y=10^x$, the inverse is $y=\\log_{10}(x)$, often written as $y=\\log(x)$.</p><p>The <b>domain</b> of $y = \\log_2(x)$ (allowed inputs for x) is $x > 0$.<br>The <b>range</b> (possible outputs for y) is all real numbers.</p>`,
+    expe: `<h3>Inverse of $y = e^x$ is $y = \\ln(x)$</h3><p>The number $e \\approx 2.718$ is a special mathematical constant. Its exponential function $y=e^x$ is so common that its inverse, $\\log_e(x)$, gets a special name: the <b>natural logarithm</b>, or $y=\\ln(x)$.</p><p>The <b>domain</b> of $y=\\ln(x)$ (the set of allowed x-inputs) is $x > 0$.<br>The <b>range</b> (the set of possible y-outputs) is all real numbers.</p>`,
+    sin_restricted: `<h3>Inverse of $y = \\sin(x)$ is $y = \\arcsin(x)$</h3><p>To make $\\sin(x)$ invertible, we must restrict its domain. The standard choice is $[-\\pi/2, \\pi/2]$. The inverse function is called <b>arcsin</b> (or $\\sin^{-1}$).</p><p>The <b>domain</b> of $y = \\arcsin(x)$ must be the range of the original restricted sine function, which is $[-1, 1]$.<br>The <b>range</b> of $y = \\arcsin(x)$ is $[-\\pi/2, \\pi/2]$.</p>`,
+    cos_restricted: `<h3>Inverse of $y = \\cos(x)$ is $y = \\arccos(x)$</h3><p>To make $\\cos(x)$ invertible, we restrict its domain, usually to $[0, \\pi]$. The inverse function is called <b>arccos</b> (or $\\cos^{-1}$).</p><p>The <b>domain</b> of $y = \\arccos(x)$ must be the range of the original restricted cosine function, which is $[-1, 1]$.<br>The <b>range</b> of $y = \\arccos(x)$ is $[0, \\pi]$.</p>`,
+  };
+
+  function render() {
+    const yVal = parseFloat(slider.value); yValSpan.textContent = yVal.toFixed(1);
+    const currentFunc = funcs[funcId]; const currentInv = invFuncs[funcId]; const xVal = currentInv(yVal); const currentXRange = xRanges[funcId];
+
+    clear(lctx); axes(lctx); plot(lctx, currentFunc, false, currentXRange);
+    lctx.strokeStyle = C_BLUE; lctx.lineWidth = 4; lctx.beginPath(); lctx.moveTo(cx(0), cy(0)); lctx.lineTo(cx(0), cy(yVal)); lctx.stroke();
+    dashed(lctx, cx(xVal), cy(yVal), 0, cy(yVal), C_RED);
+    lctx.fillStyle = '#000'; lctx.beginPath(); lctx.arc(cx(xVal), cy(yVal), 6, 0, 2 * Math.PI); lctx.fill();
+
+    clear(rctx); axes(rctx); plot(rctx, currentInv, false);
+    rctx.strokeStyle = C_BLUE; rctx.lineWidth = 4; rctx.beginPath(); rctx.moveTo(cx(0), cy(0)); rctx.lineTo(cx(yVal), cy(0)); rctx.stroke();
+    dashed(rctx, cx(yVal), cy(xVal), cx(yVal), cy(0), C_RED);
+    rctx.fillStyle = '#000'; rctx.beginPath(); rctx.arc(cx(yVal), cy(xVal), 6, 0, 2 * Math.PI); rctx.fill();
+
+    infoBox.innerHTML = infoContent[funcId];
+    captionL.innerHTML = formulas[funcId].solved;
+    captionR.innerHTML = formulas[funcId].inv;
+    MathJax.typesetPromise([infoBox, captionL, captionR]);
+  }
+
+  document.querySelectorAll('#funcButtonsFamous button').forEach(btn => btn.addEventListener('click', (e) => {
+    document.querySelectorAll('#funcButtonsFamous button').forEach(b => b.classList.remove('selected'));
+    e.currentTarget.classList.add('selected'); funcId = e.currentTarget.dataset.func;
+    if (funcId.includes('sin') || funcId.includes('cos')) { slider.min = -1; slider.max = 1; slider.step = 0.05; if (Math.abs(parseFloat(slider.value)) > 1) slider.value = 1; } 
+    else { slider.min = 0.1; slider.max = 5; slider.step = 0.1; if (parseFloat(slider.value) < 0.1) slider.value = 2; }
+    render();
+  }));
+  slider.addEventListener('input', render); document.querySelector('#funcButtonsFamous button').classList.add('selected'); render();
+}
+
+// Initial typesetting call
+setTimeout(() => MathJax.typesetPromise(), 100);
 </script>
 </body>
 </html>
