@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quadratic Solutions</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+  </script>
+  <style>
+    :root {
+      --primary-color: #1565c0; --light-gray: #f5f5f5; --medium-gray: #e0e0e0;
+      --dark-gray: #424242; --text-color: #212121; --box-w: 280px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6; background: var(--light-gray); color: var(--text-color);
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh; padding: 1rem;
+    }
+    .app {
+      width: 100%; max-width: 1080px; background: #fff; border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,.1); padding: 2rem;
+    }
+    h1,h2,h3,p { text-align: center; }
+    h1 { font-size: 1.8rem; color: var(--primary-color); margin-bottom: 1rem; }
+    h2 { font-size: 1.4rem; color: var(--primary-color); margin-bottom: .5rem; }
+    h3 { font-size: 1.1rem; margin-bottom: .5rem; }
+    p { margin-bottom: .5rem; }
+    .tagline {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: #555;
+      margin-top: -0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tabs { display: flex; border-bottom: 2px solid var(--medium-gray); margin-bottom: 1rem; }
+    .tab-btn {
+      flex: 1; padding: .5rem 0; text-align:center; cursor:pointer; font-weight:600;
+      border-bottom: 3px solid transparent; transition: border .2s;
+    }
+    .tab-btn.active { border-color: var(--primary-color); color: var(--primary-color); }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+
+    .box-row, .concept-row { display:flex; justify-content:center; align-items:stretch; gap:1rem; flex-wrap:wrap; margin-bottom: 1rem; }
+    #openRow { flex-direction: column; align-items: center; gap: 0.5rem; }
+    .concept-box { border:1px dashed var(--medium-gray); border-radius:6px; padding:.75rem; width:220px; text-align:center; display: flex; flex-direction: column; justify-content: center;}
+    .concept-arrow { font-size: 2rem; color: #888; align-self: center; }
+
+    .card {
+      width: var(--box-w); min-height: 110px; border: 1px solid var(--medium-gray); border-radius: 6px;
+      padding: 1rem; display:flex; flex-direction:column; justify-content:center; align-items:center;
+      text-align:center; background:#fff; transition: border .3s;
+    }
+    #openRow .card { width: 480px; }
+    .card.correct { border:2px solid #4caf50; }
+    .card.wrong   { border:2px solid #e53935; }
+    .card-content { margin-top: .5rem; font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; }
+    
+    .card-input-area {
+      width: 100%; display: flex; align-items: center; justify-content: center; 
+      gap: 0.5rem; margin-top: 0.5rem; font-family: 'Courier New', Courier, monospace; font-size: 1.2rem;
+    }
+    .solutions-input { display: flex; flex-direction: column; gap: 0.5rem; font-size: 1.2rem; }
+    .card-input-area input, .card-input-area select {
+        font-family: 'Courier New', Courier, monospace; font-size: 1.2rem;
+        border: 1px solid #ccc; border-radius: 4px; padding: 2px; text-align: center;
+    }
+    .card-input-area input[type=number] { width: 50px; }
+    .card-input-area select { border: none; background: #eee; padding: 4px 2px;}
+    textarea { width:100%; height:70px; resize:none; border:1px solid var(--medium-gray); border-radius:4px; padding:.5rem; font-family: 'Courier New', Courier, monospace; font-size: 1rem;}
+    
+    button { cursor:pointer; border:none; background:var(--primary-color); color:#fff; padding:.4rem .75rem; border-radius:4px; font-size: 1rem;}
+    button.outline { background:#fff; color:var(--primary-color); border:1px solid var(--primary-color); }
+
+    .arrow { font-size:1.4rem; user-select:none; align-self: center;}
+    .info-box { background:var(--light-gray); border:1px solid var(--medium-gray); border-radius:6px; padding:1rem; margin-top:2rem; }
+    
+    #ctsSolutionPanel {
+        background: var(--light-gray); border: 1px solid var(--medium-gray);
+        border-radius: 6px; padding: 1rem 1.5rem; margin-top: 1rem; text-align: left;
+    }
+    #ctsSolutionPanel h4 { text-align: left; margin-top: 0; color: var(--primary-color); }
+    #ctsSolutionPanel p { text-align: left; margin-bottom: 1rem; line-height: 1.8; }
+    #ctsSolutionPanel ol { padding-left: 20px; }
+    #ctsSolutionPanel li { margin-bottom: 1.5rem; padding-left: 0.5rem; }
+    .hint { color: var(--primary-color); font-style: italic; margin-bottom: 1rem; border-left: 3px solid var(--primary-color); padding-left: 1rem;}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Quadratic Solutions</h1>
+    <p class="tagline">From Factoring to Formula</p>
+    <p class="intro">Every method rewrites a quadratic into a form that reveals its roots. Pick a tab to explore the different solving methods.</p>
+    <div class="tabs">
+      <div class="tab-btn" data-tab="factor">Factoring</div>
+      <div class="tab-btn" data-tab="cts">Complete&nbsp;the&nbsp;Square</div>
+    </div>
+    
+    <div id="factor" class="tab-content">
+      <h2>Worked Examples</h2>
+      <div style="text-align:center; margin-bottom:.75rem;">
+        <label>Choose type:&nbsp;
+          <select id="typeSel">
+            <option value="two-positive">two positive roots</option>
+            <option value="two-negative">two negative roots</option>
+            <option value="pos-neg">one positive & one negative</option>
+            <option value="repeated-positive">equal positive roots</option>
+            <option value="repeated-negative">equal negative roots</option>
+          </select>
+        </label>
+        <button id="newWorked" class="outline" style="margin-left:.5rem;">New example</button>
+      </div>
+      <div class="box-row" id="workedRow"></div>
+      <h2 style="margin-top:2rem;">Open Examples</h2>
+      <p>Click "Try me" on one card to reveal it. Then, fill in the other two and check your answer.</p>
+      <div class="box-row" id="openRow"></div>
+      <div style="text-align:center; margin-top:.75rem; display: flex; justify-content: center; gap: 0.5rem;">
+        <button id="checkBtn">Check answers</button>
+        <button id="resetOpenBtn" class="outline">Next problem</button>
+      </div>
+      <div class="info-box">Factoring works when you can find two numbers whose product is <em>c</em> and whose sum is <em>-b</em> for the quadratic <em>x² + bx + c = 0</em>. This method rebuilds the equation from its integer roots.</div>
+    </div>
+
+    <div id="cts" class="tab-content">
+        <p>This is the <strong>general method</strong> for solving any quadratic equation. It works every time, even when factoring is not obvious. The entire method is based on transforming the general equation $ax^2 + bx + c = 0$ into a form that reveals its solutions, which are given by the famous quadratic formula:
+        $$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$$
+        </p>
+        <h3 style="margin-top: 2rem;">The Big Picture</h3>
+        <div class="concept-row">
+            <div class="concept-box"><strong>1. General Form</strong><br><br>$ax^2 + bx + c = 0$</div>
+            <div class="concept-arrow">↔</div>
+            <div class="concept-box"><strong>2. Completing the Square</strong><br><br>$(x + \frac{b}{2a})^2 = \frac{b^2 - 4ac}{4a^2}$</div>
+            <div class="concept-arrow">→</div>
+            <div class="concept-box"><strong>3. The Solutions</strong><br><br>$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$</div>
+        </div>
+        <p style="text-align: center; margin-top: -0.5rem; color: #424242;"><em>We usually go directly from Box 1 to Box 3 using the formula, but the reason this works is because of the algebra in Box 2.</em></p>
+        <h3 style="margin-top: 2rem;">Interactive Worked Examples</h3>
+        <div style="text-align: center;">
+            <label for="ctsExamplesSel">Choose an Example:</label>
+            <select id="ctsExamplesSel" style="font-size: 1rem; padding: 0.25rem 0.5rem;">
+                <option value="general">General Form: ax²+bx+c=0</option>
+                <option value="factor">x² - 6x + 5 = 0</option>
+                <option value="non1">3x² + 6x - 6 = 0</option>
+                <option value="negA">-2x² + 4x + 6 = 0</option>
+                <option value="fracA">0.5x² + 2x - 6 = 0</option>
+                <option value="noPerf">x² + 4x - 1 = 0</option>
+            </select>
+        </div>
+        <div id="ctsSolutionPanel"></div>
+        <div class="info-box">
+            <h4 style="text-align:center; margin-top:0;">Flexibility and Purpose</h4>
+            <p>Being comfortable with both <strong>factoring</strong> and the <strong>quadratic formula</strong> gives you great flexibility. If you can spot the factors easily, that is often the quickest way to a solution.</p>
+            <p>If the goal is only to find the numerical solutions, we usually use the quadratic formula directly as a shortcut. However, the process of <strong>completing the square</strong> is a very important skill in mathematics, as it's used for changing the form of an equation to make it easier to graph, find its maximum or minimum value (vertex), and in many other advanced applications.</p>
+        </div>
+    </div>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // =================================================================
+    // =========== FULL SCRIPT FOR BOTH TABS ===========================
+    // =================================================================
+
+    // --- UTILITIES & CORE LOGIC ---
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+    // --- DOM ELEMENT SELECTION (ALL TABS) ---
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    const workedRow = document.getElementById('workedRow');
+    const typeSel = document.getElementById('typeSel');
+    const newWorkedBtn = document.getElementById('newWorked');
+    const openRow = document.getElementById('openRow');
+    const checkBtn = document.getElementById('checkBtn');
+    const resetOpenBtn = document.getElementById('resetOpenBtn');
+    const ctsExamplesSel = document.getElementById('ctsExamplesSel');
+    const ctsSolutionPanel = document.getElementById('ctsSolutionPanel');
+
+    // =================================================
+    // =========== TAB 1: FACTORING ====================
+    // =================================================
+    const horizontalArrow = '<div class="arrow">↔</div>';
+    const verticalArrow = '<div class="arrow">↕</div>'; 
+    let openData;
+    let firstPicked = false;
+    const titleMap = { eq: 'Equation', fact: 'Factored form', sol: 'Solutions' };
+
+    function makeQuadratic(type) {
+        let p = 2, q = 3;
+        switch(type){
+            case "two-positive": p = rand(1, 5); q = rand(1, 5); if (p===q) q++; break;
+            case "two-negative": p = -rand(1, 5); q = -rand(1, 5); if (p===q) q--; break;
+            case "pos-neg": p = rand(1, 6); q = -rand(1, 6); if(p+q===0) p++; break;
+            case "repeated-positive": p = q = rand(1, 5); break;
+            case "repeated-negative": p = q = -rand(1, 5); break;
+        }
+        const b = -(p + q); const c = p * q;
+        const s = n => (n >= 0 ? "+" : "-"); const a = n => Math.abs(n);
+        let bTerm = ''; if (b !== 0) bTerm = (a(b) === 1) ? ` ${s(b)} x` : ` ${s(b)} ${a(b)}x`;
+        let cTerm = ''; if (c !== 0) cTerm = ` ${s(c)} ${a(c)}`;
+        const eqString = `x²${bTerm}${cTerm} = 0`;
+        return { eq: eqString, fact: `(x ${p > 0 ? "-" : "+"} ${a(p)})(x ${q > 0 ? "-" : "+"} ${a(q)}) = 0`, sol: `x = ${p}, x = ${q}`, roots: [p, q].sort() };
+    }
+
+    function renderWorked(data){
+      workedRow.innerHTML = `<div class="card"><strong>Equation</strong><div class="card-content">${data.eq}</div></div> ${horizontalArrow} <div class="card"><strong>Factored form</strong><div class="card-content">${data.fact}</div></div> ${horizontalArrow} <div class="card"><strong>Solutions</strong><div class="card-content">${data.sol}</div></div>`;
+    }
+
+    function resetOpen() {
+      openData = makeQuadratic('pos-neg');
+      firstPicked = false;
+      openRow.innerHTML = `<div class="card" data-key="eq"><strong>Equation</strong><button class="outline" style="margin-top:.5rem;">Try me</button></div> ${verticalArrow} <div class="card" data-key="fact"><strong>Factored form</strong><button class="outline" style="margin-top:.5rem;">Try me</button></div> ${verticalArrow} <div class="card" data-key="sol"><strong>Solutions</strong><button class="outline" style="margin-top:.5rem;">Try me</button></div>`;
+      openRow.querySelectorAll('.card').forEach(c => c.classList.remove('correct', 'wrong'));
+    }
+
+    function setCardToInputMode(card, key) {
+        let inputHTML = '';
+        if (key === 'eq') { inputHTML = `<textarea placeholder="Type x^2 for x²..."></textarea>`; } 
+        else if (key === 'fact') { inputHTML = `<div class="card-input-area"><span>(x</span><select class="sign-select"><option value="+">+</option><option value="-">-</option></select><input type="number" class="num-input" min="0" placeholder="#"><span>)(x</span><select class="sign-select"><option value="+">+</option><option value="-">-</option></select><input type="number" class="num-input" min="0" placeholder="#"><span>) = 0</span></div>`; } 
+        else if (key === 'sol') { inputHTML = `<div class="solutions-input"><div><span>x = </span><input type="number" class="sol-input"></div><div><span>x = </span><input type="number" class="sol-input"></div></div>`; }
+        card.innerHTML = `<strong>${titleMap[key]}</strong>${inputHTML}`;
+    }
+    
+    // =====================================================
+    // =========== TAB 2: COMPLETE THE SQUARE ==============
+    // =====================================================
+    const ctsExamples = {
+      'general': { a: 'a', b: 'b', c: 'c', eq: 'ax²+bx+c=0' },
+      'factor': { a: 1, b: -6, c: 5, eq: 'x² - 6x + 5 = 0', hint: "This equation can be factored into (x-1)(x-5)=0, but let's solve it with the general method." },
+      'non1': { a: 3, b: 6, c: -6, eq: '3x² + 6x - 6 = 0' },
+      'negA': { a: -2, b: 4, c: 6, eq: '-2x² + 4x + 6 = 0' },
+      'fracA': { a: 0.5, b: 2, c: -6, eq: '0.5x² + 2x - 6 = 0' },
+      'noPerf': { a: 1, b: 4, c: -1, eq: 'x² + 4x - 1 = 0' }
+    };
+    function formatNumber(n) {
+        const rounded = Math.round(n * 1000) / 1000;
+        if (rounded === 0) return '+ 0';
+        return rounded < 0 ? `- ${Math.abs(rounded)}` : `+ ${Math.abs(rounded)}`;
+    }
+    function generateCtsSteps(ex) {
+        if (!ex) return;
+        const { a, b, c } = ex;
+        let stepsHTML = `<h4>Step-by-step Solution for: $${ex.eq}$</h4>`;
+        if (ex.hint) { stepsHTML += `<p class="hint">${ex.hint}</p>`; }
+        stepsHTML += `<ol>`;
+        if (typeof a === 'string') {
+            stepsHTML += `<li><strong>Start with the general form:</strong><p>$${a}x^2 + ${b}x + ${c} = 0$</p></li>`;
+            stepsHTML += `<li><strong>Make the coefficient of $x^2$ equal 1 (by dividing by a):</strong><p>$x^2 + (\\frac{${b}}{${a}})x + (\\frac{${c}}{${a}}) = 0$</p></li>`;
+            stepsHTML += `<li><strong>Move the constant term to the other side:</strong><p>$x^2 + (\\frac{${b}}{${a}})x = -\\frac{${c}}{${a}}$</p></li>`;
+            stepsHTML += `<li><strong>Rewrite the left side as a perfect square minus a constant:</strong><p>The term $(\\frac{b}{a})x$ is $2 \\cdot x \\cdot \\frac{b}{2a}$. This means the perfect square is $(x + \\frac{b}{2a})^2$.</p><p>$(x + \\frac{b}{2a})^2 - (\\frac{b}{2a})^2 = -\\frac{c}{a}$</p></li>`;
+            stepsHTML += `<li><strong>Isolate the square and solve:</strong><p>$(x + \\frac{b}{2a})^2 = \\frac{b^2}{4a^2} - \\frac{c}{a} = \\frac{b^2 - 4ac}{4a^2}$</p><p>$x + \\frac{b}{2a} = \\pm\\frac{\\sqrt{b^2 - 4ac}}{2a}$</p><p>Which gives the final formula:</p><p>$$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$</p></li>`;
+        } else {
+            stepsHTML += `<li><strong>Start with the equation:</strong><p>$${ex.eq.replace(/\s/g, '')}$</p></li>`;
+            const b_over_a = b/a; const c_over_a = c/a;
+            if (a !== 1) { stepsHTML += `<li><strong>Make the coefficient of $x^2$ equal 1 (by dividing by ${a}):</strong><p>$x^2 ${formatNumber(b_over_a)}x ${formatNumber(c_over_a)} = 0$</p></li>`; }
+            stepsHTML += `<li><strong>Move the constant term to the other side:</strong><p>$x^2 ${formatNumber(b_over_a)}x = ${-c_over_a}$</p></li>`;
+            const half_b = b_over_a / 2;
+            stepsHTML += `<li><strong>Rewrite the left side (half of ${b_over_a} is ${half_b}):</strong><p>$(x ${formatNumber(half_b)})^2 - (${half_b})^2 = ${-c_over_a}$</p><p>$(x ${formatNumber(half_b)})^2 ${formatNumber(-(half_b*half_b))} = ${-c_over_a}$</p></li>`;
+            const final_const = -c_over_a + (half_b*half_b);
+            stepsHTML += `<li><strong>Isolate the square and solve:</strong><p>$(x ${formatNumber(half_b)})^2 = ${final_const}$</p>`;
+            if(final_const < 0) {
+                 stepsHTML += `<p>Since the right side is negative, there are no real solutions.</p></li>`;
+            } else {
+                const sqrt_final = Math.sqrt(final_const);
+                if (Number.isInteger(sqrt_final)) {
+                     stepsHTML += `<p>$x ${formatNumber(half_b)} = \\pm\\sqrt{${final_const}} = \\pm${sqrt_final}$</p>`;
+                     const root1 = -half_b + sqrt_final; const root2 = -half_b - sqrt_final;
+                     stepsHTML += `<p>$x = ${-half_b} \\pm ${sqrt_final}$</p><p>The solutions are $x = ${root1}$ and $x = ${root2}$.</p></li>`;
+                } else {
+                     stepsHTML += `<p>$x ${formatNumber(half_b)} = \\pm\\sqrt{${final_const}}$</p>`;
+                     stepsHTML += `<p>The exact solutions are $x = ${-half_b} \\pm \\sqrt{${final_const}}$.</p></li>`;
+                }
+            }
+        }
+        stepsHTML += `</ol>`;
+        ctsSolutionPanel.innerHTML = stepsHTML;
+        if (window.MathJax) { MathJax.typesetPromise([ctsSolutionPanel]); }
+    }
+    
+    // =====================================================
+    // =========== EVENT LISTENERS =========================
+    // =====================================================
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-tab');
+        tabs.forEach(b => b.classList.toggle('active', b === btn));
+        contents.forEach(c => c.classList.toggle('active', c.id === id));
+        if (c.id === 'cts' && c.classList.contains('active')) {
+            if (window.MathJax) { MathJax.typesetPromise(); }
+        }
+      });
+    });
+    typeSel.addEventListener('change', e => { renderWorked(makeQuadratic(e.target.value)); });
+    newWorkedBtn.addEventListener('click', () => { renderWorked(makeQuadratic(typeSel.value)); });
+    openRow.addEventListener('click', e => {
+      const btn = e.target.closest('button'); if (!btn) return;
+      const card = btn.closest('.card'); const k = card.getAttribute('data-key');
+      if (!firstPicked) { const contentMap = { eq: openData.eq, fact: openData.fact, sol: openData.sol }; card.innerHTML = `<strong>${titleMap[k]}</strong><div class="card-content">${contentMap[k]}</div>`; firstPicked = true; openRow.querySelectorAll('button').forEach(b => { if(b) b.textContent = 'Find me' }); } 
+      else { if (card.querySelector('button')) { setCardToInputMode(card, k); } }
+    });
+    checkBtn.addEventListener('click', () => {
+      openRow.querySelectorAll('.card').forEach(card => {
+        const k = card.getAttribute('data-key'); let isCorrect = null;
+        if (k === 'fact') { const signs = card.querySelectorAll('.sign-select'); const nums = card.querySelectorAll('.num-input'); if (nums.length === 2 && nums[0].value !== '' && nums[1].value !== '') { const r1 = (signs[0].value === '+')?-Number(nums[0].value):Number(nums[0].value); const r2 = (signs[1].value === '+')?-Number(nums[1].value):Number(nums[1].value); const uR = [r1, r2].sort(); isCorrect = JSON.stringify(uR) === JSON.stringify(openData.roots); } } 
+        else if (k === 'sol') { const inputs = card.querySelectorAll('.sol-input'); if (inputs.length === 2 && inputs[0].value !== '' && inputs[1].value !== '') { const uR = [Number(inputs[0].value), Number(inputs[1].value)].sort(); isCorrect = JSON.stringify(uR) === JSON.stringify(openData.roots); } } 
+        else if (k === 'eq') { const ta = card.querySelector('textarea'); if (ta && ta.value.trim() !== '') { const n = str => str.replace(/\s/g, '').replace('x^2', 'x²'); isCorrect = n(ta.value) === n(openData.eq); } }
+        if (isCorrect === true) { card.innerHTML = `<strong>${titleMap[k]}</strong><div class="card-content">${openData[k]}</div>`; card.classList.add('correct'); card.classList.remove('wrong'); } 
+        else if (isCorrect === false) { card.classList.add('wrong'); card.classList.remove('correct'); }
+      });
+    });
+    resetOpenBtn.addEventListener('click', resetOpen);
+    ctsExamplesSel.addEventListener('change', (e) => {
+        const selectedKey = e.target.value;
+        generateCtsSteps(ctsExamples[selectedKey]);
+    });
+    document.body.addEventListener('input', e => {
+        if (e.target.tagName === 'TEXTAREA' && e.target.value.includes('^2')) {
+            const cursorPos = e.target.selectionStart;
+            e.target.value = e.target.value.replace(/\^2/g, '²');
+            e.target.setSelectionRange(cursorPos - 1, cursorPos - 1);
+        }
+    });
+
+    // =====================================================
+    // =========== INITIAL PAGE LOAD =======================
+    // =====================================================
+    tabs[0].classList.add('active');
+    contents[0].classList.add('active');
+    renderWorked(makeQuadratic(typeSel.value));
+    resetOpen();
+    generateCtsSteps(ctsExamples.general);
+
+});
+</script>
+</body>
+</html>
