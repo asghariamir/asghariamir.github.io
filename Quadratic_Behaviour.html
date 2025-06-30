@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quadratic Solutions</title>
+  <title>Quadratic Behaviour</title>
   <script>
     MathJax = {
       tex: {
@@ -18,6 +18,7 @@
   <script type="text/javascript" id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --primary-color: #1565c0; --light-gray: #f5f5f5; --medium-gray: #e0e0e0;
@@ -38,15 +39,9 @@
     h1 { font-size: 1.8rem; color: var(--primary-color); margin-bottom: 1rem; }
     h2 { font-size: 1.4rem; color: var(--primary-color); margin-bottom: .5rem; }
     h3 { font-size: 1.1rem; margin-bottom: .5rem; }
+    h4 { text-align: left; margin-top: 0; color: var(--primary-color); }
     p { margin-bottom: .5rem; }
-    .tagline {
-      font-size: 1.1rem;
-      font-style: italic;
-      color: #555;
-      margin-top: -0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
+    .tagline { font-size: 1.1rem; font-style: italic; color: #555; margin-top: -0.5rem; margin-bottom: 1.5rem; }
     .tabs { display: flex; border-bottom: 2px solid var(--medium-gray); margin-bottom: 1rem; }
     .tab-btn {
       flex: 1; padding: .5rem 0; text-align:center; cursor:pointer; font-weight:600;
@@ -60,6 +55,10 @@
     #openRow { flex-direction: column; align-items: center; gap: 0.5rem; }
     .concept-box { border:1px dashed var(--medium-gray); border-radius:6px; padding:.75rem; width:220px; text-align:center; display: flex; flex-direction: column; justify-content: center;}
     .concept-arrow { font-size: 2rem; color: #888; align-self: center; }
+    .info-box { background:var(--light-gray); border:1px solid var(--medium-gray); border-radius:6px; padding:1.25rem; margin-top:2rem; }
+    .info-box p, .info-box li { text-align: left; }
+    .info-box ul { padding-left: 20px; }
+    .info-box strong { color: var(--primary-color); }
 
     .card {
       width: var(--box-w); min-height: 110px; border: 1px solid var(--medium-gray); border-radius: 6px;
@@ -67,6 +66,8 @@
       text-align:center; background:#fff; transition: border .3s;
     }
     #openRow .card { width: 480px; }
+    #workedRow { align-items: center; }
+
     .card.correct { border:2px solid #4caf50; }
     .card.wrong   { border:2px solid #e53935; }
     .card-content { margin-top: .5rem; font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; }
@@ -88,12 +89,19 @@
     button.outline { background:#fff; color:var(--primary-color); border:1px solid var(--primary-color); }
 
     .arrow { font-size:1.4rem; user-select:none; align-self: center;}
-    .info-box { background:var(--light-gray); border:1px solid var(--medium-gray); border-radius:6px; padding:1rem; margin-top:2rem; }
-    
-    #ctsSolutionPanel {
-        background: var(--light-gray); border: 1px solid var(--medium-gray);
-        border-radius: 6px; padding: 1rem 1.5rem; margin-top: 1rem; text-align: left;
-    }
+
+    .graph-explorer { display: flex; flex-wrap: wrap; gap: 2rem; }
+    .graph-container { flex: 2; min-width: 300px; }
+    .controls-container { flex: 1; min-width: 250px; }
+    .slider-group { margin-bottom: 1rem; }
+    .slider-group label { display: block; font-weight: 600; margin-bottom: 0.25rem; }
+    .slider-group input[type="range"] { width: 100%; }
+    .panel { margin-top: 1.5rem; padding: 1rem; background: var(--light-gray); border-radius: 6px; }
+    .panel:first-child { margin-top: 0; }
+    .panel h4 { margin-bottom: 0.75rem; }
+    .panel p { text-align: left; font-size: 0.95rem; margin-bottom: 0.5rem; line-height: 1.5;}
+    .panel p strong { color: var(--primary-color); }
+    #ctsSolutionPanel { background: var(--light-gray); border: 1px solid var(--medium-gray); border-radius: 6px; padding: 1rem 1.5rem; margin-top: 1rem; text-align: left; }
     #ctsSolutionPanel h4 { text-align: left; margin-top: 0; color: var(--primary-color); }
     #ctsSolutionPanel p { text-align: left; margin-bottom: 1rem; line-height: 1.8; }
     #ctsSolutionPanel ol { padding-left: 20px; }
@@ -103,12 +111,13 @@
 </head>
 <body>
   <div class="app">
-    <h1>Quadratic Solutions</h1>
-    <p class="tagline">From Factoring to Formula</p>
-    <p class="intro">Every method rewrites a quadratic into a form that reveals its roots. Pick a tab to explore the different solving methods.</p>
+    <h1>Quadratic Behaviour</h1>
+    <p class="tagline">From Equations to Functions</p>
+    <p class="intro">Every method rewrites a quadratic into a form that reveals its roots. Pick a tab to explore the different solving methods and their graphical meaning.</p>
     <div class="tabs">
       <div class="tab-btn" data-tab="factor">Factoring</div>
-      <div class="tab-btn" data-tab="cts">Complete&nbsp;the&nbsp;Square</div>
+      <div class="tab-btn" data-tab="cts">Completing the Square</div>
+      <div class="tab-btn" data-tab="graphs">Functions & Graphs</div>
     </div>
     
     <div id="factor" class="tab-content">
@@ -133,7 +142,7 @@
         <button id="checkBtn">Check answers</button>
         <button id="resetOpenBtn" class="outline">Next problem</button>
       </div>
-      <div class="info-box">Factoring works when you can find two numbers whose product is <em>c</em> and whose sum is <em>-b</em> for the quadratic <em>x² + bx + c = 0</em>. This method rebuilds the equation from its integer roots.</div>
+      <div class="info-box"><p>Factoring works when you can find two numbers whose product is <em>c</em> and whose sum is <em>-b</em> for the quadratic <em>x² + bx + c = 0</em>. This method rebuilds the equation from its integer roots.</p></div>
     </div>
 
     <div id="cts" class="tab-content">
@@ -168,17 +177,69 @@
             <p>If the goal is only to find the numerical solutions, we usually use the quadratic formula directly as a shortcut. However, the process of <strong>completing the square</strong> is a very important skill in mathematics, as it's used for changing the form of an equation to make it easier to graph, find its maximum or minimum value (vertex), and in many other advanced applications.</p>
         </div>
     </div>
+    
+    <div id="graphs" class="tab-content">
+        <h3>The Interactive Parabola Explorer</h3>
+        <p>See how the coefficients $a$, $b$, and $c$ affect the graph of the function $y = ax^2+bx+c$.</p>
+        <div class="graph-explorer">
+            <div class="graph-container">
+                <canvas id="parabolaChart"></canvas>
+            </div>
+            <div class="controls-container">
+                <div class="panel">
+                    <h4>Controls</h4>
+                    <div class="slider-group">
+                        <label for="slider-a">Coefficient a = <span id="val-a">1.0</span></label>
+                        <input type="range" id="slider-a" min="-5" max="5" value="1" step="0.1">
+                    </div>
+                    <div class="slider-group">
+                        <label for="slider-b">Coefficient b = <span id="val-b">2.0</span></label>
+                        <input type="range" id="slider-b" min="-10" max="10" value="2" step="0.1">
+                    </div>
+                    <div class="slider-group">
+                        <label for="slider-c">Coefficient c = <span id="val-c">-3.0</span></label>
+                        <input type="range" id="slider-c" min="-10" max="10" value="-3" step="0.1">
+                    </div>
+                </div>
+                <div class="panel">
+                    <h4>Equation Forms</h4>
+                    <p><strong>Standard:</strong> <span id="standard-form-output"></span></p>
+                    <p><strong>Vertex:</strong> <span id="vertex-form-output"></span></p>
+                </div>
+                <div class="panel">
+                    <h4>Analysis</h4>
+                    <p><strong>Vertex:</strong> <span id="vertex-output"></span> (<span id="minmax-output"></span>)</p>
+                    <p><strong>Y-Intercept:</strong> <span id="y-intercept-output"></span></p>
+                    <hr>
+                    <p><strong>Discriminant (Δ):</strong> <span id="delta-output"></span></p>
+                    <p><strong>Interpretation:</strong> <span id="delta-interp"></span></p>
+                    <p><strong>Roots (x-intercepts):</strong> <span id="roots-output"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="info-box">
+            <h4>Understanding the Discriminant (Δ)</h4>
+            <p>The expression inside the square root of the quadratic formula, $\Delta = b^2 - 4ac$, is called the discriminant. It tells you how many real solutions an equation has, which corresponds to how many times its graph crosses the x-axis.</p>
+            <ul>
+                <li>If $\Delta > 0$: There are <strong>two distinct real roots</strong>. The parabola crosses the x-axis at two different points.</li>
+                <li>If $\Delta = 0$: There is <strong>one repeated real root</strong>. The parabola's vertex touches the x-axis at a single point.</li>
+                <li>If $\Delta < 0$: There are <strong>no real roots</strong> (the solutions are complex). The parabola does not cross the x-axis at all.</li>
+            </ul>
+        </div>
+        <div class="info-box">
+            <h4>Finding the Vertex and Max/Min</h4>
+            <p>The process of "Completing the Square" is the key to finding the vertex. It converts the standard form $y = ax^2 + bx + c$ into the <strong>vertex form</strong>: $y = a(x-h)^2 + k$.</p>
+            <ul>
+                <li>The coordinates of the vertex are simply <strong>(h, k)</strong>.</li>
+                <li>The value of <strong>'a'</strong> tells you if the vertex is a maximum or minimum. If 'a' is positive, the parabola opens upwards and the vertex is a minimum. If 'a' is negative, the parabola opens downwards and the vertex is a maximum.</li>
+            </ul>
+        </div>
+    </div>
   </div>
 
 <script>
+// COMPLETE AND CORRECTED SCRIPT FOR ALL THREE TABS
 document.addEventListener('DOMContentLoaded', () => {
-
-    // =================================================================
-    // =========== FULL SCRIPT FOR BOTH TABS ===========================
-    // =================================================================
-
-    // --- UTILITIES & CORE LOGIC ---
-    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
     // --- DOM ELEMENT SELECTION (ALL TABS) ---
     const tabs = document.querySelectorAll('.tab-btn');
@@ -191,17 +252,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetOpenBtn = document.getElementById('resetOpenBtn');
     const ctsExamplesSel = document.getElementById('ctsExamplesSel');
     const ctsSolutionPanel = document.getElementById('ctsSolutionPanel');
+    const sliderA = document.getElementById('slider-a');
+    const sliderB = document.getElementById('slider-b');
+    const sliderC = document.getElementById('slider-c');
+    const valA = document.getElementById('val-a');
+    const valB = document.getElementById('val-b');
+    const valC = document.getElementById('val-c');
+    const standardFormOutput = document.getElementById('standard-form-output');
+    const vertexFormOutput = document.getElementById('vertex-form-output');
+    const vertexOutput = document.getElementById('vertex-output');
+    const minMaxOutput = document.getElementById('minmax-output');
+    const yInterceptOutput = document.getElementById('y-intercept-output');
+    const deltaOutput = document.getElementById('delta-output');
+    const deltaInterp = document.getElementById('delta-interp');
+    const rootsOutput = document.getElementById('roots-output');
+    const canvas = document.getElementById('parabolaChart');
+
+    // --- SHARED UTILITY ---
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
     // =================================================
     // =========== TAB 1: FACTORING ====================
     // =================================================
-    const horizontalArrow = '<div class="arrow">↔</div>';
-    const verticalArrow = '<div class="arrow">↕</div>'; 
-    let openData;
-    let firstPicked = false;
-    const titleMap = { eq: 'Equation', fact: 'Factored form', sol: 'Solutions' };
-
-    function makeQuadratic(type) {
+    let openData_Factoring;
+    let firstPicked_Factoring = false;
+    const titleMap_Factoring = { eq: 'Equation', fact: 'Factored form', sol: 'Solutions' };
+    
+    function makeQuadratic_Factoring(type) {
         let p = 2, q = 3;
         switch(type){
             case "two-positive": p = rand(1, 5); q = rand(1, 5); if (p===q) q++; break;
@@ -217,24 +294,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const eqString = `x²${bTerm}${cTerm} = 0`;
         return { eq: eqString, fact: `(x ${p > 0 ? "-" : "+"} ${a(p)})(x ${q > 0 ? "-" : "+"} ${a(q)}) = 0`, sol: `x = ${p}, x = ${q}`, roots: [p, q].sort() };
     }
-
-    function renderWorked(data){
-      workedRow.innerHTML = `<div class="card"><strong>Equation</strong><div class="card-content">${data.eq}</div></div> ${horizontalArrow} <div class="card"><strong>Factored form</strong><div class="card-content">${data.fact}</div></div> ${horizontalArrow} <div class="card"><strong>Solutions</strong><div class="card-content">${data.sol}</div></div>`;
+    function renderWorked_Factoring(data){
+      workedRow.innerHTML = `<div class="card"><strong>Equation</strong><div class="card-content">${data.eq}</div></div> <div class="arrow">↔</div> <div class="card"><strong>Factored form</strong><div class="card-content">${data.fact}</div></div> <div class="arrow">↔</div> <div class="card"><strong>Solutions</strong><div class="card-content">${data.sol}</div></div>`;
     }
-
-    function resetOpen() {
-      openData = makeQuadratic('pos-neg');
-      firstPicked = false;
-      openRow.innerHTML = `<div class="card" data-key="eq"><strong>Equation</strong><button class="outline" style="margin-top:.5rem;">Try me</button></div> ${verticalArrow} <div class="card" data-key="fact"><strong>Factored form</strong><button class="outline" style="margin-top:.5rem;">Try me</button></div> ${verticalArrow} <div class="card" data-key="sol"><strong>Solutions</strong><button class="outline" style="margin-top:.5rem;">Try me</button></div>`;
+    function resetOpen_Factoring() {
+      openData_Factoring = makeQuadratic_Factoring('pos-neg');
+      firstPicked_Factoring = false;
+      openRow.innerHTML = `<div class="card" data-key="eq"><strong>Equation</strong><button class="outline" style="margin-top:.5rem;">Try me</button></div> <div class="arrow">↕</div> <div class="card" data-key="fact"><strong>Factored form</strong><button class="outline" style="margin-top:.5rem;">Try me</button></div> <div class="arrow">↕</div> <div class="card" data-key="sol"><strong>Solutions</strong><button class="outline" style="margin-top:.5rem;">Try me</button></div>`;
       openRow.querySelectorAll('.card').forEach(c => c.classList.remove('correct', 'wrong'));
     }
-
-    function setCardToInputMode(card, key) {
+    function setCardToInputMode_Factoring(card, key) {
         let inputHTML = '';
         if (key === 'eq') { inputHTML = `<textarea placeholder="Type x^2 for x²..."></textarea>`; } 
         else if (key === 'fact') { inputHTML = `<div class="card-input-area"><span>(x</span><select class="sign-select"><option value="+">+</option><option value="-">-</option></select><input type="number" class="num-input" min="0" placeholder="#"><span>)(x</span><select class="sign-select"><option value="+">+</option><option value="-">-</option></select><input type="number" class="num-input" min="0" placeholder="#"><span>) = 0</span></div>`; } 
         else if (key === 'sol') { inputHTML = `<div class="solutions-input"><div><span>x = </span><input type="number" class="sol-input"></div><div><span>x = </span><input type="number" class="sol-input"></div></div>`; }
-        card.innerHTML = `<strong>${titleMap[key]}</strong>${inputHTML}`;
+        card.innerHTML = `<strong>${titleMap_Factoring[key]}</strong>${inputHTML}`;
     }
     
     // =====================================================
@@ -248,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'fracA': { a: 0.5, b: 2, c: -6, eq: '0.5x² + 2x - 6 = 0' },
       'noPerf': { a: 1, b: 4, c: -1, eq: 'x² + 4x - 1 = 0' }
     };
-    function formatNumber(n) {
+    function formatNumber_CTS(n) {
         const rounded = Math.round(n * 1000) / 1000;
         if (rounded === 0) return '+ 0';
         return rounded < 0 ? `- ${Math.abs(rounded)}` : `+ ${Math.abs(rounded)}`;
@@ -268,33 +342,107 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             stepsHTML += `<li><strong>Start with the equation:</strong><p>$${ex.eq.replace(/\s/g, '')}$</p></li>`;
             const b_over_a = b/a; const c_over_a = c/a;
-            if (a !== 1) { stepsHTML += `<li><strong>Make the coefficient of $x^2$ equal 1 (by dividing by ${a}):</strong><p>$x^2 ${formatNumber(b_over_a)}x ${formatNumber(c_over_a)} = 0$</p></li>`; }
-            stepsHTML += `<li><strong>Move the constant term to the other side:</strong><p>$x^2 ${formatNumber(b_over_a)}x = ${-c_over_a}$</p></li>`;
+            if (a !== 1) { stepsHTML += `<li><strong>Make the coefficient of $x^2$ equal 1 (by dividing by ${a}):</strong><p>$x^2 ${formatNumber_CTS(b_over_a)}x ${formatNumber_CTS(c_over_a)} = 0$</p></li>`; }
+            stepsHTML += `<li><strong>Move the constant term to the other side:</strong><p>$x^2 ${formatNumber_CTS(b_over_a)}x = ${-c_over_a}$</p></li>`;
             const half_b = b_over_a / 2;
-            stepsHTML += `<li><strong>Rewrite the left side (half of ${b_over_a} is ${half_b}):</strong><p>$(x ${formatNumber(half_b)})^2 - (${half_b})^2 = ${-c_over_a}$</p><p>$(x ${formatNumber(half_b)})^2 ${formatNumber(-(half_b*half_b))} = ${-c_over_a}$</p></li>`;
+            stepsHTML += `<li><strong>Rewrite the left side (half of ${b_over_a} is ${half_b}):</strong><p>$(x ${formatNumber_CTS(half_b)})^2 - (${half_b})^2 = ${-c_over_a}$</p><p>$(x ${formatNumber_CTS(half_b)})^2 ${formatNumber_CTS(-(half_b*half_b))} = ${-c_over_a}$</p></li>`;
             const final_const = -c_over_a + (half_b*half_b);
-            stepsHTML += `<li><strong>Isolate the square and solve:</strong><p>$(x ${formatNumber(half_b)})^2 = ${final_const}$</p>`;
+            stepsHTML += `<li><strong>Isolate the square and solve:</strong><p>$(x ${formatNumber_CTS(half_b)})^2 = ${final_const}$</p>`;
             if(final_const < 0) {
                  stepsHTML += `<p>Since the right side is negative, there are no real solutions.</p></li>`;
             } else {
                 const sqrt_final = Math.sqrt(final_const);
                 if (Number.isInteger(sqrt_final)) {
-                     stepsHTML += `<p>$x ${formatNumber(half_b)} = \\pm\\sqrt{${final_const}} = \\pm${sqrt_final}$</p>`;
+                     stepsHTML += `<p>$x ${formatNumber_CTS(half_b)} = \\pm\\sqrt{${final_const}} = \\pm${sqrt_final}$</p>`;
                      const root1 = -half_b + sqrt_final; const root2 = -half_b - sqrt_final;
                      stepsHTML += `<p>$x = ${-half_b} \\pm ${sqrt_final}$</p><p>The solutions are $x = ${root1}$ and $x = ${root2}$.</p></li>`;
                 } else {
-                     stepsHTML += `<p>$x ${formatNumber(half_b)} = \\pm\\sqrt{${final_const}}$</p>`;
+                     stepsHTML += `<p>$x ${formatNumber_CTS(half_b)} = \\pm\\sqrt{${final_const}}$</p>`;
                      stepsHTML += `<p>The exact solutions are $x = ${-half_b} \\pm \\sqrt{${final_const}}$.</p></li>`;
                 }
             }
         }
         stepsHTML += `</ol>`;
         ctsSolutionPanel.innerHTML = stepsHTML;
-        if (window.MathJax) { MathJax.typesetPromise([ctsSolutionPanel]); }
+        if (window.MathJax && window.MathJax.typesetPromise) { MathJax.typesetPromise([ctsSolutionPanel]).catch(err => console.error("MathJax Error: ", err)); }
     }
     
     // =====================================================
-    // =========== EVENT LISTENERS =========================
+    // =========== TAB 3: FUNCTIONS & GRAPHS ===============
+    // =====================================================
+    let parabolaChart;
+    function updateGraphAndAnalysis() {
+        if (!sliderA) return;
+        const a = parseFloat(sliderA.value);
+        const b = parseFloat(sliderB.value);
+        const c = parseFloat(sliderC.value);
+
+        valA.textContent = a.toFixed(1);
+        valB.textContent = b.toFixed(1);
+        valC.textContent = c.toFixed(1);
+
+        const b_sign = b < 0 ? '-' : '+';
+        const c_sign = c < 0 ? '-' : '+';
+        standardFormOutput.textContent = `y = ${a.toFixed(1)}x² ${b_sign} ${Math.abs(b).toFixed(1)}x ${c_sign} ${Math.abs(c).toFixed(1)}`;
+
+        let vertexX, vertexY, delta;
+        if (Math.abs(a) < 0.01) { 
+            vertexFormOutput.textContent = 'N/A (This is a line)';
+            vertexOutput.textContent = 'N/A';
+            minMaxOutput.textContent = 'N/A';
+            deltaOutput.textContent = 'N/A';
+            deltaInterp.textContent = 'This is a linear equation.';
+            rootsOutput.textContent = b !== 0 ? (-c / b).toFixed(2) : 'N/A';
+            vertexX = 0;
+        } else {
+            delta = b * b - 4 * a * c;
+            vertexX = -b / (2 * a);
+            vertexY = a * vertexX * vertexX + b * vertexX + c;
+            const h_sign = -vertexX >= 0 ? '+' : '-';
+            const k_sign = vertexY >= 0 ? '+' : '-';
+            vertexFormOutput.textContent = `y = ${a.toFixed(1)}(x ${h_sign} ${Math.abs(vertexX).toFixed(2)})² ${k_sign} ${Math.abs(vertexY).toFixed(2)}`;
+            vertexOutput.textContent = `(${vertexX.toFixed(2)}, ${vertexY.toFixed(2)})`;
+            minMaxOutput.textContent = a > 0 ? 'Minimum' : 'Maximum';
+            deltaOutput.textContent = delta.toFixed(2);
+            if (delta >= 0) {
+                const root1 = (-b + Math.sqrt(delta)) / (2 * a);
+                const root2 = (-b - Math.sqrt(delta)) / (2 * a);
+                rootsOutput.textContent = (Math.abs(delta) < 0.001) ? root1.toFixed(2) : `${root1.toFixed(2)}, ${root2.toFixed(2)}`;
+                deltaInterp.textContent = (Math.abs(delta) < 0.001) ? 'Δ = 0, so there is one repeated x-intercept.' : 'Δ > 0, so there are two distinct x-intercepts.';
+            } else {
+                deltaInterp.textContent = 'Δ < 0, so there are no real roots/x-intercepts.';
+                rootsOutput.textContent = 'None';
+            }
+        }
+        yInterceptOutput.textContent = `(0, ${c.toFixed(1)})`;
+
+        const dataPoints = [];
+        const range = 10;
+        const step = 0.25;
+        const startX = vertexX - range;
+        const endX = vertexX + range;
+        for (let x = startX; x <= endX; x += step) {
+            dataPoints.push({x: x, y: a * x * x + b * x + c});
+        }
+        parabolaChart.data.datasets[0].data = dataPoints;
+        parabolaChart.update();
+    }
+    function initializeChart() {
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        parabolaChart = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets: [{ label: 'y = ax² + bx + c', data: [], showLine: true, borderColor: 'rgba(21, 101, 192, 1)', backgroundColor: 'rgba(21, 101, 192, 0.5)', tension: 0.1, pointRadius: 0 }] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: 'x-axis' } }, y: { title: { display: true, text: 'y-axis' } } },
+                plugins: { tooltip: { callbacks: { label: (context) => `(x: ${context.parsed.x.toFixed(2)}, y: ${context.parsed.y.toFixed(2)})` } } }
+            }
+        });
+    }
+
+    // =====================================================
+    // =========== GLOBAL EVENT LISTENERS ==================
     // =====================================================
     tabs.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -302,33 +450,36 @@ document.addEventListener('DOMContentLoaded', () => {
         tabs.forEach(b => b.classList.toggle('active', b === btn));
         contents.forEach(c => c.classList.toggle('active', c.id === id));
         if (c.id === 'cts' && c.classList.contains('active')) {
-            if (window.MathJax) { MathJax.typesetPromise(); }
+            if (window.MathJax && window.MathJax.typesetPromise) { MathJax.typesetPromise(); }
         }
       });
     });
-    typeSel.addEventListener('change', e => { renderWorked(makeQuadratic(e.target.value)); });
-    newWorkedBtn.addEventListener('click', () => { renderWorked(makeQuadratic(typeSel.value)); });
+    
+    typeSel.addEventListener('change', e => { renderWorked_Factoring(makeQuadratic_Factoring(e.target.value)); });
+    newWorkedBtn.addEventListener('click', () => { renderWorked_Factoring(makeQuadratic_Factoring(typeSel.value)); });
     openRow.addEventListener('click', e => {
       const btn = e.target.closest('button'); if (!btn) return;
       const card = btn.closest('.card'); const k = card.getAttribute('data-key');
-      if (!firstPicked) { const contentMap = { eq: openData.eq, fact: openData.fact, sol: openData.sol }; card.innerHTML = `<strong>${titleMap[k]}</strong><div class="card-content">${contentMap[k]}</div>`; firstPicked = true; openRow.querySelectorAll('button').forEach(b => { if(b) b.textContent = 'Find me' }); } 
-      else { if (card.querySelector('button')) { setCardToInputMode(card, k); } }
+      if (!firstPicked_Factoring) { const contentMap = { eq: openData_Factoring.eq, fact: openData_Factoring.fact, sol: openData_Factoring.sol }; card.innerHTML = `<strong>${titleMap_Factoring[k]}</strong><div class="card-content">${contentMap[k]}</div>`; firstPicked_Factoring = true; openRow.querySelectorAll('button').forEach(b => { if(b) b.textContent = 'Find me' }); } 
+      else { if (card.querySelector('button')) { setCardToInputMode_Factoring(card, k); } }
     });
     checkBtn.addEventListener('click', () => {
       openRow.querySelectorAll('.card').forEach(card => {
         const k = card.getAttribute('data-key'); let isCorrect = null;
-        if (k === 'fact') { const signs = card.querySelectorAll('.sign-select'); const nums = card.querySelectorAll('.num-input'); if (nums.length === 2 && nums[0].value !== '' && nums[1].value !== '') { const r1 = (signs[0].value === '+')?-Number(nums[0].value):Number(nums[0].value); const r2 = (signs[1].value === '+')?-Number(nums[1].value):Number(nums[1].value); const uR = [r1, r2].sort(); isCorrect = JSON.stringify(uR) === JSON.stringify(openData.roots); } } 
-        else if (k === 'sol') { const inputs = card.querySelectorAll('.sol-input'); if (inputs.length === 2 && inputs[0].value !== '' && inputs[1].value !== '') { const uR = [Number(inputs[0].value), Number(inputs[1].value)].sort(); isCorrect = JSON.stringify(uR) === JSON.stringify(openData.roots); } } 
-        else if (k === 'eq') { const ta = card.querySelector('textarea'); if (ta && ta.value.trim() !== '') { const n = str => str.replace(/\s/g, '').replace('x^2', 'x²'); isCorrect = n(ta.value) === n(openData.eq); } }
-        if (isCorrect === true) { card.innerHTML = `<strong>${titleMap[k]}</strong><div class="card-content">${openData[k]}</div>`; card.classList.add('correct'); card.classList.remove('wrong'); } 
+        if (k === 'fact') { const signs = card.querySelectorAll('.sign-select'); const nums = card.querySelectorAll('.num-input'); if (nums.length === 2 && nums[0].value !== '' && nums[1].value !== '') { const r1 = (signs[0].value === '+')?-Number(nums[0].value):Number(nums[0].value); const r2 = (signs[1].value === '+')?-Number(nums[1].value):Number(nums[1].value); const uR = [r1, r2].sort(); isCorrect = JSON.stringify(uR) === JSON.stringify(openData_Factoring.roots); } } 
+        else if (k === 'sol') { const inputs = card.querySelectorAll('.sol-input'); if (inputs.length === 2 && inputs[0].value !== '' && inputs[1].value !== '') { const uR = [Number(inputs[0].value), Number(inputs[1].value)].sort(); isCorrect = JSON.stringify(uR) === JSON.stringify(openData_Factoring.roots); } } 
+        else if (k === 'eq') { const ta = card.querySelector('textarea'); if (ta && ta.value.trim() !== '') { const n = str => str.replace(/\s/g, '').replace('x^2', 'x²'); isCorrect = n(ta.value) === n(openData_Factoring.eq); } }
+        if (isCorrect === true) { card.innerHTML = `<strong>${titleMap_Factoring[k]}</strong><div class="card-content">${openData_Factoring[k]}</div>`; card.classList.add('correct'); card.classList.remove('wrong'); } 
         else if (isCorrect === false) { card.classList.add('wrong'); card.classList.remove('correct'); }
       });
     });
-    resetOpenBtn.addEventListener('click', resetOpen);
-    ctsExamplesSel.addEventListener('change', (e) => {
-        const selectedKey = e.target.value;
-        generateCtsSteps(ctsExamples[selectedKey]);
-    });
+    resetOpenBtn.addEventListener('click', resetOpen_Factoring);
+    ctsExamplesSel.addEventListener('change', (e) => { generateCtsSteps(ctsExamples[e.target.value]); });
+    if (sliderA) {
+        sliderA.addEventListener('input', updateGraphAndAnalysis);
+        sliderB.addEventListener('input', updateGraphAndAnalysis);
+        sliderC.addEventListener('input', updateGraphAndAnalysis);
+    }
     document.body.addEventListener('input', e => {
         if (e.target.tagName === 'TEXTAREA' && e.target.value.includes('^2')) {
             const cursorPos = e.target.selectionStart;
@@ -342,10 +493,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // =====================================================
     tabs[0].classList.add('active');
     contents[0].classList.add('active');
-    renderWorked(makeQuadratic(typeSel.value));
-    resetOpen();
+    
+    renderWorked_Factoring(makeQuadratic_Factoring(typeSel.value));
+    resetOpen_Factoring();
+    
     generateCtsSteps(ctsExamples.general);
-
+    
+    if (canvas) {
+        initializeChart();
+        updateGraphAndAnalysis();
+    }
 });
 </script>
 </body>
