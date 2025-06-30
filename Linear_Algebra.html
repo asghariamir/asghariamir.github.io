@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linear Algebra Dashboard – Resilient</title>
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    MathJax = { tex: { inlineMath: [['$', '$']] } };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <!-- math.js + Plotly -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --light-gray: #f4f6f8;
+      --medium-gray: #dce1e6;
+      --dark-gray: #4a4a4a;
+      --text-color: #333;
+      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --error-color: #e74c3c;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--light-gray);
+      color: var(--text-color);
+      padding: 1rem;
+    }
+    .app { width: 100%; max-width: 1400px; margin: auto; }
+    h1 { text-align: center; color: var(--primary-color); margin-bottom: .5rem; }
+    p.intro { text-align: center; margin-bottom: 2rem; font-size: 1.1rem; color: #666; }
+    .dashboard-container { display: flex; flex-wrap: wrap; gap: 2rem; }
+    .algebra-column { flex: 1; min-width: 400px; display: flex; flex-direction: column; gap: 1.5rem; }
+    .geometry-column { flex: 1.5; min-width: 500px; }
+    .card {
+      background: #fff; border-radius: 8px; box-shadow: var(--card-shadow);
+      padding: 1.5rem; transition: box-shadow .3s ease;
+    }
+    .card:hover { box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+    .card h4 {
+      margin: 0 0 1rem; font-size: 1.2rem; color: var(--primary-color);
+      border-bottom: 2px solid var(--light-gray); padding-bottom: .5rem;
+    }
+    textarea#equations-input {
+      width: 100%; height: 120px; resize: vertical; border: 1px solid var(--medium-gray);
+      border-radius: 6px; padding: .75rem; font-family: 'Courier New', Courier, monospace; font-size: 1.1rem;
+    }
+    .output-area {
+      min-height: 80px; display: flex; justify-content: center; align-items: center;
+      font-size: 1.4rem; overflow-x: auto;
+    }
+    #plot-container { width: 100%; height: 600px; }
+    .status-message, .error-message { font-style: italic; font-size: 1rem; color: var(--dark-gray); }
+    .error-message { color: var(--error-color); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Linear Algebra Dashboard</h1>
+    <p class="intro">An interactive tool to explore the connections between linear equations, matrices, and their geometric representations.</p>
+
+    <div class="dashboard-container">
+      <!-- Algebra side -->
+      <div class="algebra-column">
+        <div class="card">
+          <h4>System of Equations</h4>
+          <!-- Added clearer placeholder illustrating =0 equations -->
+          <textarea id="equations-input" rows="3" placeholder="x + y + z = 6&#10;2*y + 5*z = -4&#10;2*x + 5*y - z = 27"></textarea>
+        </div>
+        <div class="card">
+          <h4>Matrix Form ($Ax=b$)</h4>
+          <div class="output-area" id="matrix-form-output"><p class="status-message">Waiting for libraries...</p></div>
+        </div>
+        <div class="card">
+          <h4>Augmented Form ($[A|b]$)</h4>
+          <div class="output-area" id="augmented-form-output"></div>
+        </div>
+        <div class="card">
+          <h4>Row-Reduced Echelon Form (RREF)</h4>
+          <div class="output-area" id="rref-output"></div>
+        </div>
+      </div>
+      <!-- Geometry side -->
+      <div class="geometry-column">
+        <div class="card">
+          <h4>Geometric View</h4>
+          <div id="plot-container"><p class="status-message">Waiting for libraries to load...</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Wait for DOM & external libs ------------------------------------------------
+window.addEventListener('DOMContentLoaded', () => {
+  const inputArea      = document.getElementById('equations-input');
+  const matrixOut      = document.getElementById('matrix-form-output');
+  const augmentedOut   = document.getElementById('augmented-form-output');
+  const rrefOut        = document.getElementById('rref-output');
+  const plotContainer  = document.getElementById('plot-container');
+
+  /* --------------------------------------------------------------------------
+   * LaTeX helpers
+   * -----------------------------------------------------------------------*/
+  function toLatexNumber(value, useFraction = false) {
+    if (typeof value !== 'number' || Number.isNaN(value)) return String(value);
+    if (!Number.isFinite(value)) return value > 0 ? '\\infty' : '-\\infty';
+
+    if (!useFraction) return value.toString();
+    if (Math.abs(value - Math.round(value)) < 1e-9) return Math.round(value).toString();
+    try {
+      const frac = math.fraction(value);
+      return `\\frac{${frac.n}}{${frac.d}}`;
+    } catch (err) {
+      console.error('Fraction conversion failed:', err);
+      return value.toPrecision(6);
+    }
+  }
+
+  function matrixToLatex(matrix, useFraction = false) {
+    const data = Array.isArray(matrix) ? matrix : matrix.toArray();
+    const rows = data.map(row => row.map(v => toLatexNumber(v, useFraction)).join(' & '));
+    return `\\begin{bmatrix}\n${rows.join(' \\\\')}\n\\end{bmatrix}`;
+  }
+
+  /* --------------------------------------------------------------------------
+   * Error helper
+   * -----------------------------------------------------------------------*/
+  function displayError(msg, clear = true) {
+    matrixOut.innerHTML = `<p class="error-message">Error: ${msg}</p>`;
+    if (clear) { augmentedOut.innerHTML = ''; rrefOut.innerHTML = ''; plotContainer.innerHTML='' }
+  }
+
+  /* --------------------------------------------------------------------------
+   * Main UI update
+   * -----------------------------------------------------------------------*/
+  function updateDashboard() {
+    const raw = inputArea.value;
+    if (!raw.trim()) {
+      matrixOut.innerHTML   = '<p class="status-message">Enter equations to see results.</p>';
+      augmentedOut.innerHTML= '';
+      rrefOut.innerHTML     = '';
+      plotContainer.innerHTML = '<p class="status-message">Enter equations to see the graph.</p>';
+      return;
+    }
+
+    try {
+      const { A, b, variables } = parseLinearSystem(raw);
+      if (!A.length) throw new Error('No valid equations found.');
+
+      // Matrix & vector outputs
+      const Atex   = matrixToLatex(A);
+      const vTex   = matrixToLatex(variables.map(v => [v]));
+      const bTex   = matrixToLatex(b);
+      matrixOut.innerHTML    = `$$${Atex}\\,${vTex}= ${bTex}$$`;
+      augmentedOut.innerHTML = `$$${matrixToLatex(math.concat(A, b, 1))}$$`;
+
+      // RREF
+      const rrefMat = rref(A.map(r => [...r]), b.map(v => v[0]));
+      rrefOut.innerHTML = `$$${matrixToLatex(rrefMat, true)}$$`;
+
+      // Update graph
+      updateGraph(A, b, variables);
+
+      // Re‑typeset
+      window.MathJax && MathJax.typesetPromise([matrixOut, augmentedOut, rrefOut]);
+
+    } catch (err) {
+      console.error(err);
+      displayError(err.message);
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+   * Graphing helpers (unchanged logic)
+   * -----------------------------------------------------------------------*/
+  function updateGraph(A, b, vars) {
+    Plotly.purge(plotContainer);
+    const n = vars.length;
+
+    if (n === 2) {
+      const traces = A.map((row,i)=>{ const [a,c]=row, d=b[i][0];
+        let x=[-10,10], y=[-10,10];
+        if (Math.abs(c)>1e-9) y = x.map(v=> (d-a*v)/c);
+        else if(Math.abs(a)>1e-9) x=[d/a,d/a];
+        return {x,y, mode:'lines', type:'scatter', name:`Eq ${i+1}`};
+      });
+      Plotly.newPlot(plotContainer,traces,{title:'2D Graph of Linear System',margin:{t:40}});
+    }
+    else if (n === 3) {
+      const colors=['#3498db','#e74c3c','#2ecc71'];
+      const traces=[];
+      A.forEach((row,i)=>{
+        const [a,c,d]=row, e=b[i][0];
+        if(Math.abs(d)>1e-9){
+          const xs=[-10,10], ys=[-10,10];
+          const zs=xs.map(x=> ys.map(y=> (e-a*x-c*y)/d));
+          traces.push({x:xs,y:ys,z:zs,type:'surface',opacity:.7,showscale:false,
+            colorscale:[[0,colors[i%colors.length]],[1,colors[i%colors.length]]]});
+        }
+      });
+      if(traces.length) Plotly.newPlot(plotContainer,traces,{title:'3D Graph of Linear System',scene:{aspectratio:{x:1,y:1,z:1}}});
+      else plotContainer.innerHTML='<p class="status-message">Cannot plot plane(s) on the z‑axis. Try rewriting equations to solve for z.</p>';
+    }
+    else {
+      plotContainer.innerHTML='<p class="status-message">Graphing is only supported for 2 or 3 variables.</p>';
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+   * Parsing logic – tolerant RHS handling (assume 0 if omitted)
+   * -----------------------------------------------------------------------*/
+  function parseLinearSystem(text) {
+    const eqs = text.trim().split(/\n|;|,/).map(l=>l.trim()).filter(l=>l);
+    if (!eqs.length) throw new Error('No equations provided.');
+
+    // Discover variable names appearing on LHS only (safer)
+    const varSet = new Set();
+    const lhsVarRx = /[a-zA-Z][\w]*/g;
+    eqs.forEach(eq=>{ const [lhs]=eq.split('='); (lhs||'').match(lhsVarRx)?.forEach(v=>varSet.add(v)); });
+    if (!varSet.size) throw new Error('No variables detected on the left‑hand sides.');
+    const variables = [...varSet].sort();
+    const vIndex = new Map(variables.map((v,i)=>[v,i]));
+
+    const termRx = /([+-])?\s*(\d*\.?\d+)?\s*\*?\s*([a-zA-Z][\w]*)/g;
+    const A=[], b=[];
+
+    eqs.forEach(eq=>{
+      const split = eq.split('=');
+      if(split.length>2) throw new Error(`Too many '=' signs in equation: ${eq}`);
+      const lhsRaw = split[0];
+      const rhsRaw = split[1];
+
+      // If RHS is missing or blank, interpret as 0 for robustness
+      const rhsExpr = (rhsRaw===undefined || !rhsRaw.trim()) ? '0' : rhsRaw.trim();
+      let rhsVal;
+      try { rhsVal = math.evaluate(rhsExpr); } catch { throw new Error(`Unable to parse RHS expression in equation: ${eq}`); }
+      if(typeof rhsVal!== 'number' || !Number.isFinite(rhsVal)) throw new Error(`Right‑hand side not a valid number or expression in equation: ${eq}`);
+      b.push([rhsVal]);
+
+      // Build coefficient row
+      const row=new Array(variables.length).fill(0);
+      const lhs = lhsRaw.trim().startsWith('-')? lhsRaw.trim() : '+'+lhsRaw.trim();
+      termRx.lastIndex=0; let m;
+      while((m=termRx.exec(lhs))!==null){
+        const sign=m[1]==='-'?-1:1;
+        const coeff= m[2]? Number(m[2]) : 1;
+        const varName=m[3];
+        const idx=vIndex.get(varName);
+        if(idx!==undefined) row[idx]+= sign*coeff;
+      }
+      A.push(row);
+    });
+
+    return {A,b,variables};
+  }
+
+  /* --------------------------------------------------------------------------
+   * RREF (Gauss‑Jordan) with zero‑pivot guard
+   * -----------------------------------------------------------------------*/
+  function rref(mat, vec){
+    const m = mat.map((row,i)=>[...row,vec[i]]);
+    let lead=0, rows=m.length, cols=m[0].length;
+    for(let r=0;r<rows;r++){
+      if(lead>=cols) break;
+      let i=r; while(Math.abs(m[i][lead])<1e-9){ if(++i===rows){ i=r; if(++lead===cols) return m; } }
+      [m[i],m[r]]=[m[r],m[i]];
+      const lv=m[r][lead]; if(Math.abs(lv)<1e-12) continue;
+      for(let j=0;j<cols;j++) m[r][j]/=lv;
+      for(let k=0;k<rows;k++) if(k!==r){ const factor=m[k][lead]; for(let j=0;j<cols;j++) m[k][j]-=factor*m[r][j]; }
+      lead++;
+    }
+    return m.map(row=>row.map(v=>Math.abs(v)<1e-9?0:v));
+  }
+
+  /* --------------------------------------------------------------------------
+   * Initialise
+   * -----------------------------------------------------------------------*/
+  const waitLibs=setInterval(()=>{
+    if(window.math&&window.Plotly&&window.MathJax){
+      clearInterval(waitLibs);
+      inputArea.addEventListener('input', updateDashboard);
+      updateDashboard();
+    }
+  },100);
+});
+</script>
+</body>
+</html>
