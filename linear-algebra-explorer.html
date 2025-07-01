@@ -32,6 +32,11 @@
         <!-- Content injected dynamically by renderVectorTab() -->
     </div>
 
+    <!-- Function Form Tab -->
+    <div id="function-tab" class="tab-content">
+        <!-- Content injected dynamically by renderFunctionTab() -->
+    </div>
+
     <script>
     // ... existing code ...
     // EDIT 1: Universal reset helper – allows users to start over without refreshing
@@ -560,6 +565,7 @@
         // render RowOps after other tabs updated
         renderRowOpsTab();
         renderVectorTab();
+        renderFunctionTab();
     }
 
     // ===================================================================
@@ -678,6 +684,82 @@
 
         const layout={ title:'Vector Combination', scene:{ xaxis:{title:'x'}, yaxis:{title:'y'}, zaxis:{title:'z'}, aspectmode:'cube' }, margin:{l:0,r:0,b:0,t:40} };
         Plotly.newPlot(container,traces,layout,{responsive:true});
+    }
+
+    // ===================================================================
+    // FUNCTION FORM TAB LOGIC (Treating A as a linear transformation)
+    // ===================================================================
+
+    function renderFunctionTab(){
+        const container = document.getElementById('function-tab');
+        if(!container) return;
+
+        if(!appState.matrixData || appState.matrixData.length===0){
+            container.innerHTML = '<p>Please define a system in the "Forms" tab first.</p>';
+            return;
+        }
+
+        const rows = appState.rows; // also dimension of codomain
+        const vars = appState.cols - 1; // dimension of domain (inputs)
+
+        // initial x guess from solution if unique else zeros
+        let xInit = Array(vars).fill(0);
+        if(rows===2 && vars===2){ const sol=solve2DSystem(); if(sol){ xInit=[sol.x.valueOf(), sol.y.valueOf()]; } }
+        if(rows===3 && vars===3){ const sol=solve3DSystem(); if(sol){ xInit=[sol.x.valueOf(), sol.y.valueOf(), sol.z.valueOf()]; } }
+
+        // build input controls
+        const inputHTML = xInit.map((val,i)=>`<label>x${i+1}: <input type="number" step="any" class="func-x" data-idx="${i}" value="${val.toFixed(2)}"></label>`).join(' ');
+
+        container.innerHTML = `<h3>Function Form (T(\vec x)=A\vec x)</h3>
+            <div id="function-latex" style="margin-bottom:1rem"></div>
+            <div class="function-inputs" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; margin-bottom:1rem;">${inputHTML}</div>
+            <div id="function-plot" class="plot-container"></div>
+        `;
+
+        const xInputs=[...container.querySelectorAll('.func-x')];
+        const latexDiv=container.querySelector('#function-latex');
+        const plotDiv=container.querySelector('#function-plot');
+
+        const A = appState.matrixData.map(row=> row.slice(0,vars));
+        const bVec= appState.matrixData.map(row=> row[vars]); // original RHS vector
+
+        function getX(){ return xInputs.map(inp=> parseFloat(inp.value)||0); }
+
+        function multiply(A,x){ return A.map(row=> row.reduce((sum,val,idx)=> sum+val*x[idx],0)); }
+
+        function vectorToLatex(v){ return `\\begin{bmatrix} ${v.map(val=> val.toFixed(2)).join(' \\ ')} \\end{bmatrix}`; }
+
+        function update(){
+            const xVec=getX();
+            const yVec=multiply(A,xVec);
+            latexDiv.innerHTML=`$$A\,${vectorToLatex(xVec)} = ${vectorToLatex(yVec)}$$`;
+            if(window.MathJax){ MathJax.typesetPromise([latexDiv]); }
+            renderFunctionPlot(xVec,yVec,plotDiv);
+        }
+
+        xInputs.forEach(inp=> inp.addEventListener('input', update));
+        update();
+    }
+
+    function renderFunctionPlot(xVec,yVec,container){
+        const dim = xVec.length;
+        if(dim===2){
+            const traces=[
+                {x:[0,xVec[0]], y:[0,xVec[1]], type:'scatter', mode:'lines+markers', name:'x', line:{color:'green',width:4}, marker:{size:6,color:'green'}},
+                {x:[0,yVec[0]], y:[0,yVec[1]], type:'scatter', mode:'lines+markers', name:'T(x)', line:{color:'orange',width:4}, marker:{size:6,color:'orange'}},
+            ];
+            const layout={ title:'Transformation of x', xaxis:{zeroline:true}, yaxis:{scaleanchor:'x',scaleratio:1,zeroline:true}, margin:{t:40,l:40,r:20,b:40} };
+            Plotly.newPlot(container,traces,layout,{responsive:true});
+        } else if(dim===3){
+            const traces=[
+                {type:'scatter3d', mode:'lines+markers', name:'x', x:[0,xVec[0]], y:[0,xVec[1]], z:[0,xVec[2]], line:{color:'green',width:5}, marker:{size:4,color:'green'}},
+                {type:'scatter3d', mode:'lines+markers', name:'T(x)', x:[0,yVec[0]], y:[0,yVec[1]], z:[0,yVec[2]], line:{color:'orange',width:5}, marker:{size:4,color:'orange'}},
+            ];
+            const layout={ title:'Transformation of x', scene:{xaxis:{title:'x'}, yaxis:{title:'y'}, zaxis:{title:'z'}, aspectmode:'cube'}, margin:{l:0,r:0,b:0,t:40} };
+            Plotly.newPlot(container,traces,layout,{responsive:true});
+        } else {
+            container.innerHTML='<p>Plot only supported for 2D or 3D domain vectors.</p>';
+        }
     }
 
     </script>
