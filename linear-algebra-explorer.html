@@ -296,6 +296,134 @@ function render3DTransformPicture(container){
     Plotly.newPlot(container,traces,layout,{responsive:true});
 }
 
+// ===================================================================
+// === Challenge Logic for "Find Me" Boxes ============================
+// ===================================================================
+
+// Delegated listener already attached earlier. Extend it to detect
+// clicks on .find-me-btn even when the app is live.
+interactiveGrid.addEventListener('click', (e)=>{
+    const btn=e.target.closest('button');
+    if(!btn) return;
+    const box=btn.closest('.interactive-box');
+    if(btn.classList.contains('find-me-btn')){
+        openChallengeForm(box);
+        return;
+    }
+    // Fallback for initial "Try Me" click (handled only if app not live)
+    if(!appState.isLive) handleTryMeClick(box);
+});
+
+function openChallengeForm(box){
+    switch(box.id){
+        case 'box-system':
+            createSystemChallengeForm(box);
+            break;
+        case 'box-matrix-eq':
+            createMatrixEqChallengeForm(box);
+            break;
+        case 'box-vector-eq':
+            createVectorEqChallengeForm(box);
+            break;
+        default:
+            break;
+    }
+}
+
+/* ---------------- System of Equations Challenge ------------------- */
+function createSystemChallengeForm(container){
+    const vars = Array.from({length: appState.cols-1}, (_,i)=>`x_{${i+1}}`);
+    container.innerHTML = `<h3>System of Equations</h3>
+        <textarea class="challenge-system-input" placeholder="Enter equations, e.g.\n2*x_1 + 3*x_2 = 5\n-x_1 + 4*x_2 = 1" rows="${appState.rows+1}"></textarea>
+        <button class="action-btn check-system-btn">Check</button>
+        <p class="challenge-feedback"></p>`;
+
+    const textarea = container.querySelector('.challenge-system-input');
+    const feedback = container.querySelector('.challenge-feedback');
+    container.querySelector('.check-system-btn').addEventListener('click',()=>{
+        const userText = textarea.value.trim();
+        if(!userText){ feedback.textContent='Please enter your equations.'; return; }
+        try{
+            // Use the robust parser from earlier (already defined in script)
+            const {A,b}=parseLinearSystem(userText.replace(/x(\d+)/g,'x_$1'));
+            const userAug = A.map((row,i)=>[...row,b[i][0]]);
+            if(compareMatrices(userAug, appState.matrixData)) success(container,feedback);
+            else failure(container,feedback);
+        }catch(err){ feedback.textContent = `Parse error: ${err.message}`; }
+    });
+}
+
+/* ---------------- Matrix Equation Challenge ----------------------- */
+function createMatrixEqChallengeForm(container){
+    const rows = appState.rows;
+    const cols = appState.cols-1; // A columns
+    const buildInputs = (r,c,cls)=>{
+        let html='<div class="matrix-input-grid" style="grid-template-columns: repeat('+c+',40px);">';
+        for(let i=0;i<r*c;i++) html += `<input type="number" class="${cls}" />`;
+        html+='</div>'; return html;
+    };
+    container.innerHTML = `<h3>Matrix Equation (AX = b)</h3>
+        <p>Enter matrix A (${rows}×${cols}) and vector b.</p>
+        ${buildInputs(rows,cols,'A-cell')}
+        <div style="height:8px"></div>
+        ${buildInputs(rows,1,'b-cell')}
+        <button class="action-btn check-matrix-btn">Check</button>
+        <p class="challenge-feedback"></p>`;
+
+    const feedback = container.querySelector('.challenge-feedback');
+    container.querySelector('.check-matrix-btn').addEventListener('click',()=>{
+        const Ainputs=[...container.querySelectorAll('.A-cell')].map(inp=> Number(inp.value)||0);
+        const binputs=[...container.querySelectorAll('.b-cell')].map(inp=> Number(inp.value)||0);
+        const A=[]; let row=[];
+        Ainputs.forEach((val,idx)=>{ row.push(val); if((idx+1)%cols===0){A.push(row); row=[];} });
+        const userAug = A.map((r,i)=>[...r,binputs[i]||0]);
+        if(compareMatrices(userAug, appState.matrixData)) success(container,feedback);
+        else failure(container,feedback);
+    });
+}
+
+/* ---------------- Vector Equation Challenge ----------------------- */
+function createVectorEqChallengeForm(container){
+    const vars = appState.cols-1;
+    container.innerHTML = `<h3>Vector Equation</h3>
+        <p>Enter the scalars to express b as a combination of columns of A.</p>
+        <div class="vector-inputs">${Array.from({length:vars},(_,i)=>`<label>x${i+1}: <input type='number' step='any' class='vec-coeff' /></label>`).join(' ')}</div>
+        <button class="action-btn check-vector-btn">Check</button>
+        <p class="challenge-feedback"></p>`;
+
+    const feedback = container.querySelector('.challenge-feedback');
+    container.querySelector('.check-vector-btn').addEventListener('click',()=>{
+        const coeffs=[...container.querySelectorAll('.vec-coeff')].map(inp=> Number(inp.value)||0);
+        if(coeffs.length!==vars){ feedback.textContent='Need '+vars+' coefficients.'; return; }
+        // Compute A*coeffs and compare with b
+        const Ax = appState.matrixData.map(row=> row.slice(0,vars).reduce((sum,val,j)=> sum+val*coeffs[j],0));
+        const b   = appState.matrixData.map(row=> row[vars]);
+        const diff = Ax.some((val,i)=> Math.abs(val-b[i])>1e-6);
+        if(!diff) success(container,feedback); else failure(container,feedback);
+    });
+}
+
+/* ---------------- Helpers ----------------------- */
+function compareMatrices(M1,M2){
+    if(M1.length!==M2.length||M1[0].length!==M2[0].length) return false;
+    for(let i=0;i<M1.length;i++){
+        for(let j=0;j<M1[0].length;j++) if(Math.abs(M1[i][j]-M2[i][j])>1e-6) return false;
+    }
+    return true;
+}
+function success(container,feedback){
+    container.classList.remove('is-error');
+    container.classList.add('is-success');
+    feedback.style.color='var(--success-green)';
+    feedback.textContent='✔ Correct!';
+}
+function failure(container,feedback){
+    container.classList.remove('is-success');
+    container.classList.add('is-error');
+    feedback.style.color='var(--error-red)';
+    feedback.textContent='✖ Not quite, try again.';
+}
+
 // ... existing code ...
 </script>
 </body>
