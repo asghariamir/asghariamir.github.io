@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Linear Algebra Explorer</title>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+        MathJax = { tex: { inlineMath: [['$', '$']] } };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+
+    <!-- Plotly & Helpers -->
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fraction.js/4.2.0/fraction.min.js"></script>
+
+    <style>
+        /* ... existing code ... */
+    </style>
+</head>
+<body>
+    <!-- ... existing code (identical to user provided markup) ... -->
+
+<script>
+// ... existing code ...
+// EDIT 1: Universal reset helper – allows users to start over without refreshing
+function resetAppState() {
+    appState.isLive     = false;
+    appState.rows       = 0;
+    appState.cols       = 0;
+    appState.matrixData = [];
+    updateUI();
+}
+
+// EDIT 2: Attach a single delegated listener for any future "Try Me" buttons – no more stale listeners
+interactiveGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.action-btn');
+    if (!btn) return;
+    handleTryMeClick(btn.parentElement);
+});
+
+// EDIT 3: After the user presses "Set Matrix" immediately show a pretty LaTeX rendering
+//          of the augmented matrix they just entered, rather than leaving the form in place.
+function showConfirmedAugmentedMatrix(container) {
+    displayMathJaxMatrix(container, appState.matrixData);
+}
+
+// Patch original createAugmentedMatrixForm to invoke the pretty-print helper
+const originalCreateAug = createAugmentedMatrixForm;
+createAugmentedMatrixForm = function(container){
+    originalCreateAug(container);
+    // when the user confirms, pretty-print
+    container.querySelector('#set-matrix-btn')?.addEventListener('click', () => {
+        showConfirmedAugmentedMatrix(container);
+    }, { once:true }); // only run once per session
+};
+
+/* -----------------------------------------------------------------------
+ * 3-DIMENSIONAL SUPPORT
+ * ---------------------------------------------------------------------*/
+
+function solve3DSystem() {
+    if (appState.rows !== 3 || appState.cols < 4) return null;
+    const [r1,r2,r3] = appState.matrixData;
+    const a1=new Fraction(r1[0]); const b1=new Fraction(r1[1]); const c1=new Fraction(r1[2]); const d1=new Fraction(r1[3]);
+    const a2=new Fraction(r2[0]); const b2=new Fraction(r2[1]); const c2=new Fraction(r2[2]); const d2=new Fraction(r2[3]);
+    const a3=new Fraction(r3[0]); const b3=new Fraction(r3[1]); const c3=new Fraction(r3[2]); const d3=new Fraction(r3[3]);
+
+    // Determinant of A
+    const det = a1.mul(b2.mul(c3).sub(c2.mul(b3)))
+                   .sub(b1.mul(a2.mul(c3).sub(c2.mul(a3))))
+                   .add(c1.mul(a2.mul(b3).sub(b2.mul(a3))));
+    if (det.n === 0) return null;
+
+    const detX = d1.mul(b2.mul(c3).sub(c2.mul(b3)))
+                  .sub(b1.mul(d2.mul(c3).sub(c2.mul(d3))))
+                  .add(c1.mul(d2.mul(b3).sub(b2.mul(d3))));
+    const detY = a1.mul(d2.mul(c3).sub(c2.mul(d3)))
+                  .sub(d1.mul(a2.mul(c3).sub(c2.mul(a3))))
+                  .add(c1.mul(a2.mul(d3).sub(d2.mul(a3))));
+    const detZ = a1.mul(b2.mul(d3).sub(d2.mul(b3)))
+                  .sub(b1.mul(a2.mul(d3).sub(d2.mul(a3))))
+                  .add(d1.mul(a2.mul(b3).sub(b2.mul(a3))));
+
+    const x = detX.div(det);
+    const y = detY.div(det);
+    const z = detZ.div(det);
+    return {x,y,z};
+}
+
+function generatePlaneSurface([a,b,c,d], range=10, steps=15){
+    // Decide which coordinate to solve for (pivot on the largest coefficient)
+    const abs = v => Math.abs(v);
+    const maxCoeff = Math.max(abs(a),abs(b),abs(c));
+    const xs = Array.from({length:steps}, (_,i)=> -range + 2*range*i/(steps-1));
+    const ys = xs.slice();
+    const gridX=[], gridY=[], gridZ=[];
+    for(let xi=0; xi<xs.length; xi++){
+        const rowX=[], rowY=[], rowZ=[];
+        for(let yi=0; yi<ys.length; yi++){
+            const x=xs[xi], y=ys[yi];
+            let zVal;
+            if(maxCoeff===abs(c) && abs(c)>1e-9){
+                zVal = (d - a*x - b*y)/c;
+            }else if(maxCoeff===abs(b) && abs(b)>1e-9){
+                // solve for y, keep z grid same as y param
+                const z = y; // treat ys array as z when y is pivot
+                zVal = z;
+                rowY[yi] = (d - a*x - c*z)/b;
+            }else if(abs(a)>1e-9){
+                // solve for x
+                zVal = y; // treat y param as z
+                rowX[yi] = (d - b*y - c*zVal)/a;
+            } else {
+                zVal = 0;
+            }
+            rowX[yi] = x;
+            rowY[yi] = y;
+            rowZ[yi] = zVal;
+        }
+        gridX.push(rowX); gridY.push(rowY); gridZ.push(rowZ);
+    }
+    return {x:gridX, y:gridY, z:gridZ};
+}
+
+function render3DRowPicture(container){
+    const layout = {
+        title: 'Row Picture: Intersection of Planes',
+        scene: {
+            xaxis:{title:'x₁'}, yaxis:{title:'x₂'}, zaxis:{title:'x₃'},
+            aspectmode:'cube'
+        },
+        margin:{l:0,r:0,b:0,t:40}
+    };
+
+    const colors=['rgba(52,152,219,0.7)','rgba(231,76,60,0.7)','rgba(46,204,113,0.7)'];
+    const surfaces = appState.matrixData.slice(0,3).map((row,i)=>{
+        const {x,y,z}=generatePlaneSurface(row);
+        return { type:'surface', x, y, z, showscale:false, name:`Eq ${i+1}`, opacity:0.7,
+                 colorscale:[[0,colors[i]],[1,colors[i]] ] };
+    });
+
+    const solution = solve3DSystem();
+    if(solution){
+        surfaces.push({
+            type:'scatter3d', mode:'markers+text',
+            x:[solution.x.valueOf()], y:[solution.y.valueOf()], z:[solution.z.valueOf()],
+            marker:{size:4,color:'black'}, text:[`(${solution.x.toFraction(true)},${solution.y.toFraction(true)},${solution.z.toFraction(true)})`], textposition:'top right'
+        });
+    }
+    Plotly.newPlot(container, surfaces, layout, {responsive:true});
+}
+
+function render3DColumnPicture(container){
+    const col1=[appState.matrixData[0][0],appState.matrixData[1][0],appState.matrixData[2][0]];
+    const col2=[appState.matrixData[0][1],appState.matrixData[1][1],appState.matrixData[2][1]];
+    const col3=[appState.matrixData[0][2],appState.matrixData[1][2],appState.matrixData[2][2]];
+    const b   =[appState.matrixData[0][3],appState.matrixData[1][3],appState.matrixData[2][3]];
+
+    const vectorTrace = (v,name,color) => ({
+        type:'scatter3d', mode:'lines+markers', name,
+        x:[0,v[0]], y:[0,v[1]], z:[0,v[2]],
+        line:{width:5,color}, marker:{size:4,color}
+    });
+
+    const traces=[
+        vectorTrace(col1,'Column 1','blue'),
+        vectorTrace(col2,'Column 2','green'),
+        vectorTrace(col3,'Column 3','orange'),
+        vectorTrace(b,'Vector b','red')
+    ];
+
+    const solution = solve3DSystem();
+    if(solution){
+        const s = solution;
+        const scaled1=[col1[0]*s.x.valueOf(), col1[1]*s.x.valueOf(), col1[2]*s.x.valueOf()];
+        const scaled2=[scaled1[0]+col2[0]*s.y.valueOf(), scaled1[1]+col2[1]*s.y.valueOf(), scaled1[2]+col2[2]*s.y.valueOf()];
+        const scaled3=[scaled2[0]+col3[0]*s.z.valueOf(), scaled2[1]+col3[1]*s.z.valueOf(), scaled2[2]+col3[2]*s.z.valueOf()];
+        traces.push({ type:'scatter3d', mode:'lines+markers', name:'Combination Path',
+            x:[0,scaled1[0],scaled2[0],scaled3[0]],
+            y:[0,scaled1[1],scaled2[1],scaled3[1]],
+            z:[0,scaled1[2],scaled2[2],scaled3[2]],
+            line:{ dash:'dash', color:'grey'}, marker:{size:3,color:'grey'} });
+    }
+
+    const layout={ title:'Column Picture: Vector Combination',
+        scene:{ xaxis:{title:'x₁'}, yaxis:{title:'x₂'}, zaxis:{title:'x₃'}, aspectmode:'cube' }, margin:{l:0,r:0,b:0,t:40} };
+    Plotly.newPlot(container,traces,layout,{responsive:true});
+}
+
+// EDIT 4: Extend existing renderGeometry dispatcher
+const originalRenderGeometry = renderGeometry;
+renderGeometry = function(){
+    const rowPlotDiv=document.getElementById('row-plot');
+    const colPlotDiv=document.getElementById('col-plot');
+    const transPlotDiv=document.getElementById('transform-plot');
+
+    if(!appState.matrixData || !appState.matrixData.length){
+        rowPlotDiv.innerHTML=colPlotDiv.innerHTML=transPlotDiv.innerHTML='<p>Please set a system in the "Forms" tab first.</p>';
+        return;
+    }
+    if(appState.rows===2){
+        render2DRowPicture(rowPlotDiv);
+        render2DColumnPicture(colPlotDiv);
+        render2DTransformPicture(transPlotDiv);
+    } else if(appState.rows===3){
+        render3DRowPicture(rowPlotDiv);
+        render3DColumnPicture(colPlotDiv);
+        render3DTransformPicture(transPlotDiv);
+    } else {
+        const msg='<p>Currently supports only 2×3 or 3×4 augmented matrices.</p>';
+        rowPlotDiv.innerHTML=colPlotDiv.innerHTML=transPlotDiv.innerHTML=msg;
+    }
+};
+
+function multiply2D(A, v){
+    return [A[0][0]*v[0] + A[0][1]*v[1], A[1][0]*v[0] + A[1][1]*v[1]];
+}
+
+function render2DTransformPicture(container){
+    const gridRange = 5;
+    const steps = 11;
+    const traces = [];
+    // Original grid (light grey)
+    for(let i=-gridRange;i<=gridRange;i++){
+        // horizontal
+        const xs = Array.from({length:steps}, (_,j)=> -gridRange + 2*gridRange*j/(steps-1));
+        const ys = xs.map(()=> i);
+        traces.push({x:xs, y:ys, mode:'lines', type:'scatter', line:{color:'lightgrey'}, hoverinfo:'none', showlegend:false});
+        // vertical
+        traces.push({x:ys, y:xs, mode:'lines', type:'scatter', line:{color:'lightgrey'}, hoverinfo:'none', showlegend:false});
+    }
+
+    // Build A and transformation grid (blue)
+    const A = [ [appState.matrixData[0][0], appState.matrixData[0][1]],
+                [appState.matrixData[1][0], appState.matrixData[1][1]] ];
+
+    for(let i=-gridRange;i<=gridRange;i++){
+        // horizontal line y=i
+        const domXs = Array.from({length:steps}, (_,j)=> -gridRange + 2*gridRange*j/(steps-1));
+        const domYs = domXs.map(()=> i);
+        const imgPoints = domXs.map((x,idx)=> multiply2D(A,[x,domYs[idx]]));
+        const tx = imgPoints.map(p=>p[0]);
+        const ty = imgPoints.map(p=>p[1]);
+        traces.push({x:tx, y:ty, mode:'lines', type:'scatter', line:{color:'#2196f3'}, hoverinfo:'none', showlegend:false});
+        // vertical line x=i
+        const domYs2 = domXs; // reuse
+        const domXs2 = domYs.map(()=> i);
+        const imgPoints2 = domYs2.map((y,idx)=> multiply2D(A,[i,y]));
+        const tx2 = imgPoints2.map(p=>p[0]);
+        const ty2 = imgPoints2.map(p=>p[1]);
+        traces.push({x:tx2, y:ty2, mode:'lines', type:'scatter', line:{color:'#2196f3'}, hoverinfo:'none', showlegend:false});
+    }
+
+    // Show basis vectors and their images
+    const basis = {
+        e1: [[0,0],[1,0]],
+        e2: [[0,0],[0,1]]
+    };
+    const e1Img = multiply2D(A,[1,0]);
+    const e2Img = multiply2D(A,[0,1]);
+    traces.push({x:[0,1],y:[0,0],mode:'lines+markers',name:'e₁',line:{color:'green',width:3},marker:{size:6,color:'green'}});
+    traces.push({x:[0,0],y:[0,1],mode:'lines+markers',name:'e₂',line:{color:'orange',width:3},marker:{size:6,color:'orange'}});
+    traces.push({x:[0,e1Img[0]],y:[0,e1Img[1]],mode:'lines+markers',name:'A e₁',line:{color:'green',dash:'dash',width:3},marker:{size:6,color:'green'}});
+    traces.push({x:[0,e2Img[0]],y:[0,e2Img[1]],mode:'lines+markers',name:'A e₂',line:{color:'orange',dash:'dash',width:3},marker:{size:6,color:'orange'}});
+
+    const layout = { title:'Transformation Picture: T(x)=Ax', xaxis:{zeroline:true}, yaxis:{scaleanchor:'x',scaleratio:1,zeroline:true}, margin:{t:40,l:40,b:40,r:20} };
+
+    Plotly.newPlot(container,traces,layout,{responsive:true});
+}
+
+function render3DTransformPicture(container){
+    // Build A 3x3
+    const A = [ [appState.matrixData[0][0],appState.matrixData[0][1],appState.matrixData[0][2]],
+                [appState.matrixData[1][0],appState.matrixData[1][1],appState.matrixData[1][2]],
+                [appState.matrixData[2][0],appState.matrixData[2][1],appState.matrixData[2][2]] ];
+
+    const basis = [ [1,0,0], [0,1,0], [0,0,1] ];
+    const colors = ['green','orange','purple'];
+    const traces=[];
+    basis.forEach((vec,i)=>{
+        const img = [ A[0][0]*vec[0]+A[0][1]*vec[1]+A[0][2]*vec[2],
+                       A[1][0]*vec[0]+A[1][1]*vec[1]+A[1][2]*vec[2],
+                       A[2][0]*vec[0]+A[2][1]*vec[1]+A[2][2]*vec[2] ];
+        // original axis
+        traces.push({type:'scatter3d',mode:'lines+markers',name:`e${i+1}`,
+            x:[0,vec[0]],y:[0,vec[1]],z:[0,vec[2]], line:{color:colors[i],width:3}, marker:{size:4,color:colors[i]}});
+        // transformed axis
+        traces.push({type:'scatter3d',mode:'lines+markers',name:`A e${i+1}`,
+            x:[0,img[0]],y:[0,img[1]],z:[0,img[2]], line:{color:colors[i],dash:'dash',width:3}, marker:{size:4,color:colors[i]}});
+    });
+
+    const layout = { title:'Transformation Picture: T(x)=Ax', scene:{xaxis:{title:'x₁'},yaxis:{title:'x₂'},zaxis:{title:'x₃'},aspectmode:'cube'}, margin:{l:0,r:0,b:0,t:40} };
+
+    Plotly.newPlot(container,traces,layout,{responsive:true});
+}
+
+// ===================================================================
+// === Challenge Logic for "Find Me" Boxes ============================
+// ===================================================================
+
+// Delegated listener already attached earlier. Extend it to detect
+// clicks on .find-me-btn even when the app is live.
+interactiveGrid.addEventListener('click', (e)=>{
+    const btn=e.target.closest('button');
+    if(!btn) return;
+    const box=btn.closest('.interactive-box');
+    if(btn.classList.contains('find-me-btn')){
+        openChallengeForm(box);
+        return;
+    }
+    // Fallback for initial "Try Me" click (handled only if app not live)
+    if(!appState.isLive) handleTryMeClick(box);
+});
+
+function openChallengeForm(box){
+    switch(box.id){
+        case 'box-system':
+            createSystemChallengeForm(box);
+            break;
+        case 'box-matrix-eq':
+            createMatrixEqChallengeForm(box);
+            break;
+        case 'box-vector-eq':
+            createVectorEqChallengeForm(box);
+            break;
+        default:
+            break;
+    }
+}
+
+/* ---------------- System of Equations Challenge ------------------- */
+function createSystemChallengeForm(container){
+    const vars = Array.from({length: appState.cols-1}, (_,i)=>`x_{${i+1}}`);
+    container.innerHTML = `<h3>System of Equations</h3>
+        <textarea class="challenge-system-input" placeholder="Enter equations, e.g.\n2*x_1 + 3*x_2 = 5\n-x_1 + 4*x_2 = 1" rows="${appState.rows+1}"></textarea>
+        <button class="action-btn check-system-btn">Check</button>
+        <p class="challenge-feedback"></p>`;
+
+    const textarea = container.querySelector('.challenge-system-input');
+    const feedback = container.querySelector('.challenge-feedback');
+    container.querySelector('.check-system-btn').addEventListener('click',()=>{
+        const userText = textarea.value.trim();
+        if(!userText){ feedback.textContent='Please enter your equations.'; return; }
+        try{
+            // Use the robust parser from earlier (already defined in script)
+            const {A,b}=parseLinearSystem(userText.replace(/x(\d+)/g,'x_$1'));
+            const userAug = A.map((row,i)=>[...row,b[i][0]]);
+            if(compareMatrices(userAug, appState.matrixData)) success(container,feedback);
+            else failure(container,feedback);
+        }catch(err){ feedback.textContent = `Parse error: ${err.message}`; }
+    });
+}
+
+/* ---------------- Matrix Equation Challenge ----------------------- */
+function createMatrixEqChallengeForm(container){
+    const rows = appState.rows;
+    const cols = appState.cols-1; // A columns
+    const buildInputs = (r,c,cls)=>{
+        let html='<div class="matrix-input-grid" style="grid-template-columns: repeat('+c+',40px);">';
+        for(let i=0;i<r*c;i++) html += `<input type="number" class="${cls}" />`;
+        html+='</div>'; return html;
+    };
+    container.innerHTML = `<h3>Matrix Equation (AX = b)</h3>
+        <p>Enter matrix A (${rows}×${cols}) and vector b.</p>
+        ${buildInputs(rows,cols,'A-cell')}
+        <div style="height:8px"></div>
+        ${buildInputs(rows,1,'b-cell')}
+        <button class="action-btn check-matrix-btn">Check</button>
+        <p class="challenge-feedback"></p>`;
+
+    const feedback = container.querySelector('.challenge-feedback');
+    container.querySelector('.check-matrix-btn').addEventListener('click',()=>{
+        const Ainputs=[...container.querySelectorAll('.A-cell')].map(inp=> Number(inp.value)||0);
+        const binputs=[...container.querySelectorAll('.b-cell')].map(inp=> Number(inp.value)||0);
+        const A=[]; let row=[];
+        Ainputs.forEach((val,idx)=>{ row.push(val); if((idx+1)%cols===0){A.push(row); row=[];} });
+        const userAug = A.map((r,i)=>[...r,binputs[i]||0]);
+        if(compareMatrices(userAug, appState.matrixData)) success(container,feedback);
+        else failure(container,feedback);
+    });
+}
+
+/* ---------------- Vector Equation Challenge ----------------------- */
+function createVectorEqChallengeForm(container){
+    const vars = appState.cols-1;
+    container.innerHTML = `<h3>Vector Equation</h3>
+        <p>Enter the scalars to express b as a combination of columns of A.</p>
+        <div class="vector-inputs">${Array.from({length:vars},(_,i)=>`<label>x${i+1}: <input type='number' step='any' class='vec-coeff' /></label>`).join(' ')}</div>
+        <button class="action-btn check-vector-btn">Check</button>
+        <p class="challenge-feedback"></p>`;
+
+    const feedback = container.querySelector('.challenge-feedback');
+    container.querySelector('.check-vector-btn').addEventListener('click',()=>{
+        const coeffs=[...container.querySelectorAll('.vec-coeff')].map(inp=> Number(inp.value)||0);
+        if(coeffs.length!==vars){ feedback.textContent='Need '+vars+' coefficients.'; return; }
+        // Compute A*coeffs and compare with b
+        const Ax = appState.matrixData.map(row=> row.slice(0,vars).reduce((sum,val,j)=> sum+val*coeffs[j],0));
+        const b   = appState.matrixData.map(row=> row[vars]);
+        const diff = Ax.some((val,i)=> Math.abs(val-b[i])>1e-6);
+        if(!diff) success(container,feedback); else failure(container,feedback);
+    });
+}
+
+/* ---------------- Helpers ----------------------- */
+function compareMatrices(M1,M2){
+    if(M1.length!==M2.length||M1[0].length!==M2[0].length) return false;
+    for(let i=0;i<M1.length;i++){
+        for(let j=0;j<M1[0].length;j++) if(Math.abs(M1[i][j]-M2[i][j])>1e-6) return false;
+    }
+    return true;
+}
+function success(container,feedback){
+    container.classList.remove('is-error');
+    container.classList.add('is-success');
+    feedback.style.color='var(--success-green)';
+    feedback.textContent='✔ Correct!';
+}
+function failure(container,feedback){
+    container.classList.remove('is-success');
+    container.classList.add('is-error');
+    feedback.style.color='var(--error-red)';
+    feedback.textContent='✖ Not quite, try again.';
+}
+
+// ... existing code ...
+</script>
+</body>
+</html>
