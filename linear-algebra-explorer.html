@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Linear Algebra Explorer</title>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+        MathJax = { tex: { inlineMath: [['$', '$']] } };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+
+    <!-- Plotly & Helpers -->
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fraction.js/4.2.0/fraction.min.js"></script>
+
+    <style>
+        /* ... existing code ... */
+    </style>
+</head>
+<body>
+    <!-- ... existing code (identical to user provided markup) ... -->
+
+<script>
+// ... existing code ...
+// EDIT 1: Universal reset helper – allows users to start over without refreshing
+function resetAppState() {
+    appState.isLive     = false;
+    appState.rows       = 0;
+    appState.cols       = 0;
+    appState.matrixData = [];
+    updateUI();
+}
+
+// EDIT 2: Attach a single delegated listener for any future "Try Me" buttons – no more stale listeners
+interactiveGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.action-btn');
+    if (!btn) return;
+    handleTryMeClick(btn.parentElement);
+});
+
+// EDIT 3: After the user presses "Set Matrix" immediately show a pretty LaTeX rendering
+//          of the augmented matrix they just entered, rather than leaving the form in place.
+function showConfirmedAugmentedMatrix(container) {
+    displayMathJaxMatrix(container, appState.matrixData);
+}
+
+// Patch original createAugmentedMatrixForm to invoke the pretty-print helper
+const originalCreateAug = createAugmentedMatrixForm;
+createAugmentedMatrixForm = function(container){
+    originalCreateAug(container);
+    // when the user confirms, pretty-print
+    container.querySelector('#set-matrix-btn')?.addEventListener('click', () => {
+        showConfirmedAugmentedMatrix(container);
+    }, { once:true }); // only run once per session
+};
+
+/* -----------------------------------------------------------------------
+ * 3-DIMENSIONAL SUPPORT
+ * ---------------------------------------------------------------------*/
+
+function solve3DSystem() {
+    if (appState.rows !== 3 || appState.cols < 4) return null;
+    const [r1,r2,r3] = appState.matrixData;
+    const a1=new Fraction(r1[0]); const b1=new Fraction(r1[1]); const c1=new Fraction(r1[2]); const d1=new Fraction(r1[3]);
+    const a2=new Fraction(r2[0]); const b2=new Fraction(r2[1]); const c2=new Fraction(r2[2]); const d2=new Fraction(r2[3]);
+    const a3=new Fraction(r3[0]); const b3=new Fraction(r3[1]); const c3=new Fraction(r3[2]); const d3=new Fraction(r3[3]);
+
+    // Determinant of A
+    const det = a1.mul(b2.mul(c3).sub(c2.mul(b3)))
+                   .sub(b1.mul(a2.mul(c3).sub(c2.mul(a3))))
+                   .add(c1.mul(a2.mul(b3).sub(b2.mul(a3))));
+    if (det.n === 0) return null;
+
+    const detX = d1.mul(b2.mul(c3).sub(c2.mul(b3)))
+                  .sub(b1.mul(d2.mul(c3).sub(c2.mul(d3))))
+                  .add(c1.mul(d2.mul(b3).sub(b2.mul(d3))));
+    const detY = a1.mul(d2.mul(c3).sub(c2.mul(d3)))
+                  .sub(d1.mul(a2.mul(c3).sub(c2.mul(a3))))
+                  .add(c1.mul(a2.mul(d3).sub(d2.mul(a3))));
+    const detZ = a1.mul(b2.mul(d3).sub(d2.mul(b3)))
+                  .sub(b1.mul(a2.mul(d3).sub(d2.mul(a3))))
+                  .add(d1.mul(a2.mul(b3).sub(b2.mul(a3))));
+
+    const x = detX.div(det);
+    const y = detY.div(det);
+    const z = detZ.div(det);
+    return {x,y,z};
+}
+
+function generatePlaneSurface([a,b,c,d], range=10, steps=15){
+    // Decide which coordinate to solve for (pivot on the largest coefficient)
+    const abs = v => Math.abs(v);
+    const maxCoeff = Math.max(abs(a),abs(b),abs(c));
+    const xs = Array.from({length:steps}, (_,i)=> -range + 2*range*i/(steps-1));
+    const ys = xs.slice();
+    const gridX=[], gridY=[], gridZ=[];
+    for(let xi=0; xi<xs.length; xi++){
+        const rowX=[], rowY=[], rowZ=[];
+        for(let yi=0; yi<ys.length; yi++){
+            const x=xs[xi], y=ys[yi];
+            let zVal;
+            if(maxCoeff===abs(c) && abs(c)>1e-9){
+                zVal = (d - a*x - b*y)/c;
+            }else if(maxCoeff===abs(b) && abs(b)>1e-9){
+                // solve for y, keep z grid same as y param
+                const z = y; // treat ys array as z when y is pivot
+                zVal = z;
+                rowY[yi] = (d - a*x - c*z)/b;
+            }else if(abs(a)>1e-9){
+                // solve for x
+                zVal = y; // treat y param as z
+                rowX[yi] = (d - b*y - c*zVal)/a;
+            } else {
+                zVal = 0;
+            }
+            rowX[yi] = x;
+            rowY[yi] = y;
+            rowZ[yi] = zVal;
+        }
+        gridX.push(rowX); gridY.push(rowY); gridZ.push(rowZ);
+    }
+    return {x:gridX, y:gridY, z:gridZ};
+}
+
+function render3DRowPicture(container){
+    const layout = {
+        title: 'Row Picture: Intersection of Planes',
+        scene: {
+            xaxis:{title:'x₁'}, yaxis:{title:'x₂'}, zaxis:{title:'x₃'},
+            aspectmode:'cube'
+        },
+        margin:{l:0,r:0,b:0,t:40}
+    };
+
+    const colors=['rgba(52,152,219,0.7)','rgba(231,76,60,0.7)','rgba(46,204,113,0.7)'];
+    const surfaces = appState.matrixData.slice(0,3).map((row,i)=>{
+        const {x,y,z}=generatePlaneSurface(row);
+        return { type:'surface', x, y, z, showscale:false, name:`Eq ${i+1}`, opacity:0.7,
+                 colorscale:[[0,colors[i]],[1,colors[i]] ] };
+    });
+
+    const solution = solve3DSystem();
+    if(solution){
+        surfaces.push({
+            type:'scatter3d', mode:'markers+text',
+            x:[solution.x.valueOf()], y:[solution.y.valueOf()], z:[solution.z.valueOf()],
+            marker:{size:4,color:'black'}, text:[`(${solution.x.toFraction(true)},${solution.y.toFraction(true)},${solution.z.toFraction(true)})`], textposition:'top right'
+        });
+    }
+    Plotly.newPlot(container, surfaces, layout, {responsive:true});
+}
+
+function render3DColumnPicture(container){
+    const col1=[appState.matrixData[0][0],appState.matrixData[1][0],appState.matrixData[2][0]];
+    const col2=[appState.matrixData[0][1],appState.matrixData[1][1],appState.matrixData[2][1]];
+    const col3=[appState.matrixData[0][2],appState.matrixData[1][2],appState.matrixData[2][2]];
+    const b   =[appState.matrixData[0][3],appState.matrixData[1][3],appState.matrixData[2][3]];
+
+    const vectorTrace = (v,name,color) => ({
+        type:'scatter3d', mode:'lines+markers', name,
+        x:[0,v[0]], y:[0,v[1]], z:[0,v[2]],
+        line:{width:5,color}, marker:{size:4,color}
+    });
+
+    const traces=[
+        vectorTrace(col1,'Column 1','blue'),
+        vectorTrace(col2,'Column 2','green'),
+        vectorTrace(col3,'Column 3','orange'),
+        vectorTrace(b,'Vector b','red')
+    ];
+
+    const solution = solve3DSystem();
+    if(solution){
+        const s = solution;
+        const scaled1=[col1[0]*s.x.valueOf(), col1[1]*s.x.valueOf(), col1[2]*s.x.valueOf()];
+        const scaled2=[scaled1[0]+col2[0]*s.y.valueOf(), scaled1[1]+col2[1]*s.y.valueOf(), scaled1[2]+col2[2]*s.y.valueOf()];
+        const scaled3=[scaled2[0]+col3[0]*s.z.valueOf(), scaled2[1]+col3[1]*s.z.valueOf(), scaled2[2]+col3[2]*s.z.valueOf()];
+        traces.push({ type:'scatter3d', mode:'lines+markers', name:'Combination Path',
+            x:[0,scaled1[0],scaled2[0],scaled3[0]],
+            y:[0,scaled1[1],scaled2[1],scaled3[1]],
+            z:[0,scaled1[2],scaled2[2],scaled3[2]],
+            line:{ dash:'dash', color:'grey'}, marker:{size:3,color:'grey'} });
+    }
+
+    const layout={ title:'Column Picture: Vector Combination',
+        scene:{ xaxis:{title:'x₁'}, yaxis:{title:'x₂'}, zaxis:{title:'x₃'}, aspectmode:'cube' }, margin:{l:0,r:0,b:0,t:40} };
+    Plotly.newPlot(container,traces,layout,{responsive:true});
+}
+
+// EDIT 4: Extend existing renderGeometry dispatcher
+const originalRenderGeometry = renderGeometry;
+renderGeometry = function(){
+    const rowPlotDiv=document.getElementById('row-plot');
+    const colPlotDiv=document.getElementById('col-plot');
+
+    if(!appState.matrixData || !appState.matrixData.length){
+        rowPlotDiv.innerHTML=colPlotDiv.innerHTML='<p>Please set a system in the "Forms" tab first.</p>';
+        return;
+    }
+    if(appState.rows===2){
+        render2DRowPicture(rowPlotDiv);
+        render2DColumnPicture(colPlotDiv);
+    } else if(appState.rows===3){
+        render3DRowPicture(rowPlotDiv);
+        render3DColumnPicture(colPlotDiv);
+    } else {
+        rowPlotDiv.innerHTML='<p>Currently supports only 2×3 or 3×4 augmented matrices.</p>';
+        colPlotDiv.innerHTML=rowPlotDiv.innerHTML;
+    }
+};
+
+// ... existing code ...
+</script>
+</body>
+</html>
