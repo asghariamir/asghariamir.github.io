@@ -194,22 +194,107 @@ const originalRenderGeometry = renderGeometry;
 renderGeometry = function(){
     const rowPlotDiv=document.getElementById('row-plot');
     const colPlotDiv=document.getElementById('col-plot');
+    const transPlotDiv=document.getElementById('transform-plot');
 
     if(!appState.matrixData || !appState.matrixData.length){
-        rowPlotDiv.innerHTML=colPlotDiv.innerHTML='<p>Please set a system in the "Forms" tab first.</p>';
+        rowPlotDiv.innerHTML=colPlotDiv.innerHTML=transPlotDiv.innerHTML='<p>Please set a system in the "Forms" tab first.</p>';
         return;
     }
     if(appState.rows===2){
         render2DRowPicture(rowPlotDiv);
         render2DColumnPicture(colPlotDiv);
+        render2DTransformPicture(transPlotDiv);
     } else if(appState.rows===3){
         render3DRowPicture(rowPlotDiv);
         render3DColumnPicture(colPlotDiv);
+        render3DTransformPicture(transPlotDiv);
     } else {
-        rowPlotDiv.innerHTML='<p>Currently supports only 2×3 or 3×4 augmented matrices.</p>';
-        colPlotDiv.innerHTML=rowPlotDiv.innerHTML;
+        const msg='<p>Currently supports only 2×3 or 3×4 augmented matrices.</p>';
+        rowPlotDiv.innerHTML=colPlotDiv.innerHTML=transPlotDiv.innerHTML=msg;
     }
 };
+
+function multiply2D(A, v){
+    return [A[0][0]*v[0] + A[0][1]*v[1], A[1][0]*v[0] + A[1][1]*v[1]];
+}
+
+function render2DTransformPicture(container){
+    const gridRange = 5;
+    const steps = 11;
+    const traces = [];
+    // Original grid (light grey)
+    for(let i=-gridRange;i<=gridRange;i++){
+        // horizontal
+        const xs = Array.from({length:steps}, (_,j)=> -gridRange + 2*gridRange*j/(steps-1));
+        const ys = xs.map(()=> i);
+        traces.push({x:xs, y:ys, mode:'lines', type:'scatter', line:{color:'lightgrey'}, hoverinfo:'none', showlegend:false});
+        // vertical
+        traces.push({x:ys, y:xs, mode:'lines', type:'scatter', line:{color:'lightgrey'}, hoverinfo:'none', showlegend:false});
+    }
+
+    // Build A and transformation grid (blue)
+    const A = [ [appState.matrixData[0][0], appState.matrixData[0][1]],
+                [appState.matrixData[1][0], appState.matrixData[1][1]] ];
+
+    for(let i=-gridRange;i<=gridRange;i++){
+        // horizontal line y=i
+        const domXs = Array.from({length:steps}, (_,j)=> -gridRange + 2*gridRange*j/(steps-1));
+        const domYs = domXs.map(()=> i);
+        const imgPoints = domXs.map((x,idx)=> multiply2D(A,[x,domYs[idx]]));
+        const tx = imgPoints.map(p=>p[0]);
+        const ty = imgPoints.map(p=>p[1]);
+        traces.push({x:tx, y:ty, mode:'lines', type:'scatter', line:{color:'#2196f3'}, hoverinfo:'none', showlegend:false});
+        // vertical line x=i
+        const domYs2 = domXs; // reuse
+        const domXs2 = domYs.map(()=> i);
+        const imgPoints2 = domYs2.map((y,idx)=> multiply2D(A,[i,y]));
+        const tx2 = imgPoints2.map(p=>p[0]);
+        const ty2 = imgPoints2.map(p=>p[1]);
+        traces.push({x:tx2, y:ty2, mode:'lines', type:'scatter', line:{color:'#2196f3'}, hoverinfo:'none', showlegend:false});
+    }
+
+    // Show basis vectors and their images
+    const basis = {
+        e1: [[0,0],[1,0]],
+        e2: [[0,0],[0,1]]
+    };
+    const e1Img = multiply2D(A,[1,0]);
+    const e2Img = multiply2D(A,[0,1]);
+    traces.push({x:[0,1],y:[0,0],mode:'lines+markers',name:'e₁',line:{color:'green',width:3},marker:{size:6,color:'green'}});
+    traces.push({x:[0,0],y:[0,1],mode:'lines+markers',name:'e₂',line:{color:'orange',width:3},marker:{size:6,color:'orange'}});
+    traces.push({x:[0,e1Img[0]],y:[0,e1Img[1]],mode:'lines+markers',name:'A e₁',line:{color:'green',dash:'dash',width:3},marker:{size:6,color:'green'}});
+    traces.push({x:[0,e2Img[0]],y:[0,e2Img[1]],mode:'lines+markers',name:'A e₂',line:{color:'orange',dash:'dash',width:3},marker:{size:6,color:'orange'}});
+
+    const layout = { title:'Transformation Picture: T(x)=Ax', xaxis:{zeroline:true}, yaxis:{scaleanchor:'x',scaleratio:1,zeroline:true}, margin:{t:40,l:40,b:40,r:20} };
+
+    Plotly.newPlot(container,traces,layout,{responsive:true});
+}
+
+function render3DTransformPicture(container){
+    // Build A 3x3
+    const A = [ [appState.matrixData[0][0],appState.matrixData[0][1],appState.matrixData[0][2]],
+                [appState.matrixData[1][0],appState.matrixData[1][1],appState.matrixData[1][2]],
+                [appState.matrixData[2][0],appState.matrixData[2][1],appState.matrixData[2][2]] ];
+
+    const basis = [ [1,0,0], [0,1,0], [0,0,1] ];
+    const colors = ['green','orange','purple'];
+    const traces=[];
+    basis.forEach((vec,i)=>{
+        const img = [ A[0][0]*vec[0]+A[0][1]*vec[1]+A[0][2]*vec[2],
+                       A[1][0]*vec[0]+A[1][1]*vec[1]+A[1][2]*vec[2],
+                       A[2][0]*vec[0]+A[2][1]*vec[1]+A[2][2]*vec[2] ];
+        // original axis
+        traces.push({type:'scatter3d',mode:'lines+markers',name:`e${i+1}`,
+            x:[0,vec[0]],y:[0,vec[1]],z:[0,vec[2]], line:{color:colors[i],width:3}, marker:{size:4,color:colors[i]}});
+        // transformed axis
+        traces.push({type:'scatter3d',mode:'lines+markers',name:`A e${i+1}`,
+            x:[0,img[0]],y:[0,img[1]],z:[0,img[2]], line:{color:colors[i],dash:'dash',width:3}, marker:{size:4,color:colors[i]}});
+    });
+
+    const layout = { title:'Transformation Picture: T(x)=Ax', scene:{xaxis:{title:'x₁'},yaxis:{title:'x₂'},zaxis:{title:'x₃'},aspectmode:'cube'}, margin:{l:0,r:0,b:0,t:40} };
+
+    Plotly.newPlot(container,traces,layout,{responsive:true});
+}
 
 // ... existing code ...
 </script>
