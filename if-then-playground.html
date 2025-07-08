@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>If-Then & Justify App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* --- Shared Variables & Global Styles --- */
+        :root {
+            --fail: #b71c1c;
+            --primary: #1565c0;
+            --good: #2e7d32;
+            --border: #d0d0d0;
+            --bg: #fafafa;
+            --card: #fff;
+            --text-color: #222;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* --- Main App Container --- */
+        .container {
+            max-width: 760px;
+            width: 100%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, .08);
+            padding: 1.4rem 1.7rem;
+        }
+
+        /* --- Tab Controls --- */
+        .tabs {
+            display: flex;
+            gap: .5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: .48em 1.1em;
+            background: #f0f3fa;
+            border-radius: 6px 6px 0 0;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: .13s;
+        }
+
+        .tab.active {
+            background: var(--card);
+            color: var(--primary);
+            border-color: var(--border) var(--border) var(--card) var(--border);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .02);
+        }
+
+        .tab:hover:not(.active) {
+            background: #e0e5ee;
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+        }
+        
+        /* --- Headings --- */
+        h1, h2, h3 {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        h1 { font-size: 1.5rem; margin-bottom: .2em; }
+        h2 { font-size: 1.4rem; margin-bottom: 1rem; text-align: center; }
+        h3 { font-size: 1.13rem; margin-bottom: .13em; }
+
+        /* --- IF-THEN APP STYLES --- */
+        #ifThenApp .intro-flex { display: flex; align-items: center; margin-bottom: 1.2em; gap: 1rem; }
+        #ifThenApp .static-venn { min-width: 100px; }
+        #ifThenApp .intro-blurb { font-size: 1.08em; color: #233; margin-bottom: 0.13em; }
+        #ifThenApp .intro-venn-label { font-size: .98em; color: #444; }
+
+        #ifThenApp .statement-select-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 1.2em; }
+        #ifThenApp .statement-select-label { font-weight: 600; margin-right: .7em; }
+        #ifThenApp .statement-select {
+            min-width: 320px; font-size: 1.08em; padding: .4em .7em;
+            border-radius: 6px; border: 1.5px solid var(--border); background: #f9faff; color: #234; outline: none;
+        }
+
+        #ifThenApp .interactive-block { text-align: center; margin-bottom: 1.6em; }
+        #ifThenApp .interactive-instruct { font-size: 1.03em; color: #444; margin-bottom: 1.2em; margin-top: .7em; }
+        #ifThenApp .vennBox {
+            aspect-ratio: 1/1; width: 330px; height: 330px; max-width: 96vw; max-height: 96vw;
+            margin: 0 auto; border: 1px solid var(--border); border-radius: 6px; background: var(--card); overflow: hidden; box-sizing: border-box;
+        }
+        #ifThenApp .vennBox.locked { cursor: default; filter: grayscale(.65) brightness(0.97); }
+        #ifThenApp .fail-region { cursor: pointer; opacity: 0; pointer-events: all; transition: opacity 0.15s; }
+        #ifThenApp .fail-region.visible { opacity: 1; }
+        #ifThenApp .locked-feedback, #ifThenApp .hover-feedback {
+            margin: 1.3em auto 1.2em auto; background: #f7f7fb; border-radius: 8px; border: 1px solid #e0e0e0;
+            max-width: 430px; padding: 1em 1em .7em 1em; text-align: center; font-size: 1.07em; transition: background .33s;
+        }
+        #ifThenApp .logic-form-label { color: var(--primary); font-weight: 600; font-size: 1.04em; }
+        #ifThenApp .locked-statement { font-size: 1.06em; margin: .22em 0 .7em 0; }
+        #ifThenApp .fail-context { margin-top: .2em; font-size: .97em; color: #3c3c3c; }
+
+        #ifThenApp .truth-check { display: flex; justify-content: center; align-items: center; gap: 1.6em; margin: 2em 0 1em 0; font-size: 1.13em; }
+        #ifThenApp .truth-radio { accent-color: var(--primary); }
+        #ifThenApp .truth-submit-btn {
+            margin-left: 1.7em; padding: .5em 2em; border-radius: 7px; background: var(--primary); color: #fff;
+            font-weight: 600; font-size: 1em; border: none; box-shadow: 0 1px 4px rgba(21, 101, 192, 0.10);
+            cursor: pointer; transition: .13s; outline: none;
+        }
+        #ifThenApp .truth-submit-btn:disabled { background: #b3b3b3; cursor: not-allowed; }
+
+        #ifThenApp .info-card {
+            border: 1.5px solid var(--border); border-radius: 7px; padding: 1.15em 1.1em 1em 1.1em;
+            background: #fcfcfc; margin: 2rem auto 0; font-size: 1.07em; display: none; max-width: 500px;
+            text-align: center; box-shadow: 0 2px 8px rgba(21, 101, 192, 0.06);
+        }
+        #ifThenApp .info-card.visible { display: block; }
+        #ifThenApp .msg-good { color: var(--good); font-weight: 600; }
+        #ifThenApp .msg-bad { color: var(--fail); font-weight: 600; }
+        #ifThenApp .msg-iff { font-weight: 500; color: #234; margin-top: 0.7em; }
+        #ifThenApp .counter { font-family: monospace; font-size: .99em; }
+        #ifThenApp .tryagain-btn {
+            margin-top: 1.3em; padding: .48em 2em; border-radius: 7px; background: var(--fail); color: #fff;
+            font-weight: 600; font-size: 1em; border: none; box-shadow: 0 1px 4px rgba(183, 28, 28, 0.13);
+            cursor: pointer; transition: .13s; outline: none;
+        }
+        #ifThenApp .reminder { display: block; margin-top: .9em; font-size: .98em; color: var(--fail); }
+        #ifThenApp .hidden { display: none; }
+        
+        /* --- JUSTIFY APP STYLES --- */
+        #justifyContent .question { margin: 1.3rem 0 .6rem 0; font-size: 1.07em; line-height: 1.5; }
+        #justifyContent label { display: block; margin-bottom: .6em; cursor: pointer; font-size: 1.05em; }
+        #justifyContent button {
+            margin-top: 1rem; padding: .6em 1.5em; background: var(--primary); color: #fff;
+            border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 1em;
+        }
+        #justifyContent .result { font-weight: 600; margin-top: 1.2rem; min-height: 1.5em; }
+        #justifyContent .vennBox {
+            aspect-ratio: 1/1; width: 300px; margin: .5rem auto 2rem auto; border: 1px solid var(--border);
+            border-radius: 8px; background: var(--card); display: flex; align-items: center;
+            justify-content: center; position: relative;
+        }
+        #justifyContent .vennBox circle:hover { fill: rgba(21, 101, 192, .12); cursor: pointer; }
+        #justifyContent .hover-info {
+            position: absolute; top: 5px; left: 5px; background: var(--card); border: 1px solid var(--border);
+            padding: .35rem .6rem; border-radius: 6px; font-size: .9em; color: #333; display: none; max-width: 90%; z-index: 10;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab" id="tabIf" onclick="activate('ifThenApp','tabIf')">If-Then</div>
+            <div class="tab active" id="tabJust" onclick="activate('justifyContent','tabJust')">Justify</div>
+        </div>
+
+        <div id="ifThenApp" class="panel">
+            <main class="app">
+                <div class="intro-flex">
+                    <div style="flex:1 1 0%">
+                        <h1>If-Then Logic</h1>
+                        <div class="intro-blurb">
+                            All sentences are of the form <b>“If P, then Q.”</b> The diagram shows that the <b>inner circle</b> is “if” (P), and the <b>outer circle</b> is “then” (Q).
+                        </div>
+                        <span class="intro-venn-label">Whenever P holds, Q holds too.</span>
+                    </div>
+                    <div class="static-venn" id="introVenn"></div>
+                </div>
+                <div class="tabs" id="topicTabs"></div>
+                <div class="tabs" id="logicTabs"></div>
+                <div class="statement-select-wrap">
+                    <label for="statementSelect" class="statement-select-label">Choose a statement:</label>
+                    <select id="statementSelect" class="statement-select"></select>
+                </div>
+                <div class="interactive-block">
+                    <h3 id="dynTitle"></h3>
+                    <div class="interactive-instruct">
+                        Move your mouse over the diagram to find the counterexample region.<br>
+                        <span style="font-size:.97em;color:#3c3c3c;">Click the region to lock it and evaluate the statement.</span>
+                    </div>
+                    <div id="svgDyn" class="vennBox"></div>
+                    <div id="hoverBox" class="hover-feedback hidden"></div>
+                    <div id="lockedBox" class="locked-feedback hidden"></div>
+                </div>
+                <form id="truthCheck" class="truth-check hidden">
+                    <label><input class="truth-radio" type="radio" name="truthval" value="true" disabled> This statement is <b>TRUE</b></label>
+                    <label><input class="truth-radio" type="radio" name="truthval" value="false" disabled> This statement is <b>FALSE</b></label>
+                    <button type="submit" class="truth-submit-btn" disabled>Submit</button>
+                </form>
+                <section class="info-card" id="infoCard">
+                    <div id="infoFeedback"></div>
+                    <span id="iffMsg" class="msg-iff"></span>
+                    <div id="counterMsg" class="counter"></div>
+                    <button type="button" class="tryagain-btn hidden" id="tryAgainBtn">Try Again</button>
+                    <span class="reminder hidden" id="reminderMsg">
+                        A conditional statement is <b>true</b> if every time <b>P</b> is true, <b>Q</b> is also true.<br>
+                        It is <b>false</b> if you can find a case where <b>P</b> is true and <b>Q</b> is false.
+                    </span>
+                </section>
+            </main>
+        </div>
+
+        <div id="justifyContent" class="panel active">
+            <h2>Justify the Statement</h2>
+            <div class="vennBox">
+                <div class="hover-info" id="hoverInfo"></div>
+                <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" id="circleQ" fill="none" stroke="#1565c0" stroke-width="2"></circle>
+                    <circle cx="50" cy="50" r="20" id="circleP" fill="none" stroke="#1565c0" stroke-width="2"></circle>
+                    <text x="50" y="52" text-anchor="middle" dominant-baseline="middle" fill="#222" font-size="10">P</text>
+                    <text x="50" y="8" text-anchor="middle" fill="#222" font-size="10">Q</text>
+                </svg>
+            </div>
+            <div class="question" id="justifyQuestion"></div>
+            <form id="justifyForm">
+                <label><input type="radio" name="choice" value="yes"> Yes</label>
+                <label><input type="radio" name="choice" value="no"> No</label>
+                <label><input type="radio" name="choice" value="unknown"> Not enough information</label>
+                <button type="submit">Submit</button>
+            </form>
+            <div id="justifyResult" class="result"></div>
+        </div>
+    </div>
+
+<script>
+    /*==================================================
+        GLOBAL APP LOGIC (TABS)
+    ==================================================*/
+    function activate(panelId, tabId) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(panelId).classList.add('active');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    /*==================================================
+        IF-THEN APP LOGIC
+    ==================================================*/
+    (function() {
+        // Encapsulate all If-Then logic to prevent global scope conflicts
+        const DATA = [
+            { topic: "Geometry", statements: [
+                { p: "a figure is a square", q: "it is a rectangle", forms: { converse: {truth: false, counter: "a non-square rectangle", failContext: "There is a rectangle that is not a square."}, inverse: {truth: false, counter: "a non-square rectangle", failContext: "There is a figure that is not a square, but it is not a rectangle."}, contrapositive: {truth: true} } },
+                { p: "a triangle is equilateral", q: "it is isosceles", forms: { converse: {truth: false, counter: "an isosceles triangle that is not equilateral", failContext: "There is an isosceles triangle that is not equilateral."}, inverse: {truth: false, counter: "an isosceles triangle that is not equilateral", failContext: "There is a triangle that is not equilateral, but it is not isosceles."}, contrapositive: {truth: true} } },
+                { p: "an angle is right", q: "it is 90 degrees", forms: { converse: {truth: true}, inverse: {truth: true}, contrapositive: {truth: true} } }
+            ]},
+            { topic: "Numbers", statements: [
+                { p: "n is divisible by 4", q: "n is even", forms: { converse: {truth: false, counter: "n = 2", failContext: "There is an even number that is not divisible by 4."}, inverse: {truth: false, counter: "n = 2", failContext: "There is a number that is not divisible by 4, but it is not even."}, contrapositive: {truth: true} } },
+                { p: "x is rational", q: "-x is rational", forms: { converse: {truth: true}, inverse: {truth: true}, contrapositive: {truth: true} } },
+            ]}
+        ];
+        const LOGIC_FORMS = [ {id:"converse",label:"Converse",def:"If Q then P."}, {id:"inverse",label:"Inverse",def:"If not P then not Q."}, {id:"contrapositive",label:"Contrapositive",def:"If not Q then not P."} ];
+        const FAILURE_REGION = { converse: "QnotP", inverse: "QnotP", contrapositive: null };
+
+        function englishNegate(s) {
+            let idx = s.indexOf(" is ");
+            if (idx >= 0) return s.slice(0, idx+4) + "not " + s.slice(idx+4);
+            idx = s.indexOf(" are ");
+            if (idx >= 0) return s.slice(0, idx+5) + "not " + s.slice(idx+5);
+            return "not ("+s+")";
+        }
+
+        function makeIfThen(stmt, form) {
+            switch(form){
+                case 'converse': return `If ${stmt.q}, then ${stmt.p}.`;
+                case 'inverse': return `If ${englishNegate(stmt.p)}, then ${englishNegate(stmt.q)}.`;
+                case 'contrapositive': return `If ${englishNegate(stmt.q)}, then ${englishNegate(stmt.p)}.`;
+                default: return `If ${stmt.p}, then ${stmt.q}.`;
+            }
+        }
+        function makeIfAndOnlyIf(stmt) { return `${stmt.p.charAt(0).toUpperCase()+stmt.p.slice(1)} if and only if ${stmt.q}.`; }
+
+        function addFailPatternDef(svg){
+            if(!svg.querySelector('#failPattern')){
+                const defs = document.createElementNS(svg.namespaceURI,"defs");
+                defs.innerHTML = `<pattern id="failPattern" patternUnits="userSpaceOnUse" width="0.08" height="0.08" patternTransform="rotate(45)"><rect x="0" y="0" width="0.04" height="0.08" fill="rgba(183,28,28,0.22)"/></pattern>`;
+                svg.appendChild(defs);
+            }
+        }
+
+        function buildInteractiveVenn(targetId, failRegion, locked, hoverActive, onHover, onLock, circlesCoincide) {
+            const wrap = document.getElementById(targetId);
+            wrap.innerHTML = '';
+            if (locked) wrap.classList.add('locked'); else wrap.classList.remove('locked');
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttribute('viewBox', '-1 -1 2 2');
+            let RP = circlesCoincide ? 0.62 : 0.40, RQ = 0.62;
+            let qCirc = document.createElementNS(svgNS, "circle");
+            qCirc.setAttribute("cx", 0); qCirc.setAttribute("cy", 0); qCirc.setAttribute("r", RQ);
+            qCirc.setAttribute("fill", "none"); qCirc.setAttribute("stroke", "#222"); qCirc.setAttribute("stroke-width", "0.04");
+            svg.appendChild(qCirc);
+            let pCirc = document.createElementNS(svgNS, "circle");
+            pCirc.setAttribute("cx", 0); pCirc.setAttribute("cy", 0); pCirc.setAttribute("r", RP);
+            pCirc.setAttribute("fill", "none"); pCirc.setAttribute("stroke", "#222"); pCirc.setAttribute("stroke-width", "0.04");
+            svg.appendChild(pCirc);
+            let textP = document.createElementNS(svgNS, "text");
+            textP.setAttribute("x", 0); textP.setAttribute("y", 0.04);
+            textP.setAttribute("fill", "#222"); textP.setAttribute("font-size", "0.18"); textP.setAttribute("font-weight", "700"); textP.setAttribute("text-anchor", "middle");
+            textP.textContent = "P"; svg.appendChild(textP);
+            let textQ = document.createElementNS(svgNS, "text");
+            textQ.setAttribute("x", 0); textQ.setAttribute("y", -RQ - 0.08);
+            textQ.setAttribute("fill", "#222"); textQ.setAttribute("font-size", "0.13"); textQ.setAttribute("font-weight", "700"); textQ.setAttribute("text-anchor", "middle");
+            textQ.textContent = "Q"; svg.appendChild(textQ);
+
+            if (failRegion && !circlesCoincide) {
+                addFailPatternDef(svg);
+                let g = document.createElementNS(svgNS, "g");
+                g.classList.add("fail-region");
+                if (locked || hoverActive) g.classList.add("visible");
+                let mask = document.createElementNS(svgNS, "mask");
+                mask.setAttribute("id", "failMaskQnotP");
+                mask.innerHTML = `<rect x="-1" y="-1" width="2" height="2" fill="white"/><circle cx="0" cy="0" r="0.40" fill="black"/>`;
+                svg.appendChild(mask);
+                let el = document.createElementNS(svgNS, "circle");
+                el.setAttribute("cx", 0); el.setAttribute("cy", 0); el.setAttribute("r", RQ);
+                el.setAttribute("fill", "url(#failPattern)");
+                el.setAttribute("mask", "url(#failMaskQnotP)");
+                g.appendChild(el);
+                svg.appendChild(g);
+
+                if (!locked) {
+                    svg.addEventListener("mousemove", function (evt) {
+                        const rect = svg.getBoundingClientRect();
+                        const x = ((evt.clientX - rect.left) / rect.width) * 2 - 1;
+                        const y = ((evt.clientY - rect.top) / rect.height) * 2 - 1;
+                        const r = Math.sqrt(x * x + y * y);
+                        const inDonut = (r <= RQ && r >= RP);
+                        if(inDonut !== g.classList.contains('visible')) {
+                           g.classList.toggle('visible');
+                           onHover && onHover(inDonut);
+                        }
+                    });
+                     svg.addEventListener("mouseleave", () => {
+                        if(g.classList.contains('visible')){
+                            g.classList.remove('visible');
+                            onHover && onHover(false);
+                        }
+                    });
+                    svg.addEventListener("click", function (evt) {
+                        const rect = svg.getBoundingClientRect();
+                        const x = ((evt.clientX - rect.left) / rect.width) * 2 - 1;
+                        const y = ((evt.clientY - rect.top) / rect.height) * 2 - 1;
+                        const r = Math.sqrt(x * x + y * y);
+                        if (r <= RQ && r >= RP) onLock && onLock();
+                    });
+                }
+            }
+            wrap.appendChild(svg);
+        }
+
+        function buildStaticVenn(targetId){
+            const wrap=document.getElementById(targetId);
+            wrap.innerHTML = '';
+            const svgNS="http://www.w3.org/2000/svg";
+            const svg=document.createElementNS(svgNS,'svg');
+            svg.setAttribute('viewBox','-1 -1 2 2');
+            svg.setAttribute('width', 100); svg.setAttribute('height', 100);
+            let RP = 0.40, RQ = 0.62;
+            let qCirc = document.createElementNS(svgNS,"circle");
+            qCirc.setAttribute("cx",0); qCirc.setAttribute("cy",0); qCirc.setAttribute("r",RQ);
+            qCirc.setAttribute("fill","none"); qCirc.setAttribute("stroke","#222"); qCirc.setAttribute("stroke-width","0.04");
+            svg.appendChild(qCirc);
+            let pCirc = document.createElementNS(svgNS,"circle");
+            pCirc.setAttribute("cx",0); pCirc.setAttribute("cy",0); pCirc.setAttribute("r",RP);
+            pCirc.setAttribute("fill","none"); pCirc.setAttribute("stroke","#222"); pCirc.setAttribute("stroke-width","0.04");
+            svg.appendChild(pCirc);
+            let textP = document.createElementNS(svgNS,"text");
+            textP.setAttribute("x", 0); textP.setAttribute("y", 0.04);
+            textP.setAttribute("fill", "#222"); textP.setAttribute("font-size", "0.18"); textP.setAttribute("font-weight", "700"); textP.setAttribute("text-anchor", "middle");
+            textP.textContent = "P"; svg.appendChild(textP);
+            let textQ = document.createElementNS(svgNS,"text");
+            textQ.setAttribute("x", 0); textQ.setAttribute("y", -RQ-0.08);
+            textQ.setAttribute("fill", "#222"); textQ.setAttribute("font-size", "0.13"); textQ.setAttribute("font-weight", "700"); textQ.setAttribute("text-anchor", "middle");
+            textQ.textContent = "Q"; svg.appendChild(textQ);
+            wrap.appendChild(svg);
+        }
+
+        let state = { topicIdx: 0, formIdx: 0, statementIdx: 0, locked: false, hoverSeen: false, hoverActive: false, circlesCoincide: false, selectedTruth: null, submitted: false };
+
+        function showHoverBox(onHover){
+            const st = DATA[state.topicIdx].statements[state.statementIdx];
+            const form = LOGIC_FORMS[state.formIdx].id;
+            const formLabel = LOGIC_FORMS[state.formIdx].label;
+            const formInfo = st.forms[form];
+            const hoverBox = document.getElementById('hoverBox');
+            if (!state.locked && (onHover || (!FAILURE_REGION[form] && state.hoverSeen))) {
+                hoverBox.classList.remove("hidden");
+                hoverBox.innerHTML = `<span class="logic-form-label">${formLabel}:</span> <span class="locked-statement">${makeIfThen(st, form)}</span>` + (formInfo?.failContext ? `<div class="fail-context">${formInfo.failContext}</div>` : "");
+            } else {
+                hoverBox.classList.add("hidden");
+            }
+        }
+
+        function showLockedBox() {
+            const st = DATA[state.topicIdx].statements[state.statementIdx];
+            const form = LOGIC_FORMS[state.formIdx].id;
+            const formLabel = LOGIC_FORMS[state.formIdx].label;
+            const formInfo = st.forms[form];
+            const lockedBox = document.getElementById('lockedBox');
+            lockedBox.classList.remove("hidden");
+            lockedBox.innerHTML = `<span class="logic-form-label">${formLabel}:</span> <span class="locked-statement">${makeIfThen(st, form)}</span>` + (formInfo?.failContext ? `<div class="fail-context">${formInfo.failContext}</div>` : "");
+        }
+
+        function refreshTabs(){
+            buildStaticVenn('introVenn');
+            const topicTabs = document.getElementById('topicTabs');
+            topicTabs.innerHTML = '';
+            DATA.forEach((t, i) => {
+                const tab = document.createElement('div');
+                tab.className = 'tab' + (i === state.topicIdx ? ' active' : '');
+                tab.textContent = t.topic;
+                tab.onclick = () => { if(state.topicIdx!==i){ state.topicIdx=i; state.statementIdx=0; resetAll(); refreshTabs(); } };
+                topicTabs.appendChild(tab);
+            });
+            const logicTabs = document.getElementById('logicTabs');
+            logicTabs.innerHTML = '';
+            LOGIC_FORMS.forEach((f, i) => {
+                const tab = document.createElement('div');
+                tab.className = 'tab' + (i === state.formIdx ? ' active' : '');
+                tab.textContent = f.label;
+                tab.onclick = () => { if(state.formIdx!==i){ state.formIdx=i; resetAll(); refreshTabs(); } };
+                logicTabs.appendChild(tab);
+            });
+            const select = document.getElementById('statementSelect');
+            select.innerHTML = '';
+            DATA[state.topicIdx].statements.forEach((st, i) => {
+                const opt = document.createElement('option');
+                opt.value = i; opt.textContent = `If ${st.p}, then ${st.q}.`;
+                select.appendChild(opt);
+            });
+            select.value = state.statementIdx;
+            select.onchange = e => { state.statementIdx = Number(select.value); resetAll(); refreshTabs(); };
+            refreshContent();
+        }
+
+        function resetAll() {
+            Object.assign(state, { locked: false, hoverSeen: false, circlesCoincide: false, hoverActive: false, selectedTruth: null, submitted: false });
+            document.getElementById('lockedBox').classList.add("hidden");
+            document.getElementById('hoverBox').classList.add("hidden");
+            document.getElementById('truthCheck').classList.add("hidden");
+            document.getElementById('infoCard').classList.remove("visible");
+        }
+
+        function refreshContent(){
+            const st = DATA[state.topicIdx].statements[state.statementIdx];
+            const form = LOGIC_FORMS[state.formIdx].id;
+            let failRegion = FAILURE_REGION[form];
+            buildInteractiveVenn('svgDyn', failRegion, state.locked, state.hoverActive,
+                (onHover) => {
+                    if(state.locked) return;
+                    state.hoverActive = !!onHover;
+                    if(!state.hoverSeen && (onHover || !failRegion)) state.hoverSeen = true;
+                    showHoverBox(onHover);
+                },
+                () => {
+                    if (!state.locked && (state.hoverSeen || state.hoverActive)) {
+                        state.locked = true;
+                        showLockedBox();
+                        document.getElementById('hoverBox').classList.add("hidden");
+                        document.getElementById('truthCheck').classList.remove("hidden");
+                        updateTruthCheck();
+                        refreshContent();
+                    }
+                }, state.circlesCoincide
+            );
+            if (!state.locked) {
+                document.getElementById('svgDyn').classList.remove('locked');
+            } else {
+                 document.getElementById('svgDyn').classList.add('locked');
+            }
+            updateTruthCheck();
+        }
+
+        function updateTruthCheck() {
+            const radios = document.querySelectorAll('#ifThenApp .truth-radio');
+            const submitBtn = document.querySelector('#ifThenApp .truth-submit-btn');
+            radios.forEach(radio => radio.disabled = !state.locked || state.submitted);
+            submitBtn.disabled = !state.selectedTruth || !state.locked || state.submitted;
+            if(!state.selectedTruth || !state.locked) {
+                radios.forEach(radio => radio.checked = false);
+            }
+        }
+        
+        document.getElementById('truthCheck').onsubmit = function(e){
+            e.preventDefault();
+            if(!state.selectedTruth) return;
+            state.submitted = true;
+            const st = DATA[state.topicIdx].statements[state.statementIdx];
+            const form = LOGIC_FORMS[state.formIdx].id;
+            const formInfo = st.forms[form];
+            const actualTruth = !!(formInfo && formInfo.truth);
+            const userTruth = (state.selectedTruth === 'true');
+
+            const infoCard = document.getElementById('infoCard');
+            const infoFeedback = document.getElementById('infoFeedback');
+            const iffMsg = document.getElementById('iffMsg');
+            const counterMsg = document.getElementById('counterMsg');
+            const tryAgainBtn = document.getElementById('tryAgainBtn');
+            const reminderMsg = document.getElementById('reminderMsg');
+            infoCard.classList.add("visible");
+            tryAgainBtn.classList.add("hidden");
+            reminderMsg.classList.add("hidden");
+
+            if(userTruth === actualTruth) {
+                infoFeedback.innerHTML = `<span class="msg-good">Correct! The statement is <b>${actualTruth ? "TRUE" : "FALSE"}</b>.</span>`;
+                iffMsg.textContent = (actualTruth && st.forms["converse"]?.truth) ? makeIfAndOnlyIf(st) : "";
+                counterMsg.textContent = (!actualTruth && formInfo?.counter) ? `Counterexample: ${formInfo.counter}` : "";
+            } else {
+                infoFeedback.innerHTML = `<span class="msg-bad">Not quite.</span>`;
+                iffMsg.textContent = "";
+                counterMsg.textContent = "";
+                reminderMsg.classList.remove("hidden");
+                tryAgainBtn.classList.remove("hidden");
+            }
+            updateTruthCheck();
+        };
+
+        document.querySelectorAll('#ifThenApp .truth-radio').forEach(radio => {
+            radio.onchange = function(e){ state.selectedTruth = e.target.value; updateTruthCheck(); }
+        });
+
+        document.getElementById('tryAgainBtn').onclick = function(){
+            state.submitted = false; state.selectedTruth = null;
+            document.getElementById('infoCard').classList.remove("visible");
+            updateTruthCheck();
+        };
+
+        // Initial Load
+        refreshTabs();
+
+    })();
+
+
+    /*==================================================
+        JUSTIFY APP LOGIC
+    ==================================================*/
+    (function() {
+        // Encapsulate all Justify logic
+        const justifyData = [
+            { rule: "If a triangle is a right triangle, then the Pythagorean equation holds", candidate: "The triangle with sides 3,4,5 satisfies the Pythagorean equation.", correct: "no" },
+            { rule: "If an integer is divisible by 6, then it is divisible by 2", candidate: "8 is divisible by 2", correct: "no" },
+            { rule: "If a triangle is equilateral, then it is isosceles", candidate: "This triangle is equilateral.", correct: "yes" },
+            { rule: "If the Pythagorean equation holds in a triangle, then it is a right triangle", candidate: "This triangle satisfies the Pythagorean equation.", correct: "yes" },
+            { rule: "If a triangle has two equal angles, then the opposite sides are equal", candidate: "This triangle has equal opposite sides.", correct: "unknown" }
+        ];
+        let idx = 0;
+
+        const questionEl = document.getElementById('justifyQuestion');
+        const formEl = document.getElementById('justifyForm');
+        const resultEl = document.getElementById('justifyResult');
+
+        function renderQuestion() {
+            const q = justifyData[idx];
+            questionEl.innerHTML = `<strong>If-Then Rule:</strong> ${q.rule}<br><strong>Candidate:</strong> ${q.candidate}`;
+            formEl.reset();
+            resultEl.textContent = '';
+        }
+
+        formEl.addEventListener('submit', e => {
+            e.preventDefault();
+            const sel = document.querySelector('input[name="choice"]:checked');
+            if (!sel) return;
+            const correct = justifyData[idx].correct;
+            const isCorrect = sel.value === correct;
+            resultEl.innerHTML = isCorrect ? '✅ Correct' : `❌ Incorrect. The correct answer is: <strong>${correct}</strong>`;
+            resultEl.style.color = isCorrect ? 'var(--good)' : 'var(--fail)';
+            idx = (idx + 1) % justifyData.length;
+            setTimeout(renderQuestion, 2500);
+        });
+
+        // Venn Diagram Interaction
+        const hoverInfo = document.getElementById('hoverInfo');
+        const circleP = document.getElementById('circleP');
+        const circleQ = document.getElementById('circleQ');
+
+        function showInfo(text) { hoverInfo.textContent = text; hoverInfo.style.display = 'block'; }
+        function hideInfo() { hoverInfo.style.display = 'none'; }
+
+        circleP.addEventListener('mouseenter', () => {
+            const ifPart = justifyData[idx].rule.split(' then ')[0].replace(/^If\s+/i, '');
+            showInfo('IF (P): ' + ifPart);
+        });
+        circleP.addEventListener('mouseleave', hideInfo);
+
+        circleQ.addEventListener('mouseenter', () => {
+            const thenPart = justifyData[idx].rule.split(' then ')[1];
+            showInfo('THEN (Q): ' + thenPart);
+        });
+        circleQ.addEventListener('mouseleave', hideInfo);
+
+        // Initial Load
+        renderQuestion();
+    })();
+</script>
+</body>
+</html>
