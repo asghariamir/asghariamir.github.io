@@ -1,385 +1,388 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Integer Panel Playground</title>
-  <style>
-    :root {
-      --primary:#1565c0;
-      --negative:#c62828;
-      --light:#f5f5f5; --mid:#e0e0e0; --dark:#424242; --text:#212121;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--light);color:var(--text);display:flex;justify-content:center;align-items:center;min-height:100vh;padding:1rem}
-    .container{width:100%;max-width:840px;background:#fff;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.1);padding:1.7rem 2rem}
-    h1{text-align:center;font-size:2.2rem;color:var(--primary);margin-bottom:.2rem;font-weight:700;}
-    .subtitle{
-      text-align:center;
-      font-size:1.05rem;
-      color:var(--dark);
-      margin-bottom:1.1rem;
-      font-weight:500;
-      letter-spacing:0.01em;
-      opacity:0.79;
-    }
-    /* Main operation "tabs" as two half-width buttons */
-    .main-ops{
-      display:flex;
-      width:100%;
-      border-radius:14px;
-      overflow:hidden;
-      margin-bottom:.44rem;
-    }
-    .main-op-btn{
-      flex:1 1 50%;
-      background:var(--mid);
-      border:none;
-      color:var(--primary);
-      font-size:1.22rem;
-      font-weight:600;
-      padding:.79rem 0;
-      cursor:pointer;
-      transition:background 0.17s,color 0.17s;
-      outline:none;
-      border-radius:0;
-    }
-    .main-op-btn.active{
-      background:var(--primary);
-      color:#fff;
-      z-index:1;
-    }
-    /* Help panels row: two halves, each 50% width */
-    .help-panels-row{
-      display:flex;
-      width:100%;
-      margin-bottom:1.15rem;
-    }
-    .help-panel-half{
-      flex:1 1 50%;
-      display:flex;
-      justify-content:stretch;
-      gap:0;
-      transition:opacity 0.16s;
-    }
-    #helpAddCol{border-right:6px solid #fff;}
-    .help-panel{
-      flex:1 1 50%;
-      background:var(--mid);
-      border:none;
-      color:var(--primary);
-      font-size:1.05rem;
-      font-weight:600;
-      padding:.82rem 0;
-      cursor:pointer;
-      border-radius:0;
-      transition:background 0.15s,color 0.15s;
-      margin:0;
-      border-right:1px solid #fff;
-    }
-    #helpAddCol .help-panel{flex:1 1 50%;} /* Each 25% */
-    #helpMulCol .help-panel{flex:1 1 100%;border-right:none;} /* 50% */
-    .help-panel:last-child{border-right:none;}
-    .help-panel.active{
-      background:var(--primary);
-      color:#fff;
-    }
-    .help-panel.inactive {
-      opacity:0.4;
-      pointer-events:none;
-      cursor:default;
-    }
-    .help-panel-half.inactive{
-      opacity:0.42;
-      pointer-events:none;
-    }
-    @media (max-width:700px){
-      .main-ops, .help-panels-row{flex-direction:column;}
-      .main-op-btn, .help-panel-half, .help-panel{width:100%;flex:none;}
-      #helpAddCol{border-right:none;}
-      .help-panel-half{margin-bottom:2px;}
-    }
-    .tab-info{margin: 1.2rem 0 1rem 0;}
-    .tab-info ul{margin:.5rem 0 0 1.6rem;}
-    .tab-info strong{color:var(--primary);}
-    .back-btn {display:block;margin:1.5rem auto 0 auto;background:var(--primary);color:#fff;border:none;padding:.45rem 1.18rem;border-radius:4px;font-size:.98rem;cursor:pointer;}
-    /* ... rest of your original CSS unchanged ... */
-    .eq{display:flex;justify-content:center;align-items:center;gap:.45rem;flex-wrap:wrap;margin-bottom:.7rem}
-    .eq input[type="number"],.eq input[readonly]{width:4.6rem;padding:.35rem .4rem;font-size:1rem;border:1px solid var(--mid);border-radius:4px;background:var(--light);text-align:center}
-    .eq input[readonly]{background:#fff;font-weight:600;width:5.4rem}
-    .eq span{font-size:1.26rem;font-weight:600}
-    .eq button{background:var(--primary);color:#fff;border:none;padding:.43rem 1.1rem;border-radius:4px;font-size:.92rem;cursor:pointer}
-    .toggle-op{background:#fff;color:var(--dark);border:1px solid var(--mid)}
-    .band-wrap{display:flex;justify-content:center;gap:1rem;margin:1rem 0}
-    .side{display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-end;gap:.6rem;width:240px;min-height:260px;border:1px dashed var(--mid);border-radius:3px;padding:.5rem 0;overflow:hidden}
-    .band-line{width:4px;background:var(--dark);min-height:260px;border-radius:2px}
-    .sq{width:28px;height:28px;border:1px solid var(--mid);border-radius:4px;cursor:grab}
-    .sq.blue{background:var(--primary)}
-    .sq.red{background:var(--negative)}
-    .sq:active{cursor:grabbing}
-    .no-drop{cursor:not-allowed!important}
-    .pots{display:flex;justify-content:center;gap:1.5rem;margin-top:.3rem}
-    .pot{display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:4px;width:120px;min-height:72px;border:2px solid var(--mid);border-radius:6px;padding:6px;position:relative}
-    .pot-label{position:absolute;top:-1.2rem;left:50%;transform:translateX(-50%);font-size:.8rem;color:var(--dark)}
-    .result{text-align:center;margin-top:.7rem;font-size:1.2rem;font-weight:600}
-    .ok{color:green;animation:flash .8s ease-in-out}
-    .err{color:var(--negative);animation:shake .5s ease-in-out}
-    @keyframes flash{0%{opacity:0}50%{opacity:1}}
-    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Integer Panel Playground</title>
+    <style>
+        :root {
+            --primary: #1565c0;
+            --negative: #c62828;
+            --light: #f5f5f5;
+            --mid: #e0e0e0;
+            --dark: #424242;
+            --text: #212121;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--light); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; }
+        .container { width: 100%; max-width: 840px; background: #fff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.1); padding: 1.7rem 2rem; }
+        h1 { text-align: center; font-size: 2.2rem; color: var(--primary); margin-bottom: .2rem; font-weight: 700; }
+        .subtitle { text-align: center; font-size: 1.05rem; color: var(--dark); margin-bottom: 1.1rem; font-weight: 500; letter-spacing: 0.01em; opacity: 0.79; }
+        .main-ops { display: flex; width: 100%; border-radius: 14px; overflow: hidden; margin-bottom: .44rem; }
+        .main-op-btn { flex: 1 1 50%; background: var(--mid); border: none; color: var(--primary); font-size: 1.22rem; font-weight: 600; padding: .79rem 0; cursor: pointer; transition: background 0.17s, color 0.17s; outline: none; border-radius: 0; }
+        .main-op-btn.active { background: var(--primary); color: #fff; z-index: 1; }
+        .help-panels-row { display: flex; width: 100%; margin-bottom: 1.15rem; }
+        .help-panel-half { flex: 1 1 50%; display: flex; justify-content: stretch; gap: 0; transition: opacity 0.16s; }
+        #helpAddCol { border-right: 6px solid #fff; }
+        .help-panel { flex: 1 1 50%; background: var(--mid); border: none; color: var(--primary); font-size: 1.05rem; font-weight: 600; padding: .82rem 0; cursor: pointer; border-radius: 0; transition: background 0.15s, color 0.15s; margin: 0; border-right: 1px solid #fff; }
+        #helpAddCol .help-panel { flex: 1 1 50%; }
+        #helpMulCol .help-panel { flex: 1 1 100%; border-right: none; }
+        .help-panel:last-child { border-right: none; }
+        .help-panel.active { background: var(--primary); color: #fff; }
+        .help-panel.inactive { opacity: 0.4; pointer-events: none; cursor: default; }
+        .help-panel-half.inactive { opacity: 0.42; pointer-events: none; }
+        @media (max-width: 700px) {
+            .main-ops, .help-panels-row { flex-direction: column; }
+            .main-op-btn, .help-panel-half, .help-panel { width: 100%; flex: none; }
+            #helpAddCol { border-right: none; }
+            .help-panel-half { margin-bottom: 2px; }
+        }
+        .tab-info { margin: 1.2rem 0 1rem 0; }
+        .tab-info ul { margin: .5rem 0 0 1.6rem; }
+        .tab-info strong { color: var(--primary); }
+        .back-btn { display: block; margin: 1.5rem auto 0 auto; background: var(--primary); color: #fff; border: none; padding: .45rem 1.18rem; border-radius: 4px; font-size: .98rem; cursor: pointer; }
+        .eq { display: flex; justify-content: center; align-items: center; gap: .45rem; flex-wrap: wrap; margin-bottom: .7rem; }
+        .eq input[type="number"], .eq input[readonly] { width: 4.6rem; padding: .35rem .4rem; font-size: 1rem; border: 1px solid var(--mid); border-radius: 4px; background: var(--light); text-align: center; }
+        .eq input[readonly] { background: #fff; font-weight: 600; width: 5.4rem; }
+        .eq span { font-size: 1.26rem; font-weight: 600; }
+        .eq button { background: var(--primary); color: #fff; border: none; padding: .43rem 1.1rem; border-radius: 4px; font-size: .92rem; cursor: pointer; }
+        .toggle-op { background: #fff; color: var(--dark); border: 1px solid var(--mid); }
+        .band-wrap { display: flex; justify-content: center; gap: 1rem; margin: 1rem 0; }
+        .side { display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: .6rem; width: 240px; min-height: 260px; border: 1px dashed var(--mid); border-radius: 3px; padding: .5rem; }
+        .band-line { width: 4px; background: var(--dark); min-height: 260px; border-radius: 2px; }
+        .sq { width: 28px; height: 28px; border: 1px solid var(--mid); border-radius: 4px; cursor: grab; }
+        .sq.blue { background: var(--primary); }
+        .sq.red { background: var(--negative); }
+        .sq:active { cursor: grabbing; }
+        .no-drop { cursor: not-allowed !important; }
+        .pots { display: flex; justify-content: center; gap: 1.5rem; margin-top: .3rem; }
+        .pot { display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: 4px; width: 120px; min-height: 72px; border: 2px solid var(--mid); border-radius: 6px; padding: 6px; position: relative; }
+        .pot-label { position: absolute; top: -1.2rem; left: 50%; transform: translateX(-50%); font-size: .8rem; color: var(--dark); }
+        .result { text-align: center; margin-top: .7rem; font-size: 1.2rem; font-weight: 600; }
+        .ok { color: green; animation: flash .8s ease-in-out; }
+        .err { color: var(--negative); animation: shake .5s ease-in-out; }
+        @keyframes flash { 0% { opacity: 0; } 50% { opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Integer Panel Playground</h1>
-    <div class="subtitle">Visualize Integer Operations with Panels</div>
+    <div class="container">
+        <h1>Integer Panel Playground</h1>
+        <div class="subtitle">Visualize Integer Operations with Panels</div>
 
-    <!-- Main Operation Tabs -->
-    <div class="main-ops">
-      <button class="main-op-btn active" id="mainAdd" onclick="switchMain('addTab')">Add / Subtract</button>
-      <button class="main-op-btn" id="mainMul" onclick="switchMain('mulTab')">Multiply</button>
+        <div class="main-ops">
+            <button class="main-op-btn active" id="mainAdd" onclick="switchMain('addTab')">Add / Subtract</button>
+            <button class="main-op-btn" id="mainMul" onclick="switchMain('mulTab')">Multiply</button>
+        </div>
+
+        <div class="help-panels-row">
+            <div class="help-panel-half" id="helpAddCol">
+                <button class="help-panel" id="helpAdd" onclick="showHelp('howAddTab',this)">How to Add</button>
+                <button class="help-panel" id="helpSub" onclick="showHelp('howSubTab',this)">How to Subtract</button>
+            </div>
+            <div class="help-panel-half" id="helpMulCol">
+                <button class="help-panel" id="helpMul" onclick="showHelp('howMulTab',this)">How to Multiply</button>
+            </div>
+        </div>
+
+        <section id="addTab" class="tab active">
+            <div class="tab-info">
+                <p> When you enter the first number, its squares are automatically placed in the correct panel—right panel for positive, left panel for negative.<br>
+          Then, use the controls to add or subtract the second number. Adding or subtracting is about combining or removing squares in the two panels, following the color rules. <strong>Zero-pairing </strong>(a blue square and a red square together) makes zero and disappears. Try exploring both panels!</p>
+            </div>
+            <div class="eq">
+                <input id="aAdd" type="number" min="-9" max="9" placeholder="num 1" />
+                <button id="opToggle" class="toggle-op" aria-label="toggle plus minus">+</button>
+                <input id="bAdd" type="number" min="-9" max="9" placeholder="num 2" />
+                <span>=</span>
+                <input id="ansAdd" readonly placeholder="?" />
+                <button id="doneAdd">Done</button>
+                <button id="resetAdd" style="background:var(--dark)">Reset</button>
+            </div>
+            <div class="band-wrap">
+                <div class="side" id="leftAdd"></div>
+                <div class="band-line"></div>
+                <div class="side" id="rightAdd"></div>
+            </div>
+            <div class="pots">
+                <div class="pot" id="redPot"><span class="pot-label">Red (–1)</span></div>
+                <div class="pot" id="bluePot"><span class="pot-label">Blue (+1)</span></div>
+            </div>
+            <div id="feedAdd" class="result"></div>
+        </section>
+
+        <section id="mulTab" class="tab" style="display:none;">
+            <div class="tab-info">
+                <p> Enter a number in either box to place its blocks in the correct panel. To multiply, use <strong>Replicate</strong> for positive multipliers or <strong>Flip</strong> for negative multipliers. The order of operations (flip then replicate, or vice versa) doesn't change the correct answer. Explore both!</p>
+            </div>
+            <div class="eq">
+                <input id="aMul" type="number" min="-5" max="5" placeholder="num 1" />
+                <span>×</span>
+                <input id="bMul" type="number" min="-5" max="5" placeholder="num 2" />
+                <span>=</span>
+                <input id="ansMul" readonly placeholder="?" />
+                <button id="flipMul">Flip</button>
+                <button id="repMul">Replicate</button>
+                <button id="submitMul">Submit</button>
+                <button id="resetMul" style="background:var(--dark)">Reset</button>
+            </div>
+            <div class="band-wrap">
+                <div class="side" id="leftMul"></div>
+                <div class="band-line"></div>
+                <div class="side" id="rightMul"></div>
+            </div>
+            <div id="feedMul" class="result"></div>
+        </section>
+
+        <section id="howAddTab" class="tab" style="display:none;">
+            <div class="tab-info">
+                <strong>How to Add Integers Using the Panels:</strong>
+                <ul>
+                    <li>Enter your <strong>first number</strong>. Blue squares for positive go into the <strong>right panel</strong>, red squares for negative into the <strong>left panel</strong>.</li>
+                    <li>Add your <strong>second number</strong> by dragging squares from the red and blue pots below.</li>
+                    <li>If it’s the <strong>same color</strong> (e.g., adding blues to blues), just place them together.</li>
+                    <li>If you’re adding <strong>opposite colors</strong> (e.g., positive plus negative), pairs of blue and red squares form zero-pairs and disappear when you hit "Done". What’s left is your answer!</li>
+                </ul>
+            </div>
+            <button class="back-btn" onclick="backToWorkspace()">Back to workspace</button>
+        </section>
+        <section id="howSubTab" class="tab" style="display:none;">
+             <div class="tab-info">
+                <strong>How to Subtract Integers Using the Panels:</strong>
+                 <ul>
+                     <li>Enter your <strong>first number</strong> to set the panels.</li>
+                     <li>To subtract, you must be able to "take away" the correct color of squares.</li>
+                     <li>If you’re subtracting the <strong>same color</strong> (e.g., 5 blue − 2 blue), just drag 2 blue squares out of the panel.</li>
+                     <li>If you don’t have enough to subtract (e.g., 2 blue − 5 blue), add <strong>zero-pairs</strong> (one red, one blue) from the pots until you have enough to take away. Then remove the required squares.</li>
+                 </ul>
+             </div>
+            <button class="back-btn" onclick="backToWorkspace()">Back to workspace</button>
+        </section>
+        <section id="howMulTab" class="tab" style="display:none;">
+             <div class="tab-info">
+                <strong>How to Multiply Integers Using the Panels:</strong>
+                <ul>
+                    <li>Choose the <strong>first number</strong>: its blocks appear in the correct panel.</li>
+                    <li>If you multiply by a <strong>positive</strong> number, just <strong>replicate</strong> (add lots) that many times. Example: (–3) × 2 means you start with one block of 3 reds, and you replicate it once more.</li>
+                    <li>If you multiply by a <strong>negative</strong> number, you must use the <strong>Flip</strong> button. You can flip first then replicate, or replicate then flip all the blocks. The result is the same!</li>
+                </ul>
+             </div>
+            <button class="back-btn" onclick="backToWorkspace()">Back to workspace</button>
+        </section>
     </div>
-
-    <!-- Help Panels Row: Side by Side Under Parent -->
-    <div class="help-panels-row">
-      <!-- Left half: Add/Subtract help (two buttons) -->
-      <div class="help-panel-half" id="helpAddCol">
-        <button class="help-panel" id="helpAdd" onclick="showHelp('howAddTab',this)">How to Add</button>
-        <button class="help-panel" id="helpSub" onclick="showHelp('howSubTab',this)">How to Subtract</button>
-      </div>
-      <!-- Right half: Multiply help (one button) -->
-      <div class="help-panel-half" id="helpMulCol">
-        <button class="help-panel" id="helpMul" onclick="showHelp('howMulTab',this)">How to Multiply</button>
-      </div>
-    </div>
-
-    <!-- ADD / SUBTRACT -->
-    <section id="addTab" class="tab active">
-      <div class="tab-info">
-        <p>
-          <strong>First Number First:</strong> When you enter the first number, its squares are automatically placed in the correct panel—right panel for positive, left panel for negative.<br>
-          Then, use the controls to add or subtract the second number. Adding or subtracting is about combining or removing squares in the two panels, following the color rules. Zero-pairing (a blue square and a red square together) makes zero and disappears. Try exploring both panels!
-        </p>
-      </div>
-      <div class="eq">
-        <input id="aAdd" type="number" min="-9" max="9" value="3" />
-        <button id="opToggle" class="toggle-op" aria-label="toggle plus minus">+</button>
-        <input id="bAdd" type="number" min="-9" max="9" value="2" />
-        <span>=</span>
-        <input id="ansAdd" readonly placeholder="?" />
-        <button id="doneAdd">Done</button>
-        <button id="resetAdd" style="background:var(--dark)">Reset</button>
-      </div>
-      <div class="band-wrap">
-        <div class="side" id="leftAdd"></div>
-        <div class="band-line"></div>
-        <div class="side" id="rightAdd"></div>
-      </div>
-      <div class="pots">
-        <div class="pot" id="bluePot"><span class="pot-label">Blue (+1)</span></div>
-        <div class="pot" id="redPot"><span class="pot-label">Red (–1)</span></div>
-      </div>
-      <div id="feedAdd" class="result"></div>
-    </section>
-
-    <!-- MULTIPLY -->
-    <section id="mulTab" class="tab" style="display:none;">
-      <div class="tab-info">
-        <p>
-          <strong>First Number First:</strong> When you enter the first number, its squares are automatically placed in the correct panel.<br>
-          To multiply by a <strong>positive</strong> number, just add that many lots (replicate columns) to get the answer.<br>
-          To multiply by a <strong>negative</strong> number, you must use the <strong>Flip</strong> button at some stage—before or after replicating—then add the lots. Either approach leads to the same answer. Try it out!
-        </p>
-      </div>
-      <div class="eq">
-        <input id="aMul" type="number" min="-4" max="4" value="2" />
-        <span>×</span>
-        <input id="bMul" type="number" min="-4" max="4" value="-3" />
-        <span>=</span>
-        <input id="ansMul" readonly placeholder="?" />
-        <button id="flipMul">Flip</button>
-        <button id="repMul">Replicate</button>
-        <button id="submitMul">Submit</button>
-        <button id="resetMul" style="background:var(--dark)">Reset</button>
-      </div>
-      <div class="band-wrap">
-        <div class="side" id="leftMul"></div>
-        <div class="band-line"></div>
-        <div class="side" id="rightMul"></div>
-      </div>
-      <div id="feedMul" class="result"></div>
-    </section>
-
-    <!-- HOW TO ADD -->
-    <section id="howAddTab" class="tab" style="display:none;">
-      <div class="tab-info">
-        <strong>How to Add Integers Using the Panels:</strong>
-        <ul>
-          <li>Enter your <strong>first number</strong>. Blue squares for positive go into the <strong>right panel</strong>, red squares for negative into the <strong>left panel</strong>.</li>
-          <li>Add your <strong>second number</strong> by clicking <strong>+</strong>.</li>
-          <li>If it’s the <strong>same color</strong> (e.g., adding positives to positives), just place all the squares together. The answer is all in the right panel.</li>
-          <li>If you’re <strong>adding opposite colors</strong> (e.g., positive plus negative), pairs of blue and red squares form zero-pairs and disappear. What’s left in each panel is your answer!</li>
-        </ul>
-        <div style="margin-top:1.1rem;">
-          <strong>Example:</strong> Add 3 + (–2). Place 3 blue squares in the right panel and 2 red in the left. One blue and one red can cancel (zero-pair), leaving 2 blue in the right and 1 red in the left. The answer is what you see!
-        </div>
-      </div>
-      <button class="back-btn" onclick="backToWorkspace()">Back to workspace</button>
-    </section>
-
-    <!-- HOW TO SUBTRACT -->
-    <section id="howSubTab" class="tab" style="display:none;">
-      <div class="tab-info">
-        <strong>How to Subtract Integers Using the Panels:</strong>
-        <ul>
-          <li>Enter your <strong>first number</strong>. Its squares appear in the correct panel automatically.</li>
-          <li>To subtract a number, click the <strong>–</strong> button and enter the second number.</li>
-          <li>If you’re subtracting the <strong>same color</strong> (e.g., subtracting 2 blue from 5 blue in the right panel), just take those away.</li>
-          <li>If you don’t have enough to subtract, add zero-pairs: for example, to do 5 – 7, convert to (5 + 2) and (–2), then take away 7 blue from the right panel, using the extra squares from zero-pairs.</li>
-          <li>If you subtract a negative (e.g., 2 – (–3)), you add that many blue squares to the right panel, and then remove the red squares.</li>
-        </ul>
-        <div style="margin-top:1.1rem;">
-          <strong>Example:</strong> To compute 5 – 7, first add two zero-pairs to have 7 blue squares in the right panel and 2 red in the left. Now, you can take away 7 blue, and what’s left is your answer!
-        </div>
-      </div>
-      <button class="back-btn" onclick="backToWorkspace()">Back to workspace</button>
-    </section>
-
-    <!-- HOW TO MULTIPLY -->
-    <section id="howMulTab" class="tab" style="display:none;">
-      <div class="tab-info">
-        <strong>How to Multiply Integers Using the Panels:</strong>
-        <ul>
-          <li>Choose the <strong>first number</strong>: its squares appear in the appropriate panel.</li>
-          <li>If you multiply by a <strong>positive</strong> number, just replicate (add lots) that many times. For example, (–3) × 2: add another column of 3 reds; your answer is all the squares combined.</li>
-          <li>If you multiply by a <strong>negative</strong> number, you must use the <strong>Flip</strong> button at some stage. You can flip first, then replicate; or replicate first, then flip—the result will be the same. Try both ways to see!</li>
-        </ul>
-        <div style="margin-top:1.1rem;">
-          <strong>Example:</strong> To find (–3) × (–2): first, see 3 reds appear. You can either flip them to 3 blues, then replicate (add another 3 blues), or replicate (add another column of 3 reds), then flip both columns to 3 blues each. The answer is always 6 blue squares.
-        </div>
-      </div>
-      <button class="back-btn" onclick="backToWorkspace()">Back to workspace</button>
-    </section>
-  </div>
 
 <script>
-const $ = id => document.getElementById(id);
-const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
-const makeSq = col => { const d=document.createElement('div'); d.className='sq '+col; d.draggable=true; return d; };
+    const $ = id => document.getElementById(id);
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const makeSq = col => { const d = document.createElement('div'); d.className = 'sq ' + col; d.draggable = true; return d; };
 
-// Main operation and help navigation
-function switchMain(tabId) {
-  document.getElementById('mainAdd').classList.toggle('active',tabId==='addTab');
-  document.getElementById('mainMul').classList.toggle('active',tabId==='mulTab');
-  document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
-  $(tabId).style.display='block';
-  // Help panels: enable/disable correct group
-  if(tabId==='addTab'){
-    document.getElementById('helpAddCol').classList.remove('inactive');
-    document.getElementById('helpMulCol').classList.add('inactive');
-  } else {
-    document.getElementById('helpAddCol').classList.add('inactive');
-    document.getElementById('helpMulCol').classList.remove('inactive');
-  }
-  // Clear help button highlights
-  document.querySelectorAll('.help-panel').forEach(b=>b.classList.remove('active'));
-}
-function showHelp(helpId, btn){
-  document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
-  $(helpId).style.display='block';
-  document.querySelectorAll('.help-panel').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
-function backToWorkspace(){
-  if(document.getElementById('mainAdd').classList.contains('active')){
+    // --- Global State ---
+    let activeTabId = 'addTab';
+    let addPanelsLocked = false;
+    let mulPanelsLocked = false;
+
+    // --- Navigation ---
+    function switchMain(tabId) {
+        activeTabId = tabId;
+        $('mainAdd').classList.toggle('active', tabId === 'addTab');
+        $('mainMul').classList.toggle('active', tabId === 'mulTab');
+        document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
+        $(tabId).style.display = 'block';
+        $('helpAddCol').classList.toggle('inactive', tabId !== 'addTab');
+        $('helpMulCol').classList.toggle('inactive', tabId !== 'mulTab');
+        document.querySelectorAll('.help-panel').forEach(b => b.classList.remove('active'));
+    }
+
+    function showHelp(helpId, btn) {
+        document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
+        $(helpId).style.display = 'block';
+        document.querySelectorAll('.help-panel').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function backToWorkspace() {
+        switchMain(activeTabId);
+    }
+
+    // --- UTILITY ---
+    function drawSquares(container, count, color) {
+        for (let i = 0; i < count; i++) container.appendChild(makeSq(color));
+    }
+
+    // --- ADD / SUBTRACT ---
+    const leftA = $('leftAdd'), rightA = $('rightAdd');
+    const bluePot = $('bluePot'), redPot = $('redPot');
+    let dragEl = null;
+
+    function initializeAddPanels() {
+        if (addPanelsLocked) return;
+
+        const aVal = $('aAdd').value;
+        const bVal = $('bAdd').value;
+        let initialValue = null;
+
+        if (aVal && !bVal) initialValue = aVal;
+        else if (bVal && !aVal) initialValue = bVal;
+        else if (!aVal && !bVal) {
+            leftA.innerHTML = '';
+            rightA.innerHTML = '';
+            updateAddAns();
+            return;
+        } else return;
+        
+        const num = clamp(parseInt(initialValue, 10), -9, 9);
+        leftA.innerHTML = '';
+        rightA.innerHTML = '';
+        if (num > 0) drawSquares(rightA, num, 'blue');
+        else if (num < 0) drawSquares(leftA, -num, 'red');
+        updateAddAns();
+    }
+
+    $('aAdd').addEventListener('input', initializeAddPanels);
+    $('bAdd').addEventListener('input', initializeAddPanels);
+
+    $('resetAdd').onclick = () => {
+        addPanelsLocked = false;
+        ['aAdd', 'bAdd', 'ansAdd', 'feedAdd'].forEach(id => $(id).value = '');
+        leftA.innerHTML = '';
+        rightA.innerHTML = '';
+        $('opToggle').textContent = '+';
+    };
+    
+    function replenish(pot, col) { while (pot.children.length < 10) pot.appendChild(makeSq(col)); }
+    replenish(bluePot, 'blue');
+    replenish(redPot, 'red');
+
+    document.body.addEventListener('dragstart', e => { if (e.target.classList.contains('sq')) dragEl = e.target; });
+    document.body.addEventListener('dragend', () => { dragEl = null; });
+    [bluePot, redPot, leftA, rightA].forEach(el => el.addEventListener('dragover', e => e.preventDefault()));
+
+    function onDrop(e) {
+        e.preventDefault();
+        if (!dragEl) return;
+        addPanelsLocked = true; // Lock panels once user starts dragging
+        e.currentTarget.appendChild(dragEl);
+        updateAddAns();
+        replenish(bluePot, 'blue');
+        replenish(redPot, 'red');
+    }
+
+    bluePot.ondrop = onDrop;
+    redPot.ondrop = onDrop;
+    leftA.ondrop = onDrop;
+    rightA.ondrop = onDrop;
+
+    function cancelPairs() {
+        const reds = [...leftA.querySelectorAll('.sq.red')];
+        const blues = [...rightA.querySelectorAll('.sq.blue')];
+        const n = Math.min(reds.length, blues.length);
+        for (let i = 0; i < n; i++) {
+            reds[i].remove();
+            blues[i].remove();
+        }
+    }
+
+    function updateAddAns() {
+        const currentVal = rightA.querySelectorAll('.sq.blue').length - leftA.querySelectorAll('.sq.red').length;
+        $('ansAdd').value = currentVal;
+        return currentVal;
+    }
+
+    $('doneAdd').onclick = () => {
+        addPanelsLocked = true;
+        cancelPairs();
+        const actual = updateAddAns();
+        const a = parseInt($('aAdd').value || 0, 10);
+        const b = parseInt($('bAdd').value || 0, 10);
+        const op = $('opToggle').textContent === '+' ? 1 : -1;
+        const expected = a + op * b;
+        const f = $('feedAdd');
+        f.textContent = actual === expected ? '✔ Correct!' : '✖ Try again…';
+        f.className = 'result ' + (actual === expected ? 'ok' : 'err');
+    };
+
+    // --- MULTIPLICATION ---
+    const leftM = $('leftMul'), rightM = $('rightMul');
+
+    function initializeMulPanels() {
+        if (mulPanelsLocked) return;
+        const aVal = $('aMul').value;
+        const bVal = $('bMul').value;
+        let initialValue = null;
+
+        if (aVal && !bVal) initialValue = aVal;
+        else if (bVal && !aVal) initialValue = bVal;
+        else if (!aVal && !bVal) {
+            leftM.innerHTML = '';
+            rightM.innerHTML = '';
+            updateMulAns();
+            return;
+        } else return;
+        
+        leftM.innerHTML = '';
+        rightM.innerHTML = '';
+        const num = clamp(parseInt(initialValue || 0, 10), -5, 5);
+        if (num !== 0) {
+            const colDiv = document.createElement('div');
+            const color = num > 0 ? 'blue' : 'red';
+            drawSquares(colDiv, Math.abs(num), color);
+            const targetPanel = num > 0 ? rightM : leftM;
+            targetPanel.appendChild(colDiv);
+        }
+        updateMulAns();
+    }
+    
+    $('aMul').addEventListener('input', initializeMulPanels);
+    $('bMul').addEventListener('input', initializeMulPanels);
+
+    function lockMulPanels() { mulPanelsLocked = true; }
+    $('flipMul').addEventListener('click', () => {
+        lockMulPanels();
+        const colsLeft = [...leftM.children];
+        const colsRight = [...rightM.children];
+        colsRight.forEach(col => leftM.appendChild(col));
+        colsLeft.forEach(col => rightM.appendChild(col));
+        [...leftM.querySelectorAll('.sq'), ...rightM.querySelectorAll('.sq')].forEach(sq => {
+            sq.classList.toggle('blue');
+            sq.classList.toggle('red');
+        });
+        updateMulAns();
+    });
+
+    $('repMul').addEventListener('click', () => {
+        lockMulPanels();
+        const srcPanel = rightM.children.length ? rightM : leftM;
+        if (!srcPanel.children.length) return;
+        srcPanel.appendChild(srcPanel.children[0].cloneNode(true));
+        updateMulAns();
+    });
+
+    function updateMulAns() {
+        const currentVal = rightM.querySelectorAll('.sq.blue').length - leftM.querySelectorAll('.sq.red').length;
+        $('ansMul').value = currentVal;
+        return currentVal;
+    }
+
+    $('submitMul').onclick = () => {
+        lockMulPanels();
+        const actual = updateMulAns();
+        const a = parseInt($('aMul').value || 0, 10);
+        const b = parseInt($('bMul').value || 0, 10);
+        const expected = a * b;
+        const f = $('feedMul');
+        f.textContent = actual === expected ? '✔ Correct!' : '✖ Try again…';
+        f.className = 'result ' + (actual === expected ? 'ok' : 'err');
+    };
+
+    $('resetMul').onclick = () => {
+        mulPanelsLocked = false;
+        ['aMul', 'bMul', 'ansMul', 'feedMul'].forEach(id => $(id).value = '');
+        leftM.innerHTML = '';
+        rightM.innerHTML = '';
+    };
+
+    // --- Initial Setup ---
     switchMain('addTab');
-  }else{
-    switchMain('mulTab');
-  }
-}
-
-// ADD / SUBTRACT logic (unchanged)
-const leftA=$('leftAdd'), rightA=$('rightAdd');
-const bluePot=$('bluePot'), redPot=$('redPot');
-let dragEl=null;
-function replenish(pot,col){while(pot.children.length<6)pot.appendChild(makeSq(col));}
-replenish(bluePot,'blue'); replenish(redPot,'red');
-
-document.body.addEventListener('dragstart',e=>{if(e.target.classList.contains('sq')) dragEl=e.target;});
-document.body.addEventListener('dragend',()=>{dragEl=null});
-[bluePot,redPot,leftA,rightA].forEach(el=>el.addEventListener('dragover',e=>e.preventDefault()));
-function dropFactory(target,isRight){return e=>{e.preventDefault();if(!dragEl)return;const blue=dragEl.classList.contains('blue');
-  if(target.classList.contains('pot')||(blue&&isRight)||(!blue&&!isRight)){
-    target.appendChild(dragEl);
-    updateAddAns();
-    replenish(bluePot,'blue'); replenish(redPot,'red');
-  } else {
-    dragEl.classList.add('no-drop'); setTimeout(()=>dragEl.classList.remove('no-drop'),300);
-  }
-}}
-bluePot.ondrop=dropFactory(bluePot,false);
-redPot.ondrop=dropFactory(redPot,false);
-leftA.ondrop=dropFactory(leftA,false);
-rightA.ondrop=dropFactory(rightA,true);
-
-function drawAAdd(){
-  leftA.innerHTML=''; rightA.innerHTML='';
-  const a=clamp(parseInt($('aAdd').value||0,10),-9,9);
-  if(a>0){for(let i=0;i<a;i++) rightA.appendChild(makeSq('blue'));}
-  else if(a<0){for(let i=0;i<-a;i++) leftA.appendChild(makeSq('red'));}
-  updateAddAns();
-}
-$('aAdd').addEventListener('input',drawAAdd); drawAAdd();
-$('opToggle').onclick=()=>{$('opToggle').textContent=$('opToggle').textContent==='+'?'−':'+'};
-function cancelPairs(){const reds=[...leftA.querySelectorAll('.sq.red')];const blues=[...rightA.querySelectorAll('.sq.blue')];const n=Math.min(reds.length,blues.length);for(let i=0;i<n;i++){reds[i].remove(); blues[i].remove();}}
-function updateAddAns(){ $('ansAdd').value = rightA.querySelectorAll('.sq.blue').length - leftA.querySelectorAll('.sq.red').length; }
-$('doneAdd').onclick=()=>{
-  cancelPairs(); updateAddAns();
-  const a=parseInt($('aAdd').value||0,10);
-  const b=parseInt($('bAdd').value||0,10);
-  const op=$('opToggle').textContent==='+'?1:-1;
-  const expected=a+op*b;
-  const actual=parseInt($('ansAdd').value||0,10);
-  const f=$('feedAdd'); f.textContent=actual===expected?'✔ Correct!':'✖ Try again…'; f.className='result '+(actual===expected?'ok':'err');
-};
-$('resetAdd').onclick=()=>{ $('bAdd').value=''; $('feedAdd').textContent=''; drawAAdd(); };
-
-// MULTIPLICATION logic (unchanged except FLIP earlier)
-const leftM=$('leftMul'), rightM=$('rightMul');
-function drawAMul(){
-  leftM.innerHTML=''; rightM.innerHTML='';
-  const a=clamp(parseInt($('aMul').value||0,10),-4,4);
-  if(a>0){const col=document.createElement('div'); for(let i=0;i<a;i++) col.appendChild(makeSq('blue')); rightM.appendChild(col);}
-  else if(a<0){const col=document.createElement('div'); for(let i=0;i<-a;i++) col.appendChild(makeSq('red')); leftM.appendChild(col);}
-  updateMulAns();
-}
-$('aMul').addEventListener('input',drawAMul); drawAMul();
-$('flipMul').onclick = () => {
-  const colsLeft = [...leftM.children];
-  const colsRight = [...rightM.children];
-  colsRight.forEach(col => leftM.appendChild(col));
-  colsLeft.forEach(col => rightM.appendChild(col));
-  [...leftM.querySelectorAll('.sq'), ...rightM.querySelectorAll('.sq')].forEach(sq => {
-    sq.classList.toggle('blue');
-    sq.classList.toggle('red');
-  });
-  updateMulAns();
-};
-$('repMul').onclick=()=>{
-  const src=rightM.children.length?rightM:leftM;
-  if(!src.children.length) return;
-  src.appendChild(src.children[0].cloneNode(true));
-  updateMulAns();
-};
-function updateMulAns(){ $('ansMul').value = rightM.querySelectorAll('.sq.blue').length - leftM.querySelectorAll('.sq.red').length; }
-$('submitMul').onclick=()=>{
-  updateMulAns();
-  const a=parseInt($('aMul').value||0,10);
-  const b=parseInt($('bMul').value||0,10);
-  const expected=a*b;
-  const actual=parseInt($('ansMul').value||0,10);
-  const f=$('feedMul'); f.textContent=actual===expected?'✔ Correct!':'✖ Try again…'; f.className='result '+(actual===expected?'ok':'err');
-};
-$('resetMul').onclick=()=>{ $('feedMul').textContent=''; $('ansMul').value=''; drawAMul(); };
 </script>
 </body>
 </html>
