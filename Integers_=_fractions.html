@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Integers=Fractions</title>
+    <style>
+        :root {
+            --primary: #0d47a1;
+            --success: #2e7d32;
+            --gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark: #37474f;
+            --border: #bdbdbd;
+            --light-blue-bg: #e3f2fd;
+            /* Integer Colors */
+            --int-pos: #1565c0;
+            /* Blue */
+            --int-neg: #c62828;
+            /* Red */
+            /* Fraction Colors */
+            --frac-axis: #ff8f00;
+            /* Orange - from App 1 */
+            --div-area-color: rgba(46, 125, 50, 0.5);
+            /* Green - from App 2 */
+            --div-known-side-color: #ff8f00;
+            /* Orange - from App 2 */
+            --div-unknown-side-color: #c62828;
+            /* Red - from App 2 */
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: linear-gradient(135deg, #f0f4f8 0%, #e9ecef 100%);
+            color: var(--dark); 
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        h1 { 
+            text-align: center; 
+            margin: 2rem 0 1rem; 
+            color: var(--primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .app { 
+            max-width: 940px; 
+            margin: 0 auto 2rem; 
+            padding: 0 1rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* --- Tabs --- */
+        .tabs { 
+            display: flex; 
+            margin: 0;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .tab-btn { 
+            flex: 1; 
+            background: none; 
+            border: none; 
+            padding: 1.2rem 1rem; 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            border-bottom: 3px solid transparent; 
+            color: #6c757d;
+            transition: all 0.3s ease;
+            position: relative;
+            white-space: nowrap;
+            min-width: 140px;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(13, 71, 161, 0.05);
+            color: var(--primary);
+        }
+        
+        .tab-btn .op-icon { 
+            font-size: 1.3rem; 
+            margin-right: 8px; 
+            font-weight: 700;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        
+        .tab-btn:hover .op-icon {
+            transform: scale(1.1);
+        }
+        
+        .tab-btn.active { 
+            color: var(--primary); 
+            border-bottom-color: var(--primary);
+            background: white;
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: white;
+        }
+        
+        .tab { 
+            display: none;
+            padding: 2rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .tab.active { 
+            display: block; 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Common Elements --- */
+        .master { 
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 1.25rem; 
+            border-radius: 12px; 
+            font-size: 1.35rem; 
+            font-weight: 600; 
+            text-align: center; 
+            margin-bottom: 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.5rem; 
+            flex-wrap: wrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid rgba(13, 71, 161, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .master:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+        
+        .master.green { 
+            color: var(--success);
+            background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
+            border-color: rgba(46, 125, 50, 0.2);
+        }
+        
+        .workbox { 
+            border: 2px dashed var(--border); 
+            border-radius: 12px; 
+            padding: 1.5rem;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+        }
+        
+        .workbox:hover {
+            border-color: #9e9e9e;
+            background: #f8f9fa;
+        }
+        
+        .btn { 
+            background: linear-gradient(135deg, var(--primary) 0%, #1565c0 100%);
+            color: #fff; 
+            border: none; 
+            padding: 0.65rem 1.5rem; 
+            font-size: 0.95rem; 
+            font-weight: 500;
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 71, 161, 0.35);
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(13, 71, 161, 0.25);
+        }
+        
+        .btn:disabled { 
+            background: linear-gradient(135deg, #cfd8dc 0%, #b0bec5 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .ctrls { 
+            margin: 1.5rem 0; 
+            display: flex; 
+            gap: 12px; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .intro, .summary-box { 
+            margin-bottom: 1.5rem; 
+            padding: 1.25rem; 
+            background: linear-gradient(135deg, var(--light-blue-bg) 0%, #ffffff 100%);
+            border-left: 4px solid var(--primary); 
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .intro p, .summary-box p, .summary-box li {
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .summary-box ul {
+            padding-left: 20px;
+            margin-top: 0.5rem;
+        }
+        
+        .message-box { 
+            min-height: 48px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            font-weight: 500; 
+            color: var(--primary);
+            font-size: 0.95rem;
+            padding: 0.75rem;
+            background: rgba(13, 71, 161, 0.05);
+            border-radius: 8px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .message-box:empty {
+            display: none;
+        }
+        
+        input[type=number] { 
+            width: 60px; 
+            padding: 6px 8px; 
+            margin: 0 4px; 
+            text-align: center; 
+            border: 2px solid #e9ecef;
+            border-radius: 6px; 
+            appearance: textfield; 
+            -moz-appearance: textfield; 
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        input[type=number]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1);
+        }
+        
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        
+        .pair-inputs { 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            gap: 4px; 
+            align-items: center; 
+            border: 2px solid #e9ecef;
+            border-radius: 8px; 
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .pair-inputs span { 
+            padding: 0 8px; 
+            font-weight: bold; 
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .pair-inputs input { 
+            border: none; 
+            width: 50px; 
+            padding: 8px 4px; 
+            text-align: center; 
+            font-size: 1.1rem; 
+            background: transparent;
+            font-weight: 500;
+        }
+        
+        .pair-inputs input:focus {
+            outline: none;
+            background: rgba(13, 71, 161, 0.05);
+        }
+        
+        /* --- Integer Squares --- */
+        .sq { 
+            width: 18px; 
+            height: 18px; 
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .sq:hover {
+            transform: scale(1.1);
+        }
+        
+        .blue { 
+            background: linear-gradient(135deg, var(--int-pos) 0%, #1976d2 100%);
+        }
+        
+        .red { 
+            background: linear-gradient(135deg, var(--int-neg) 0%, #d32f2f 100%);
+        }
+
+        /* --- Integer Addition Specific --- */
+        .int-add-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 8px 1fr; 
+            margin-bottom: 1rem;
+            gap: 8px;
+        }
+        
+        .int-add-box { 
+            min-height: 80px; 
+            border: 2px dashed var(--border); 
+            border-radius: 8px;
+            padding: 12px; 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-content: flex-start; 
+            gap: 4px;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+        }
+        
+        .int-add-box:hover {
+            border-color: #9e9e9e;
+            background: #f8f9fa;
+        }
+        
+        .int-add-divider { 
+            background: repeating-linear-gradient(
+                to bottom, 
+                var(--primary) 0 3px, 
+                transparent 3px 8px
+            );
+            border-radius: 2px;
+        }
+        
+        .int-add-regroup { 
+            border: 2px dashed var(--border); 
+            border-radius: 8px;
+            padding: 12px; 
+            min-height: 80px; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-auto-rows: min-content;
+            gap: 12px;
+            background: #fafbfc;
+        }
+        
+        .int-add-cell { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 4px; 
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            min-height: 50px;
+            border: 1px solid #e9ecef;
+        }
+
+        /* --- Fraction Multiplication Specific --- */
+        .frac-mul-wrapper .shade { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            background: linear-gradient(135deg, rgba(67, 160, 71, 0.7) 0%, rgba(76, 175, 80, 0.6) 100%);
+            pointer-events: none; 
+            transition: width 1.5s ease-out, height 1.5s ease-out;
+            border-radius: 2px;
+        }
+        
+        .frac-mul-wrapper .axis { 
+            position: absolute; 
+            background: var(--frac-axis); 
+            pointer-events: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .frac-mul-wrapper .grid-line { 
+            position: absolute; 
+            background: var(--border); 
+            box-sizing: border-box;
+            opacity: 0.6;
+        }
+        
+        .frac-mul-wrapper .fraction-input-wrapper { 
+            display: none; 
+            align-items: center; 
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(13, 71, 161, 0.05);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+        
+        /* --- Shared Fraction Styles --- */
+        .fraction-input { 
+            display: inline-flex; 
+            flex-direction: column; 
+            text-align: center; 
+            border: 2px solid #e9ecef;
+            border-radius: 8px; 
+            padding: 6px 8px; 
+            background: white; 
+            vertical-align: middle;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .fraction-input:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+        
+        .fraction-input .num, 
+        .fraction-input .den { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 4px; 
+            padding: 4px;
+            font-weight: 500;
+        }
+        
+        .fraction-input .den { 
+            border-top: 2px solid var(--dark);
+            margin-top: 2px;
+            padding-top: 6px;
+        }
+
+        /* --- Integer Subtraction Specific --- */
+        .sub-explanation { 
+            text-align: center; 
+            font-weight: 500; 
+            padding: 1rem; 
+            margin-bottom: 1.5rem; 
+            background: linear-gradient(135deg, var(--light-blue-bg) 0%, #ffffff 100%);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .sub-visual-model { 
+            display: grid; 
+            grid-template-rows: 1fr; 
+            gap: 1.5rem; 
+        }
+        
+        .sub-target-box-container { 
+            border: 3px solid var(--primary); 
+            border-radius: 12px; 
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            box-shadow: 0 4px 12px rgba(13, 71, 161, 0.1);
+        }
+        
+        .sub-part-part-container { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1.5rem; 
+        }
+        
+        .sub-box { 
+            min-height: 80px; 
+            padding: 1rem; 
+            border: 2px dashed var(--border); 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 4px;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+        }
+        
+        .sub-box:hover {
+            border-color: #9e9e9e;
+            background: #f8f9fa;
+        }
+        
+        #intSubTab .guided-workspace { 
+            border: 2px dashed var(--primary); 
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, rgba(13, 71, 161, 0.05) 0%, #ffffff 100%);
+        }
+        
+        #intSubTab .guided-step { 
+            display: none; 
+        }
+        
+        #intSubTab .guided-step.active { 
+            display: block; 
+            text-align: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        #intSubTab .guided-step p {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+        
+        #intSubTab .sub-input-area { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.5rem; 
+            margin-top: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        /* --- Fraction Division Specific --- */
+        #fracDivTab .main-container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 2rem; 
+            align-items: flex-start; 
+        }
+        
+        #fracDivTab .geometry-container { 
+            flex: 1; 
+            min-width: 320px; 
+        }
+        
+        #fracDivTab .algebra-container { 
+            flex: 1; 
+            min-width: 300px; 
+            padding-top: 1rem; 
+        }
+        
+        #fracDivTab .unitSquare { 
+            height: 320px; 
+            width: 320px; 
+            position: relative; 
+            background: white; 
+            margin: 1.5rem auto; 
+            transition: width 0.5s ease-out;
+            border-radius: 2px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        #fracDivTab .grid-line { 
+            position: absolute; 
+            background: var(--border); 
+            box-sizing: border-box;
+            opacity: 0.6;
+        }
+        
+        #fracDivTab .div-shade { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 2; 
+            background: var(--div-area-color); 
+            pointer-events: none;
+            border-radius: 2px;
+        }
+        
+        #fracDivTab .div-known-side-marker { 
+            position: absolute; 
+            left: -10px; 
+            top: 0; 
+            width: 6px; 
+            background: var(--div-known-side-color); 
+            pointer-events: none; 
+            border-radius: 3px; 
+            z-index: 3;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        #fracDivTab .div-unknown-side-marker { 
+            position: absolute; 
+            left: 0; 
+            top: -10px; 
+            height: 6px; 
+            background: var(--div-unknown-side-color); 
+            pointer-events: none; 
+            border-radius: 3px; 
+            z-index: 3;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        #fracDivTab .algebra-playground { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 0.75rem; 
+        }
+        
+        #fracDivTab .algebra-bottom-row { 
+            display: flex; 
+            gap: 0.75rem; 
+        }
+        
+        #fracDivTab .div-frac-box { 
+            width: 140px; 
+            height: 80px; 
+            padding: 0.75rem; 
+            border: 3px solid var(--border); 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 6px; 
+            background: white; 
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        #fracDivTab .div-frac-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        #fracDivTab .div-frac-box.target { 
+            border-color: var(--div-area-color);
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.05) 0%, #ffffff 100%);
+        }
+        
+        #fracDivTab .div-frac-box.known { 
+            border-color: var(--div-known-side-color);
+            background: linear-gradient(135deg, rgba(255, 143, 0, 0.05) 0%, #ffffff 100%);
+        }
+        
+        #fracDivTab .div-frac-box.unknown { 
+            border-color: var(--div-unknown-side-color); 
+            border-style: dashed;
+            background: linear-gradient(135deg, rgba(198, 40, 40, 0.05) 0%, #ffffff 100%);
+        }
+        
+        #fracDivTab .div-frac-box.solved { 
+            border-style: solid; 
+            border-color: var(--div-unknown-side-color);
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        #fracDivTab .algebra-step { 
+            margin-top: 1.5rem; 
+            padding: 1.25rem; 
+            background: linear-gradient(135deg, var(--light-blue-bg) 0%, #ffffff 100%);
+            border-radius: 8px; 
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        #fracDivTab .algebra-step p { 
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        #fracDivTab .algebra-step .algebra-expression { 
+            font-size: 1.1rem; 
+        }
+        
+        #fracDivTab .algebra-expression { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.5rem; 
+            font-size: 1.3rem; 
+            font-weight: 500; 
+            flex-wrap: wrap;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        #fracDivTab #cell_result_display { 
+            color: var(--primary); 
+            font-weight: bold; 
+            margin-top: 1rem; 
+            font-size: 1.1rem; 
+            width: 100%;
+            line-height: 1.6;
+        }
+
+        /* --- Lesson Ideas Tab --- */
+        #lessonIdeasTab h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        #lessonIdeasTab p, #lessonIdeasTab li {
+            font-size: 1.05rem;
+            margin-bottom: 0.75rem;
+        }
+        #lessonIdeasTab ul {
+            list-style-position: inside;
+            margin-bottom: 1.5rem;
+        }
+        .ideas-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 1.5rem; 
+            font-size: 0.95rem;
+        }
+        .ideas-table th, .ideas-table td { 
+            border: 1px solid var(--border); 
+            padding: 0.85rem; 
+            text-align: center; 
+            vertical-align: middle;
+        }
+        .ideas-table th { 
+            background-color: var(--light-blue-bg); 
+            color: var(--primary); 
+            font-weight: 600; 
+        }
+        .ideas-table td {
+             background-color: #f8f9fa;
+        }
+        .ideas-table td:last-child {
+            text-align: left;
+            padding-left: 1.5rem;
+            background-color: white;
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .tab-btn { font-size: 0.85rem; padding: 1rem 0.75rem; min-width: auto; }
+            .tab-btn .op-icon { font-size: 1.1rem; }
+            .master { font-size: 1.2rem; padding: 1rem; }
+            .app { border-radius: 0; margin: 0; }
+            .tab { padding: 1.5rem 1rem; }
+            input[type=number] { width: 50px; font-size: 1rem; }
+        }
+        
+    </style>
+</head>
+<body>
+<div class="app">
+    <h1>Integers=Fractions</h1>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="intAddTab"><span class="op-icon">+</span>Int. Addition</button>
+        <button class="tab-btn" data-tab="fracMulTab"><span class="op-icon">×</span>Frac. Multiplication</button>
+        <button class="tab-btn" data-tab="intSubTab"><span class="op-icon">−</span>Int. Subtraction</button>
+        <button class="tab-btn" data-tab="fracDivTab"><span class="op-icon">÷</span>Frac. Division</button>
+        <button class="tab-btn" data-tab="lessonIdeasTab"><span class="op-icon">💡</span>Lesson Ideas</button>
+    </div>
+
+    <div id="intAddTab" class="tab active">
+        <div class="intro">
+            <p>Imagine blue squares as positive pieces and red squares as negative pieces. We’ll join two piles—one that looks like (a – b) and another that looks like (c – d)—and watch how they rearrange themselves to represent a useful identity.</p>
+        </div>
+        <div class="master" id="intMaster_from_app1">
+             ( <input id="aInput" type="number" min="0" value="4"> – <input id="bInput" type="number" min="0" value="1"> ) + ( <input id="cInput" type="number" min="0" value="3"> – <input id="dInput" type="number" min="0" value="2"> ) = ( <span id="phA">□</span> + <span id="phC">□</span> ) – ( <span id="phB">□</span> + <span id="phD">□</span> )
+        </div>
+        
+        <div class="int-add-grid workbox">
+            <div class="int-add-box" id="boxLeft"></div>
+            <div class="int-add-divider"></div>
+            <div class="int-add-box" id="boxRight"></div>
+        </div>
+        <div class="int-add-regroup workbox">
+            <div class="int-add-cell" id="bl1"></div>
+            <div class="int-add-cell" id="rd1"></div>
+            
+            <div class="int-add-cell" id="bl2"></div>
+            <div class="int-add-cell" id="rd2"></div>
+        </div>
+        <div class="ctrls">
+            <button class="btn" id="visualBtn">Visualise Left Side</button>
+            <button class="btn" id="blueBtn" disabled>Enter Blues</button>
+            <button class="btn" id="redBtn" disabled>Enter Reds</button>
+            <button class="btn" id="addResetBtn">Start Again</button>
+        </div>
+        <div class="ctrls" style="flex-direction:column;gap:0.5rem">
+            <div id="blueInputs" style="display:none;align-items:center;gap:0.4rem">
+                <div class="pair-inputs">
+                    <input id="blueA" type="number" min="0" placeholder="a"><span>+</span><input id="blueC" type="number" min="0" placeholder="c">
+                </div>
+                <button class="btn" id="blueOK">OK</button>
+            </div>
+            <div id="redInputs" style="display:none;align-items:center;gap:0.4rem">
+                <div class="pair-inputs">
+                    <input id="redB" type="number" min="0" placeholder="b"><span>+</span><input id="redD" type="number" min="0" placeholder="d">
+                </div>
+                <button class="btn" id="redOK">OK</button>
+            </div>
+        </div>
+        <div class="message-box" id="intMsg"></div>
+        <div class="summary-box" id="intAddSummary" style="display:none; margin-top: 1.5rem;">
+            <p>You can re-group without changing the total. The picture you built will become the backdrop for fraction multiplication in the next tab, because the idea of “gather like with like” works for products too.</p>
+        </div>
+    </div>
+    
+    <div id="fracMulTab" class="tab">
+        <div class="intro"><p>We'll see how multiplying fractions is like finding a rectangle's area. The key insight is viewing this same area in two ways: as a product of its sides, and as a fraction of the whole unit square.</p></div>
+        <div class="master" id="fracMaster_from_app1">( <input id="fA" type="number" value="2" min="1"> / <input id="fB" type="number" value="3" min="1"> ) × ( <input id="fC" type="number" value="4" min="1"> / <input id="fD" type="number" value="5" min="1"> ) = ( <span id="fNum1">□</span> × <span id="fNum2">□</span> ) / ( <span id="fDen1">□</span> × <span id="fDen2">□</span> )</div>
+        <div class="frac-mul-wrapper">
+            <div style="display:flex;gap:1rem;align-items:flex-start; justify-content:center;">
+                <div class="ctrls" style="flex-direction:column;gap:0.6rem;min-width:160px">
+                    <button class="btn" id="drawBtn">Draw Sides</button>
+                    <button class="btn" id="shadeBtn" disabled>Shade</button>
+                    <div class="frac-ctrl-group">
+                        <button class="btn" id="gridBtn" disabled>Create Grid</button>
+                        <div id="gridInputs" class="fraction-input-wrapper" style="display:none;">
+                            <div class="pair-inputs">
+                                <input id="gridB" type="number" min="1" placeholder="b"><span>×</span><input id="gridD" type="number" min="1" placeholder="d">
+                            </div>
+                            <button class="btn" id="gridOK">OK</button>
+                        </div>
+                    </div>
+                    <div class="frac-ctrl-group">
+                        <button class="btn" id="areaBtn" disabled>Area as Fraction</button>
+                        <div id="numInputs" class="fraction-input-wrapper" style="display:none;">
+                            <div class="fraction-input">
+                                <div class="num">
+                                    <input id="numA" type="number" min="1" placeholder="a"><span>×</span><input id="numC" type="number" min="1" placeholder="c">
+                                </div>
+                                <div class="den">
+                                    <span id="denB">b</span><span>×</span><span id="denD">d</span>
+                                </div>
+                            </div>
+                            <button class="btn" id="numOK">OK</button>
+                        </div>
+                    </div>
+                    <button class="btn" id="mulResetBtn">Start Again</button>
+                </div>
+                <div id="mulUnitSquare" style="width: 320px; height: 320px; position: relative; border: 2px solid var(--dark); background: #fff;"></div>
+            </div>
+        </div>
+        <div class="message-box" id="fracMsg"></div>
+        <div class="summary-box" id="fracMulSummary" style="display:none; margin-top: 1.5rem;">
+            <p><b>Key Takeaways:</b> We have seen that expressing the shaded rectangle's area as a fraction of the whole unit square directly reveals the standard procedure for fraction multiplication.. This process of grouping numerators and grouping denominators is structurally similar to how we grouped positive and negative integers in the addition tab.</p>
+        </div>
+    </div>
+    
+    <div id="intSubTab" class="tab">
+        <div class="intro">
+            <p>Here, we learn that "adding the opposite" is rooted in the fundamental meaning of subtraction: finding a missing part in an addition problem. This idea provides a bridge to understanding fraction division in the next tab.</p>
+        </div>
+        <div class="master" id="subMaster">
+            <input id="subA" type="number" value="-2">
+            <span>−</span>
+            <input id="subB" type="number" value="-5">
+            <span id="subFinalResult"></span>
+        </div>
+        <div class="sub-visual-model">
+            <div id="subExplanation" class="sub-explanation"></div>
+            <div class="sub-target-box-container"><div class="sub-box" id="subTargetBox"></div></div>
+            <div class="sub-part-part-container"><div class="sub-box" id="subKnownPartBox"></div><div class="sub-box" id="subMissingPartBox"></div></div>
+        </div>
+        <div id="subGuidedWorkspace" class="guided-workspace" style="display: none;">
+            <div id="subStep1" class="guided-step"></div>
+            <div id="subStep2" class="guided-step"></div>
+            <div id="subConfirmation" class="guided-step"></div>
+        </div>
+        <div class="message-box" id="subMsg"></div>
+        <div class="ctrls"><button class="btn" id="subSimplifyBtn" disabled>Simplify</button><button class="btn" id="subResetBtn">Reset</button></div>
+        <div class="summary-box" id="subSummary" style="display:none; margin-top: 1.5rem;">
+            <p>Every subtraction hides an addition. This “opposite trick” is the stepping-stone to fraction division, where we’ll swap “add the opposite” for “multiply by the flip”.</p>
+        </div>
+    </div>
+
+    <div id="fracDivTab" class="tab">
+        <div class="intro">
+            <p>Suppose you know a rectangle’s area (<sup>a</sup>&frasl;<sub>b</sub>) and one of its sides (<sup>c</sup>&frasl;<sub>d</sub>). How long is the other side? This is a division problem. Just as we linked subtraction to finding a missing part in addition, we can link division to finding a missing factor in multiplication.</p>
+        </div>
+        <div class="master" id="divMaster">
+            <div class="fraction-input"><div class="num"><input id="divA" type="number" value="1" min="1"></div><div class="den"><input id="divB" type="number" value="3"></div></div>
+            <span>÷</span>
+            <div class="fraction-input"><div class="num"><input id="divC" type="number" value="2" min="1"></div><div class="den"><input id="divD" type="number" value="5"></div></div>
+            <div id="divResultWrapper" style="display: contents;"></div>
+        </div>
+
+        <div class="main-container">
+            <div class="geometry-container">
+                <div id="proof-display" class="algebra-step" style="display: none;"></div>
+                <div id="divUnitSquare" class="unitSquare"></div>
+                <div id="geometry-controls" class="ctrls">
+                    <button class="btn" id="divDrawSideBtn">1. Draw Known Side</button>
+                    <button class="btn" id="divShadeBtn" disabled>2. Shade Target Area</button>
+                    <button class="btn" id="divGridBtn" disabled style="display:none;">3. Draw Grid</button>
+                    <button class="btn" id="divProofBtn" disabled style="display:none;">4. Count Cells</button>
+                </div>
+            </div>
+
+            <div id="algebra-container" class="algebra-container" style="display: none;">
+                <div class="algebra-playground">
+                    <div id="divTargetBox" class="div-frac-box target"></div>
+                    <div class="algebra-bottom-row">
+                        <div id="divKnownSideBox" class="div-frac-box known"></div>
+                        <div id="divUnknownSideBox" class="div-frac-box unknown"></div>
+                    </div>
+                </div>
+                <div id="algStep1" class="algebra-step" style="display:none;"></div>
+                <div id="algStep2" class="algebra-step" style="display:none;"></div>
+                <div id="simplification-step" class="algebra-step" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="summary-box" id="divSummary" style="display:none;"></div>
+        <div class="ctrls" style="margin-top:2rem;"><button class="btn" id="divResetBtn">Reset All</button></div>
+    </div>
+
+    <div id="lessonIdeasTab" class="tab">
+        <h3>What Structure Swap Is All About</h3>
+        <p>Structure Swap is a thinking playground where you discover that “different” numbers share the same structure.</p>
+        <ul>
+            <li>Integers use <b>0</b> as their resting point. Adding an opposite (like +5 and -5) brings a number back to zero.</li>
+            <li>Fractions use <b>1</b> as their resting point. Multiplying by an inverse (like <sup>2</sup>&frasl;<sub>3</sub> and <sup>3</sup>&frasl;<sub>2</sub>) brings a number back to one.</li>
+        </ul>
+        <p>The colours, squares, and grids help you spot four parallel stories:</p>
+        
+        <table class="ideas-table">
+            <thead>
+                <tr>
+                    <th>Integers</th>
+                    <th>Fractions</th>
+                    <th>The Big Idea</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>add (+)</b></td>
+                    <td><b>multiply (×)</b></td>
+                    <td>Putting parts together.</td>
+                </tr>
+                <tr>
+                    <td><b>subtract (−)</b></td>
+                    <td><b>divide (÷)</b></td>
+                    <td>Undoing by using an opposite or a "flip" (inverse).</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+/******** GLOBAL UTILITIES & TAB HANDLER ********/
+const showTab = (id) => {
+    // Deactivate all tab buttons and tabs
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+    // Activate the clicked/specified tab button and tab content
+    document.querySelector(`.tab-btn[data-tab="${id}"]`).classList.add('active');
+    document.getElementById(id).classList.add('active');
+};
+
+document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+    const tabId = btn.dataset.tab;
+    showTab(tabId);
+    // Call the specific reset function for the newly activated tab
+    if (tabId === 'intAddTab' && window.intAddReset) window.intAddReset();
+    else if (tabId === 'fracMulTab' && window.fracMulReset) window.fracMulReset();
+    else if (tabId === 'intSubTab' && window.intSubReset) window.intSubReset();
+    else if (tabId === 'fracDivTab' && window.fracDivReset) window.fracDivReset();
+}));
+
+const makeSquares = (val) => {
+    const f = document.createDocumentFragment();
+    if (val === 0) return f;
+    const n = Math.abs(val);
+    const c = val > 0 ? 'blue' : 'red';
+    for (let i = 0; i < n; i++) {
+        const d = document.createElement('div');
+        d.className = `sq ${c}`;
+        f.appendChild(d);
+    }
+    return f;
+};
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+const createFractionHTML = (n, d) => `<div class="fraction-input" style="font-size: 1.1rem;"><div class="num">${n}</div><div class="den">${d}</div></div>`;
+
+/******** INTEGER ADDITION LOGIC ********/
+(() => {
+    const aIn = document.getElementById('aInput'), bIn = document.getElementById('bInput'), cIn = document.getElementById('cInput'), dIn = document.getElementById('dInput');
+    const phA = document.getElementById('phA'), phB = document.getElementById('phB'), phC = document.getElementById('phC'), phD = document.getElementById('phD');
+    const boxLeft = document.getElementById('boxLeft'), boxRight = document.getElementById('boxRight');
+    const bl1 = document.getElementById('bl1'), bl2 = document.getElementById('bl2'), rd1 = document.getElementById('rd1'), rd2 = document.getElementById('rd2');
+    const visualBtn = document.getElementById('visualBtn'), blueBtn = document.getElementById('blueBtn'), redBtn = document.getElementById('redBtn'), resetBtn = document.getElementById('addResetBtn');
+    const blueInputs = document.getElementById('blueInputs'), redInputs = document.getElementById('redInputs');
+    const blueA = document.getElementById('blueA'), blueC = document.getElementById('blueC'), blueOK = document.getElementById('blueOK');
+    const redB = document.getElementById('redB'), redD = document.getElementById('redD'), redOK = document.getElementById('redOK');
+    const msg = document.getElementById('intMsg'), summary = document.getElementById('intAddSummary');
+    let a, b, c, d;
+
+    const visualise = () => {
+        a = +aIn.value; b = +bIn.value; c = +cIn.value; d = +dIn.value;
+        if (a < 0 || b < 0 || c < 0 || d < 0) { msg.textContent = 'Values must be non‑negative'; return; }
+        boxLeft.appendChild(makeSquares(a)); boxLeft.appendChild(makeSquares(-b));
+        boxRight.appendChild(makeSquares(c)); boxRight.appendChild(makeSquares(-d));
+        [aIn, bIn, cIn, dIn].forEach(el => el.disabled = true);
+        blueBtn.disabled = false; visualBtn.disabled = true;
+        msg.textContent = 'Now regroup the blues (a and c).';
+    };
+
+    const checkBlues = () => {
+        const va = +blueA.value, vc = +blueC.value;
+        if (va === a && vc === c) {
+            bl1.appendChild(makeSquares(va)); bl2.appendChild(makeSquares(vc));
+            blueInputs.style.display = 'none'; blueBtn.disabled = true; redBtn.disabled = false;
+            msg.textContent = 'Great, now regroup the reds (b and d).';
+        } else { msg.textContent = 'Incorrect values for blues.'; }
+    };
+
+    const checkReds = () => {
+        const vb = +redB.value, vd = +redD.value;
+        if (vb === b && vd === d) {
+            rd1.appendChild(makeSquares(-vb)); rd2.appendChild(makeSquares(-vd));
+            redInputs.style.display = 'none'; redBtn.disabled = true;
+            msg.textContent = 'Identity balanced!';
+            phA.textContent = a; phB.textContent = b; phC.textContent = c; phD.textContent = d;
+            summary.style.display = 'block';
+        } else { msg.textContent = 'Incorrect values for reds.'; }
+    };
+
+    const reset = () => {
+        [aIn, bIn, cIn, dIn].forEach(el => { el.disabled = false; });
+        aIn.value = 4; bIn.value = 1;
+        cIn.value = 3; dIn.value = 2;
+        boxLeft.innerHTML = ''; boxRight.innerHTML = ''; bl1.innerHTML = ''; bl2.innerHTML = ''; rd1.innerHTML = ''; rd2.innerHTML = '';
+        blueInputs.style.display = 'none'; redInputs.style.display = 'none';
+        summary.style.display = 'none';
+        blueBtn.disabled = true; redBtn.disabled = true; visualBtn.disabled = false;
+        phA.textContent = '□'; phC.textContent = '□'; phB.textContent = '□'; phD.textContent = '□';
+        msg.textContent = '';
+    };
+    window.intAddReset = reset; // Expose reset to global scope
+
+    visualBtn.addEventListener('click', visualise);
+    blueBtn.addEventListener('click', () => { blueInputs.style.display = 'flex'; });
+    blueOK.addEventListener('click', checkBlues);
+    redBtn.addEventListener('click', () => { redInputs.style.display = 'flex'; });
+    redOK.addEventListener('click', checkReds);
+    resetBtn.addEventListener('click', reset);
+})();
+
+/******** FRACTION MULTIPLICATION LOGIC ********/
+(() => {
+    const fA = document.getElementById('fA'), fB = document.getElementById('fB'), fC = document.getElementById('fC'), fD = document.getElementById('fD');
+    const fNum1 = document.getElementById('fNum1'), fNum2 = document.getElementById('fNum2'), fDen1 = document.getElementById('fDen1'), fDen2 = document.getElementById('fDen2');
+    const drawBtn = document.getElementById('drawBtn'), shadeBtn = document.getElementById('shadeBtn'), gridBtn = document.getElementById('gridBtn'), areaBtn = document.getElementById('areaBtn');
+    const resetBtn = document.getElementById('mulResetBtn'), gridInputs = document.getElementById('gridInputs'), numInputs = document.getElementById('numInputs');
+    const gridBIn = document.getElementById('gridB'), gridDIn = document.getElementById('gridD'), gridOK = document.getElementById('gridOK');
+    const numAIn = document.getElementById('numA'), numCIn = document.getElementById('numC'), numOK = document.getElementById('numOK');
+    const unit = document.getElementById('mulUnitSquare'), msg = document.getElementById('fracMsg'), summary = document.getElementById('fracMulSummary');
+
+    const drawAxes = () => {
+        unit.innerHTML = '';
+        const a = +fA.value, b = +fB.value, c = +fC.value, d = +fD.value;
+        if (a > b || c > d) { msg.textContent = 'Numerator cannot exceed denominator.'; return; }
+        // VERTICAL axis represents the first fraction, a/b. Its height is a/b of the unit square.
+        const vA = document.createElement('div'); vA.className = 'axis'; vA.style.cssText = 'left:0;top:0;width:4px;height:0;'; unit.appendChild(vA);
+        // HORIZONTAL axis represents the second fraction, c/d. Its width is c/d of the unit square.
+        const hA = document.createElement('div'); hA.className = 'axis'; hA.style.cssText = 'top:0;left:0;height:4px;width:0;'; unit.appendChild(hA);
+        requestAnimationFrame(() => { vA.style.transition = 'height .6s'; vA.style.height = `${(a / b) * 100}%`; hA.style.transition = 'width .6s'; hA.style.width = `${(c / d) * 100}%` });
+        shadeBtn.disabled = false; drawBtn.disabled = true; [fA, fB, fC, fD].forEach(el => el.disabled = true); msg.textContent = 'Click Shade to highlight overlap.';
+    };
+
+    const shadeArea = async () => {
+        const a = +fA.value, b = +fB.value, c = +fC.value, d = +fD.value;
+        const r = document.createElement('div'); r.className = 'shade'; r.style.cssText = 'width:0;height:0;';
+        unit.appendChild(r);
+        await sleep(50); 
+        // Width is determined by c/d, Height by a/b
+        r.style.width = `${(c / d) * 100}%`; r.style.height = `${(a / b) * 100}%`;
+        shadeBtn.disabled = true; gridBtn.disabled = false; msg.textContent = 'Now create the grid (b × d).';
+    };
+
+    const buildGrid = () => {
+        const bV = +gridBIn.value, dV = +gridDIn.value, b = +fB.value, d = +fD.value;
+        if (bV !== b || dV !== d) { msg.textContent = 'Grid dimensions incorrect.'; return; }
+        gridInputs.style.display = 'none'; gridBtn.disabled = true;
+        fDen1.textContent = b; fDen2.textContent = d;
+        unit.querySelectorAll('.axis').forEach(e => e.remove());
+        msg.textContent = 'Drawing grid...';
+        // Horizontal lines for the first fraction's denominator (b)
+        for (let i = 1; i < b; i++) { const l = document.createElement('div'); l.className = 'grid-line'; l.style.cssText = `top:${(i / b) * 100}%;left:0;height:1px;width:100%;`; unit.appendChild(l) }
+        // Vertical lines for the second fraction's denominator (d)
+        for (let i = 1; i < d; i++) { const l = document.createElement('div'); l.className = 'grid-line'; l.style.cssText = `left:${(i / d) * 100}%;top:0;width:1px;height:100%;`; unit.appendChild(l) }
+        areaBtn.disabled = false;
+        msg.textContent = 'Now fill in the numerator (a × c).';
+    };
+
+    const finishFraction = () => {
+        const aV = +numAIn.value, cV = +numCIn.value, a = +fA.value, c = +fC.value;
+        if (aV !== a || cV !== c) { msg.textContent = 'Numerator incorrect.'; return; }
+        numInputs.style.display = 'none'; areaBtn.disabled = true;
+        fNum1.textContent = a; fNum2.textContent = c;
+        [fNum1, fNum2, fDen1, fDen2].forEach(e => e.style.color = 'var(--success)');
+        msg.textContent = 'Fraction identity confirmed!';
+        summary.style.display = 'block';
+    };
+
+    const reset = () => {
+        unit.innerHTML = '';
+        [fA, fB, fC, fD].forEach(e => e.disabled = false);
+        [fNum1, fNum2, fDen1, fDen2].forEach(e => { e.textContent = '□'; e.style.color = ''; });
+        fA.value = 2; fB.value = 3; fC.value = 4; fD.value = 5;
+        drawBtn.disabled = false; shadeBtn.disabled = true; gridBtn.disabled = true; areaBtn.disabled = true;
+        gridInputs.style.display = 'none'; numInputs.style.display = 'none';
+        summary.style.display = 'none';
+        msg.textContent = '';
+    };
+    window.fracMulReset = reset; // Expose reset to global scope
+
+    drawBtn.addEventListener('click', drawAxes);
+    shadeBtn.addEventListener('click', shadeArea);
+    gridBtn.addEventListener('click', () => { gridInputs.style.display = 'flex'; });
+    gridOK.addEventListener('click', buildGrid);
+    areaBtn.addEventListener('click', () => { document.getElementById('denB').textContent = fB.value; document.getElementById('denD').textContent = fD.value; numInputs.style.display = 'flex'; });
+    numOK.addEventListener('click', finishFraction);
+    resetBtn.addEventListener('click', reset);
+})();
+
+/******** INTEGER SUBTRACTION LOGIC ********/
+(() => {
+    const aIn = document.getElementById('subA'), bIn = document.getElementById('subB');
+    const finalResultEl = document.getElementById('subFinalResult');
+    const explanation = document.getElementById('subExplanation'), targetBox = document.getElementById('subTargetBox'), knownPartBox = document.getElementById('subKnownPartBox'), missingPartBox = document.getElementById('subMissingPartBox'), msg = document.getElementById('subMsg'), guidedWorkspace = document.getElementById('subGuidedWorkspace');
+    const step1El = document.getElementById('subStep1'), step2El = document.getElementById('subStep2'), confirmEl = document.getElementById('subConfirmation');
+    const simplifyBtn = document.getElementById('subSimplifyBtn'), resetBtn = document.getElementById('subResetBtn'), summary = document.getElementById('subSummary');
+    let a, b, oppositeB, currentOppositeB;
+
+    const renderBox = (val, container) => {
+        container.innerHTML = '';
+        if (val !== null) container.appendChild(makeSquares(val));
+    };
+
+    const setup = () => {
+        a = parseInt(aIn.value);
+        b = parseInt(bIn.value);
+        if (isNaN(a) || isNaN(b)) { msg.textContent = "Please enter valid integers."; return; }
+        oppositeB = -b;
+        finalResultEl.innerHTML = '';
+        document.getElementById('subMaster').classList.remove('green');
+        simplifyBtn.disabled = true;
+        summary.style.display = 'none';
+        guidedWorkspace.style.display = 'block';
+        [step1El, step2El, confirmEl].forEach(el => { el.classList.remove('active'); el.innerHTML = ''; });
+        missingPartBox.innerHTML = '';
+        msg.textContent = '';
+        explanation.innerHTML = `To find the result of <b>${a} − (${b})</b>, we need to find a number that, when added to <b>(${b})</b>, gives us <b>${a}</b>.`;
+        renderBox(a, targetBox);
+        renderBox(b, knownPartBox);
+        step1El.classList.add('active');
+        step1El.innerHTML = `<p>Let's cancel out <b>(${b})</b> by adding its opposite.</p><div class="sub-input-area"><input type="number" id="subInput1" style="width: 60px;"><button class="btn" id="subStep1OK">OK</button></div>`;
+        document.getElementById('subStep1OK').addEventListener('click', checkStep1);
+    };
+
+    const checkStep1 = () => {
+        const enteredVal = parseInt(document.getElementById('subInput1').value);
+        if (enteredVal === oppositeB) {
+            msg.textContent = 'Correct!';
+            currentOppositeB = enteredVal;
+            renderBox(currentOppositeB, missingPartBox);
+            step1El.classList.remove('active');
+            step2El.classList.add('active');
+            step2El.innerHTML = `<p>Now, add the target value to the same box.</p><div class="sub-input-area"><span style="font-size:1.2rem;font-weight:bold;">${currentOppositeB > 0 ? '+' : ''}${currentOppositeB} + </span><input type="number" id="subInput2" style="width: 60px;"><button class="btn" id="subStep2OK">OK</button></div>`;
+            document.getElementById('subStep2OK').addEventListener('click', checkStep2);
+        } else { msg.textContent = `That's not the opposite of (${b}). Remember, the opposite has the other sign.`; }
+    };
+
+    const checkStep2 = () => {
+        const enteredVal = parseInt(document.getElementById('subInput2').value);
+        if (enteredVal === a) {
+            msg.textContent = 'Excellent!';
+            missingPartBox.appendChild(makeSquares(a));
+            step2El.classList.remove('active');
+            confirmEl.classList.add('active');
+            confirmEl.innerHTML = `<p>Notice the two bottom boxes now equal the top box. To get a single number, let's simplify the expression you built.</p>`;
+            simplifyBtn.disabled = false;
+        } else { msg.textContent = `That's not the target value. Look at the top box again.`; }
+    };
+
+    const simplify = async () => {
+        simplifyBtn.disabled = true;
+        guidedWorkspace.style.display = 'none';
+        msg.textContent = "Cancelling zero pairs...";
+        const blues = Array.from(missingPartBox.querySelectorAll('.blue')), reds = Array.from(missingPartBox.querySelectorAll('.red'));
+        const pairs = Math.min(blues.length, reds.length);
+        if (pairs > 0) {
+            for (let i = 0; i < pairs; i++) {
+                blues[i].style.transition = 'all 0.3s';
+                reds[i].style.transition = 'all 0.3s';
+                await sleep(50);
+                blues[i].style.transform = 'scale(0.1)';
+                blues[i].style.opacity = '0';
+                reds[i].style.transform = 'scale(0.1)';
+                reds[i].style.opacity = '0';
+                await sleep(150);
+            }
+        }
+        await sleep(500);
+        const finalValue = a - b;
+        renderBox(finalValue, missingPartBox);
+        msg.textContent = 'Simplification complete! The identity is revealed.';
+        finalResultEl.innerHTML = `= ${a} + (${oppositeB}) = <b style="color:var(--success);">${finalValue}</b>`;
+        document.getElementById('subMaster').classList.add('green');
+        summary.style.display = 'block';
+    };
+    window.intSubReset = setup; // Expose reset to global scope
+
+    aIn.addEventListener('change', setup);
+    bIn.addEventListener('change', setup);
+    resetBtn.addEventListener('click', setup);
+    simplifyBtn.addEventListener('click', simplify);
+    setup(); // Initial call
+})();
+
+/******** FRACTION DIVISION LOGIC (UPDATED) ********/
+(() => {
+    const getEl = id => document.getElementById(id);
+    let a, b, c, d, unknownSide;
+    const UNIT_SQUARE_SIZE = 320; // px
+
+    const getDOMElements = () => ({
+        aIn: getEl('divA'), bIn: getEl('divB'), cIn: getEl('divC'), dIn: getEl('divD'),
+        mainContainer: getEl('fracDivTab').querySelector('.main-container'),
+        unitSquare: getEl('divUnitSquare'), resultWrapper: getEl('divResultWrapper'),
+        drawSideBtn: getEl('divDrawSideBtn'), shadeBtn: getEl('divShadeBtn'), 
+        gridBtn: getEl('divGridBtn'), proofBtn: getEl('divProofBtn'),
+        algebraContainer: getEl('algebra-container'),
+        targetBox: getEl('divTargetBox'), knownSideBox: getEl('divKnownSideBox'), unknownSideBox: getEl('divUnknownSideBox'),
+        algStep1: getEl('algStep1'), algStep2: getEl('algStep2'),
+        simplificationStep: getEl('simplification-step'),
+        proofDisplay: getEl('proof-display'),
+        summary: getEl('divSummary'), master: getEl('divMaster'), resetBtn: getEl('divResetBtn'),
+        geometryControls: getEl('geometry-controls')
+    });
+
+    const animateAxisTicks = async (unitSquare, axis, count) => {
+        for (let i = 1; i < count; i++) {
+            const tick = document.createElement('div');
+            tick.style.position = 'absolute';
+            tick.style.background = 'var(--dark)';
+            tick.style.transition = 'opacity 0.2s ease-in';
+            tick.style.opacity = '0';
+            if (axis === 'vertical') {
+                tick.style.left = '-8px';
+                tick.style.top = `calc(${(i / count) * 100}% - 1px)`;
+                tick.style.width = '6px';
+                tick.style.height = '2px';
+            } else {
+                tick.style.top = '-8px';
+                tick.style.left = `${(i / count) * UNIT_SQUARE_SIZE}px`;
+                tick.style.width = '2px';
+                tick.style.height = '6px';
+            }
+            unitSquare.appendChild(tick);
+            await sleep(50);
+            tick.style.opacity = '1';
+        }
+        await sleep(500);
+    };
+
+    const drawKnownSide = async () => {
+        const els = getDOMElements();
+        a = +els.aIn.value; b = +els.bIn.value; c = +els.cIn.value; d = +els.dIn.value;
+        if (!a || !b || !c || !d ) { alert("Please enter valid, non-zero fractions."); return; }
+        // We can allow improper fractions here, but the visualization makes most sense with proper fractions.
+        // if (a >= b || c >= d) { alert("Please use proper fractions (numerator < denominator)."); return; }
+        unknownSide = { num: a * d, den: b * c };
+
+        const widthRatio = unknownSide.num / unknownSide.den;
+        const numSquares = Math.ceil(widthRatio);
+
+        if (numSquares > 1) {
+            els.mainContainer.style.flexDirection = 'column';
+            els.proofDisplay.style.display = 'block';
+            els.proofDisplay.innerHTML = `<p>The result of this division is greater than 1, so we need more than one unit square to see the full picture. The known side is ${createFractionHTML(c, d)} and the target area is ${createFractionHTML(a, b)}.</p>`;
+        }
+        
+        // Adjust canvas size and draw the unit square outlines
+        els.unitSquare.innerHTML = ''; // Clear canvas
+        els.unitSquare.style.width = `${numSquares * UNIT_SQUARE_SIZE}px`; // Set new canvas width
+        
+        for (let i = 0; i < numSquares; i++) {
+            const squareOutline = document.createElement('div');
+            squareOutline.style.cssText = `position: absolute; left: ${i * UNIT_SQUARE_SIZE}px; top: 0; width: ${UNIT_SQUARE_SIZE}px; height: ${UNIT_SQUARE_SIZE}px; border: 2px solid var(--dark); box-sizing: border-box; z-index: 0;`;
+            els.unitSquare.appendChild(squareOutline);
+        }
+
+        [els.aIn, els.bIn, els.cIn, els.dIn].forEach(el => el.disabled = true);
+        els.drawSideBtn.disabled = true;
+        
+        await animateAxisTicks(els.unitSquare, 'vertical', d);
+
+        const marker = document.createElement('div');
+        marker.className = 'div-known-side-marker';
+        marker.style.height = '0%'; marker.style.transition = 'height 1s ease-out';
+        els.unitSquare.appendChild(marker);
+        await sleep(50);
+        marker.style.height = `${(c / d) * 100}%`;
+        await sleep(1100);
+
+        // Draw HORIZONTAL lines across the entire canvas
+        for (let i = 1; i < d; i++) {
+            const line = document.createElement('div');
+            line.className = 'grid-line';
+            line.style.cssText = `z-index: 1; top:${(i / d) * 100}%; left:0; height:1px; width:0; transition:width 1s ease-out;`;
+            els.unitSquare.appendChild(line);
+            await sleep(150);
+            line.style.width = '100%';
+        }
+        await sleep(1200);
+        els.shadeBtn.disabled = false;
+    };
+
+    const shadeTargetArea = async () => {
+        const els = getDOMElements();
+        els.shadeBtn.disabled = true;
+        const unknownWidthPx = (unknownSide.num / unknownSide.den) * UNIT_SQUARE_SIZE;
+
+        const shadeRect = document.createElement('div');
+        shadeRect.className = 'div-shade';
+        shadeRect.style.cssText = `height:${(c / d) * 100}%; width: 0; transition: width 1.5s ease-out;`;
+        els.unitSquare.appendChild(shadeRect);
+
+        const unknownMarker = document.createElement('div');
+        unknownMarker.className = 'div-unknown-side-marker';
+        unknownMarker.style.cssText = `width: 0; transition: width 1.5s ease-out;`;
+        els.unitSquare.appendChild(unknownMarker);
+
+        await sleep(100);
+        shadeRect.style.width = `${unknownWidthPx}px`;
+        unknownMarker.style.width = `${unknownWidthPx}px`;
+        await sleep(1600);
+        els.gridBtn.disabled = false;
+        els.gridBtn.style.display = 'inline-block';
+        els.algebraContainer.style.display = 'block';
+        setupAlgebra();
+    };
+
+    const drawUnknownSideGrid = async () => {
+        const els = getDOMElements();
+        els.gridBtn.disabled = true;
+        const den_unknown = b * c;
+        const widthRatio = unknownSide.num / unknownSide.den;
+        const numSquares = Math.ceil(widthRatio);
+        
+        await animateAxisTicks(els.unitSquare, 'horizontal', den_unknown);
+
+        for (let i = 1; i < den_unknown * numSquares; i++) {
+            const lineX = (i / den_unknown) * UNIT_SQUARE_SIZE;
+            const line = document.createElement('div');
+            line.className = 'grid-line';
+            line.style.cssText = `z-index: 1; left:${lineX}px; top:0; width:1px; height:0; transition:height 1s ease-out;`;
+            els.unitSquare.appendChild(line);
+             if (i < 20) { // Speed up animation for many lines
+                await sleep(50);
+            }
+            line.style.height = '100%';
+        }
+        await sleep(1200);
+
+        els.unitSquare.querySelectorAll('.div-known-side-marker, .div-unknown-side-marker').forEach(m => m.style.display = 'none');
+        els.proofBtn.disabled = false;
+        els.proofBtn.style.display = 'inline-block';
+    };
+
+    const countCellsProof = async () => {
+        const els = getDOMElements();
+        els.proofBtn.disabled = true;
+        els.proofDisplay.style.display = 'block';
+        
+        let content = `<p>The grid is complete. Enter the number of cells in the shaded area and in the whole unit square.</p>
+        <div class="algebra-expression" style="margin-top:0.5rem; justify-content:center;">
+            <div class="fraction-input">
+                <div class="num"><input id="user_shaded_cells" type="number" style="width:60px;"></div>
+                <div class="den"><input id="user_unit_cells" type="number" style="width:60px;"></div>
+            </div>
+            <button id="check_cells_btn" class="btn">Check</button>
+        </div>
+        <div id="cell_result_display"></div>`;
+
+        els.proofDisplay.innerHTML = content;
+        getEl('check_cells_btn').addEventListener('click', checkCellCount);
+    };
+    
+    const checkCellCount = () => {
+        const resultDisplay = getEl('cell_result_display');
+        const userShaded = +getEl('user_shaded_cells').value;
+        const userUnit = +getEl('user_unit_cells').value;
+
+        const correctShaded = a * c * d;
+        const correctUnit = b * c * d;
+        
+        if (userShaded === correctShaded && userUnit === correctUnit) {
+            resultDisplay.style.color = 'var(--success)';
+            let successContent = `Correct! Let's see how that simplifies:
+            <div class="algebra-expression" style="margin-top:0.5rem; justify-content:start;">
+                ${createFractionHTML(userShaded, userUnit)}
+                <span>=</span>
+                ${createFractionHTML(`${a}×${c}×${d}`, `${b}×${c}×${d}`)}
+                <span>=</span>
+                <b>${createFractionHTML(a, b)}</b>
+            </div>`;
+            resultDisplay.innerHTML = successContent;
+            
+            const els = getDOMElements();
+            els.resultWrapper.innerHTML = `<span>=</span>${createFractionHTML(a,b)}<span>×</span>${createFractionHTML(d,c)}<span>=</span><b style="color:var(--success);">${createFractionHTML(unknownSide.num,unknownSide.den)}</b>`;
+            els.master.classList.add('green');
+            els.summary.style.display = 'block';
+            els.summary.innerHTML = `<p><b>Discovery Complete:</b></p><ul>
+                <li>Dividing by a fraction asks, “what is the other side of a rectangle with this area and that side?”</li>
+                <li>Flipping the divisor changes the division into a multiplication problem to find a missing factor, just as we changed subtraction into finding a missing part in an addition problem.</li>
+            </ul>`;
+            getEl('check_cells_btn').disabled = true;
+
+        } else {
+            resultDisplay.style.color = 'var(--div-unknown-side-color)';
+            resultDisplay.textContent = 'Not quite. Try counting again. Hint: The number of cells = (height in cells) × (width in cells).';
+        }
+    };
+
+    const setupAlgebra = () => {
+        const els = getDOMElements();
+        els.targetBox.innerHTML = createFractionHTML(a, b);
+        els.knownSideBox.innerHTML = createFractionHTML(c, d);
+        els.unknownSideBox.innerHTML = '?';
+        els.algStep1.style.display = 'block';
+        els.algStep1.innerHTML = `<p>Let's build the expression for the unknown side. 
+First, multiply by the reciprocal of the known side.</p><div class="algebra-expression">${createFractionHTML(c, d)}<span>×</span><div class="fraction-input"><div class="num"><input id="alg1_n" type="number"></div><div class="den"><input id="alg1_d" type="number"></div></div><button id="alg1_ok" class="btn">OK</button></div>`;
+        getEl('alg1_ok').addEventListener('click', checkAlgebraP1);
+    };
+
+    const checkAlgebraP1 = () => {
+        const els = getDOMElements();
+        const n = +getEl('alg1_n').value, de = +getEl('alg1_d').value;
+        if (n === d && de === c) {
+            els.unknownSideBox.innerHTML = createFractionHTML(d, c);
+            els.algStep1.style.display = 'none';
+            els.algStep2.style.display = 'block';
+            els.algStep2.innerHTML = `<p>Great! Now, multiply by the target area to complete the expression.</p><div class="algebra-expression">${createFractionHTML(c,d)}<span>×</span>${createFractionHTML(d,c)}<span>×</span><div class="fraction-input"><div class="num"><input id="alg2_n" type="number"></div><div class="den"><input id="alg2_d" type="number"></div></div><button id="alg2_ok" class="btn">OK</button></div>`;
+            getEl('alg2_ok').addEventListener('click', checkAlgebraP2);
+        } else { alert("Not quite. The reciprocal (or inverse) of a fraction is found by flipping it."); }
+    };
+
+    const checkAlgebraP2 = () => {
+        const els = getDOMElements();
+        const n = +getEl('alg2_n').value, de = +getEl('alg2_d').value;
+        if (n === a && de === b) {
+            els.unknownSideBox.innerHTML = `${createFractionHTML(d,c)}<span>×</span>${createFractionHTML(a,b)}`;
+            els.unknownSideBox.classList.remove('unknown');
+            els.unknownSideBox.classList.add('solved'); 
+            els.algStep2.style.display = 'none';
+            els.simplificationStep.style.display = 'block';
+            els.simplificationStep.innerHTML = `<p>Excellent! Now simplify the algebraic expression.</p><div class="algebra-expression"><span>${createFractionHTML(d,c)} × ${createFractionHTML(a,b)} = </span><div class="fraction-input"><div class="num"><input id="simp_n" type="number"></div><div class="den"><input id="simp_d" type="number"></div></div><button id="simp_ok" class="btn">OK</button></div>`;
+            getEl('simp_ok').addEventListener('click', checkSimplification);
+        } else { alert("That's not the target area fraction. Look at the green box."); }
+    };
+
+    const checkSimplification = async () => {
+         const els = getDOMElements();
+        const n = +getEl('simp_n').value, de = +getEl('simp_d').value;
+        if (n === unknownSide.num && de === unknownSide.den) {
+            els.simplificationStep.innerHTML = `<p style="color: var(--success); font-weight: bold;">Algebraic simplification complete!</p>`;
+            if (!els.master.classList.contains('green')) {
+                els.resultWrapper.innerHTML = `<span>=</span>${createFractionHTML(a,b)}<span>×</span>${createFractionHTML(d,c)}<span>=</span><b style="color:var(--success);">${createFractionHTML(unknownSide.num,unknownSide.den)}</b>`;
+                els.master.classList.add('green');
+            }
+        } else { alert(`Incorrect. Multiply the numerators (${d}×${a}), then multiply the denominators (${c}×${b}).`); }
+    };
+
+    const reset = () => {
+        const els = getDOMElements();
+        [els.aIn, els.bIn, els.cIn, els.dIn].forEach(el => el.disabled = false);
+        els.aIn.value = 1; els.bIn.value = 3; els.cIn.value = 2; els.dIn.value = 5;
+        els.unitSquare.innerHTML = '';
+        els.unitSquare.style.width = `${UNIT_SQUARE_SIZE}px`; // Reset canvas width
+        els.mainContainer.style.flexDirection = ''; // Reset flex direction
+        els.resultWrapper.innerHTML = '';
+        els.master.classList.remove('green');
+        [els.algebraContainer, els.algStep1, els.algStep2, els.simplificationStep, els.summary, els.proofDisplay].forEach(el => el.style.display = 'none');
+        els.geometryControls.style.display = 'flex';
+        els.drawSideBtn.disabled = false;
+        els.shadeBtn.disabled = true;
+        els.gridBtn.style.display = 'none';
+        els.gridBtn.disabled = true;
+        els.proofBtn.style.display = 'none';
+        els.proofBtn.disabled = true;
+        els.unknownSideBox.classList.remove('solved');
+        els.unknownSideBox.classList.add('unknown');
+        [els.targetBox, els.knownSideBox, els.unknownSideBox].forEach(box => box.innerHTML = '');
+    };
+    window.fracDivReset = reset; // Expose reset to global scope
+
+    // Event listeners
+    const els = getDOMElements();
+    els.drawSideBtn.addEventListener('click', drawKnownSide);
+    els.shadeBtn.addEventListener('click', shadeTargetArea);
+    els.gridBtn.addEventListener('click', drawUnknownSideGrid);
+    els.proofBtn.addEventListener('click', countCellsProof);
+    els.resetBtn.addEventListener('click', reset);
+    reset(); // Initial call
+})();
+
+// Initial tab activation and reset on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Manually activate the first tab and call its reset function to set up its initial state
+    showTab('intAddTab');
+    if (window.intAddReset) {
+        window.intAddReset();
+    }
+});
+</script>
+</body>
+</html>
