@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Algebra Explorer</title>
+    <script>
+        MathJax = { tex: { inlineMath: [['$', '$']], packages: {'[+]': ['ams']} } };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+        }
+      }
+    </script>
+    <style>
+        :root {
+            --primary-color: #1565c0; --light-gray: #f5f5f5; --medium-gray: #e0e0e0;
+            --dark-gray: #424242; --text-color: #212121; --success-color: #388e3c;
+            --error-color: #d32f2f; --info-color: #0288d1; --purple-color: #673ab7;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--light-gray); color: var(--text-color); padding: 20px; line-height: 1.6;
+        }
+        .container {
+            max-width: 1800px; margin: 0 auto; background: white; padding: 20px;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 { color: var(--primary-color); }
+        h1 { text-align: center; margin-bottom: 20px; font-size: 2.2rem; }
+        h2 { margin: 25px 0 15px; font-size: 1.8rem; border-bottom: 2px solid var(--medium-gray); padding-bottom: 5px; }
+        h3 { margin: 15px 0 10px; font-size: 1.3rem; }
+        h4 { margin: 10px 0 5px; font-size: 1.1rem; color: var(--dark-gray); }
+
+        #control-panel, #analysis-section, .card {
+            background: #fdfdfd; border: 1px solid var(--medium-gray); padding: 20px;
+            border-radius: 8px; margin-bottom: 20px;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; }
+        .dim-selector { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        .dim-selector label { font-weight: bold; }
+        .dim-selector input[type="number"] { width: 60px; padding: 5px; font-size: 1rem; border: 1px solid var(--medium-gray); border-radius: 4px; }
+        #matrix-input-container .matrix-cell input { width: 60px; text-align: center; border: 1px solid #ccc; border-radius: 4px; padding: 6px; font-size: 1rem; transition: all 0.2s; }
+        #matrix-input-container .matrix-cell input:focus { border-color: var(--primary-color); box-shadow: 0 0 5px rgba(21, 101, 192, 0.3); outline: none; }
+        
+        #analysis-section { padding: 10px 20px; background: #fafafa; }
+        #status-bar { padding: 15px; text-align: center; border-radius: 6px; margin-top: 15px; transition: all 0.3s; }
+        .status-unique { background-color: #e8f5e9; border: 1px solid var(--success-color); } .status-unique h3 { color: var(--success-color); }
+        .status-infinite { background-color: #e1f5fe; border: 1px solid var(--info-color); } .status-infinite h3 { color: var(--info-color); }
+        .status-none { background-color: #ffebee; border: 1px solid var(--error-color); } .status-none h3 { color: var(--error-color); }
+        #status-bar p { margin: 5px 0 0; }
+        .math-display { background: white; padding: 15px; margin: 10px 0; border-radius: 4px; font-size: 1.1rem; text-align: center; overflow-x: auto; min-height: 60px; border: 1px solid #eee; }
+        .matrix-equation { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .matrix-bracket { font-size: 2.5em; font-weight: 100; color: #333; }
+        .matrix-content { display: inline-table; margin: 0 5px; }
+        .matrix-row { display: table-row; }
+        .matrix-cell { display: table-cell; padding: 8px 12px; text-align: center; min-width: 40px; }
+        .matrix-divider { display: table-cell; padding: 0 8px; border-left: 1px dashed #aaa; }
+
+        .tabs { display: flex; border-bottom: 2px solid var(--medium-gray); margin-bottom: 20px; overflow-x: auto; }
+        .tab { padding: 12px 24px; cursor: pointer; background: none; border: none; color: var(--dark-gray); font-size: 1rem; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        canvas { width: 100% !important; height: 450px !important; background: #fff; border: 1px solid var(--medium-gray); border-radius: 4px; display: block; touch-action: none; }
+        
+        .synthesis-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
+        .synthesis-table th, .synthesis-table td { border-bottom: 1px solid var(--medium-gray); padding: 12px 15px; text-align: left; }
+        .synthesis-table th { background-color: var(--light-gray); }
+        .synthesis-table td:not(:first-child) { border-left: 2px solid var(--medium-gray); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Linear Algebra Explorer</h1>
+
+        <div id="control-panel">
+            <h2>🎛️ Control Panel</h2>
+            <div class="dim-selector">
+                <label for="m-rows">Equations (m):</label>
+                <input type="number" id="m-rows" value="2" min="1" max="5">
+                <label for="n-cols">Unknowns (n):</label>
+                <input type="number" id="n-cols" value="2" min="1" max="5">
+            </div>
+            <div id="matrix-input-container"></div>
+        </div>
+
+        <div id="analysis-section">
+            <h2>📊 Analysis</h2>
+            <div id="central-rref" class="math-display"></div>
+            <div id="status-bar"></div>
+        </div>
+
+        <div id="visualization-tabs">
+            <div class="tabs">
+                <button class="tab active" data-tab="row" onclick="window.showTab('row')">📚 Row Picture</button>
+                <button class="tab" data-tab="column" onclick="window.showTab('column')">➡️ Column Picture</button>
+                <button class="tab" data-tab="subspace" onclick="window.showTab('subspace')">🔲 Subspace Picture</button>
+                <button class="tab" data-tab="synthesis" onclick="window.showTab('synthesis')">✨ Synthesis</button>
+            </div>
+            
+            <div id="row" class="tab-content active">
+                <div class="card">
+                    <h4>Parametric Solution</h4>
+                    <div id="row-solution-text" class="math-display"></div>
+                </div>
+                <div class="card">
+                    <h4>Geometric Interpretation</h4>
+                    <p>The intersection of lines or planes. In 2D, you can click and drag the lines to explore!</p>
+                    <canvas id="row-canvas"></canvas>
+                </div>
+            </div>
+
+            <div id="column" class="tab-content">
+                <div class="card">
+                    <h4>Vector Solution</h4>
+                    <div id="column-solution-text" class="math-display"></div>
+                </div>
+                <div class="card">
+                    <h4>Geometric Interpretation</h4>
+                    <p>A solution exists if the point representing $\vec{b}$ is in the span of the column vectors.</p>
+                    <canvas id="column-canvas"></canvas>
+                </div>
+            </div>
+
+            <div id="subspace" class="tab-content">
+                <div class="card">
+                    <h4>Vector Solution</h4>
+                    <p>The general solution $\vec{x}$ is the sum of a particular solution $\vec{x}_p$ and the homogeneous solution $\vec{x}_h$ from the Kernel.</p>
+                    <div id="subspace-solution-text" class="math-display"></div>
+                </div>
+                <div class="card">
+                     <h4>Domain ($\mathbb{R}^n$) and Codomain ($\mathbb{R}^m$)</h4>
+                     <div class="grid">
+                         <div>
+                            <p><strong>Domain:</strong> Kernel & Solution Set</p>
+                            <canvas id="subspace-domain-canvas"></canvas>
+                         </div>
+                         <div>
+                            <p><strong>Codomain:</strong> Image & Target Point $\vec{b}$</p>
+                            <canvas id="subspace-codomain-canvas"></canvas>
+                         </div>
+                     </div>
+                </div>
+            </div>
+
+            <div id="synthesis" class="tab-content">
+                <div class="card">
+                    <table id="synthesis-content" class="synthesis-table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    class Fraction {
+        constructor(num, den = 1) {if (num instanceof Fraction) {this.num = num.num;this.den = num.den;return;}if (typeof num === 'string' && num.includes('/')) {const parts = num.split('/');num = parseInt(parts[0]);den = parseInt(parts[1]);}if (!Number.isInteger(num) || !Number.isInteger(den)) {const dec = Math.max((num.toString().split('.')[1] || '').length, (den.toString().split('.')[1] || '').length);const mult = Math.pow(10, dec);num = Math.round(num * mult);den = Math.round(den * mult);}if (den === 0) throw new Error("Denominator cannot be zero.");const common = this.gcd(Math.abs(num), Math.abs(den));this.num = num / common;this.den = den / common;if (this.den < 0) {this.num = -this.num;this.den = -this.den;}}gcd(a, b) {while (b) {[a, b] = [b, a % b];}return a;}add(o) {o = new Fraction(o);return new Fraction(this.num * o.den + o.num * this.den, this.den * o.den);}subtract(o) {o = new Fraction(o);return new Fraction(this.num * o.den - o.num * this.den, this.den * o.den);}multiply(o) {o = new Fraction(o);return new Fraction(this.num * o.num, this.den * o.den);}divide(o) {o = new Fraction(o);if (o.isZero()) throw new Error("Division by zero.");return new Fraction(this.num * o.den, this.den * o.num);}isZero() {return this.num === 0;}toFloat() {return this.num / this.den;}toHTML() {if (this.den === 1) return this.num.toString();if (this.num === 0) return "0";return `\\frac{${this.num}}{${this.den}}`;}
+    }
+
+    let system = { m: 2, n: 2, A: [], b: [], variables: [] };
+    let threeScenes = {};
+    let canvasInteraction = { dragging: false, lineIndex: -1 };
+
+    function initControls() {
+        const m_input = document.getElementById('m-rows');
+        const n_input = document.getElementById('n-cols');
+        const createNewSystem = () => {
+            system.m = parseInt(m_input.value);
+            system.n = parseInt(n_input.value);
+            generateDefaultSystem(system.m, system.n);
+            generateMatrixInput();
+            updateSystem();
+        };
+        m_input.addEventListener('change', createNewSystem);
+        n_input.addEventListener('change', createNewSystem);
+        createNewSystem();
+    }
+
+    function generateDefaultSystem(m, n) {
+        const defaultExamples = {
+            '2x2': [[1, 1], [2, -1], [3, 0]],
+            '2x3': [[1, 2, -1], [2, 3, 1], [4, 5]],
+            '3x2': [[1, 2], [3, 1], [1, -1], [4, 5, 2]],
+            '3x3': [[1, 1, 2], [2, 1, 3], [1, -1, -1], [6, 8, 0]],
+        };
+        const key = `${m}x${n}`;
+        const data = defaultExamples[key] || [];
+        system.A = Array.from({ length: m }, (_, i) => Array.from({ length: n }, (_, j) => new Fraction(data[i]?.[j] ?? (i === j ? 1 : 0))));
+        system.b = Array.from({ length: m }, (_, i) => new Fraction(data[m]?.[i] ?? i + 1));
+        const allVars = ['x','y','z','w','v'];
+        system.variables = allVars.slice(0, n);
+    }
+
+    function generateMatrixInput() {
+        const container = document.getElementById('matrix-input-container');
+        let html = '<h4>System [A|b]</h4><div class="matrix-equation"><span class="matrix-bracket">[</span><div class="matrix-content">';
+        for (let i = 0; i < system.m; i++) {
+            html += '<div class="matrix-row">';
+            for (let j = 0; j < system.n; j++) {
+                html += `<div class="matrix-cell"><input type="number" step="0.5" id="A_${i}_${j}" value="${system.A[i][j].toFloat()}"></div>`;
+            }
+            html += '<div class="matrix-divider"></div>';
+            html += `<div class="matrix-cell"><input type="number" step="0.5" id="b_${i}" value="${system.b[i].toFloat()}"></div>`;
+            html += '</div>';
+        }
+        html += '</div><span class="matrix-bracket">]</span></div>';
+        container.innerHTML = html;
+        container.querySelectorAll('input').forEach(input => input.addEventListener('change', updateSystemFromGrid));
+    }
+
+    function updateSystemFromGrid() {
+        for (let i = 0; i < system.m; i++) {
+            for (let j = 0; j < system.n; j++) {
+                system.A[i][j] = new Fraction(parseFloat(document.getElementById(`A_${i}_${j}`).value));
+            }
+            system.b[i] = new Fraction(parseFloat(document.getElementById(`b_${i}`).value));
+        }
+        updateSystem();
+    }
+
+    function updateSystem() {
+        try {
+            system.augmented = system.A.map((row, i) => [...row, system.b[i]]);
+            calculateRREF();
+            analyzeSolution();
+            updateUI();
+        } catch (error) {
+            console.error("Error during system update:", error);
+            document.getElementById('status-bar').innerHTML = `<p style="color:var(--error-color)">Error: ${error.message}</p>`;
+        }
+    }
+    
+    function updateUI() {
+        updateRREFDisplay();
+        updateStatusbar();
+        updateSolutionTexts();
+        updateSynthesisView();
+        const activeTabName = document.querySelector('.tab.active').dataset.tab;
+        redrawActiveCanvas(activeTabName);
+        MathJax.typesetPromise();
+    }
+
+    function calculateRREF() { let M = system.augmented.map(row => row.map(val => new Fraction(val))); let lead = 0; const rows = M.length; if(rows === 0) return; const cols = M[0].length; for (let r = 0; r < rows; r++) { if (lead >= cols) break; let i = r; while (i < rows && M[i][lead].isZero()) i++; if (i === rows) { lead++; r--; continue; } [M[i], M[r]] = [M[r], M[i]]; let val = M[r][lead]; if(val.isZero()) continue; for (let j = 0; j < cols; j++) M[r][j] = M[r][j].divide(val); for (let i_other = 0; i_other < rows; i_other++) { if (i_other !== r) { val = M[i_other][lead]; for (let j = 0; j < cols; j++) M[i_other][j] = M[i_other][j].subtract(val.multiply(M[r][j])); } } lead++; } system.rref = M; }
+    
+    function analyzeSolution() { const numVars = system.n; const rref = system.rref; system.pivotCols = []; system.freeCols = []; for (const row of rref) { const isAllZeroCoeffs = row.slice(0, numVars).every(c => c.isZero()); if (isAllZeroCoeffs && !row[numVars].isZero()) { system.solutionType = 'none'; system.rank = rref.filter(r => r.slice(0, numVars).some(c => !c.isZero())).length; system.nullity = numVars - system.rank; return; } } let r_idx = 0; for (let c_idx = 0; c_idx < numVars; c_idx++) { if (r_idx < rref.length && !rref[r_idx][c_idx].isZero()) { system.pivotCols.push(c_idx); r_idx++; } else { system.freeCols.push(c_idx); } } system.rank = system.pivotCols.length; system.nullity = numVars - system.rank; system.solutionType = (system.nullity === 0) ? 'unique' : 'infinite'; }
+    
+    function updateRREFDisplay() { document.getElementById('central-rref').innerHTML = formatAugmentedMatrix(system.rref, system.n); }
+    
+    function updateStatusbar() { const bar = document.getElementById('status-bar'); let hint; if (system.solutionType === 'unique') { hint = 'The system has exactly one solution (a single point).'; } else if (system.solutionType === 'infinite') { const dim_text = system.nullity === 1 ? 'a line' : `a ${system.nullity}-dimensional space`; hint = `The solution forms an infinite set (${dim_text}).`; } else { hint = 'The system is inconsistent; no solution exists.'; } const types = { unique: { class: 'status-unique', title: 'Unique Solution', icon: '✔️'}, infinite: { class: 'status-infinite', title: 'Infinite Solutions', icon: '♾️'}, none: { class: 'status-none', title: 'No Solution', icon: '❌'} }; const status = types[system.solutionType]; bar.className = status.class; bar.innerHTML = `<h3>${status.icon} ${status.title}</h3><p>${hint}</p><p><strong>Rank(A)</strong> = ${system.rank} | <strong>Nullity(A)</strong> = ${system.nullity}</p>`; };
+    
+    function updateSolutionTexts() {
+        const hsText = getHighSchoolSolutionText();
+        const vecText = getVectorSolutionText();
+        document.getElementById('row-solution-text').innerHTML = hsText;
+        document.getElementById('column-solution-text').innerHTML = vecText;
+        document.getElementById('subspace-solution-text').innerHTML = vecText;
+    }
+
+    function updateSynthesisView() { const messages = { unique: { hs: "Lines/planes intersect at a single point.", vec: "$\\vec{b}$ is a unique linear combination of the column vectors.", mat: "The solution is a single point. The kernel is trivial: $\\{\\vec{0}\\}$." }, infinite: { hs: `The intersection forms an infinite set of points (e.g., a line or a plane).`, vec: "$\\vec{b}$ can be formed by infinitely many linear combinations of the columns.", mat: `The solution set is an infinite space (a translated copy of the kernel).` }, none: { hs: "Lines/planes have no common intersection.", vec: "$\\vec{b}$ is outside the span (Image) of the column vectors.", mat: "$\\vec{b}$ is not in the Image of A." } }; let html = `<thead><tr><th></th><th style="color:var(--success-color)">One Solution</th><th style="color:var(--info-color)">Infinite Solutions</th><th style="color:var(--error-color)">No Solution</th></tr></thead><tbody>`; html += `<tr><th>📚 Row Picture</th><td>${messages.unique.hs}</td><td>${messages.infinite.hs}</td><td>${messages.none.hs}</td></tr>`; html += `<tr><th>➡️ Column Picture</th><td>${messages.unique.vec}</td><td>${messages.infinite.vec}</td><td>${messages.none.vec}</td></tr>`; html += `<tr><th>🔲 Subspace Picture</th><td>${messages.unique.mat}</td><td>${messages.infinite.mat}</td><td>${messages.none.mat}</td></tr></tbody>`; document.getElementById('synthesis-content').innerHTML = html; }
+    
+    function formatAugmentedMatrix(matrix, varCount) { let h='<div class="matrix-equation"><div class="matrix-wrapper"><span class="matrix-bracket">[</span><div class="matrix-content">'; matrix.forEach(r=>{ h+='<div class="matrix-row">'; r.forEach((c,j)=>{ if(j===varCount) h+='<div class="matrix-divider"></div>'; h+=`<div class="matrix-cell">$${c.toHTML()}$</div>`; }); h+='</div>'; }); h+='</div><span class="matrix-bracket">]</span></div></div>'; return h; };
+    
+    function getParticularSolution() { const particularSol = new Array(system.n).fill(new Fraction(0)); let pivotRow = 0; for (let col = 0; col < system.n; col++) { if (system.pivotCols.includes(col) && pivotRow < system.rref.length) { particularSol[col] = system.rref[pivotRow][system.n]; pivotRow++; } } return particularSol; };
+    
+    function getNullSpaceBasis() { if (system.nullity === 0) return []; const basisVectors = []; for (let k = 0; k < system.freeCols.length; k++) { const basisVector = new Array(system.n).fill(new Fraction(0)); const freeColIndex = system.freeCols[k]; basisVector[freeColIndex] = new Fraction(1); let pivotRow = 0; for (let i = 0; i < system.pivotCols.length; i++) { const pivotColIndex = system.pivotCols[i]; const val = system.rref[pivotRow][freeColIndex]; basisVector[pivotColIndex] = val.multiply(new Fraction(-1)); pivotRow++; } basisVectors.push(basisVector); } return basisVectors; };
+    
+    function getVectorSolutionText() { if (system.solutionType === 'none') return '<p style="color:var(--error-color)">No Solution Exists</p>'; const formatVector = (vec) => `\\begin{pmatrix} ${vec.map(f => f.toHTML()).join(' \\\\ ')} \\end{pmatrix}`; const xp = getParticularSolution(); if (system.solutionType === 'unique') return `$\\vec{x} = ${formatVector(xp)}$`; const xh = getNullSpaceBasis(); const xh_str = xh.map((vec, i) => `t_{${i+1}} ${formatVector(vec)}`).join(' + '); return `$\\vec{x} = \\underbrace{${formatVector(xp)}}_{\\vec{x}_p} + \\underbrace{${xh_str}}_{\\text{Kernel}(A)}$`; };
+    
+    function getHighSchoolSolutionText() { if(system.solutionType === 'none') return '<p style="color:var(--error-color)">No Solution</p>'; const xp = getParticularSolution(); if(system.solutionType === 'unique') return xp.map((v, i) => `$${system.variables[i]} = ${v.toHTML()}$`).join('<br>'); const xh = getNullSpaceBasis(); return system.variables.map((v, i) => { let line = `$${system.variables[i]} = ${xp[i].toHTML()}`; xh.forEach((nsVec, nsIdx) => { const coeff = nsVec[i]; if (!coeff.isZero()) { let sign = coeff.toFloat() > 0 ? '+' : '-'; let valStr = coeff.toHTML().replace('-', ''); if (valStr === '1' && system.nullity > 0) valStr = ''; line += ` ${sign} ${valStr} t_{${nsIdx+1}}`; } }); return line.replace('= 0 +', '=').replace('= 0 -', '= -').replace(/\+ -/g, '-') + '$'; }).join('<br>'); };
+    
+    function redrawActiveCanvas(tabName) { Object.values(threeScenes).forEach(s => { if(s.renderer) s.renderer.dispose(); if(s.scene) s.scene.clear(); }); threeScenes = {}; ['row-canvas', 'column-canvas', 'subspace-domain-canvas', 'subspace-codomain-canvas'].forEach(id => { const canvas = document.getElementById(id); if(canvas) { const ctx = canvas.getContext('2d'); ctx.clearRect(0,0, canvas.width, canvas.height); } }); if (tabName === 'subspace') { if (system.n > 1 && system.n < 4) ((system.n == 2) ? draw2DDomain : draw3DDomain)('subspace-domain-canvas'); else drawNDPlaceholder('subspace-domain-canvas', `Domain is ${system.n}D`); if (system.m > 1 && system.m < 4) ((system.m == 2) ? draw2DCodomain : draw3DCodomain)('subspace-codomain-canvas'); else drawNDPlaceholder('subspace-codomain-canvas', `Codomain is ${system.m}D`); return; } const canvasId = tabName + '-canvas'; if(system.n < 2 || system.n > 3) { drawNDPlaceholder(canvasId, `System is ${system.n}D`); return; } const renderMap = { 2: { row: draw2DRowPicture, column: draw2DColumnPicture }, 3: { row: draw3DRowPicture, column: draw3DColumnPicture } }; if (renderMap[system.n] && renderMap[system.n][tabName]) { renderMap[system.n][tabName](canvasId); } else { drawNDPlaceholder(canvasId, 'Visualization not available.'); } };
+    
+    function handleCanvasMouseDown(e) { if (system.n !== 2) return; const canvas = e.target; const rect = canvas.getBoundingClientRect(); const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top; const { centerX, centerY, scale } = setup2DCanvas('row-canvas', system.variables); if(!scale) return; for (let i = 0; i < system.m; i++) { const a = system.A[i][0].toFloat(); const b = system.A[i][1].toFloat(); const c = system.b[i].toFloat(); const x = (mouseX - centerX) / scale; const y = (centerY - mouseY) / scale; const dist = Math.abs(a * x + b * y - c) / Math.sqrt(a*a + b*b); if (dist < 0.5) { canvasInteraction.dragging = true; canvasInteraction.lineIndex = i; canvas.style.cursor = 'move'; return; } } };
+    
+    function handleCanvasMouseMove(e) { if (!canvasInteraction.dragging || system.n !== 2) return; const i = canvasInteraction.lineIndex; const canvas = e.target; const rect = canvas.getBoundingClientRect(); const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top; const { centerX, centerY, scale } = setup2DCanvas('row-canvas', system.variables); if(!scale) return; const worldX = (mouseX - centerX) / scale; const worldY = (centerY - mouseY) / scale; const a = system.A[i][0].toFloat(); const b = system.A[i][1].toFloat(); const newC = a * worldX + b * worldY; system.b[i] = new Fraction(newC); document.getElementById(`b_${i}`).value = newC.toFixed(2); updateSystem(); };
+    
+    function handleCanvasMouseUp(e) { if (canvasInteraction.dragging) { canvasInteraction.dragging = false; canvasInteraction.lineIndex = -1; e.target.style.cursor = 'default'; updateSystem(); } };
+    
+    window.showTab = (tabName) => { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelector(`[data-tab="${tabName}"]`).classList.add('active'); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); document.getElementById(tabName).classList.add('active'); updateSystem(); };
+    
+    function setup2DCanvas(canvasId, axisLabels) { const canvas = document.getElementById(canvasId); if(!canvas) return {}; const ctx = canvas.getContext('2d'); canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; const allValues = [...system.A.flat().map(f => Math.abs(f.toFloat())), ...system.b.map(f => Math.abs(f.toFloat()))]; const maxVal = Math.max(...allValues.filter(v=>!isNaN(v)), 5); const scale = (Math.min(canvas.width, canvas.height) / 2) / (maxVal * 1.2 || 5); const centerX = canvas.width / 2; const centerY = canvas.height / 2; ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0,centerY); ctx.lineTo(canvas.width,centerY); ctx.stroke(); ctx.beginPath(); ctx.moveTo(centerX,0); ctx.lineTo(centerX,canvas.height); ctx.stroke(); if(axisLabels) { ctx.fillStyle = '#666'; ctx.font = '12px Arial'; if(axisLabels[0]) ctx.fillText(axisLabels[0], canvas.width - 15, centerY - 10); if(axisLabels[1]) ctx.fillText(axisLabels[1], centerX + 10, 15); } return { ctx, centerX, centerY, scale, width: canvas.width, height: canvas.height }; };
+    function draw2DRowPicture(canvasId) { const { ctx, centerX, centerY, scale, width, height } = setup2DCanvas(canvasId, system.variables); if(!ctx) return; const colors = ['#1565c0', '#d32f2f', '#388e3c', '#ff8f00', '#673ab7']; system.A.forEach((row, i) => { const a = row[0].toFloat(), b = row[1].toFloat(), c = system.b[i].toFloat(); ctx.strokeStyle = colors[i % colors.length]; ctx.lineWidth = (canvasInteraction.lineIndex === i) ? 4 : 2.5; ctx.beginPath(); if (Math.abs(b) > 1e-6) { const x1 = -width/2 / scale; const x2 = width/2 / scale; const y1 = (c - a * x1) / b; const y2 = (c - a * x2) / b; ctx.moveTo(centerX + x1 * scale, centerY - y1 * scale); ctx.lineTo(centerX + x2 * scale, centerY - y2 * scale); } else if (Math.abs(a) > 1e-6) { const x = c / a; ctx.moveTo(centerX + x * scale, 0); ctx.lineTo(centerX + x * scale, height); } ctx.stroke(); }); };
+    function drawNDPlaceholder(canvasId, reason) { const canvas = document.getElementById(canvasId); if(!canvas) return; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#666'; ctx.font = '16px Arial'; ctx.textAlign = 'center'; let msg = `Visualization for ${reason} is not possible.`; ctx.fillText(msg, canvas.width / 2, canvas.height / 2); };
+    function init3DScene(canvasId) { const canvas = document.getElementById(canvasId); if(!canvas) return {}; const scene = new THREE.Scene(); scene.background = new THREE.Color(0xffffff); const camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000); camera.position.set(8, 8, 8); const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); renderer.setSize(canvas.clientWidth, canvas.clientHeight); renderer.setPixelRatio(window.devicePixelRatio); const controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = true; const axesHelper = new THREE.AxesHelper(10); scene.add(axesHelper); const gridHelper = new THREE.GridHelper(20, 20); gridHelper.material.opacity = 0.25; gridHelper.material.transparent = true; scene.add(gridHelper); scene.add(new THREE.AmbientLight(0xffffff, 0.6)); const light = new THREE.DirectionalLight(0xffffff, 1); light.position.set(5, 10, 7.5); scene.add(light); threeScenes[canvasId] = { scene, camera, renderer, controls }; function animate() { if(!threeScenes[canvasId] || !threeScenes[canvasId].renderer) return; requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); } animate(); return threeScenes[canvasId]; };
+    function draw2DColumnPicture(canvasId) { const { ctx, centerX, centerY, scale } = setup2DCanvas(canvasId, null); if(!ctx) return; const colors = ['#1565c0', '#d32f2f', '#388e3c', '#673ab7']; const origin = { x: centerX, y: centerY }; const drawArrow = (to, color, label) => { ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(origin.x, origin.y); ctx.lineTo(origin.x + to.x, origin.y - to.y); ctx.stroke(); const headlen = 10; const angle = Math.atan2(to.y, to.x); ctx.beginPath(); ctx.moveTo(origin.x + to.x, origin.y - to.y); ctx.lineTo(origin.x + to.x - headlen * Math.cos(angle - Math.PI / 6), origin.y - to.y + headlen * Math.sin(angle - Math.PI / 6)); ctx.lineTo(origin.x + to.x - headlen * Math.cos(angle + Math.PI / 6), origin.y - to.y + headlen * Math.sin(angle + Math.PI / 6)); ctx.fill(); if(label) ctx.fillText(label, origin.x + to.x + 5, origin.y - to.y - 5); }; system.A[0].forEach((_, j) => { drawArrow({x: system.A[0][j].toFloat()*scale, y: system.A[1][j].toFloat()*scale}, colors[j % colors.length], system.variables[j]); }); const bVec = {x:system.b[0].toFloat()*scale, y:system.b[1].toFloat()*scale}; drawArrow(bVec, colors[3], 'b'); }
+    function draw3DRowPicture(canvasId) { const { scene } = init3DScene(canvasId); if(!scene) return; const colors = [0x1565c0, 0xd32f2f, 0x388e3c]; system.A.forEach((row, i) => { const normal = new THREE.Vector3(row[0].toFloat(), row[1].toFloat(), row[2].toFloat()); if (normal.length() < 1e-6) return; const plane = new THREE.Plane(normal, -system.b[i].toFloat()); const planeGeom = new THREE.PlaneGeometry(30, 30); const coplanarPoint = new THREE.Vector3(); plane.coplanarPoint(coplanarPoint); const quaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1), normal.clone().normalize()); planeGeom.applyQuaternion(quaternion); planeGeom.translate(coplanarPoint.x, coplanarPoint.y, coplanarPoint.z); const material = new THREE.MeshLambertMaterial({ color: colors[i % colors.length], side: THREE.DoubleSide, transparent: true, opacity: 0.6 }); scene.add(new THREE.Mesh(planeGeom, material)); }); };
+    function draw3DColumnPicture(canvasId) { const { scene } = init3DScene(canvasId); if(!scene) return; const colors = [0x1565c0, 0xd32f2f, 0x388e3c, 0x673ab7]; const addArrow = (dir, color) => { if(dir.length() > 1e-6) scene.add(new THREE.ArrowHelper(dir.clone().normalize(), new THREE.Vector3(0,0,0), dir.length(), color, 0.5, 0.3)); }; system.A[0].forEach((_, j) => { const dir = new THREE.Vector3(...system.A.map(row => row[j].toFloat())); addArrow(dir, colors[j % colors.length]); }); const b_dir = new THREE.Vector3(...system.b.map(f => f.toFloat())); addArrow(b_dir, colors[3]); }
+    function draw2DDomain(canvasId) { const { ctx, centerX, centerY, scale } = setup2DCanvas(canvasId, system.variables); if(!ctx) return; const nullBasis = getNullSpaceBasis(); if (system.nullity === 1) { const [x, y] = nullBasis[0].map(f => f.toFloat()); ctx.strokeStyle = 'rgba(56, 142, 60, 0.7)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(centerX - x * 100 * scale, centerY + y * 100 * scale); ctx.lineTo(centerX + x * 100 * scale, centerY - y * 100 * scale); ctx.stroke(); } else if (system.nullity === 2) { ctx.fillStyle = 'rgba(56, 142, 60, 0.2)'; ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height); } else if (system.nullity === 0) { ctx.fillStyle = '#388e3c'; ctx.beginPath(); ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI); ctx.fill(); } }
+    function draw2DCodomain(canvasId) { const { ctx, centerX, centerY, scale } = setup2DCanvas(canvasId, ['y₁', 'y₂']); if(!ctx) return; if (system.rank === 1 && system.m === 2) { const colVecs = system.A[0].map((_, c) => system.A.map(r => r[c].toFloat())); const basisVec = colVecs.find(v => v.some(c => Math.abs(c) > 1e-6)); if (basisVec) { const [x, y] = basisVec; ctx.strokeStyle = 'rgba(21, 101, 192, 0.7)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(centerX - x * 100 * scale, centerY + y * 100 * scale); ctx.lineTo(centerX + x * 100 * scale, centerY - y * 100 * scale); ctx.stroke(); } } else if (system.rank >= 2) { ctx.fillStyle = 'rgba(21, 101, 192, 0.2)'; ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height); } const bVec = system.b.map(f => f.toFloat()); ctx.fillStyle = '#673ab7'; ctx.beginPath(); ctx.arc(centerX + bVec[0] * scale, centerY - bVec[1] * scale, 6, 0, 2*Math.PI); ctx.fill(); }
+    function draw3DDomain(canvasId) { const { scene } = init3DScene(canvasId); if(!scene) return; const nullBasis = getNullSpaceBasis(); if (system.nullity === 1) { const dir = new THREE.Vector3(...nullBasis[0].map(f => f.toFloat())).normalize(); const lineGeom = new THREE.BufferGeometry().setFromPoints([dir.clone().multiplyScalar(-20), dir.clone().multiplyScalar(20)]); scene.add(new THREE.Line(lineGeom, new THREE.LineBasicMaterial({ color: 0x388e3c, linewidth: 3 }))); } else if (system.nullity === 2) { const v1 = new THREE.Vector3(...nullBasis[0].map(f => f.toFloat())); const v2 = new THREE.Vector3(...nullBasis[1].map(f => f.toFloat())); const normal = v1.clone().cross(v2).normalize(); scene.add(new THREE.PlaneHelper(new THREE.Plane(normal, 0), 20, 0x388e3c)); } }
+    function draw3DCodomain(canvasId) { const { scene } = init3DScene(canvasId); if(!scene) return; if (system.rank > 0) { const colVectors = system.A[0].map((_, c) => new THREE.Vector3(...system.A.map(r => r[c].toFloat()))); if (system.rank === 1) { const dir = colVectors.find(v => v.length() > 1e-6).normalize(); const lineGeom = new THREE.BufferGeometry().setFromPoints([dir.clone().multiplyScalar(-20), dir.clone().multiplyScalar(20)]); scene.add(new THREE.Line(lineGeom, new THREE.LineBasicMaterial({ color: 0x1565c0, linewidth: 3 }))); } else if (system.rank === 2) { const basis = []; for(const v of colVectors) { if (v.length() > 1e-6 && (basis.length === 0 || basis[0].clone().cross(v).length() > 1e-6)) basis.push(v); if (basis.length === 2) break; } if (basis.length === 2) { const normal = basis[0].clone().cross(basis[1]).normalize(); scene.add(new THREE.PlaneHelper(new THREE.Plane(normal, 0), 20, 0x1565c0)); } } else if (system.rank >= 3) { const gridHelper = new THREE.GridHelper(20, 20, 0x1565c0, 0x1565c0); gridHelper.material.opacity = 0.15; gridHelper.material.transparent = true; scene.add(gridHelper);}} const b_pos = new THREE.Vector3(...system.b.map(f => f.toFloat())); const b_geom = new THREE.SphereGeometry(0.3, 32, 16); const b_mat = new THREE.MeshBasicMaterial({color: 0x673ab7}); const b_sphere = new THREE.Mesh(b_geom, b_mat); b_sphere.position.copy(b_pos); scene.add(b_sphere); }
+
+    const rowCanvas = document.getElementById('row-canvas');
+    rowCanvas.addEventListener('mousedown', handleCanvasMouseDown);
+    rowCanvas.addEventListener('mousemove', handleCanvasMouseMove);
+    rowCanvas.addEventListener('mouseup', handleCanvasMouseUp);
+    rowCanvas.addEventListener('mouseleave', handleCanvasMouseUp);
+    window.addEventListener('load', initControls);
+</script>
+</body>
+</html>
