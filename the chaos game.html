@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Chaos Game</title>
+
+    <script>
+        window.MathJax = {
+          tex: { inlineMath: [['$', '$']] },
+          startup: { ready: () => { window.MathJax.startup.defaultReady(); } }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1565c0; /* Blue */
+            --primary-light: #e3f2fd;
+            --secondary-color: #c62828; /* Red for trend line */
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+            --card-color: #ffffff;
+            --accent-red: #ef4444;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+        }
+
+        /* --- Global Styles & Structure --- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6; background-color: var(--light-gray); color: var(--text-color);
+            display: flex; justify-content: center; padding: 1rem;
+        }
+        .container {
+            width: 100%; max-width: 900px; margin: 1rem auto; background-color: var(--card-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid var(--medium-gray); border-radius: 12px; padding: 2rem;
+        }
+        h1 { font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        h2 { font-size: 1.5rem; color: var(--dark-gray); margin-top: 1rem; margin-bottom: 1rem; border-bottom: 2px solid var(--medium-gray); padding-bottom: 0.5rem;}
+        h3 { font-size: 1.2rem; color: var(--primary-color); margin-bottom: 1rem; }
+        
+        /* --- Standard Horizontal Tabs --- */
+        .tabs { 
+            display: flex; 
+            justify-content: center;
+            gap: 0.5rem; 
+            margin-bottom: 2rem; 
+            border-bottom: 2px solid var(--medium-gray); 
+        }
+        .tab {
+            padding: 0.75rem 1.5rem; background: none; border: none; cursor: pointer; font-size: 1.1rem;
+            color: var(--dark-gray); transition: all 0.3s ease; border-bottom: 4px solid transparent; transform: translateY(2px);
+        }
+        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- Standard Info & Intro Boxes --- */
+        .info-box, .lab-intro-box {
+            background-color: var(--primary-light); border-left: 4px solid var(--primary-color);
+            padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 8px;
+        }
+        .info-box p, .info-box ul { font-size: 0.95rem; }
+        .info-box ul { padding-left: 1.25rem; margin-top: 0.5rem; }
+        
+        /* --- Layout & Controls --- */
+        .controls-panel {
+            display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-around;
+            padding: 1rem; background-color: var(--light-gray);
+            border-radius: 8px; margin-bottom: 2rem;
+        }
+        .vis-container { border: 1px solid var(--medium-gray); border-radius: 8px; overflow: hidden; margin: 0 auto; max-width: 600px; }
+        #svg, #plot { display: block; width: 100%; height: auto; background-color: #fdfdfd; }
+        .tick text { font-size: 11px; fill: var(--dark-gray); }
+
+        .control-group { flex: 1; min-width: 200px; }
+        label { font-size: 0.9rem; font-weight: 600; color: var(--dark-gray); display: block; margin-bottom: 0.5rem; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        button {
+            padding: 0.75rem 1rem; border: none; border-radius: 8px; background: var(--primary-color); color: white;
+            font-weight: 600; cursor: pointer; font-size: 1rem; transition: background-color 0.2s ease; width: 100%;
+        }
+        .buttons-group { flex-basis: 100%; max-width: 400px; margin: 0 auto; display: flex; gap: 1rem;}
+        button:hover:not(:disabled) { background: #0d47a1; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .value-display { color: var(--primary-color); font-weight: bold; background: white; padding: 0.1rem 0.4rem; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Chaos Game</h1>
+        <div class="tabs">
+            <button class="tab active" data-tab="intro">Introduction</button>
+            <button class="tab" data-tab="sandbox">Fractal Sandbox</button>
+            <button class="tab" data-tab="analysis">Distance Analysis</button>
+        </div>
+
+        <div id="intro" class="tab-content active">
+            <h2> From Chaos to Order</h2>
+            <div class="info-box">
+                <h3>The Jump Recipe</h3>
+                <p>At each step, the computer follows a simple two-part recipe to move the point:</p>
+                <ul>
+                    <li><strong>1. Shrink:</strong> It takes the current point's position and shrinks its distance from the center. The slider <strong>`r`</strong> controls this; a value of <strong>`0.5`</strong> cuts the distance in half.</li>
+                    <li><strong>2. Shift:</strong> It "slides" that shrunken point towards one of the three colored vertices (A, B, or C).</li>
+                </ul>
+                <p>This "Shrink + Shift" rule is called an <strong>affine map</strong>.</p>
+            </div>
+            <div class="info-box">
+                <h3>From Chaos to Order</h3>
+                <p>If the choice of vertex is random, why isn't the result just a messy cloud? The secret is the "Shrink" step. Because every rule shrinks distances ($0 < r < 1$), the process is a <strong>contraction</strong>.</p>
+                <p>A mathematical theorem guarantees that when you repeatedly apply a random set of contraction rules (an <strong>Iterated-Function System</strong> or IFS), the points will always converge to a single, stable shape called an <strong>attractor</strong>. For these rules, the attractor is the famous <strong>Sierpinski Gasket</strong>.</p>
+            </div>
+             <div class="info-box">
+                <h3>The Magic of `r = 0.5`</h3>
+                <p>While any ratio between 0 and 1 will produce a fractal, <strong>$r=0.5$</strong> is the exact value where the three smaller copies of the main triangle fit together perfectly, just touching at their corners.</p>
+                <p><strong>Try it in the sandbox:</strong> Slide <strong>`r`</strong> to <strong>0.4</strong> to see gaps appear, or to <strong>0.6</strong> to see the copies overlap.</p>
+            </div>
+        </div>
+
+        <div id="sandbox" class="tab-content">
+            <div class="lab-intro-box">
+                <p><strong>Welcome to the Fractal Sandbox!</strong> Drag the colored vertices, adjust the sliders to change the rules of the simulation, and click "Run" to see the resulting fractal.</p>
+            </div>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label for="ratio_sandbox">Contraction Ratio `r` (<span id="ratio-val-sandbox" class="value-display">0.50</span>)</label>
+                    <input type="range" id="ratio_sandbox" min="0.2" max="0.8" step="0.01" value="0.5">
+                </div>
+                <div class="control-group">
+                    <label for="steps_sandbox">Iterations `N` (<span id="steps-val-sandbox" class="value-display">5000</span>)</label>
+                    <input type="range" id="steps_sandbox" min="100" max="20000" step="100" value="5000">
+                </div>
+                <div class="control-group buttons-group">
+                    <button id="run_sandbox">Run Simulation</button>
+                    <button id="download_sandbox" disabled>Download CSV</button>
+                </div>
+            </div>
+            <div class="vis-container">
+                <svg id="svg" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+        </div>
+
+        <div id="analysis" class="tab-content">
+             <div class="lab-intro-box">
+                <h3>Understanding the Plot</h3>
+                <p>This chart plots the log of the distance between successive points, $\log(|x_{n+1} - x_n|)$, against the iteration number, $n$.</p>
+                <p>Because the distance shrinks exponentially ($d_n \approx r^n d_0$), using a logarithmic scale transforms this relationship into a straight line:
+                $$ \log(d_n) \approx n \log(r) + \log(d_0) $$
+                The red dashed line shows this theoretical trend. Change the controls below to see how the data and the trend line react.</p>
+            </div>
+            <div class="controls-panel">
+                 <div class="control-group">
+                    <label for="ratio_analysis">Contraction Ratio `r` (<span id="ratio-val-analysis" class="value-display">0.50</span>)</label>
+                    <input type="range" id="ratio_analysis" min="0.2" max="0.8" step="0.01" value="0.5">
+                </div>
+                <div class="control-group">
+                    <label for="steps_analysis">Iterations `N` (<span id="steps-val-analysis" class="value-display">5000</span>)</label>
+                    <input type="range" id="steps_analysis" min="100" max="20000" step="100" value="5000">
+                </div>
+                 <div class="control-group buttons-group">
+                    <button id="run_analysis">Run Simulation</button>
+                    <button id="download_analysis" disabled>Download CSV</button>
+                </div>
+            </div>
+            <h3>Plot of Log-Distance vs. Iteration (n)</h3>
+            <div class="vis-container">
+                <svg id="plot" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- STATE MANAGEMENT ---
+    let simulationData = { pts: [], dists: [] };
+    let verts = [];
+    let appState = { r: 0.5, N: 5000 };
+
+    // --- DOM ELEMENT REFERENCES ---
+    const svg = d3.select('#svg');
+    const plot = d3.select('#plot');
+    // Sandbox controls
+    const ratioInputSandbox = document.getElementById('ratio_sandbox');
+    const stepsInputSandbox = document.getElementById('steps_sandbox');
+    const ratioValSandbox = document.getElementById('ratio-val-sandbox');
+    const stepsValSandbox = document.getElementById('steps-val-sandbox');
+    // Analysis controls
+    const ratioInputAnalysis = document.getElementById('ratio_analysis');
+    const stepsInputAnalysis = document.getElementById('steps_analysis');
+    const ratioValAnalysis = document.getElementById('ratio-val-analysis');
+    const stepsValAnalysis = document.getElementById('steps-val-analysis');
+
+    // --- D3 SETUP ---
+    const W = 600, H = 600;
+    const plotW = 800, plotH = 300;
+    const colour = d3.scaleOrdinal().domain(['A','B','C']).range(['var(--accent-red)','var(--accent-green)','var(--accent-blue)']);
+    const xScale = d3.scaleLinear().range([60, plotW - 20]);
+    const yScale = d3.scaleLog().range([plotH - 30, 20]);
+    const line = d3.line().x((d,i) => xScale(i)).y(d => yScale(d));
+
+    // --- INITIALIZATION ---
+    function initialize() {
+        verts = [{id:'A', x: W / 2, y: 50}, {id:'B', x: 50, y: H - 50}, {id:'C', x: W - 50, y: H - 50}];
+        const drag = d3.drag()
+            .on('start', event => event.sourceEvent.stopPropagation())
+            .on('drag', (event,d) => {
+                d.x = Math.max(0, Math.min(W, event.x));
+                d.y = Math.max(0, Math.min(H, event.y));
+                d3.select(event.sourceEvent.target).attr('cx', d.x).attr('cy', d.y);
+            });
+        svg.selectAll('circle.vertex').data(verts).enter().append('circle')
+            .attr('class','vertex').attr('r', 10).attr('fill', d => colour(d.id))
+            .attr('stroke','#fff').attr('stroke-width', 2).attr('cx', d => d.x).attr('cy', d => d.y)
+            .style('cursor', 'grab').call(drag);
+        runSim();
+    }
+
+    // --- CORE FUNCTIONS ---
+    function runSim(){
+        const pts = [], dists = [];
+        let x = W / 2, y = H / 2;
+        for(let i = 0; i < appState.N; i++){
+            const v = verts[Math.floor(Math.random() * 3)];
+            const newX = appState.r * x + (1 - appState.r) * v.x;
+            const newY = appState.r * y + (1 - appState.r) * v.y;
+            pts.push({x:newX, y:newY, id:v.id});
+            if (i > 0) dists.push(Math.hypot(newX - x, newY - y));
+            x = newX; y = newY;
+        }
+        simulationData = { pts, dists };
+        drawPoints();
+        drawDistance();
+        document.getElementById('download_sandbox').disabled = false;
+        document.getElementById('download_analysis').disabled = false;
+    }
+
+    function drawPoints(){
+        svg.selectAll('circle.pt').remove();
+        svg.selectAll('circle.pt').data(simulationData.pts).enter().append('circle')
+            .attr('class','pt').attr('r', 1.5).attr('fill', d => colour(d.id))
+            .attr('fill-opacity', 0.8).attr('cx', d => d.x).attr('cy', d => d.y);
+    }
+
+    function drawDistance(){
+        plot.selectAll("*").remove();
+        const xAxisGroup = plot.append('g').attr('class','xaxis').attr('transform',`translate(0,${plotH - 30})`);
+        const yAxisGroup = plot.append('g').attr('class','yaxis').attr('transform','translate(60,0)');
+
+        const filteredDists = simulationData.dists.filter(d => d > 1e-9);
+        if (filteredDists.length < 2) return;
+
+        xScale.domain([0, simulationData.dists.length]);
+        yScale.domain([d3.min(filteredDists), d3.max(filteredDists)]).clamp(true);
+
+        xAxisGroup.call(d3.axisBottom(xScale).ticks(8).tickFormat(d3.format(",")));
+        yAxisGroup.call(d3.axisLeft(yScale).ticks(5, ".1e"));
+        
+        plot.append('path').datum(filteredDists).attr('class','line data').attr('fill','none')
+            .attr('stroke','var(--primary-color)').attr('stroke-width',2).attr('d', line);
+            
+        const slope = Math.log(appState.r);
+        const y1_log = Math.log(filteredDists[0]);
+        const y2_log = y1_log + slope * (simulationData.dists.length);
+        
+        plot.append('line').attr('class', 'line trend')
+            .attr('x1', xScale(0)).attr('y1', yScale(Math.exp(y1_log)))
+            .attr('x2', xScale(simulationData.dists.length)).attr('y2', yScale(Math.exp(y2_log)))
+            .attr('stroke', 'var(--secondary-color)').attr('stroke-width', 2).attr('stroke-dasharray', '6,4');
+    }
+
+    // --- UTILITY & STATE SYNC ---
+    function downloadCSV(){
+        if (!simulationData.pts.length) return;
+        const csvHeader = 'n,x,y,dist\n';
+        const csvRows = simulationData.pts.map((p,i) => `${i},${p.x.toFixed(4)},${p.y.toFixed(4)},${(simulationData.dists[i] || 0).toExponential(6)}`);
+        const csvContent = csvHeader + csvRows.join('\n');
+        const blob = new Blob([csvContent], {type:'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ifs_simulation_data.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    function syncRatio(newValue) {
+        appState.r = newValue;
+        ratioInputSandbox.value = newValue;
+        ratioInputAnalysis.value = newValue;
+        ratioValSandbox.textContent = newValue.toFixed(2);
+        ratioValAnalysis.textContent = newValue.toFixed(2);
+    }
+
+    function syncSteps(newValue) {
+        appState.N = newValue;
+        stepsInputSandbox.value = newValue;
+        stepsInputAnalysis.value = newValue;
+        stepsValSandbox.textContent = newValue;
+        stepsValAnalysis.textContent = newValue;
+    }
+
+    // --- EVENT LISTENERS ---
+    document.querySelector('.tabs').addEventListener('click', e => {
+        if (e.target.matches('.tab')) {
+            const tabId = e.target.dataset.tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            e.target.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if(tabId === 'analysis') drawDistance();
+        }
+    });
+
+    // Listen to both sets of controls and sync them
+    ratioInputSandbox.addEventListener('input', (e) => syncRatio(+e.target.value));
+    stepsInputSandbox.addEventListener('input', (e) => syncSteps(+e.target.value));
+    document.getElementById('run_sandbox').addEventListener('click', runSim);
+    document.getElementById('download_sandbox').addEventListener('click', downloadCSV);
+    
+    ratioInputAnalysis.addEventListener('input', (e) => syncRatio(+e.target.value));
+    stepsInputAnalysis.addEventListener('input', (e) => syncSteps(+e.target.value));
+    document.getElementById('run_analysis').addEventListener('click', runSim);
+    document.getElementById('download_analysis').addEventListener('click', downloadCSV);
+
+    initialize();
+});
+</script>
+</body>
+</html>
