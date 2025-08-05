@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Chapter 1 – Decimal Search, Bisection & Linear Interpolation</title>
+<!-- MathJax -->
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+<!-- Showdown for Markdown conversion -->
+<script src="https://cdn.jsdelivr.net/npm/showdown@2/dist/showdown.min.js"></script>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;line-height:1.5;margin:30px;color:#212121;}
+h1,h2,h3,h4{color:#1565C0;}
+table{border-collapse:collapse;}
+table, th, td{border:1px solid #888;padding:4px;}
+.bluebox{border-left:4px solid #1565C0;background:#e3f2fd;padding:10px;margin:20px 0;}
+</style>
+</head>
+<body>
+<div id="content"></div>
+
+<script id="md" type="text/plain">
+# Chapter 1 — Decimal Search, Bisection & Linear Interpolation
+
+*Numerical Methods, Chaos & Fractals — Week 1*
+
+---
+
+## 1  Introduction & Connections
+
+Solving nonlinear equations lies at the heart of numerical analysis. Whether locating the break‑even point of a business model or calibrating a satellite’s orbit, we often need the real root *x* of a continuous function *f(x)* when no algebraic formula exists.
+
+This first chapter launches our exploration of computational root‑finding with three closely related **bracketing** techniques:
+
+* **Decimal (or digit) search** — the simplest systematic hunt for a sign change.
+* **Bisection method** — a binary search that halves the interval each iteration.
+* **Linear interpolation (simple secant)** — a straight‑line estimate that accelerates convergence.
+
+While these algorithms feel worlds apart from the swirling patterns of chaos and fractals, they share a hidden DNA: **iteration**. Each step applies a deterministic rule that transforms our current approximation into a sharper one.
+
+To make that kinship tangible, we introduce a *mini* version of the **Chaos Game**. The same logic that eventually conjures the Sierpiński triangle will guide our numerical methods toward a single, stable root. Keep an eye out for this recurring motif—it is the red (or rather, *blue*) thread stitching our 11‑week journey together.
+
+> ### Module Learning Outcomes (MLOs) Addressed  
+> **MLO 1.** Apply numerical algorithms to approximate solutions of mathematical problems.  
+> **MLO 2.** Analyse convergence, error behaviour and stability of numerical methods.  
+> *(Call‑out boxes in this chapter appear in the module blue #1565c0.)*
+
+---
+
+## 2  Hands‑On Activity — Paper, Pencil & the Chaos Game Teaser
+
+### Activity A  Decimal Search by Hand
+
+1. **Choose a function** you can sketch quickly—e.g. \(f(x)=x^3-2\).
+2. **Bracket a root** on the real line. A quick sign check shows \(f(1)=-1\) and \(f(2)=6\), so a root hides in \([1,2]\).
+3. **Create a table** of \(x\) values from 1.0 to 2.0 in 0.1 steps and evaluate \(f(x)\) by calculator.
+4. **Identify the smallest interval** where \(f\) changes sign (say \([1.2,1.3]\)). Repeat with 0.01 increments until your interval width \(<10^{-3}\).
+5. **Estimate the root** as the midpoint of the final sign‑change interval.
+
+Record each narrowing interval (three decimal places suffices). Notice how the interval length—and thus an upper bound on the absolute error—shrinks by a factor of *ten* with every pass.
+
+> **Blue Box — MLO 2 : Error Bounds**  
+> After each decimal pass, write the current interval length \(\ell\_n\). Explain why \(|x\_n - x^*| \le \tfrac12\ell\_n\). This forms the basis of your Week 1 mini‑assignment.
+
+### Activity B  Chaos Game Warm‑Up
+
+*Materials:* squared paper, ruler, three‑colour pens.
+
+1. Draw an equilateral triangle with vertices labelled \(A, B, C\).
+2. Pick any starting point \(P\_0\) inside the triangle.
+3. **Iterate:** randomly choose a vertex, then mark the point halfway between your current point and that vertex. Label it \(P\_1\).
+4. Repeat 20–30 times, switching pen colour every ten points.
+
+Observe the emerging *triangular* sub‑structure—even with few iterations. We will revisit this seemingly innocent game when exploring contraction mappings and attractors. For now, note how “halfway” resembles the halving of intervals in bisection.
+
+---
+
+## 3  Core Lab Activity (Online)
+
+A full interactive exploration lives in your **Lab Notebook** website. This week you will:
+
+1. Use the **Decimal Search App** to automate Activity A for \(f(x)=x^3-2\) and other functions of your choice.
+2. Compare convergence speed in the **Root‑Finding Comparison App** (decimal search vs. bisection vs. linear interpolation).
+3. Visualise error shrinkage in a live plot.
+
+> **Tip Box (Blue):** Screenshots of your convergence plots can be pasted into your Week 1 mini‑assignment.
+
+*Access:* Navigate to **Lab Notebook → Week 1 → Root Finding Basics**.
+
+---
+
+## 4  Deeper Analysis
+
+### 4.1  Mathematical Foundations
+
+**Intermediate Value Theorem (IVT).**  
+If *f* is continuous on \([a,b]\) and \(f(a)f(b)<0\), then there exists \(\xi\in(a,b)\) with \(f(\xi)=0\). This guarantees at least one root inside any interval where the function changes sign.
+
+**Definition 1 (Bracketed Root).**  
+An interval \([a\_n,b\_n]\) is *bracketed* if \(f(a\_n)f(b\_n)<0\).
+
+### 4.2  Algorithms & Convergence
+
+#### 4.2.1  Bisection Method
+
+Initialise \([a\_0,b\_0]\) with a bracketed root. Iterate
+
+\[
+  c\_n = \tfrac12(a\_n + b\_n),\qquad
+  (a\_{n+1}, b\_{n+1}) =
+    \begin{cases}
+      (a\_n, c\_n), & \text{if } f(a\_n) f(c\_n) < 0,\\[6pt]
+      (c\_n, b\_n), & \text{otherwise.}
+    \end{cases}
+\]
+
+*Error bound:* \(|c\_n - x^*| \le 2^{-(n+1)} (b\_0 - a\_0)\). Hence bisection converges **linearly** with rate ½.
+
+### 4.2.3  Linear Interpolation (Simple Secant)
+
+Given a bracket \([a\_n,b\_n]\), approximate the root by the line through \((a\_n, f(a\_n))\) and \((b\_n, f(b\_n))\):
+
+\[
+  c\_n = b\_n - f(b\_n)\,\frac{b\_n - a\_n}{f(b\_n) - f(a\_n)}.
+\]
+
+Secant convergence is **super‑linear** (order ≈ 1.618) under smoothness assumptions.
+
+> **Blue Box — Convergence Order Cheat‑Sheet**
+>
+> | Method            | Order *p*     | Error after *n* iters |
+> |-------------------|--------------|-----------------------|
+> | Decimal search    | 1 (rate 0.1) | 0.1^n                  |
+> | Bisection         | 1 (rate 0.5) | 0.5^n                  |
+> | Linear interp.    | ≈ 1.618      | ~*const*·p^-n        |
+>
+</script>
+
+<script>
+var mdText=document.getElementById('md').textContent;
+var converter=new showdown.Converter({tables:true});
+document.getElementById('content').innerHTML=converter.makeHtml(mdText);
+MathJax.typesetPromise();
+</script>
+</body>
+</html>
