@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mathswell - Interactive Maths Learning</title>
+<meta name="description" content="Interactive maths learning apps by Amir Asghari. Visual, hands-on tools for classrooms and independent study." />
+<link rel="icon" href="data:," />
+<meta property="og:title" content="Mathswell - Interactive Maths Learning" />
+<meta property="og:description" content="Explore interactive maths apps: Multiplication Web, Function Analyzer, Circle Theorems, and If‑Then Logic Explorer." />
+<meta property="og:type" content="website" />
+<style>
+  :root { --bg:#f6f8fb; --fg:#0f172a; --muted:#475569; --brand:#1e3a8a; --accent:#3b82f6; --card:#ffffff; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--fg); line-height:1.5; }
+  header { background:linear-gradient(160deg, var(--brand), var(--accent)); color:#fff; padding:3.2rem 1rem; text-align:center; }
+  header h1 { margin:0; font-size: clamp(2.2rem, 3.5vw, 3.2rem); letter-spacing:.2px; }
+  header p { margin:1rem auto 0; max-width: 62ch; opacity:.95; font-size: clamp(1rem, 1.8vw, 1.15rem); }
+  .cta { margin-top:1.25rem; display:flex; gap:.75rem; flex-wrap:wrap; justify-content:center; }
+  .btn { background:#fff; color:var(--brand); padding:.75rem 1rem; border-radius:999px; text-decoration:none; font-weight:700; }
+  nav { background:#eef2f7; padding:.8rem 1rem; display:flex; gap:1rem; justify-content:center; position:sticky; top:0; z-index:10; border-bottom:1px solid #e5e7eb; }
+  nav a { color:var(--brand); text-decoration:none; font-weight:700; }
+  main { max-width:1120px; margin:2rem auto; padding:0 1rem; }
+  h2 { font-size:1.8rem; margin:0 0 1rem; }
+  .app-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.2rem; }
+  .app-card { background:var(--card); border-radius:16px; box-shadow:0 8px 22px rgba(0,0,0,.06); padding:1.1rem; display:flex; flex-direction:column; gap:.5rem; }
+  .app-card h3 { margin:.25rem 0; font-size:1.15rem; }
+  .app-card p { margin:0; color:var(--muted); }
+  .app-card a { margin-top:.6rem; align-self:flex-start; background:var(--brand); color:#fff; padding:.5rem .9rem; border-radius:9px; text-decoration:none; font-weight:700; }
+  .apps-list { list-style:none; padding:0; margin:.75rem 0 0; display:flex; gap:.5rem; flex-wrap:wrap; }
+  .apps-list a { background:#e5e7eb; padding:.45rem .75rem; border-radius:999px; text-decoration:none; color:#111827; font-weight:700; }
+  .section { margin:3rem 0 0; }
+  .feature { background:#eef2ff; border:1px solid #dfe3ff; padding:1rem; border-radius:14px; margin-top:1rem; }
+  footer { background:var(--brand); color:#fff; text-align:center; padding:1.25rem; margin-top:3rem; }
+  .note { font-size:.95rem; color:var(--muted); margin:.5rem 0 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mathswell</h1>
+  <p>Interactive maths learning apps by Amir Asghari — fast, visual, and classroom‑ready.</p>
+  <div class="cta">
+    <a class="btn" href="#apps">Browse Apps</a>
+    <a class="btn" href="#contact">Contact</a>
+  </div>
+</header>
+
+<nav aria-label="Primary">
+  <a href="#apps">Apps</a>
+  <a href="#about">About</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<main>
+  <section id="apps" class="section">
+    <h2>Featured Apps</h2>
+    <div class="app-grid">
+      <div class="app-card">
+        <h3>Multiplication Web</h3>
+        <p>Visualise multiplication patterns as a web of products.</p>
+        <a href="https://asghariamir.github.io/maths/multiplicationweb/" target="_blank" rel="noopener">Try now</a>
+      </div>
+      <div class="app-card">
+        <h3>Function Analyzer</h3>
+        <p>Explore functions, domains, ranges, and key points interactively.</p>
+        <a href="https://asghariamir.github.io/maths/function-analyzer/" target="_blank" rel="noopener">Try now</a>
+      </div>
+      <div class="app-card">
+        <h3>Circle Theorems</h3>
+        <p>Learn geometry through interactive circle diagrams.</p>
+        <a href="https://circle-theorems.vercel.app/" target="_blank" rel="noopener">Try now</a>
+      </div>
+      <div class="app-card">
+        <h3>If‑Then Logic Explorer</h3>
+        <p>Play with propositional logic and truth tables.</p>
+        <a href="https://if-then-logic-explorer.vercel.app/" target="_blank" rel="noopener">Try now</a>
+      </div>
+    </div>
+    <p class="note">Want more? Explore the full gallery of apps.</p>
+    <div class="apps-list">
+      <a href="https://asghariamir.github.io/maths/" target="_blank" rel="noopener">All Apps</a>
+    </div>
+    <div class="feature">
+      <strong>Pro tip:</strong> Once your custom domain is connected, this page will be available at <code>https://mathswell.com</code> and all links will keep working.
+    </div>
+  </section>
+
+  <section id="about" class="section">
+    <h2>About Mathswell</h2>
+    <p>Mathswell is a growing set of interactive tools designed to make learning mathematics engaging and intuitive. Whether you're a student exploring new concepts or a teacher preparing a lesson, these apps help you learn by doing.</p>
+  </section>
+
+  <section id="contact" class="section">
+    <h2>Contact</h2>
+    <p>Email: <a href="mailto:info@mathswell.com">info@mathswell.com</a></p>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2025 Mathswell. All rights reserved.</p>
+</footer>
+</body>
+</html>
