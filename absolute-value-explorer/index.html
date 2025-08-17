@@ -58,17 +58,49 @@
             width: calc(100% - 2rem);
         }
     </style>
+    <!-- Mathswell favicon -->
+<link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+<link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+
+<!-- Mathswell app navbar styles -->
+<style>
+  .mathswell-nav {
+    display: flex;
+    justify-content: center;
+    margin: .4rem 0 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  .mathswell-nav .mw-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0f766e;
+    padding: .3rem .7rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,.9);
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .mathswell-nav .mw-link img {
+    display: block;
+  }
+</style>
+
 </head>
 
 <body>
 <div class="container">
     <h2>Absolute Value Explorer</h2>
-   <nav style="margin:0.5rem 0 1rem;text-align:center;">
-     <a href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:.45rem;">
-      <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="36" height="36">
-      <span style="font-weight:700;font-size:1.05rem;color:#0f766e;">MATHSWELL</span>
-    </a>
-   </nav>
+   <nav class="mathswell-nav">
+  <a class="mw-link" href="/">
+    <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell logo" width="28" height="28">
+    <span>MATHSWELL</span>
+  </a>
+</nav>
 
    
 
