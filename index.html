@@ -1,151 +1,321 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
-<link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mathswell — Interactive Maths Apps</title>
+  <meta name="description" content="Interactive maths learning apps by Amir Asghari, including AI-powered tools for exploration and guided practice." />
 
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mathswell — Interactive Maths Apps</title>
-<meta name="description" content="Interactive maths learning apps by Amir Asghari." />
-<link rel="icon" href="data:," />
+  <!-- Favicons -->
+  <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+  <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
 
+  <style>
+  :root {
+    --bg: #f7faf9;
+    --fg: #0b1220;
+    --muted: #4b5563;
+    --brand: #0f766e;
+    --brand-600: #158f85;
+    --accent: #f59e0b;
+    --card: #ffffff;
+    --card-border: #d1fae5;
+    --link: #0f766e;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(165deg, #e6fffb, #fdfcf7);
+    padding: 3rem 1rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  header h1 { margin: 0; font-size: clamp(2.2rem, 3.5vw, 3rem); letter-spacing: .2px; color: var(--brand); }
+  header p { margin: .75rem auto 0; max-width: 70ch; color: var(--muted); font-size: clamp(1rem,1.8vw,1.15rem); }
+  nav.primary {
+    background: #f4fbf9;
+    padding: .75rem 1rem;
+    display: flex; gap: 1rem; justify-content: center;
+    position: sticky; top: 0; z-index: 10;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  nav.primary a { color: var(--link); text-decoration: none; font-weight: 700; }
+  main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+  h2 { font-size: 1.55rem; margin: 2rem 0 1rem; color: var(--fg); }
 
-<style>
-:root {
-  --bg: #f7faf9;
-  --fg: #0b1220;
-  --muted: #4b5563;
-  --brand: #0f766e;
-  --brand-600: #158f85;
-  --accent: #f59e0b;
-  --card: #ffffff;
-  --card-border: #d1fae5;
-  --link: #0f766e;
-}
-* { box-sizing: border-box; }
-html, body { height: 100%; }
-body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial; background: var(--bg); color: var(--fg); line-height: 1.6; }
-header { background: linear-gradient(165deg, #e6fffb, #fdfcf7); padding: 3rem 1rem 2rem; text-align: center; border-bottom: 1px solid #e5e7eb; }
-header h1 { margin: 0; font-size: clamp(2.2rem, 3.5vw, 3rem); letter-spacing: .2px; color: var(--brand); }
-header p { margin: .75rem auto 0; max-width: 70ch; color: var(--muted); font-size: clamp(1rem,1.8vw,1.15rem); }
-nav.primary { background: #f4fbf9; padding: .75rem 1rem; display: flex; gap: 1rem; justify-content: center; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #e5e7eb; }
-nav.primary a { color: var(--link); text-decoration: none; font-weight: 700; }
-main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-h2 { font-size: 1.55rem; margin: 2rem 0 1rem; color: var(--fg); }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
-a.card { display: block; background: var(--card); border-radius: 16px; border: 1px solid var(--card-border); box-shadow: 0 6px 18px rgba(15, 118, 110, .05); padding: 1rem; text-decoration: none; color: inherit; transition: transform .08s ease, box-shadow .12s ease, border-color .12s ease; }
-a.card:hover, a.card:focus-visible { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(15, 118, 110, .12); border-color: #a7f3d0; outline: none; }
-.card h3 { margin: .25rem 0; font-size: 1.1rem; color: var(--fg); }
-.card p { margin: 0; color: var(--muted); font-size: .95rem; }
-footer { background: #f4fbf9; color: var(--muted); text-align: center; padding: 1rem; margin-top: 3rem; border-top: 1px solid #e5e7eb; }
-.chips { display: flex; gap: .5rem; flex-wrap: wrap; }
-.chip { background: #e6fffb; padding: .35rem .7rem; border-radius: 999px; font-weight: 700; text-decoration: none; color: var(--brand); border: 1px solid #bdebe3; }
-</style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  a.card {
+    display: block;
+    background: var(--card);
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 6px 18px rgba(15, 118, 110, .05);
+    padding: 1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform .08s ease, box-shadow .12s ease, border-color .12s ease;
+    position: relative; /* for badge positioning */
+  }
+  a.card:hover, a.card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(15, 118, 110, .12);
+    border-color: #a7f3d0;
+    outline: none;
+  }
+  .card h3 { margin: .25rem 0; font-size: 1.1rem; color: var(--fg); }
+  .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+
+  /* AI badge */
+  .badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: linear-gradient(135deg, #0f766e, #10b981);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  footer {
+    background: #f4fbf9; color: var(--muted);
+    text-align: center; padding: 1rem; margin-top: 3rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  .chips { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .chip {
+    background: #e6fffb; padding: .35rem .7rem; border-radius: 999px;
+    font-weight: 700; text-decoration: none; color: var(--brand);
+    border: 1px solid #bdebe3;
+  }
+  </style>
 </head>
 <body>
 <header>
   <div style="display:flex;align-items:center;justify-content:center;gap:.7rem;">
-    <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell logo"
-         width="72" height="72" style="display:block">
+    <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell logo" width="72" height="72" style="display:block">
     <span style="font-size:2.2rem;font-weight:700;color:#0f766e;">Mathswell</span>
   </div>
-  <p>Interactive maths learning apps for classrooms and independent study.</p>
+  <p>
+    Interactive maths learning apps for classrooms and independent study.
+    You’ll also find select <strong>AI-powered</strong> tools that generate examples, guide practice, and support deeper exploration.
+  </p>
 </header>
 
 <nav class="primary" aria-label="Primary">
-    <a href="#contact">Amir Asghari</a>
+  <a href="#contact">Amir Asghari</a>
 </nav>
+
 <main id="apps">
 
-<section id="arithmetics-and-algebra">
-  <h2>Arithmetics and Algebra</h2>
-  <div class="grid">
-    <a class="card" href="/Integer-Panel-Playground/"><h3>Integer Panel Playground</h3><p>A visual tool for teaching integer arithmetic, addition, and subtraction using an interactive panel.</p></a>
-    <a class="card" href="/integers-fractions/"><h3>Integers=Fractions</h3><p>Integers=Fractions is an interactive playground that visually demonstrates how the rules of fraction arithmetic directly mirror the rules of integers.</p></a>
-    <a class="card" href="/multiplication-web/"><h3>Multiplication Web</h3><p>A game to build an understanding of multiplication by unlocking facts using strategies like the distributive property.</p></a>
-  </div>
-</section>
-<section id="fractals-and-chaos">
-  <h2>Fractals and Chaos</h2>
-  <div class="grid">
-    <a class="card" href="/cantor-set/"><h3>Cantor Set Explorer</h3><p>Generate stages of the Cantor set, explore its properties with zoom and pan, and calculate its box-counting dimension.</p></a>
-    <a class="card" href="/crumpled-paper/"><h3>Crumpled Paper Dimension</h3><p>An interactive lab to analyze the fractal dimension of a crumpled ball by plotting its mass vs. radius on a log-log scale.</p></a>
-    <a class="card" href="/Koch-Snowflake/"><h3>Koch Snowflake Explorer</h3><p>Construct the classic Koch snowflake, explore its infinite perimeter, and analyze its fractal dimension using a box-counting lab.</p></a>
-    <a class="card" href="/logistic-bifurcation-diagram/"><h3>Logistic Map Bifurcation Diagram</h3><p>Visualize the complete bifurcation diagram of the logistic map, revealing the stunning fractal patterns on the road to chaos.</p></a>
-    <a class="card" href="/logistic-sequence-explorer/"><h3>Logistic Map Sequence Explorer</h3><p>An introduction to the logistic map. Explore how a single sequence behaves for different values of the growth rate `r`.</p></a>
-    <a class="card" href="/sierpinski-triangle/"><h3>Sierpiński Triangle Explorer</h3><p>Construct the Sierpiński triangle recursively. Includes interactive zoom/pan and a lab for calculating the box-counting dimension.</p></a>
-  </div>
-</section>
-<section id="linear-algebra">
-  <h2>Linear Algebra</h2>
-  <div class="grid">
-    <a class="card" href="/linear-algebra-explorer/"><h3>Linear Algebra Explorer</h3><p>Linear Algebra Explorer: An interactive tool to explore linear systems by linking algebra to geometry in different forms.</p></a>
-  </div>
-</section>
-<section id="logic-and-proof">
-  <h2>Logic and Proof</h2>
-  <div class="grid">
-    <a class="card" href="https://if-then-explorer.vercel.app"><h3>If-Then Logic Explorer</h3><p>A personal AI logic tutor for understanding conditional statements, their converses, inverses, and contrapositives, using AI-generated examples from various topics and with different levels of challenge.</p></a>
-  </div>
-</section>
-<section id="numerical-integration">
-  <h2>Numerical Integration</h2>
-  <div class="grid">
-    <a class="card" href="/numerical-integration/"><h3>Numerical Integration Lab</h3><p>Visually compare the Midpoint, Trapezoidal, and Simpson&#x27;s rules for approximating integrals and analyze their error rates.</p></a>
-    <a class="card" href="/romberg-integration/"><h3>Romberg Integration Lab</h3><p>Explore the powerful Romberg method, which uses Richardson extrapolation to achieve high accuracy with fewer steps.</p></a>
-  </div>
-</section>
-<section id="numerical-methods">
-  <h2>Numerical Methods</h2>
-  <div class="grid">
-    <a class="card" href="/decimal-search/"><h3>Decimal Search Root-Finder</h3><p>An interactive lab for finding the roots of equations using the Bisection Method, also known as interval or decimal searching.</p></a>
-    <a class="card" href="/fixed-point-iteration/"><h3>Fixed-Point Iteration Visualizer</h3><p>Visualize how the fixed-point iteration method finds roots, and see why some functions converge while others diverge.</p></a>
-    <a class="card" href="/linear-interpolation/"><h3>Linear Interpolation Root-Finder</h3><p>Finds roots of equations using the Method of False Position. Visualize how it uses a secant line to make intelligent guesses.</p></a>
-    <a class="card" href="/root-finding-comparison/"><h3>Root-Finding Method Comparison</h3><p>A dashboard to visually compare the performance of five different root-finding algorithms on the same function.</p></a>
-    <a class="card" href="/secant-newton-methods/"><h3>Secant &amp; Newton-Raphson Methods</h3><p>Visually compare two advanced root-finding algorithms. Explore their speed and convergence on user-defined functions.</p></a>
-    <a class="card" href="/taylor-series/"><h3>Taylor Series Visualizer</h3><p>Explore how functions are approximated by polynomials. Visually compare a function to its Taylor series and analyze the error.</p></a>
-  </div>
-</section>
-<section id="pre-calculus">
-  <h2>Pre-Calculus</h2>
-  <div class="grid">
-    <a class="card" href="/absolute-value-explorer/"><h3>Absolute Value Explorer</h3><p>Explore absolute values from two perspectives: as a function on a 2D graph, and as distance on a number line.</p></a>
-    <a class="card" href="https://circle-theorems-api.vercel.app"><h3>Circle Theorems</h3><p>The interactive canvas for building, solving, and mastering circle geometry with AI.</p></a>
-    <a class="card" href="/Exponentials/"><h3>Exponentials</h3><p>An interactive explorer for exponential functions. Visualize how the base and other parameters affect the graph&#x27;s growth and shape.</p></a>
-    <a class="card" href="/function-analyzer/"><h3>Function Analyzer</h3><p>A visual tool for pre-calculus. Draw your own graph and then analyze its domain, range, points of interest, concavity, and more.</p></a>
-    <a class="card" href="/function-explorer-linear-quadratic/"><h3>Function Explorer: Linear vs. Quadratic</h3><p>Explore the distinct behaviors of linear and quadratic functions. See how their equations, graphs, and rates of change differ.</p></a>
-    <a class="card" href="/inverse-explorer/"><h3>Inverse Function Explorer</h3><p>A tool to visualize functions and their inverses, illustrating the concept of reflection across the y = x line. Test for one-to-one criteria.</p></a>
-    <a class="card" href="/Polynomial_explorer/"><h3>Polynomial Explorer</h3><p>Explore the relationship between a polynomial&#x27;s roots and its factored form. Adjust roots on the graph and see the equation update instantly.</p></a>
-    <a class="card" href="/Quadratic_Behaviour/"><h3>Quadratic Behaviour</h3><p>An interactive tool to explore quadratic functions. See how changing coefficients affects the graph&#x27;s shape, vertex, and roots.</p></a>
-    <a class="card" href="/trig-circle/"><h3>Trigonometric Circle</h3><p>An interactive unit circle to visualize trigonometric functions (sine, cosine, tangent) and their relationships.</p></a>
-  </div>
-</section>
-<section id="solution-of-ordinary-differential-equations">
-  <h2>Solution of Ordinary Differential Equations</h2>
-  <div class="grid">
-    <a class="card" href="/ode-solver-comparison/"><h3>ODE Solver &amp; Error Comparison</h3><p>Compare the long-term accuracy and error accumulation of various methods for solving ordinary differential equations.</p></a>
-    <a class="card" href="/ode-step-visualizer/"><h3>ODE Step Visualizer</h3><p>Visually explore the geometry of a single step for the Euler, Modified Euler, and Runge-Kutta (RK4) methods.</p></a>
-    <a class="card" href="/taylor-method-ode/"><h3>Taylor Method for ODEs</h3><p>Explore how using higher-order derivatives in a Taylor series creates highly accurate solutions for differential equations.</p></a>
-  </div>
-</section>
-<section id="">
-  <h2>فارسی</h2>
-  <div class="grid">
-    <a class="card" href="/multiplication-puzzle-fa/"><h3>پازل مساحت ضرب</h3><p>یک ابزار بصری برای درک خاصیت توزیع‌پذیری ضرب با نمایش آن به عنوان مساحت و ساختن اثبات‌های تصویری.</p></a>
-  </div>
-</section>
+  <section id="arithmetics-and-algebra">
+    <h2>Arithmetics and Algebra</h2>
+    <div class="grid">
+      <a class="card" href="/Integer-Panel-Playground/">
+        <h3>Integer Panel Playground</h3>
+        <p>A visual tool for teaching integer arithmetic, addition, and subtraction using an interactive panel.</p>
+      </a>
+      <a class="card" href="/integers-fractions/">
+        <h3>Integers=Fractions</h3>
+        <p>Integers=Fractions is an interactive playground that visually demonstrates how the rules of fraction arithmetic directly mirror the rules of integers.</p>
+      </a>
+      <a class="card" href="/multiplication-web/">
+        <h3>Multiplication Web</h3>
+        <p>A game to build an understanding of multiplication by unlocking facts using strategies like the distributive property.</p>
+      </a>
+    </div>
+  </section>
 
+  <section id="fractals-and-chaos">
+    <h2>Fractals and Chaos</h2>
+    <div class="grid">
+      <a class="card" href="/cantor-set/">
+        <h3>Cantor Set Explorer</h3>
+        <p>Generate stages of the Cantor set, explore its properties with zoom and pan, and calculate its box-counting dimension.</p>
+      </a>
+      <a class="card" href="/crumpled-paper/">
+        <h3>Crumpled Paper Dimension</h3>
+        <p>An interactive lab to analyze the fractal dimension of a crumpled ball by plotting its mass vs. radius on a log-log scale.</p>
+      </a>
+      <a class="card" href="/Koch-Snowflake/">
+        <h3>Koch Snowflake Explorer</h3>
+        <p>Construct the classic Koch snowflake, explore its infinite perimeter, and analyze its fractal dimension using a box-counting lab.</p>
+      </a>
+      <a class="card" href="/logistic-bifurcation-diagram/">
+        <h3>Logistic Map Bifurcation Diagram</h3>
+        <p>Visualize the complete bifurcation diagram of the logistic map, revealing the stunning fractal patterns on the road to chaos.</p>
+      </a>
+      <a class="card" href="/logistic-sequence-explorer/">
+        <h3>Logistic Map Sequence Explorer</h3>
+        <p>An introduction to the logistic map. Explore how a single sequence behaves for different values of the growth rate <code>r</code>.</p>
+      </a>
+      <a class="card" href="/sierpinski-triangle/">
+        <h3>Sierpiński Triangle Explorer</h3>
+        <p>Construct the Sierpiński triangle recursively. Includes interactive zoom/pan and a lab for calculating the box-counting dimension.</p>
+      </a>
+    </div>
+  </section>
 
-<section id="contact">
-  <h2>Contact</h2>
-  <div class="chips">
-    <a class="chip" href="mailto:asgharidotamir@gmail.com">asgharidotamiratgmaildotcom</a>
-    <a class="chip" href="https://amirasghari.com" target="_blank" rel="noopener">amirasghari.com</a>
-  </div>
-</section>
+  <section id="linear-algebra">
+    <h2>Linear Algebra</h2>
+    <div class="grid">
+      <a class="card" href="/linear-algebra-explorer/">
+        <h3>Linear Algebra Explorer</h3>
+        <p>Linear Algebra Explorer: An interactive tool to explore linear systems by linking algebra to geometry in different forms.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="logic-and-proof">
+    <h2>Logic and Proof</h2>
+    <div class="grid">
+      <a class="card" href="https://if-then-explorer.vercel.app" target="_blank" rel="noopener">
+        <div class="badge" aria-label="AI powered">AI</div>
+        <h3>If-Then Logic Explorer</h3>
+        <p>A personal AI logic tutor for understanding conditional statements, their converses, inverses, and contrapositives, using AI-generated examples from various topics and with different levels of challenge.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="numerical-integration">
+    <h2>Numerical Integration</h2>
+    <div class="grid">
+      <a class="card" href="/numerical-integration/">
+        <h3>Numerical Integration Lab</h3>
+        <p>Visually compare the Midpoint, Trapezoidal, and Simpson&#x27;s rules for approximating integrals and analyze their error rates.</p>
+      </a>
+      <a class="card" href="/romberg-integration/">
+        <h3>Romberg Integration Lab</h3>
+        <p>Explore the powerful Romberg method, which uses Richardson extrapolation to achieve high accuracy with fewer steps.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="numerical-methods">
+    <h2>Numerical Methods</h2>
+    <div class="grid">
+      <a class="card" href="/decimal-search/">
+        <h3>Decimal Search Root-Finder</h3>
+        <p>An interactive lab for finding the roots of equations using the Bisection Method, also known as interval or decimal searching.</p>
+      </a>
+      <a class="card" href="/fixed-point-iteration/">
+        <h3>Fixed-Point Iteration Visualizer</h3>
+        <p>Visualize how the fixed-point iteration method finds roots, and see why some functions converge while others diverge.</p>
+      </a>
+      <a class="card" href="/linear-interpolation/">
+        <h3>Linear Interpolation Root-Finder</h3>
+        <p>Finds roots of equations using the Method of False Position. Visualize how it uses a secant line to make intelligent guesses.</p>
+      </a>
+      <a class="card" href="/root-finding-comparison/">
+        <h3>Root-Finding Method Comparison</h3>
+        <p>A dashboard to visually compare the performance of five different root-finding algorithms on the same function.</p>
+      </a>
+      <a class="card" href="/secant-newton-methods/">
+        <h3>Secant &amp; Newton-Raphson Methods</h3>
+        <p>Visually compare two advanced root-finding algorithms. Explore their speed and convergence on user-defined functions.</p>
+      </a>
+      <a class="card" href="/taylor-series/">
+        <h3>Taylor Series Visualizer</h3>
+        <p>Explore how functions are approximated by polynomials. Visually compare a function to its Taylor series and analyze the error.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="pre-calculus">
+    <h2>Pre-Calculus</h2>
+    <div class="grid">
+      <a class="card" href="/absolute-value-explorer/">
+        <h3>Absolute Value Explorer</h3>
+        <p>Explore absolute values from two perspectives: as a function on a 2D graph, and as distance on a number line.</p>
+      </a>
+
+      <a class="card" href="https://circle-theorems-api.vercel.app" target="_blank" rel="noopener">
+        <div class="badge" aria-label="AI powered">AI</div>
+        <h3>Circle Theorems</h3>
+        <p>The interactive canvas for building, solving, and mastering circle geometry with AI.</p>
+      </a>
+
+      <a class="card" href="/Exponentials/">
+        <h3>Exponentials</h3>
+        <p>An interactive explorer for exponential functions. Visualize how the base and other parameters affect the graph&#x27;s growth and shape.</p>
+      </a>
+      <a class="card" href="/function-analyzer/">
+        <h3>Function Analyzer</h3>
+        <p>A visual tool for pre-calculus. Draw your own graph and then analyze its domain, range, points of interest, concavity, and more.</p>
+      </a>
+      <a class="card" href="/function-explorer-linear-quadratic/">
+        <h3>Function Explorer: Linear vs. Quadratic</h3>
+        <p>Explore the distinct behaviors of linear and quadratic functions. See how their equations, graphs, and rates of change differ.</p>
+      </a>
+      <a class="card" href="/inverse-explorer/">
+        <h3>Inverse Function Explorer</h3>
+        <p>A tool to visualize functions and their inverses, illustrating the concept of reflection across the y = x line. Test for one-to-one criteria.</p>
+      </a>
+      <a class="card" href="/Polynomial_explorer/">
+        <h3>Polynomial Explorer</h3>
+        <p>Explore the relationship between a polynomial&#x27;s roots and its factored form. Adjust roots on the graph and see the equation update instantly.</p>
+      </a>
+      <a class="card" href="/Quadratic_Behaviour/">
+        <h3>Quadratic Behaviour</h3>
+        <p>An interactive tool to explore quadratic functions. See how changing coefficients affects the graph&#x27;s shape, vertex, and roots.</p>
+      </a>
+      <a class="card" href="/trig-circle/">
+        <h3>Trigonometric Circle</h3>
+        <p>An interactive unit circle to visualize trigonometric functions (sine, cosine, tangent) and their relationships.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="solution-of-ordinary-differential-equations">
+    <h2>Solution of Ordinary Differential Equations</h2>
+    <div class="grid">
+      <a class="card" href="/ode-solver-comparison/">
+        <h3>ODE Solver &amp; Error Comparison</h3>
+        <p>Compare the long-term accuracy and error accumulation of various methods for solving ordinary differential equations.</p>
+      </a>
+      <a class="card" href="/ode-step-visualizer/">
+        <h3>ODE Step Visualizer</h3>
+        <p>Visually explore the geometry of a single step for the Euler, Modified Euler, and Runge-Kutta (RK4) methods.</p>
+      </a>
+      <a class="card" href="/taylor-method-ode/">
+        <h3>Taylor Method for ODEs</h3>
+        <p>Explore how using higher-order derivatives in a Taylor series creates highly accurate solutions for differential equations.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="fa">
+    <h2>فارسی</h2>
+    <div class="grid">
+      <a class="card" href="/multiplication-puzzle-fa/">
+        <h3>پازل مساحت ضرب</h3>
+        <p>یک ابزار بصری برای درک خاصیت توزیع‌پذیری ضرب با نمایش آن به عنوان مساحت و ساختن اثبات‌های تصویری.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <div class="chips">
+      <a class="chip" href="mailto:asgharidotamir@gmail.com">asgharidotamiratgmaildotcom</a>
+      <a class="chip" href="https://amirasghari.com" target="_blank" rel="noopener">amirasghari.com</a>
+    </div>
+  </section>
 
 </main>
+
 <footer>
   <p>&copy; 2025 Mathswell.</p>
 </footer>
