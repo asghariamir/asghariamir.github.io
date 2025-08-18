@@ -109,6 +109,25 @@
     font-weight:700; font-size:.9rem;
   }
   .counter svg { width:16px; height:16px; }
+    /* Persian section right-to-left */
+#fa {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Ensure headings and text align properly */
+#fa h2, 
+#fa .card h3, 
+#fa .card p {
+  text-align: right;
+}
+
+/* Flip card badge (if used in RTL section) */
+#fa .badge {
+  right: auto;
+  left: 10px;
+}
+
   </style>
 </head>
 <body>
