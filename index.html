@@ -671,42 +671,43 @@
 
 <footer>
   <p>&copy; 2025 Mathswell.</p>
-  <p>
-    <span class="counter" title="Total visits (counts once per browser per day)">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7zm0 12a5 5 0 110-10 5 5 0 010 10zm0-2.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"/>
-      </svg>
-      Visitors: <span id="visitor-count">…</span>
-    </span>
-  </p>
-</footer>
+ <p>
+  <span class="counter" title="Counts once per browser per day">
+    Visitors (main site): <span id="visitor-count-main">…</span>
+  </span>
+</p>
 
 <script>
 (function() {
   const NAMESPACE = 'mathswell.com';
   const KEY = 'landing';
   const today = new Date().toISOString().slice(0,10);
-  const LS_KEY = 'mw_last_hit_date';
+  const LS_KEY = 'mw_' + NAMESPACE + '_' + KEY + '_last_hit';
 
-  const action = (localStorage.getItem(LS_KEY) === today) ? 'get' : 'hit';
-  const url = `https://api.countapi.xyz/${action}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}`;
+  function show(val){ 
+    document.getElementById('visitor-count-main').textContent = (val!=null) ? Number(val).toLocaleString() : '—'; 
+  }
 
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      const val = (data && typeof data.value === 'number') ? data.value : null;
-      if (val !== null) {
-        document.getElementById('visitor-count').textContent = val.toLocaleString();
-        if (action === 'hit') localStorage.setItem(LS_KEY, today);
-      } else {
-        document.getElementById('visitor-count').textContent = '—';
+  async function hitOnce() {
+    const already = localStorage.getItem(LS_KEY) === today;
+    const endpoint = already ? 'get' : 'hit';
+    const url = `https://api.countapi.xyz/${endpoint}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}`;
+    try {
+      const r = await fetch(url);
+      const d = await r.json();
+      if (typeof d.value === 'number') {
+        show(d.value);
+        if (!already) localStorage.setItem(LS_KEY, today);
+        return;
       }
-    })
-    .catch(() => {
-      document.getElementById('visitor-count').textContent = '—';
-    });
+    } catch {}
+    show(null);
+  }
+
+  hitOnce();
 })();
 </script>
+
 </body>
 </html>
 
