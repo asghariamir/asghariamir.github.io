@@ -672,25 +672,25 @@
 <footer>
   <p>&copy; 2025 Mathswell.</p>
 
-  <p style="text-align:center;margin:0.75rem 0;">
+   <p style="text-align:center;margin:0.75rem 0;">
     <span class="counter"
           style="display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .6rem;border-radius:999px;background:#e6fffb;border:1px solid #bdebe3;color:#0f766e;font-weight:700;">
-      Visitors (Circles): <span id="visitor-count-circles">…</span>
+      Visitors: <span id="visitor-count-home">…</span>
     </span>
   </p>
 </footer>
 
 <script>
 (function () {
-  var el = document.getElementById('visitor-count-circles');
+  var el = document.getElementById('visitor-count-home');
   if (!el) return;
 
   var today = new Date().toISOString().slice(0, 10);
-  var LS = 'mw_circles_last';
+  var LS = 'mw_home_last';
   var mode = (localStorage.getItem(LS) === today) ? 'get' : 'hit';
 
-  // Circles runs under ai.mathswell.com; relative path is fine here
-  var url = '/api/visitors?ns=mathswell&key=circles&mode=' + mode;
+  // Landing page runs on mathswell.com; call the API on ai.mathswell.com
+  var url = 'https://ai.mathswell.com/api/visitors?ns=mathswell&key=home&mode=' + mode;
 
   fetch(url, { cache: 'no-store' })
     .then(r => r.json())
