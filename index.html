@@ -671,32 +671,32 @@
 
 <footer>
   <p>&copy; 2025 Mathswell.</p>
- <!-- Footer counter (main site) -->
-<p style="text-align:center;margin:0.75rem 0;">
+ <p style="text-align:center;margin:0.75rem 0;">
   <span class="counter" style="display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .6rem;border-radius:999px;background:#e6fffb;border:1px solid #bdebe3;color:#0f766e;font-weight:700;">
     Visitors: <span id="visitor-count-main">…</span>
   </span>
 </p>
 
 <script>
-(function(){
-  const NAMESPACE = 'mathswell.com';
-  const KEY = 'landing';
+(() => {
+  const el = document.getElementById('visitor-count-main');
   const today = new Date().toISOString().slice(0,10);
-  const LS_KEY = `mw_last_${NAMESPACE}_${KEY}`;
-  const already = localStorage.getItem(LS_KEY) === today;
-  const mode = already ? 'get' : 'hit';
-
-  fetch(`https://ai.mathswell.com/api/visitors?ns=${encodeURIComponent(NAMESPACE)}&key=${encodeURIComponent(KEY)}&mode=${mode}`)
+  const LS = 'mw_main_last';
+  const mode = (localStorage.getItem(LS) === today) ? 'get' : 'hit';
+  fetch(`https://ai.mathswell.com/api/visitors?ns=mathswell.com&key=landing&mode=${mode}`, { cache: 'no-store' })
     .then(r => r.json())
-    .then(d => {
-      const v = (d && typeof d.value === 'number') ? d.value : null;
-      document.getElementById('visitor-count-main').textContent = (v!=null) ? v.toLocaleString() : '—';
-      if (!already) localStorage.setItem(LS_KEY, today);
+    .then(j => {
+      if (typeof j.value === 'number') {
+        el.textContent = j.value.toLocaleString();
+        if (mode === 'hit') localStorage.setItem(LS, today);
+      } else {
+        el.textContent = '—';
+      }
     })
-    .catch(() => { document.getElementById('visitor-count-main').textContent = '—'; });
+    .catch(() => { el.textContent = '—'; });
 })();
 </script>
+
 
 
 </body>
