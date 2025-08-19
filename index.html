@@ -692,7 +692,7 @@
   // Landing page runs on mathswell.com; call the API on ai.mathswell.com
   var url = 'https://ai.mathswell.com/api/visitors?ns=mathswell&key=home&mode=' + mode;
 
-  fetch(url, { cache: 'no-store' })
+  fetch('https://ai.mathswell.com/api/visitors?ns=mathswell&key=home&mode=' + mode, { cache: 'no-store' })
     .then(r => r.json())
     .then(j => {
       if (typeof j.value === 'number') {
