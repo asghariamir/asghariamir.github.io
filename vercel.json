@@ -1,16 +1,8 @@
 {
-  "buildCommand": "",
-  "outputDirectory": ".",
   "framework": null,
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 10
+      "runtime": "nodejs18.x"
     }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    }
-  ]
+  }
 }
