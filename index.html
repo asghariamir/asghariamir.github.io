@@ -672,39 +672,9 @@
 <footer>
   <p>&copy; 2025 Mathswell.</p>
 
-   <p style="text-align:center;margin:0.75rem 0;">
-    <span class="counter"
-          style="display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .6rem;border-radius:999px;background:#e6fffb;border:1px solid #bdebe3;color:#0f766e;font-weight:700;">
-      Visitors: <span id="visitor-count-home">…</span>
-    </span>
-  </p>
-</footer>
+  </footer>
 
-<script>
-(function () {
-  var el = document.getElementById('visitor-count-home');
-  if (!el) return;
 
-  var today = new Date().toISOString().slice(0, 10);
-  var LS = 'mw_home_last';
-  var mode = (localStorage.getItem(LS) === today) ? 'get' : 'hit';
-
-  // Landing page runs on mathswell.com; call the API on ai.mathswell.com
-  var url = 'https://ai.mathswell.com/api/visitors?ns=mathswell&key=home&mode=' + mode;
-
-  fetch('https://ai.mathswell.com/api/visitors?ns=mathswell&key=home&mode=' + mode, { cache: 'no-store' })
-    .then(r => r.json())
-    .then(j => {
-      if (typeof j.value === 'number') {
-        el.textContent = j.value.toLocaleString();
-        if (mode === 'hit') localStorage.setItem(LS, today);
-      } else {
-        el.textContent = '—';
-      }
-    })
-    .catch(() => { el.textContent = '—'; });
-})();
-</script>
 
 
 
