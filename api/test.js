@@ -5,8 +5,7 @@ export default function handler(req, res) {
   res.status(200).json({ 
     success: true,
     message: 'API is working!',
-    method: req.method,
-    time: new Date().toISOString(),
-    project: 'mathswell'
+    timestamp: new Date().toISOString(),
+    method: req.method
   });
 }
