@@ -682,46 +682,58 @@
 
 <script>
 (async function() {
+  console.log('🚀 Visitor counter script starting...');
+  
   try {
     // Check if this is a new session
     const sessionKey = 'mathswell_session_' + new Date().toDateString();
     const isNewSession = !sessionStorage.getItem(sessionKey);
+    console.log('📊 Is new session?', isNewSession);
     
     let response;
     if (isNewSession) {
-      // New visitor today - increment counter
+      console.log('📤 Sending POST request to increment counter...');
       response = await fetch('/api/visitor-count', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
       sessionStorage.setItem(sessionKey, 'true');
     } else {
-      // Returning visitor today - just get count
+      console.log('📥 Sending GET request to fetch counter...');
       response = await fetch('/api/visitor-count', { 
         method: 'GET'
       });
     }
     
+    console.log('📨 Response status:', response.status);
+    
     if (response.ok) {
       const data = await response.json();
+      console.log('✅ Counter data received:', data);
+      
       const counterElement = document.getElementById('visitor-count');
       if (counterElement && data.count) {
         counterElement.textContent = data.count.toLocaleString();
-        // Remove loading state
         counterElement.style.opacity = '1';
+        console.log('✨ Counter updated to:', data.count);
       }
+    } else {
+      const errorData = await response.text();
+      console.error('❌ Response not OK:', errorData);
     }
   } catch (error) {
-    console.error('Counter error:', error);
+    console.error('💥 Counter error:', error);
+    console.error('Error details:', error.message);
+    
     // Show fallback
     const counterElement = document.getElementById('visitor-count');
     if (counterElement) {
-      counterElement.textContent = '---';
+      counterElement.textContent = 'Error';
+      counterElement.title = error.message; // Hover to see error
     }
   }
 })();
 </script>
-
 
 
 
