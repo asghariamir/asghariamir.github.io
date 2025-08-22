@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numerical Integration Lab</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.29.1/plotly.min.js"></script>
+    <style>
+        :root {
+            --bg: #f7faf9;
+            --fg: #0b1220;
+            --muted: #4b5563;
+            --brand: #0f766e;
+            --brand-600: #158f85;
+            --brand-light: #10b981;
+            --accent: #f59e0b;
+            --card: #ffffff;
+            --card-border: #d1fae5;
+            --link: #0f766e;
+            --error: #dc2626;
+            --success: #10b981;
+            --warning: #f59e0b;
+            
+            /* Method colors */
+            --midpoint-color: #3b82f6;
+            --trapezoid-color: #ef4444;
+            --simpson-color: #10b981;
+            --midpoint-alpha: rgba(59, 130, 246, 0.2);
+            --trapezoid-alpha: rgba(239, 68, 68, 0.2);
+            --simpson-alpha: rgba(16, 185, 129, 0.2);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(15, 118, 110, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-20px, -20px) rotate(1deg); }
+            66% { transform: translate(20px, -10px) rotate(-1deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(165deg, #e6fffb 0%, #fdfcf7 25%, rgba(245, 158, 11, 0.05) 100%);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(15, 118, 110, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        .header > * { position: relative; z-index: 1; }
+
+        .header h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header p {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 70ch;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out 0.3s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Enhanced Tabs */
+        .tabs {
+            display: flex;
+            background: linear-gradient(90deg, #f4fbf9, #fff, #f4fbf9);
+            border-radius: 16px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 2rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--muted);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .tab-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab-button.active {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(15, 118, 110, 0.3);
+        }
+
+        .tab-button.active::before {
+            opacity: 1;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Enhanced Controls */
+        .controls-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--card-border);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .control-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-input {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .control-input.monospace {
+            font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+        }
+
+        /* Enhanced Range Slider */
+        .range-container {
+            position: relative;
+        }
+
+        .range-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #e5e7eb, var(--brand));
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(15, 118, 110, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(15, 118, 110, 0.4);
+        }
+
+        .range-value {
+            position: absolute;
+            right: 0;
+            top: -2rem;
+            background: var(--brand);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Method Selection */
+        .method-pills {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .method-pill {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .method-pill input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .method-pill label {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .method-pill input:checked + label {
+            background: var(--brand);
+            color: white;
+            border-color: var(--brand);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+        }
+
+        /* Example Pills */
+        .example-pills {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .example-pill {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #e6fffb, #f0fdf4);
+            color: var(--brand);
+            border: 1px solid #bdebe3;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .example-pill::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease, height 0.5s ease;
+        }
+
+        .example-pill:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .example-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.2);
+            border-color: var(--brand);
+        }
+
+        /* Enhanced Plot Container */
+        .plot-container {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--card-border);
+            height: 500px;
+            position: relative;
+        }
+
+        /* Plot Controls */
+        .plot-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .plot-control-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--brand);
+            color: var(--brand);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .plot-control-btn:hover {
+            background: var(--brand);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+        }
+
+        .plot-control-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Results Display */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .result-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--brand), var(--brand-light), var(--accent));
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .result-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--brand);
+            font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+        }
+
+        .result-value.error {
+            color: var(--error);
+        }
+
+        /* Error Analysis */
+        .error-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--card-border);
+        }
+
+        .run-analysis-btn {
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(15, 118, 110, 0.3);
+        }
+
+        .run-analysis-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(15, 118, 110, 0.4);
+        }
+
+        .run-analysis-btn:active {
+            transform: translateY(0);
+        }
+
+        .run-analysis-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+            background: white;
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Data Table */
+        .data-table-container {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid #f3f4f6;
+            font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(15, 118, 110, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--brand);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                position: static;
+            }
+            
+            .example-pills {
+                justify-content: center;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus styles for better accessibility */
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--brand);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>🧮 Numerical Integration Lab</h1>
+        <p>Explore the fascinating world of numerical integration by comparing different approximation methods. Watch as simple shapes approximate complex curves!</p>
+    </div>
+
+    <!-- Enhanced Tabs -->
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('explorer')">
+            <span>🎯 Visual Explorer</span>
+        </button>
+        <button class="tab-button" onclick="switchTab('error')">
+            <span>📊 Error Analysis</span>
+        </button>
+        <button class="tab-button" onclick="switchTab('theory')">
+            <span>📚 Theory Guide</span>
+        </button>
+    </div>
+
+    <!-- Visual Explorer Tab -->
+    <section id="explorer-tab" class="tab-content active">
+        <div class="controls-section">
+            <h3 style="margin-bottom: 1.5rem; color: var(--brand); font-size: 1.3rem;">🎛️ Function & Parameters</h3>
+            
+            <!-- Example Functions -->
+            <div class="example-pills">
+                <button class="example-pill" data-example="x^2">x²</button>
+                <button class="example-pill" data-example="sin(x)">sin(x)</button>
+                <button class="example-pill" data-example="exp(-x^2)">e^(-x²)</button>
+                <button class="example-pill" data-example="1/(1+x^2)">1/(1+x²)</button>
+                <button class="example-pill" data-example="sqrt(x)">√x</button>
+                <button class="example-pill" data-example="x^3-2*x">x³-2x</button>
+            </div>
+
+            <div class="controls-grid">
+                <div class="control-group full-width">
+                    <label class="control-label" for="function-input">
+                        📝 Function f(x):
+                    </label>
+                    <input type="text" id="function-input" class="control-input monospace" placeholder="Enter your function..." value="x^2">
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label" for="a-input">📍 Start (a):</label>
+                    <input type="text" id="a-input" class="control-input" value="0">
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label" for="b-input">🎯 End (b):</label>
+                    <input type="text" id="b-input" class="control-input" value="5">
+                </div>
+                
+                <div class="control-group full-width">
+                    <label class="control-label" for="n-slider">
+                        🔢 Subintervals (n): 
+                        <span class="range-value" id="n-label">10</span>
+                    </label>
+                    <div class="range-container">
+                        <input type="range" id="n-slider" class="range-slider" min="1" max="200" value="10">
+                    </div>
+                </div>
+                
+                <div class="control-group full-width">
+                    <label class="control-label">🎨 Integration Method:</label>
+                    <div class="method-pills">
+                        <div class="method-pill">
+                            <input type="radio" id="method-midpoint" name="method" value="midpoint" checked>
+                            <label for="method-midpoint">📐 Midpoint Rule</label>
+                        </div>
+                        <div class="method-pill">
+                            <input type="radio" id="method-trapezoid" name="method" value="trapezoid">
+                            <label for="method-trapezoid">📊 Trapezoidal Rule</label>
+                        </div>
+                        <div class="method-pill">
+                            <input type="radio" id="method-simpson" name="method" value="simpson">
+                            <label for="method-simpson">🎪 Simpson's Rule</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plot Container -->
+        <div class="plot-container">
+            <div class="plot-controls">
+                <button class="plot-control-btn" onclick="resetZoom()">🔄 Reset Zoom</button>
+                <button class="plot-control-btn" onclick="fitToFunction()">📐 Fit to Function</button>
+            </div>
+            <div id="plot-explorer" style="height: 100%;"></div>
+        </div>
+
+        <!-- Results Display -->
+        <div class="results-grid">
+            <div class="result-card">
+                <div class="result-label">🎯 True Integral</div>
+                <div id="true-integral-val" class="result-value">--</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label" id="approx-label">📐 Approximation</div>
+                <div id="approx-val" class="result-value">--</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">❌ Absolute Error</div>
+                <div id="error-val" class="result-value error">--</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">📊 Relative Error (%)</div>
+                <div id="relative-error-val" class="result-value error">--</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Error Analysis Tab -->
+    <section id="error-tab" class="tab-content">
+        <div class="error-section">
+            <h2 style="margin-bottom: 1rem; color: var(--brand);">📊 Error Analysis</h2>
+            <p style="color: var(--muted); margin-bottom: 2rem; line-height: 1.7;">
+                Investigate how approximation error changes as the number of subintervals increases. 
+                The Midpoint and Trapezoidal rules have error ∝ 1/n², while Simpson's rule has error ∝ 1/n⁴, making it much more accurate!
+            </p>
+            
+            <button id="run-error-analysis-btn" class="run-analysis-btn">
+                🚀 Run Comprehensive Analysis
+            </button>
+            
+            <div class="chart-container" id="error-chart-container"></div>
+            
+            <h3 style="margin: 2rem 0 1rem; color: var(--brand);">📋 Detailed Data</h3>
+            <div class="data-table-container">
+                <table class="data-table" id="error-table">
+                    <thead>
+                        <tr>
+                            <th>n</th>
+                            <th>Midpoint Error</th>
+                            <th>Trapezoidal Error</th>
+                            <th>Simpson's Error</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Theory Guide Tab -->
+    <section id="theory-tab" class="tab-content">
+        <div class="error-section">
+            <h2 style="margin-bottom: 1rem; color: var(--brand);">📚 Integration Theory Guide</h2>
+            
+            <div style="display: grid; gap: 2rem; margin-top: 2rem;">
+                <div style="background: linear-gradient(135deg, #e6fffb, #f0fdf4); padding: 2rem; border-radius: 16px; border-left: 4px solid var(--brand);">
+                    <h3 style="color: var(--brand); margin-bottom: 1rem;">🎯 The Fundamental Problem</h3>
+                    <p style="margin-bottom: 1rem;">When we can't find the exact antiderivative of a function, we need numerical methods to approximate definite integrals. These methods work by:</p>
+                    <ul style="list-style: none; padding-left: 1rem;">
+                        <li>• Dividing the interval [a,b] into n subintervals</li>
+                        <li>• Approximating the function with simpler shapes</li>
+                        <li>• Summing the areas of these shapes</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fef3c7, #fed7aa); padding: 2rem; border-radius: 16px; border-left: 4px solid var(--accent);">
+                    <h3 style="color: #d97706; margin-bottom: 1rem;">📐 Midpoint Rule</h3>
+                    <p style="margin-bottom: 1rem;"><strong>Formula:</strong> ∫<sub>a</sub><sup>b</sup> f(x)dx ≈ h · Σ f(x<sub>i</sub> + h/2)</p>
+                    <p style="margin-bottom: 1rem;">Uses rectangles where the height is determined by the function value at the midpoint of each subinterval.</p>
+                    <p><strong>Error:</strong> O(h²) = O(1/n²)</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fee2e2, #fecaca); padding: 2rem; border-radius: 16px; border-left: 4px solid var(--error);">
+                    <h3 style="color: var(--error); margin-bottom: 1rem;">📊 Trapezoidal Rule</h3>
+                    <p style="margin-bottom: 1rem;"><strong>Formula:</strong> ∫<sub>a</sub><sup>b</sup> f(x)dx ≈ (h/2) · [f(a) + 2·Σf(x<sub>i</sub>) + f(b)]</p>
+                    <p style="margin-bottom: 1rem;">Uses trapezoids formed by connecting consecutive function values with straight lines.</p>
+                    <p><strong>Error:</strong> O(h²) = O(1/n²)</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 2rem; border-radius: 16px; border-left: 4px solid var(--success);">
+                    <h3 style="color: var(--success); margin-bottom: 1rem;">🎪 Simpson's Rule</h3>
+                    <p style="margin-bottom: 1rem;"><strong>Formula:</strong> ∫<sub>a</sub><sup>b</sup> f(x)dx ≈ (h/3) · [f(a) + 4·Σf(x<sub>odd</sub>) + 2·Σf(x<sub>even</sub>) + f(b)]</p>
+                    <p style="margin-bottom: 1rem;">Uses parabolic arcs to approximate the function. Requires an even number of subintervals.</p>
+                    <p><strong>Error:</strong> O(h⁴) = O(1/n⁴) - Much more accurate!</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 2rem; border-radius: 16px; border-left: 4px solid #6366f1;">
+                    <h3 style="color: #6366f1; margin-bottom: 1rem;">🔬 Understanding Error Behavior</h3>
+                    <p style="margin-bottom: 1rem;">The error analysis reveals fascinating patterns:</p>
+                    <ul style="list-style: none; padding-left: 1rem;">
+                        <li>• <strong>Midpoint & Trapezoidal:</strong> Doubling n reduces error by ≈4×</li>
+                        <li>• <strong>Simpson's Rule:</strong> Doubling n reduces error by ≈16×</li>
+                        <li>• <strong>Log-log plots:</strong> Show these relationships as straight lines</li>
+                        <li>• <strong>Practical implication:</strong> Simpson's rule needs far fewer points for high accuracy</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+// Application State and Configuration
+const EXAMPLES = {
+    "x^2": { f_string: "x^2", a: 0, b: 5 },
+    "sin(x)": { f_string: "sin(x)", a: 0, b: "pi" },
+    "exp(-x^2)": { f_string: "exp(-x^2)", a: -2, b: 2 },
+    "1/(1+x^2)": { f_string: "1 / (1 + x^2)", a: -5, b: 5},
+    "sqrt(x)": { f_string: "sqrt(x)", a: 0, b: 4},
+    "x^3-2*x": { f_string: "x^3 - 2*x", a: -2, b: 3}
+};
+
+let state = {
+    funcString: 'x^2',
+    compiledFunc: null,
+    a: 0,
+    b: 5,
+    n: 10,
+    trueIntegral: null,
+    method: 'midpoint'
+};
+
+// Utility Functions
+function formatMathExpression(expr) {
+    return expr
+        .replace(/\^2/g, '²')
+        .replace(/\^3/g, '³')
+        .replace(/\^4/g, '⁴')
+        .replace(/sqrt\(/g, '√(')
+        .replace(/\*\*/g, '^')
+        .replace(/pi/g, 'π')
+        .replace(/exp/g, 'e^');
+}
+
+function f(x) {
+    try {
+        return state.compiledFunc ? state.compiledFunc.evaluate({x: x}) : NaN;
+    } catch (e) {
+        return NaN;
+    }
+}
+
+// Numerical Integration Methods
+function calculateMidpoint(n, a = state.a, b = state.b) {
+    const h = (b - a) / n;
+    let sum = 0;
+    for (let i = 0; i < n; i++) {
+        const midpoint = a + (i + 0.5) * h;
+        const value = f(midpoint);
+        if (isFinite(value)) {
+            sum += value;
+        }
+    }
+    return sum * h;
+}
+
+function calculateTrapezoid(n, a = state.a, b = state.b) {
+    const h = (b - a) / n;
+    let sum = (f(a) + f(b)) / 2;
+    for (let i = 1; i < n; i++) {
+        const value = f(a + i * h);
+        if (isFinite(value)) {
+            sum += value;
+        }
+    }
+    return sum * h;
+}
+
+function calculateSimpson(n, a = state.a, b = state.b) {
+    if (n % 2 !== 0) return NaN;
+    const h = (b - a) / n;
+    let sum = f(a) + f(b);
+    for (let i = 1; i < n; i += 2) {
+        const value = f(a + i * h);
+        if (isFinite(value)) {
+            sum += 4 * value;
+        }
+    }
+    for (let i = 2; i < n - 1; i += 2) {
+        const value = f(a + i * h);
+        if (isFinite(value)) {
+            sum += 2 * value;
+        }
+    }
+    return sum * h / 3;
+}
+
+// Plotting Functions
+function drawExplorerPlot() {
+    console.log('Drawing explorer plot...');
+    
+    const plotDiv = document.getElementById('plot-explorer');
+    
+    if (!state.compiledFunc) {
+        console.log('No compiled function available for plotting');
+        plotDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--muted);">Enter a function to see the visualization</div>';
+        return;
+    }
+    
+    if (typeof Plotly === 'undefined') {
+        console.error('Plotly is not loaded');
+        plotDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--error);">Plotly library not loaded. Please refresh the page.</div>';
+        return;
+    }
+    
+    try {
+        // Generate function curve
+        const x_func = [], y_func = [];
+        const plot_step = (state.b - state.a) / 200;
+        
+        for (let x = state.a; x <= state.b; x += plot_step) {
+            try {
+                const y_val = f(x);
+                if(isFinite(y_val)) { 
+                    x_func.push(x); 
+                    y_func.push(y_val); 
+                }
+            } catch (e) {
+                // Skip problematic points
+            }
+        }
+        
+        if (x_func.length === 0) {
+            plotDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--error);">Function cannot be plotted in this interval</div>';
+            return;
+        }
+
+        const h = (state.b - state.a) / state.n;
+        const shapes = [];
+
+        // Generate approximation shapes based on method
+        if (state.method === 'midpoint') {
+            for (let i = 0; i < state.n; i++) {
+                const x0 = state.a + i * h;
+                const x1 = state.a + (i + 1) * h;
+                const midpoint = (x0 + x1) / 2;
+                const height = f(midpoint);
+                
+                if (isFinite(height)) {
+                    shapes.push({
+                        type: 'rect',
+                        x0: x0, y0: 0, x1: x1, y1: height,
+                        fillcolor: 'rgba(59, 130, 246, 0.3)',
+                        line: { width: 1, color: 'rgba(59, 130, 246, 0.8)' }
+                    });
+                }
+            }
+        } else if (state.method === 'trapezoid') {
+            for (let i = 0; i < state.n; i++) {
+                const x0 = state.a + i * h;
+                const x1 = state.a + (i + 1) * h;
+                const y0 = f(x0);
+                const y1 = f(x1);
+                
+                if (isFinite(y0) && isFinite(y1)) {
+                    shapes.push({
+                        type: 'path',
+                        path: `M ${x0},0 L ${x0},${y0} L ${x1},${y1} L ${x1},0 Z`,
+                        fillcolor: 'rgba(239, 68, 68, 0.3)',
+                        line: { width: 1, color: 'rgba(239, 68, 68, 0.8)' }
+                    });
+                }
+            }
+        } else if (state.method === 'simpson') {
+            // For Simpson's rule, show parabolic approximations
+            for (let i = 0; i < state.n; i += 2) {
+                const x0 = state.a + i * h;
+                const x1 = state.a + (i + 1) * h;
+                const x2 = state.a + (i + 2) * h;
+                const y0 = f(x0);
+                const y1 = f(x1);
+                const y2 = f(x2);
+                
+                if (isFinite(y0) && isFinite(y1) && isFinite(y2)) {
+                    // Create path for parabolic section
+                    let pathStr = `M ${x0},0 L ${x0},${y0} `;
+                    
+                    // Add intermediate points for smooth parabola
+                    for (let j = 1; j <= 10; j++) {
+                        const t = j / 10;
+                        const x = x0 + t * (x2 - x0);
+                        const y = y0 * (1-t) * (1-t) + 2 * y1 * t * (1-t) + y2 * t * t;
+                        pathStr += `L ${x},${y} `;
+                    }
+                    
+                    pathStr += `L ${x2},0 Z`;
+                    
+                    shapes.push({
+                        type: 'path',
+                        path: pathStr,
+                        fillcolor: 'rgba(16, 185, 129, 0.3)',
+                        line: { width: 1, color: 'rgba(16, 185, 129, 0.8)' }
+                    });
+                }
+            }
+        }
+
+        const traces = [
+            {
+                x: x_func, 
+                y: y_func,
+                mode: 'lines',
+                name: `f(x) = ${formatMathExpression(state.funcString)}`,
+                line: { color: '#374151', width: 3 }
+            }
+        ];
+
+        const layout = {
+            title: {
+                text: `${state.method.charAt(0).toUpperCase() + state.method.slice(1)} Rule Approximation`,
+                font: { size: 18, color: '#0f766e' }
+            },
+            xaxis: { 
+                title: 'x',
+                gridcolor: '#e5e7eb',
+                zeroline: true,
+                zerolinecolor: '#9ca3af'
+            },
+            yaxis: { 
+                title: 'f(x)',
+                gridcolor: '#e5e7eb',
+                zeroline: true,
+                zerolinecolor: '#9ca3af'
+            },
+            shapes: shapes,
+            showlegend: true,
+            margin: { l: 60, r: 30, t: 60, b: 50 },
+            plot_bgcolor: 'rgba(255,255,255,0.8)',
+            paper_bgcolor: 'rgba(255,255,255,0.9)'
+        };
+
+        Plotly.newPlot('plot-explorer', traces, layout, {
+            responsive: true, 
+            displaylogo: false,
+            modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']
+        }).then(() => {
+            console.log('Plot created successfully');
+        }).catch((error) => {
+            console.error('Plotly error:', error);
+            plotDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--error);">Error creating plot</div>';
+        });
+        
+    } catch (error) {
+        console.error('Error creating plot:', error);
+        plotDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--error);">Error creating plot. Please check your function.</div>';
+    }
+}
+
+// Zoom Control Functions
+window.resetZoom = function() {
+    const plotDiv = document.getElementById('plot-explorer');
+    
+    if (!plotDiv || !plotDiv.layout) {
+        console.log('No plot to reset');
+        return;
+    }
+    
+    Plotly.relayout(plotDiv, {
+        'xaxis.autorange': true,
+        'yaxis.autorange': true
+    });
+};
+
+window.fitToFunction = function() {
+    const plotDiv = document.getElementById('plot-explorer');
+    
+    if (!plotDiv || !plotDiv.data || !plotDiv.data[0]) {
+        console.log('No plot data to fit');
+        return;
+    }
+    
+    const x_data = plotDiv.data[0].x;
+    const y_data = plotDiv.data[0].y;
+    
+    if (!x_data || !y_data || x_data.length === 0) {
+        console.log('No valid data to fit');
+        return;
+    }
+    
+    // Calculate bounds with padding
+    const x_min = Math.min(...x_data);
+    const x_max = Math.max(...x_data);
+    const y_min = Math.min(...y_data.filter(y => isFinite(y)));
+    const y_max = Math.max(...y_data.filter(y => isFinite(y)));
+    
+    const x_padding = (x_max - x_min) * 0.1;
+    const y_padding = (y_max - y_min) * 0.1;
+    
+    Plotly.relayout(plotDiv, {
+        'xaxis.range': [x_min - x_padding, x_max + x_padding],
+        'yaxis.range': [y_min - y_padding, y_max + y_padding]
+    });
+};
+
+function createErrorChart(errorData) {
+    console.log('Creating error chart with Plotly...');
+    
+    const traces = [
+        {
+            x: errorData.midpoint.map(d => d.n),
+            y: errorData.midpoint.map(d => Math.log10(d.error + 1e-15)), // Add small value to avoid log(0)
+            mode: 'lines+markers',
+            name: 'Midpoint Rule',
+            line: { color: '#3b82f6', width: 3 },
+            marker: { size: 6 }
+        },
+        {
+            x: errorData.trapezoid.map(d => d.n),
+            y: errorData.trapezoid.map(d => Math.log10(d.error + 1e-15)),
+            mode: 'lines+markers',
+            name: 'Trapezoidal Rule',
+            line: { color: '#ef4444', width: 3 },
+            marker: { size: 6 }
+        },
+        {
+            x: errorData.simpson.map(d => d.n),
+            y: errorData.simpson.map(d => Math.log10(d.error + 1e-15)),
+            mode: 'lines+markers',
+            name: "Simpson's Rule",
+            line: { color: '#10b981', width: 3 },
+            marker: { size: 6 }
+        }
+    ];
+
+    const layout = {
+        title: {
+            text: 'Error Convergence Analysis (Log Scale)',
+            font: { size: 16, color: '#0f766e' }
+        },
+        xaxis: {
+            title: 'Number of subintervals (n)',
+            gridcolor: '#e5e7eb',
+            type: 'log'
+        },
+        yaxis: {
+            title: 'log₁₀(Error)',
+            gridcolor: '#e5e7eb'
+        },
+        showlegend: true,
+        margin: { l: 60, r: 30, t: 60, b: 50 },
+        plot_bgcolor: 'rgba(255,255,255,0.8)',
+        paper_bgcolor: 'rgba(255,255,255,0.9)',
+        height: 400
+    };
+
+    try {
+        Plotly.newPlot('error-chart-container', traces, layout, {
+            responsive: true,
+            displaylogo: false
+        });
+        console.log('Error chart created successfully with Plotly');
+    } catch (error) {
+        console.error('Error creating chart:', error);
+    }
+}
+
+// Update Functions
+function updateFunction() {
+    console.log('Updating function:', document.getElementById('function-input').value);
+    
+    if (typeof math === 'undefined') {
+        console.error('Math.js not available');
+        setTimeout(updateFunction, 100);
+        return;
+    }
+    
+    const functionInput = document.getElementById('function-input');
+    functionInput.style.borderColor = '#e5e7eb';
+    
+    try {
+        state.funcString = functionInput.value || "x^2";
+        state.compiledFunc = math.compile(state.funcString);
+        console.log('Function compiled successfully');
+        updateAll();
+    } catch (e) {
+        console.error('Function compilation error:', e.message);
+        functionInput.style.borderColor = 'var(--error)';
+        state.compiledFunc = null;
+    }
+}
+
+function updateAll() {
+    console.log('Updating all calculations and display...');
+    
+    if (!state.compiledFunc) {
+        console.log('No compiled function available');
+        return;
+    }
+    
+    try {
+        state.a = math.evaluate(document.getElementById('a-input').value);
+        state.b = math.evaluate(document.getElementById('b-input').value);
+        console.log('Interval:', state.a, 'to', state.b);
+    } catch (e) {
+        console.error('Invalid interval value:', e.message);
+        return;
+    }
+    
+    // Calculate high-precision reference
+    state.trueIntegral = calculateMidpoint(5000);
+    console.log('True integral (approximation):', state.trueIntegral);
+
+    const nSlider = document.getElementById('n-slider');
+    let nValue = parseInt(nSlider.value);
+    
+    if (state.method === 'simpson' && nValue % 2 !== 0) {
+        nValue = nValue > 1 ? nValue - 1 : 2; 
+        nSlider.value = nValue;
+    }
+    
+    state.n = nValue;
+    document.getElementById('n-label').textContent = state.n;
+    
+    let approximation = 0;
+    let methodName = '';
+    
+    console.log('Using method:', state.method, 'with n =', state.n);
+    
+    switch(state.method) {
+        case 'midpoint':
+            approximation = calculateMidpoint(state.n);
+            methodName = '📐 Midpoint Approximation';
+            break;
+        case 'trapezoid':
+            approximation = calculateTrapezoid(state.n);
+            methodName = '📊 Trapezoidal Approximation';
+            break;
+        case 'simpson':
+            approximation = calculateSimpson(state.n);
+            methodName = "🎪 Simpson's Approximation";
+            break;
+    }
+    
+    console.log('Approximation:', approximation);
+    
+    const absoluteError = Math.abs(state.trueIntegral - approximation);
+    const relativeError = state.trueIntegral !== 0 ? (absoluteError / Math.abs(state.trueIntegral)) * 100 : 0;
+
+    // Update displays
+    document.getElementById('true-integral-val').textContent = state.trueIntegral.toFixed(6);
+    document.getElementById('approx-label').textContent = methodName;
+    document.getElementById('approx-val').textContent = approximation.toFixed(6);
+    document.getElementById('error-val').textContent = absoluteError.toExponential(4);
+    document.getElementById('relative-error-val').textContent = relativeError.toFixed(4) + '%';
+
+    drawExplorerPlot();
+}
+
+function loadExample(exampleKey) {
+    console.log('Loading example:', exampleKey);
+    const example = EXAMPLES[exampleKey];
+    if (example) {
+        document.getElementById('function-input').value = example.f_string;
+        document.getElementById('a-input').value = example.a;
+        document.getElementById('b-input').value = example.b;
+        updateFunction();
+    }
+}
+
+function runErrorAnalysis() {
+    console.log('Running error analysis...');
+    if (!state.compiledFunc) return;
+    
+    const runErrorAnalysisBtn = document.getElementById('run-error-analysis-btn');
+    runErrorAnalysisBtn.innerHTML = '⏳ Running Analysis...';
+    runErrorAnalysisBtn.disabled = true;
+    
+    setTimeout(() => {
+        const errorData = { midpoint: [], trapezoid: [], simpson: [] };
+        const n_values = [2, 4, 6, 8, 10, 15, 20, 30, 50, 80, 100, 150, 200];
+        
+        n_values.forEach(n => {
+            const midpointError = Math.abs(state.trueIntegral - calculateMidpoint(n));
+            const trapezoidError = Math.abs(state.trueIntegral - calculateTrapezoid(n));
+            const simpsonError = Math.abs(state.trueIntegral - calculateSimpson(n));
+            
+            errorData.midpoint.push({ n, error: midpointError });
+            errorData.trapezoid.push({ n, error: trapezoidError });
+            errorData.simpson.push({ n, error: simpsonError });
+        });
+        
+        console.log('Error data calculated:', errorData);
+        
+        renderErrorTable(n_values, errorData);
+        createErrorChart(errorData);
+        
+        runErrorAnalysisBtn.innerHTML = '🚀 Run Comprehensive Analysis';
+        runErrorAnalysisBtn.disabled = false;
+    }, 100);
+}
+
+function renderErrorTable(n_values, data) {
+    const errorTable = document.getElementById('error-table');
+    const tbody = errorTable.tBodies[0];
+    tbody.innerHTML = '';
+    n_values.forEach((n, i) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${n}</td>
+            <td>${data.midpoint[i].error.toExponential(3)}</td>
+            <td>${data.trapezoid[i].error.toExponential(3)}</td>
+            <td>${data.simpson[i].error.toExponential(3)}</td>
+        `;
+    });
+}
+
+// Tab switching
+window.switchTab = function(tabName) {
+    console.log('Switching to tab:', tabName);
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+    document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+};
+
+// Initialize application when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing application...');
+    
+    // Setup event listeners
+    document.querySelectorAll('.example-pill').forEach(pill => {
+        pill.addEventListener('click', (e) => {
+            console.log('Example clicked:', pill.dataset.example);
+            loadExample(pill.dataset.example);
+        });
+    });
+
+    // Function input
+    const functionInput = document.getElementById('function-input');
+    functionInput.addEventListener('input', updateFunction);
+    functionInput.addEventListener('change', updateFunction);
+    
+    // Parameter inputs
+    document.getElementById('a-input').addEventListener('input', updateAll);
+    document.getElementById('b-input').addEventListener('input', updateAll);
+    
+    const nSlider = document.getElementById('n-slider');
+    nSlider.addEventListener('input', (e) => {
+        document.getElementById('n-label').textContent = e.target.value;
+        updateAll();
+    });
+    
+    // Method selection
+    document.getElementsByName('method').forEach(radio => {
+        radio.addEventListener('change', (e) => { 
+            console.log('Method changed to:', e.target.value);
+            state.method = e.target.value; 
+            updateAll(); 
+        });
+    });
+    
+    // Error analysis button
+    document.getElementById('run-error-analysis-btn').addEventListener('click', runErrorAnalysis);
+    
+    // Initial update
+    updateFunction();
+    
+    console.log('Application setup complete');
+});
+</script>
+</body>
+</html>
