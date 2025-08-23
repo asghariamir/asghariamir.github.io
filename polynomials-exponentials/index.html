@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polynomials vs. Exponentials Explorer</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --brand: #0f766e;
+            --brand-light: #10b981;
+            --primary-color: #1565c0;
+            --secondary-color: #c62828;
+            --accent: #f59e0b;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+            --success-color: #4caf50;
+            --bg: #f7faf9;
+            --accent-orange: #ed6600;
+        }
+
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--bg);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        h2 { 
+            font-size: 2.2rem; 
+            color: var(--brand); 
+            margin: 1.5rem 0 0.5rem; 
+            text-align: center; 
+        }
+
+        p.info { 
+            color: #4b5563; 
+            margin-bottom: 1.5rem; 
+            text-align: center; 
+            padding: 0 1rem;
+        }
+
+        /* Mathswell Nav */
+        .mathswell-nav {
+            display: flex;
+            justify-content: center;
+            margin: 0.75rem 0 1rem;
+            position: relative;
+            z-index: 1001;
+        }
+        
+        .mathswell-nav .mw-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--brand);
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .mathswell-nav .mw-link img {
+            display: block;
+        }
+
+        /* Tabs */
+        .tabs { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 0.5rem; 
+            margin-bottom: 2rem; 
+            border-bottom: 2px solid var(--medium-gray); 
+            padding: 0 1rem;
+        }
+        
+        .tab-button { 
+            padding: 0.75rem 1.5rem; 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 1.1rem;
+            color: var(--dark-gray); 
+            transition: all 0.3s ease; 
+            border-bottom: 4px solid transparent; 
+            transform: translateY(2px);
+            font-weight: 600;
+        }
+        
+        .tab-button.active { 
+            color: var(--brand); 
+            border-bottom-color: var(--brand); 
+        }
+        
+        .tab-content { 
+            display: none; 
+            padding: 1.5rem; 
+        }
+        
+        .tab-content.active { 
+            display: block; 
+        }
+
+        /* Introduction section styles */
+        .intro-section {
+            margin: 2rem 0;
+        }
+
+        .intro-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid var(--brand);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .intro-box h3 {
+            color: var(--brand);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .intro-box p {
+            margin-bottom: 0.8rem;
+            line-height: 1.7;
+            color: #4b5563;
+        }
+
+        .intro-box strong {
+            color: var(--brand);
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .concept-card {
+            background: white;
+            border: 2px solid #e6fffb;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--brand);
+        }
+
+        .concept-card h4 {
+            color: var(--brand);
+            margin-bottom: 0.5rem;
+        }
+
+        .concept-card .math {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+        }
+
+        /* Controls */
+        .controls, .fd-controls {
+            background-color: #e6fffb;
+            border: 1px solid #d1fae5;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.5rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .controls label, .fd-controls label { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+            cursor: pointer;
+        }
+
+        .controls input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .controls input[type="number"], .fd-controls input[type="number"] {
+            width: 5rem;
+            padding: 0.25rem;
+            border: 2px solid var(--medium-gray);
+            border-radius: 4px;
+        }
+
+        /* Square buttons */
+        .square-btn {
+            border: 2px solid var(--brand);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            user-select: none;
+            background: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .square-btn input { 
+            display: none; 
+        }
+
+        .square-btn span { 
+            color: var(--brand); 
+            font-weight: 600; 
+        }
+
+        .square-btn.checked {
+            background: var(--brand);
+            border-color: var(--brand);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+        }
+
+        .square-btn.checked span { 
+            color: #fff; 
+        }
+
+        /* Tables */
+        .fd-section { 
+            margin-bottom: 2rem; 
+        }
+
+        table { 
+            border-collapse: collapse; 
+            font-size: 0.9rem; 
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table th, table td { 
+            border: 1px solid var(--medium-gray); 
+            padding: 0.5rem 0.75rem; 
+            text-align: center; 
+            min-width: 3rem; 
+        }
+
+        table th.func-label { 
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            color: #fff; 
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.75rem;
+        }
+
+        table td {
+            background: white;
+            font-family: 'Courier New', monospace;
+        }
+
+        table tr:hover td {
+            background: #f0fdf4;
+        }
+
+        .ellipsis { 
+            text-align: center !important; 
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        /* Chart */
+        .chart-box { 
+            position: relative; 
+            width: 100%; 
+            max-width: 700px; 
+            margin: 0 auto 2rem;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid var(--medium-gray);
+        }
+
+        .chart-box canvas { 
+            width: 100% !important; 
+            height: auto !important; 
+            aspect-ratio: 1 / 1; 
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            color: var(--brand);
+            border: 2px solid var(--brand);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .chart-btn:hover {
+            background: var(--brand);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+        }
+
+        .try-button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .try-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e6fffb, #f0fdf4);
+            border-left: 4px solid var(--brand);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            color: var(--dark-gray);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Polynomials vs. Exponentials Explorer</h2>
+        
+        <!-- Mathswell brand badge -->
+        <div class="mathswell-nav">
+            <a href="/" class="mw-link">
+                <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28">
+                <span>MATHSWELL</span>
+            </a>
+        </div>
+
+        <p class="info">Explore the fundamental differences between polynomial and exponential growth patterns</p>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="introduction">Introduction</button>
+            <button class="tab-button" data-tab="finite-differences">Finite Differences</button>
+            <button class="tab-button" data-tab="continuous-graphs">Continuous Graphs</button>
+        </div>
+
+        <!-- Introduction Tab -->
+        <section id="introduction-tab" class="tab-content active">
+            <div class="intro-section">
+                <div class="intro-box">
+                    <h3>🔍 What's the Big Difference?</h3>
+                    <p><strong>Polynomials</strong> like x², x³, x⁴ grow by multiplication, but at a predictable rate.</p>
+                    <p><strong>Exponentials</strong> like 2ˣ, 3ˣ, eˣ grow by repeated multiplication, creating explosive growth.</p>
+                    <p>This fundamental difference appears everywhere in mathematics, science, and real life!</p>
+                </div>
+
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <h4>Polynomial Growth</h4>
+                        <div class="math">f(x) = xⁿ</div>
+                        <p>Power is constant, base varies</p>
+                        <p style="color: var(--brand); font-weight: 600;">x² means x · x</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Exponential Growth</h4>
+                        <div class="math">f(x) = aˣ</div>
+                        <p>Base is constant, power varies</p>
+                        <p style="color: var(--accent-orange); font-weight: 600;">2ˣ means 2 · 2 · ... (x times)</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Key Insight</h4>
+                        <p>No matter how large n is in xⁿ,</p>
+                        <p>eventually aˣ will overtake it!</p>
+                        <p style="color: var(--brand); font-weight: 600;">Exponentials always win</p>
+                    </div>
+                </div>
+
+                <div class="intro-box">
+                    <h3>🎯 Two Perspectives</h3>
+                    <p><strong>1. Finite Differences:</strong> See how polynomials eventually reach zero differences, while exponentials never do.</p>
+                    <p><strong>2. Continuous Graphs:</strong> Watch how exponential functions eventually outgrow any polynomial.</p>
+                    <p>Use the tabs above to explore both perspectives interactively!</p>
+                </div>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <button class="try-button" id="try-finite-diff">Try Finite Differences →</button>
+                    <button class="try-button" id="try-graphs">Try Continuous Graphs →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Finite Differences Tab -->
+        <section id="finite-differences-tab" class="tab-content">
+            <div class="info-box">
+                <strong>Key Insight:</strong> For polynomials, the finite-difference process eventually reaches zero (x³ needs a 3rd difference; x² a 2nd).
+                For an exponential like 2ˣ, each new row is the previous row shifted one step and multiplied by the same constant, so the pattern never ends.
+            </div>
+
+            <!-- Polynomial section -->
+            <div class="fd-section">
+                <div class="fd-controls">
+                    <strong>Choose polynomial:</strong>
+                    <label class="square-btn checked">
+                        <input type="radio" name="poly" value="x2" checked>
+                        <span>x²</span>
+                    </label>
+                    <label class="square-btn">
+                        <input type="radio" name="poly" value="x3">
+                        <span>x³</span>
+                    </label>
+                    <label class="square-btn">
+                        <input type="radio" name="poly" value="x4">
+                        <span>x⁴</span>
+                    </label>
+                </div>
+                <div id="polyTable"></div>
+            </div>
+
+            <!-- 2^x section -->
+            <div class="fd-section">
+                <div class="fd-controls">
+                    <strong>2ˣ Finite Differences</strong>
+                    <label>
+                        Levels to show:
+                        <input type="number" id="expLevels" value="6" min="1" max="10">
+                    </label>
+                </div>
+                <div id="expTable"></div>
+            </div>
+        </section>
+
+        <!-- Continuous Graphs Tab -->
+        <section id="continuous-graphs-tab" class="tab-content">
+            <div class="info-box">
+                Toggle any combination of functions to compare their growth rates. The centered axes make growth-rate comparisons immediate.
+                Notice how exponentials eventually outgrow any polynomial!
+            </div>
+
+            <!-- Main graph controls -->
+            <div class="controls" id="graphControls">
+                <strong>Select Functions:</strong>
+                <label><input type="checkbox" data-func="x2" checked> x²</label>
+                <label><input type="checkbox" data-func="x3" checked> x³</label>
+                <label><input type="checkbox" data-func="x4"> x⁴</label>
+                <label><input type="checkbox" data-func="exp" checked> eˣ</label>
+                <label><input type="checkbox" data-func="2x" checked> 2ˣ</label>
+                <label><input type="checkbox" data-func="3x"> 3ˣ</label>
+            </div>
+            
+            <div class="chart-box">
+                <div class="chart-controls">
+                    <button class="chart-btn" id="reset-main-btn">🔄 Reset View</button>
+                    <button class="chart-btn" id="recenter-main-btn">🎯 Recenter</button>
+                </div>
+                <canvas id="chartMain"></canvas>
+            </div>
+
+            <!-- a^x exploration -->
+            <div class="info-box">
+                <strong>Growth vs Decay:</strong> Compare growth and decay of aˣ for 0 < a < 1 and a > 1. 
+                View (½)ˣ, 2ˣ, plus a custom base of your choice.
+            </div>
+            
+            <div class="controls" id="axControls">
+                <label><input type="checkbox" id="toggleHalf" checked> (½)ˣ</label>
+                <label><input type="checkbox" id="toggleTwo" checked> 2ˣ</label>
+                <label>
+                    Choose a:
+                    <input type="number" id="baseA" value="4" min="0.1" max="10" step="0.1">
+                </label>
+                <label id="customBaseLabel" style="font-weight: 600; color: var(--dark-gray);">4ˣ</label>
+            </div>
+            
+            <div class="chart-box">
+                <div class="chart-controls">
+                    <button class="chart-btn" id="reset-ax-btn">🔄 Reset View</button>
+                    <button class="chart-btn" id="recenter-ax-btn">🎯 Recenter</button>
+                </div>
+                <canvas id="chartAx"></canvas>
+            </div>
+        </section>
+    </div>
+
+<script>
+// Wait for Chart.js to load
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Register Chart.js plugin for centered axes with arrowheads
+    if (typeof Chart !== 'undefined') {
+        const axesArrows = {
+            id: 'axesArrows',
+            beforeDraw(chart) {
+                const { ctx, chartArea: {top, bottom, left, right}, scales: {x, y} } = chart;
+                ctx.save();
+                ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+                ctx.lineWidth = 1.5;
+                const arrow = 7;
+                const xZero = x.getPixelForValue(0);
+                const yZero = y.getPixelForValue(0);
+                
+                // Y-axis
+                ctx.beginPath();
+                ctx.moveTo(xZero, top);
+                ctx.lineTo(xZero, bottom);
+                ctx.stroke();
+                
+                // Y-axis arrow
+                ctx.beginPath();
+                ctx.moveTo(xZero, top);
+                ctx.lineTo(xZero - arrow, top + arrow * 1.2);
+                ctx.lineTo(xZero + arrow, top + arrow * 1.2);
+                ctx.closePath();
+                ctx.fill();
+                
+                // X-axis
+                ctx.beginPath();
+                ctx.moveTo(left, yZero);
+                ctx.lineTo(right, yZero);
+                ctx.stroke();
+                
+                // X-axis arrow
+                ctx.beginPath();
+                ctx.moveTo(right, yZero);
+                ctx.lineTo(right - arrow * 1.2, yZero - arrow);
+                ctx.lineTo(right - arrow * 1.2, yZero + arrow);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        };
+        Chart.register(axesArrows);
+    }
+
+    // Constants and configuration
+    const COLORS = {
+        x2: 'rgba(21, 101, 192, 1)',
+        x3: 'rgba(21, 101, 192, 0.7)',
+        x4: 'rgba(21, 101, 192, 0.5)',
+        exp: 'rgba(237, 102, 0, 1)',
+        '2x': 'rgba(237, 102, 0, 0.8)',
+        '3x': 'rgba(237, 102, 0, 0.6)',
+        halfx: 'rgba(16, 185, 129, 0.8)',
+        ax: 'rgba(197, 48, 48, 0.9)'
+    };
+
+    const LABELS = {
+        x2: 'x²',
+        x3: 'x³',
+        x4: 'x⁴',
+        exp: 'eˣ',
+        '2x': '2ˣ',
+        '3x': '3ˣ',
+        halfx: '(½)ˣ',
+        ax: 'aˣ'
+    };
+
+    const DEFAULT_RANGE = 8;
+    const DEFAULT_YMAX = 300;
+
+    let chartMain = null;
+    let chartAx = null;
+
+    // Helper functions
+    function evalFunc(key, x, a = 2) {
+        switch (key) {
+            case 'x2': return x ** 2;
+            case 'x3': return x ** 3;
+            case 'x4': return x ** 4;
+            case 'exp': return Math.E ** x;
+            case '2x': return 2 ** x;
+            case '3x': return 3 ** x;
+            case 'halfx': return 0.5 ** x;
+            case 'ax': return a ** x;
+            default: return 0;
+        }
+    }
+
+    function formatPow2(exp) {
+        if (exp < 0) return `1/${2 ** (-exp)}`;
+        if (exp === 0) return '1';
+        return `${2 ** exp}`;
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+        // Update button states
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tabName);
+        });
+        
+        // Update content visibility
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.toggle('active', content.id === `${tabName}-tab`);
+        });
+        
+        // Initialize charts when switching to graphs tab
+        if (tabName === 'continuous-graphs') {
+            setTimeout(() => {
+                if (!chartMain) createMainChart();
+                if (!chartAx) createAxChart();
+            }, 100);
+        }
+    }
+
+    // Table builders
+    function buildPolyTable(func) {
+        const xs = [...Array(8).keys()];
+        let firstRow;
+        
+        switch(func) {
+            case 'x2':
+                firstRow = xs.map(x => x ** 2);
+                break;
+            case 'x3':
+                firstRow = xs.map(x => x ** 3);
+                break;
+            case 'x4':
+                firstRow = xs.map(x => x ** 4);
+                break;
+            default:
+                firstRow = xs.map(x => x ** 2);
+        }
+        
+        const rows = [firstRow];
+        let current = firstRow;
+        
+        while (!current.every(v => v === 0) && current.length > 1) {
+            const next = [];
+            for (let i = 0; i < current.length - 1; i++) {
+                next.push(current[i + 1] - current[i]);
+            }
+            rows.push(next);
+            current = next;
+        }
+        
+        let html = `<table>`;
+        html += `<thead><tr><th class="func-label" colspan="${xs.length}">`;
+        html += func === 'x2' ? 'x²' : func === 'x3' ? 'x³' : 'x⁴';
+        html += ` Values and Differences</th></tr></thead><tbody>`;
+        
+        html += '<tr style="background: #f0fdf4;">';
+        xs.forEach(x => html += `<td><strong>x=${x}</strong></td>`);
+        html += '</tr>';
+        
+        rows.forEach((row, idx) => {
+            html += '<tr>';
+            row.forEach(v => html += `<td>${v}</td>`);
+            for (let i = row.length; i < xs.length; i++) {
+                html += '<td style="background: #f5f5f5;">-</td>';
+            }
+            html += '</tr>';
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('polyTable').innerHTML = html;
+    }
+
+    function buildExpTable(levels) {
+        const xs = Array.from({length: 11}, (_, i) => i - 5);
+        const rows = [];
+        
+        for (let k = 0; k < levels; k++) {
+            rows.push(xs.map(x => 2 ** (x + k)));
+        }
+        
+        let html = `<table>`;
+        html += `<thead><tr><th class="func-label" colspan="13">2ˣ Values and Differences</th></tr></thead><tbody>`;
+        
+        html += '<tr style="background: #f0fdf4;"><td class="ellipsis">...</td>';
+        xs.forEach(x => html += `<td><strong>x=${x}</strong></td>`);
+        html += '<td class="ellipsis">...</td></tr>';
+        
+        rows.forEach((row, idx) => {
+            html += '<tr>';
+            html += '<td class="ellipsis">...</td>';
+            row.forEach(val => {
+                const exp = Math.log2(val);
+                html += `<td>${formatPow2(exp)}</td>`;
+            });
+            html += '<td class="ellipsis">...</td>';
+            html += '</tr>';
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('expTable').innerHTML = html;
+    }
+
+    // Chart functions
+    function datasetFor(key, aVal) {
+        const data = [];
+        const step = 0.25;
+        for (let x = -DEFAULT_RANGE; x <= DEFAULT_RANGE; x += step) {
+            const y = evalFunc(key, x, aVal);
+            if (isFinite(y) && Math.abs(y) < 10000) {
+                data.push({x, y});
+            }
+        }
+        
+        return {
+            label: LABELS[key] || key,
+            data,
+            parsing: false,
+            borderColor: COLORS[key],
+            backgroundColor: 'transparent',
+            borderWidth: 2.5,
+            pointRadius: 0,
+            tension: 0.1
+        };
+    }
+
+    function createMainChart() {
+        const ctx = document.getElementById('chartMain');
+        if (!ctx || chartMain) return;
+        
+        chartMain = new Chart(ctx, {
+            type: 'line',
+            data: { datasets: [] },
+            options: {
+                maintainAspectRatio: true,
+                responsive: true,
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: { size: 12, weight: 'bold' }
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            title: (items) => `x = ${items[0].parsed.x.toFixed(2)}`,
+                            label: (item) => `${item.dataset.label}: ${item.parsed.y.toFixed(2)}`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        min: -DEFAULT_RANGE,
+                        max: DEFAULT_RANGE,
+                        display: false
+                    },
+                    y: {
+                        min: -DEFAULT_YMAX,
+                        max: DEFAULT_YMAX,
+                        display: false
+                    }
+                }
+            },
+            plugins: [typeof axesArrows !== 'undefined' ? axesArrows : {}]
+        });
+        updateMainChart();
+    }
+
+    function updateMainChart() {
+        if (!chartMain) return;
+        const checks = [...document.querySelectorAll('#graphControls input[type=checkbox]:checked')];
+        const funcs = checks.map(c => c.dataset.func);
+        chartMain.data.datasets = funcs.map(f => datasetFor(f, 2));
+        chartMain.update('none');
+    }
+
+    function createAxChart() {
+        const ctx = document.getElementById('chartAx');
+        if (!ctx || chartAx) return;
+        
+        chartAx = new Chart(ctx, {
+            type: 'line',
+            data: { datasets: [] },
+            options: {
+                maintainAspectRatio: true,
+                responsive: true,
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: { size: 12, weight: 'bold' }
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            title: (items) => `x = ${items[0].parsed.x.toFixed(2)}`,
+                            label: (item) => `${item.dataset.label}: ${item.parsed.y.toFixed(2)}`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        min: -DEFAULT_RANGE,
+                        max: DEFAULT_RANGE,
+                        display: false
+                    },
+                    y: {
+                        min: -DEFAULT_YMAX,
+                        max: DEFAULT_YMAX,
+                        display: false
+                    }
+                }
+            },
+            plugins: [typeof axesArrows !== 'undefined' ? axesArrows : {}]
+        });
+        updateAxChart();
+    }
+
+    function updateAxChart() {
+        if (!chartAx) return;
+        const datasets = [];
+        
+        if (document.getElementById('toggleHalf').checked) {
+            const halfData = datasetFor('halfx');
+            halfData.label = '(½)ˣ';
+            datasets.push(halfData);
+        }
+        
+        if (document.getElementById('toggleTwo').checked) {
+            const twoData = datasetFor('2x');
+            twoData.label = '2ˣ';
+            datasets.push(twoData);
+        }
+        
+        const a = parseFloat(document.getElementById('baseA').value || 2);
+        const axData = datasetFor('ax', a);
+        axData.label = `${a}ˣ`;
+        datasets.push(axData);
+        
+        document.getElementById('customBaseLabel').textContent = `${a}ˣ`;
+        
+        chartAx.data.datasets = datasets;
+        chartAx.update('none');
+    }
+
+    // View control functions
+    function resetMainView() {
+        if (!chartMain) return;
+        chartMain.options.scales.x.min = -DEFAULT_RANGE;
+        chartMain.options.scales.x.max = DEFAULT_RANGE;
+        chartMain.options.scales.y.min = -DEFAULT_YMAX;
+        chartMain.options.scales.y.max = DEFAULT_YMAX;
+        chartMain.update();
+    }
+
+    function recenterMainView() {
+        if (!chartMain) return;
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        
+        chartMain.data.datasets.forEach(dataset => {
+            dataset.data.forEach(point => {
+                minX = Math.min(minX, point.x);
+                maxX = Math.max(maxX, point.x);
+                minY = Math.min(minY, point.y);
+                maxY = Math.max(maxY, point.y);
+            });
+        });
+        
+        const xPadding = (maxX - minX) * 0.1 || 1;
+        const yPadding = (maxY - minY) * 0.1 || 10;
+        
+        if (Math.abs(minX) < DEFAULT_RANGE && Math.abs(maxX) < DEFAULT_RANGE) {
+            const xMax = Math.max(Math.abs(minX - xPadding), Math.abs(maxX + xPadding));
+            chartMain.options.scales.x.min = -xMax;
+            chartMain.options.scales.x.max = xMax;
+        } else {
+            chartMain.options.scales.x.min = minX - xPadding;
+            chartMain.options.scales.x.max = maxX + xPadding;
+        }
+        
+        if (Math.abs(minY) < DEFAULT_YMAX && Math.abs(maxY) < DEFAULT_YMAX) {
+            const yMax = Math.max(Math.abs(minY - yPadding), Math.abs(maxY + yPadding));
+            chartMain.options.scales.y.min = -yMax;
+            chartMain.options.scales.y.max = yMax;
+        } else {
+            chartMain.options.scales.y.min = minY - yPadding;
+            chartMain.options.scales.y.max = maxY + yPadding;
+        }
+        
+        chartMain.update();
+    }
+
+    function resetAxView() {
+        if (!chartAx) return;
+        chartAx.options.scales.x.min = -DEFAULT_RANGE;
+        chartAx.options.scales.x.max = DEFAULT_RANGE;
+        chartAx.options.scales.y.min = -DEFAULT_YMAX;
+        chartAx.options.scales.y.max = DEFAULT_YMAX;
+        chartAx.update();
+    }
+
+    function recenterAxView() {
+        if (!chartAx) return;
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        
+        chartAx.data.datasets.forEach(dataset => {
+            dataset.data.forEach(point => {
+                minX = Math.min(minX, point.x);
+                maxX = Math.max(maxX, point.x);
+                minY = Math.min(minY, point.y);
+                maxY = Math.max(maxY, point.y);
+            });
+        });
+        
+        const xPadding = (maxX - minX) * 0.1 || 1;
+        const yPadding = (maxY - minY) * 0.1 || 10;
+        
+        if (Math.abs(minX) < DEFAULT_RANGE && Math.abs(maxX) < DEFAULT_RANGE) {
+            const xMax = Math.max(Math.abs(minX - xPadding), Math.abs(maxX + xPadding));
+            chartAx.options.scales.x.min = -xMax;
+            chartAx.options.scales.x.max = xMax;
+        } else {
+            chartAx.options.scales.x.min = minX - xPadding;
+            chartAx.options.scales.x.max = maxX + xPadding;
+        }
+        
+        if (Math.abs(minY) < DEFAULT_YMAX && Math.abs(maxY) < DEFAULT_YMAX) {
+            const yMax = Math.max(Math.abs(minY - yPadding), Math.abs(maxY + yPadding));
+            chartAx.options.scales.y.min = -yMax;
+            chartAx.options.scales.y.max = yMax;
+        } else {
+            chartAx.options.scales.y.min = minY - yPadding;
+            chartAx.options.scales.y.max = maxY + yPadding;
+        }
+        
+        chartAx.update();
+    }
+
+    // Initialize all event listeners
+    function initializeApp() {
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchTab(btn.dataset.tab);
+            });
+        });
+
+        // Introduction navigation buttons
+        const tryFiniteDiff = document.getElementById('try-finite-diff');
+        const tryGraphs = document.getElementById('try-graphs');
+        
+        if (tryFiniteDiff) {
+            tryFiniteDiff.addEventListener('click', () => {
+                switchTab('finite-differences');
+            });
+        }
+        
+        if (tryGraphs) {
+            tryGraphs.addEventListener('click', () => {
+                switchTab('continuous-graphs');
+            });
+        }
+
+        // Polynomial choice buttons
+        document.querySelectorAll('.square-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.square-btn').forEach(b => b.classList.remove('checked'));
+                btn.classList.add('checked');
+                const val = btn.querySelector('input').value;
+                buildPolyTable(val);
+            });
+        });
+
+        // Exponential levels
+        const expLevels = document.getElementById('expLevels');
+        if (expLevels) {
+            expLevels.addEventListener('input', (e) => {
+                const lvl = Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1));
+                buildExpTable(lvl);
+            });
+        }
+
+        // Graph controls
+        document.querySelectorAll('#graphControls input[type=checkbox]').forEach(cb => {
+            cb.addEventListener('change', updateMainChart);
+        });
+
+        // ax controls
+        const toggleHalf = document.getElementById('toggleHalf');
+        const toggleTwo = document.getElementById('toggleTwo');
+        const baseA = document.getElementById('baseA');
+        
+        if (toggleHalf) toggleHalf.addEventListener('change', updateAxChart);
+        if (toggleTwo) toggleTwo.addEventListener('change', updateAxChart);
+        if (baseA) baseA.addEventListener('input', updateAxChart);
+
+        // Chart control buttons
+        const resetMainBtn = document.getElementById('reset-main-btn');
+        const recenterMainBtn = document.getElementById('recenter-main-btn');
+        const resetAxBtn = document.getElementById('reset-ax-btn');
+        const recenterAxBtn = document.getElementById('recenter-ax-btn');
+        
+        if (resetMainBtn) resetMainBtn.addEventListener('click', resetMainView);
+        if (recenterMainBtn) recenterMainBtn.addEventListener('click', recenterMainView);
+        if (resetAxBtn) resetAxBtn.addEventListener('click', resetAxView);
+        if (recenterAxBtn) recenterAxBtn.addEventListener('click', recenterAxView);
+
+        // Initialize tables
+        buildPolyTable('x2');
+        buildExpTable(6);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (chartMain) chartMain.update();
+            if (chartAx) chartAx.update();
+        });
+    }
+
+    // Start the app
+    initializeApp();
+});
+</script>
+</body>
+</html>
