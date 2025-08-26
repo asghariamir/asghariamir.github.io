@@ -1,1 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derivative Explorer: The Fundamental Connection</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        :root {
+            --brand: #0f766e;
+            --brand-light: #10b981;
+            --accent: #f59e0b;
+            --bg: #f7faf9;
+            --card: #ffffff;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --present-moment: rgba(59, 130, 246, 0.15);
+            --increasing: rgba(16, 185, 129, 0.15);
+            --decreasing: rgba(239, 68, 68, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #f7faf9 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(165deg, #e6fffb 0%, #fdfcf7 25%, rgba(245, 158, 11, 0.05) 100%);
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(15, 118, 110, 0.05) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-20px, -20px) rotate(1deg); }
+            66% { transform: translate(20px, -10px) rotate(-1deg); }
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: #f9fafb;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
+            color: white;
+            box-shadow: 0 2px 8px rgba(15, 118, 110, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Main Card */
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .main-card h2 {
+            color: var(--brand);
+            margin-bottom: 1rem;
+            font-size: 1.6rem;
+        }
+
+        .main-card > p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        /* Animation Controls */
+        .animation-controls {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 2px solid #fbbf24;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .animation-controls label {
+            font-weight: 600;
+            color: #d97706;
+        }
+
+        .animation-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            color: #d97706;
+            border: 2px solid #fbbf24;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .animation-btn:hover {
+            background: #fbbf24;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .animation-btn.active {
+            background: #f59e0b;
+            color: white;
+            border-color: #f59e0b;
+        }
+
+        .animation-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Canvas Container */
+        .canvas-wrapper {
+            position: relative;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 2rem 0;
+            border: 2px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .canvas-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .present-moment {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 48%;
+            width: 4%;
+            background: var(--present-moment);
+            border-left: 2px solid rgba(59, 130, 246, 0.3);
+            border-right: 2px solid rgba(59, 130, 246, 0.3);
+            pointer-events: none;
+            z-index: 10;
+            backdrop-filter: blur(2px);
+        }
+
+        .present-label {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 15;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .canvas-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--brand);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Time Display for Tab 3 */
+        .time-display-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(249, 250, 251, 0.98));
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 25;
+            min-width: 150px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .time-display {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3b82f6;
+            text-align: center;
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            text-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .time-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Paper Control Slider */
+        .paper-control {
+            position: relative;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .paper-control-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .paper-control-header h4 {
+            color: var(--brand);
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .paper-control-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .speed-warning {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 6px;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: #d97706;
+        }
+
+        .paper-slider-container {
+            position: relative;
+            height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .paper-slider {
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(to right, #e5e7eb 0%, var(--brand) 50%, #e5e7eb 100%);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: grab;
+        }
+
+        .paper-slider:active {
+            cursor: grabbing;
+        }
+
+        .paper-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--brand);
+            cursor: grab;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .paper-slider::-moz-range-thumb {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--brand);
+            cursor: grab;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .paper-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .paper-slider::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .paper-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Info Display */
+        .info-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(15, 118, 110, 0.02));
+            border-radius: 12px;
+            border: 1px solid #d1fae5;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--brand);
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+        }
+
+        .info-value.velocity {
+            color: var(--accent);
+        }
+
+        .info-value.acceleration {
+            color: #8b5cf6;
+        }
+
+        .info-description {
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.5rem; }
+            .header { padding: 1.5rem 1rem; }
+            .header h1 { font-size: 1.8rem; }
+            .header p { font-size: 1rem; }
+            .tabs { 
+                flex-direction: column; 
+                gap: 0.5rem;
+            }
+            .tab-btn { min-width: auto; }
+            .main-card { padding: 1.5rem; }
+            .info-display { 
+                grid-template-columns: 1fr 1fr; 
+                padding: 1rem;
+            }
+            .canvas-container { height: 300px; }
+            .animation-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .info-display { 
+                grid-template-columns: 1fr; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>The Derivative: Two Views, One Truth</h1>
+            <p>Discover the fundamental connection: <strong>instantaneous velocity equals the slope of the tangent line</strong>.</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; font-style: italic;">
+                Inspired by W.W. Sawyer's 
+                <a href="https://archive.org/details/W.W.SawyerWhatIsCalculusAbout" target="_blank" style="color: var(--brand); text-decoration: underline;">
+                    "What Is Calculus About?"
+                </a> 
+                and his moving paper visualization
+            </p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="motion-creates">Motion Creates Graph</button>
+            <button class="tab-btn" data-tab="graph-controls">Graph Controls Motion</button>
+            <button class="tab-btn" data-tab="two-views">Interactive Explorer</button>
+        </div>
+
+        <div id="motion-creates" class="tab-content active">
+            <div class="main-card">
+                <h2>Motion Creates History on Moving Paper</h2>
+                <p>Like a seismograph recording earthquake motion, the pen stays fixed at the <strong>present moment</strong> while paper scrolls rightward. The trace accumulates in the past (leftward) as the paper carries each mark away.</p>
+                <p style="margin-top: 0.5rem; font-size: 0.95rem; color: var(--text-muted); font-style: italic;">
+                    "If the object has a steady speed, its trail will be a straight line." - W.W. Sawyer
+                </p>
+                
+                <div class="animation-controls">
+                    <label>Animation:</label>
+                    <button class="animation-btn" id="mc-start-btn">Start</button>
+                    <button class="animation-btn" id="mc-pause-btn">Pause</button>
+                    <button class="animation-btn" id="mc-reset-btn">Reset</button>
+                    <span style="margin-left: auto; font-size: 0.9rem; color: #92400e;">Paper scrolls continuously through time</span>
+                </div>
+                
+                <div class="canvas-wrapper">
+                    <div class="canvas-label">Paper moves → Trace forms ←</div>
+                    <div class="canvas-container">
+                        <div class="present-moment">
+                            <div class="present-label">NOW</div>
+                        </div>
+                        <canvas id="motion-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="paper-control">
+                    <div class="paper-control-header">
+                        <h4>Manual Time Control</h4>
+                        <p>Drag to move paper through time manually</p>
+                    </div>
+                    <div class="speed-warning">
+                        Note: Velocity calculation assumes steady paper movement speed
+                    </div>
+                    <div class="paper-slider-container">
+                        <input type="range" class="paper-slider" id="mc-paper-slider" min="-20" max="20" step="0.01" value="0">
+                    </div>
+                    <div class="paper-info">
+                        <span>← Past</span>
+                        <span><strong>Drag to scroll through time continuously</strong></span>
+                        <span>Future →</span>
+                    </div>
+                </div>
+                
+                <div class="info-display">
+                    <div class="info-item">
+                        <div class="info-label">Position s(t)</div>
+                        <div class="info-value" id="mc-position">0.00</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Velocity = Slope</div>
+                        <div class="info-value velocity" id="mc-velocity">0.00</div>
+                        <div class="info-description" id="mc-vel-desc">Changing</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Acceleration</div>
+                        <div class="info-value acceleration" id="mc-acceleration">0.00</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Time t</div>
+                        <div class="info-value" id="mc-time">0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="graph-controls" class="tab-content">
+            <div class="main-card">
+                <h2>Pre-existing Graph on Moving Paper</h2>
+                <p>A previously drawn graph moves with the paper. The point follows the graph at the present moment, and its <strong>velocity equals the tangent slope</strong>.</p>
+                <p style="margin-top: 0.5rem; font-size: 0.95rem; color: var(--text-muted); font-style: italic;">
+                    "We can see the curves; details appear in the curves that might not be apparent in the actual movement." - W.W. Sawyer
+                </p>
+                
+                <div class="animation-controls">
+                    <label>Animation:</label>
+                    <button class="animation-btn" id="gc-start-btn">Start</button>
+                    <button class="animation-btn" id="gc-pause-btn">Pause</button>
+                    <button class="animation-btn" id="gc-reset-btn">Reset</button>
+                    <span style="margin-left: auto; font-size: 0.9rem; color: #92400e;">Graph extends infinitely in both directions</span>
+                </div>
+                
+                <div class="canvas-wrapper">
+                    <div class="canvas-label">Graph moves with paper</div>
+                    <div class="canvas-container">
+                        <div class="present-moment">
+                            <div class="present-label">NOW</div>
+                        </div>
+                        <canvas id="graph-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="paper-control">
+                    <div class="paper-control-header">
+                        <h4>Manual Time Control</h4>
+                        <p>Drag to see how the point follows the graph</p>
+                    </div>
+                    <div class="speed-warning">
+                        Note: Velocity reading depends on steady drag speed
+                    </div>
+                    <div class="paper-slider-container">
+                        <input type="range" class="paper-slider" id="gc-paper-slider" min="-20" max="20" step="0.01" value="0">
+                    </div>
+                    <div class="paper-info">
+                        <span>← Move paper left</span>
+                        <span><strong>Paper scrolls infinitely through time</strong></span>
+                        <span>Move paper right →</span>
+                    </div>
+                </div>
+                
+                <div class="info-display">
+                    <div class="info-item">
+                        <div class="info-label">Position s(t)</div>
+                        <div class="info-value" id="gc-position">0.00</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Velocity = Slope</div>
+                        <div class="info-value velocity" id="gc-velocity">0.00</div>
+                        <div class="info-description" id="gc-vel-desc">Changing</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Curvature (Accel)</div>
+                        <div class="info-value acceleration" id="gc-acceleration">0.00</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Time t</div>
+                        <div class="info-value" id="gc-time">0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="two-views" class="tab-content">
+            <div class="main-card">
+                <h2>Explore the Connection</h2>
+                <p>Move through time to discover how slope and velocity are one and the same, viewed from different perspectives.</p>
+                
+                <div class="canvas-wrapper">
+                    <div class="time-display-panel">
+                        <div class="time-label">Current Time</div>
+                        <div class="time-display" id="current-time">0.00</div>
+                    </div>
+                    <div class="canvas-label">Interactive Explorer</div>
+                    <div class="canvas-container">
+                        <div class="present-moment">
+                            <div class="present-label">NOW</div>
+                        </div>
+                        <canvas id="explorer-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="paper-control">
+                    <div class="paper-control-header">
+                        <h4>Explore Through Time</h4>
+                        <p>Drag to move through different moments</p>
+                    </div>
+                    <div class="paper-slider-container">
+                        <input type="range" class="paper-slider" id="explorer-slider" min="-10" max="10" step="0.01" value="0">
+                    </div>
+                    <div class="paper-info">
+                        <span>← Past</span>
+                        <span><strong>t = <span id="slider-time">0.00</span></strong></span>
+                        <span>Future →</span>
+                    </div>
+                </div>
+
+                <div class="info-display">
+                    <div class="info-item">
+                        <div class="info-label">Position s(t)</div>
+                        <div class="info-value" id="explorer-position">0.00</div>
+                        <div class="info-description" id="position-desc">Height on graph</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Velocity = Slope</div>
+                        <div class="info-value velocity" id="explorer-velocity">0.00</div>
+                        <div class="info-description" id="velocity-desc">Rate of change</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Acceleration</div>
+                        <div class="info-value acceleration" id="explorer-acceleration">0.00</div>
+                        <div class="info-description" id="acceleration-desc">How velocity changes</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Motion Type</div>
+                        <div class="info-value" id="explorer-behavior" style="font-size: 1rem;">---</div>
+                        <div class="info-description" id="behavior-desc">What's happening</div>
+                    </div>
+                </div>
+                
+                <div id="exploration-content" style="margin-top: 2rem;">
+                    <!-- Dynamic exploration content -->
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button id="new-function-btn" style="padding: 0.75rem 2rem; background: white; color: var(--brand); border: 2px solid var(--brand); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease;">
+                        Try a Different Function
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// Single comprehensive motion function
+const MOTION = {
+    f: t => Math.sin(t * 0.8) + 0.05 * t * t - 0.3 * t,
+    df: t => 0.8 * Math.cos(t * 0.8) + 0.1 * t - 0.3,
+    d2f: t => -0.64 * Math.sin(t * 0.8) + 0.1,
+    desc: t => {
+        const v = 0.8 * Math.cos(t * 0.8) + 0.1 * t - 0.3;
+        const a = -0.64 * Math.sin(t * 0.8) + 0.1;
+        if (Math.abs(v) < 0.05) return 'Near rest';
+        if (v > 0 && a > 0) return 'Rising & accelerating';
+        if (v > 0 && a < 0) return 'Rising & decelerating';
+        if (v < 0 && a < 0) return 'Falling & accelerating';
+        return 'Falling & decelerating';
+    }
+};
+
+// Generate random functions for challenges
+function generateRandomFunction() {
+    const a = 0.5 + Math.random() * 1;
+    const b = 0.05 + Math.random() * 0.1;
+    const c = -0.5 + Math.random();
+    const freq = 0.5 + Math.random() * 0.5;
+    
+    return {
+        f: t => a * Math.sin(t * freq) + b * t * t + c * t,
+        df: t => a * freq * Math.cos(t * freq) + 2 * b * t + c,
+        d2f: t => -a * freq * freq * Math.sin(t * freq) + 2 * b
+    };
+}
+
+// Base Canvas Manager
+class CanvasManager {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.defaultWidth = 800;
+        this.defaultHeight = 400;
+        this.setupCanvas();
+        
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => this.setupCanvas(), 250);
+        });
+    }
+    
+    setupCanvas() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        let width = rect.width;
+        let height = rect.height;
+        
+        if (!width || width === 0) {
+            width = this.defaultWidth;
+        }
+        if (!height || height === 0) {
+            height = this.defaultHeight;
+        }
+        
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = width * dpr;
+        this.canvas.height = height * dpr;
+        
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.scale(dpr, dpr);
+        
+        this.width = width;
+        this.height = height;
+        
+        if (rect.width > 0) {
+            this.defaultWidth = rect.width;
+            this.defaultHeight = rect.height;
+        }
+    }
+    
+    clear() {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+    }
+    
+    drawGrid(offsetX = 0) {
+        this.ctx.strokeStyle = '#e5e7eb';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        
+        const spacing = 40;
+        
+        for (let i = -50; i <= 50; i++) {
+            const x = this.width/2 + i * spacing + offsetX;
+            if (x >= 0 && x <= this.width) {
+                this.ctx.moveTo(x, 0);
+                this.ctx.lineTo(x, this.height);
+            }
+        }
+        
+        for (let y = 0; y < this.height; y += spacing) {
+            this.ctx.moveTo(0, y);
+            this.ctx.lineTo(this.width, y);
+        }
+        
+        this.ctx.stroke();
+        
+        this.ctx.strokeStyle = '#6b7280';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, this.height/2);
+        this.ctx.lineTo(this.width, this.height/2);
+        this.ctx.stroke();
+        
+        this.ctx.strokeStyle = 'rgba(107, 114, 128, 0.3)';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.width/2, 0);
+        this.ctx.lineTo(this.width/2, this.height);
+        this.ctx.stroke();
+    }
+}
+
+// Motion Creates Graph Animation (Tab 1)
+class MotionCreatesAnimation {
+    constructor(canvas) {
+        this.manager = new CanvasManager(canvas);
+        this.motion = MOTION;
+        this.paperPosition = 0;
+        this.trail = [];
+        this.maxTrailLength = 500;
+        this.paperSpeed = 30;
+        this.animationId = null;
+        this.isAnimating = false;
+        this.animate();
+    }
+    
+    setPaperPosition(pos) {
+        this.paperPosition = parseFloat(pos);
+        this.updateTrail();
+        this.draw();
+    }
+    
+    updateTrail() {
+        const time = this.paperPosition;
+        const y = this.motion.f(time);
+        
+        this.trail.push({ t: time, y: y });
+        this.trail = this.trail.filter(pt => pt.t <= time);
+        
+        if (this.trail.length > this.maxTrailLength) {
+            this.trail = this.trail.slice(-this.maxTrailLength);
+        }
+    }
+    
+    start() {
+        this.isAnimating = true;
+    }
+    
+    pause() {
+        this.isAnimating = false;
+    }
+    
+    reset() { 
+        this.paperPosition = 0;
+        this.trail = [];
+        this.isAnimating = false;
+        document.getElementById('mc-paper-slider').value = 0;
+        this.draw();
+    }
+    
+    animate() {
+        if (this.isAnimating) {
+            this.paperPosition += 0.02;
+            document.getElementById('mc-paper-slider').value = this.paperPosition;
+            this.updateTrail();
+        }
+        
+        this.draw();
+        this.animationId = requestAnimationFrame(() => this.animate());
+    }
+    
+    draw() {
+        const ctx = this.manager.ctx;
+        const w = this.manager.width;
+        const h = this.manager.height;
+        const scale = 50;
+        const presentX = w * 0.5;
+        
+        const time = this.paperPosition;
+        const y = this.motion.f(time);
+        const dy = this.motion.df(time);
+        const d2y = this.motion.d2f(time);
+        
+        this.manager.clear();
+        
+        const gridOffset = time * this.paperSpeed;
+        this.manager.drawGrid(gridOffset);
+        
+        const drawWidth = this.isAnimating ? presentX : w;
+        
+        if (this.trail.length > 1) {
+            ctx.beginPath();
+            ctx.strokeStyle = '#0f766e';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            let firstPoint = true;
+            for (let i = 0; i < this.trail.length; i++) {
+                const pt = this.trail[i];
+                const x = presentX - (time - pt.t) * this.paperSpeed;
+                const py = h/2 - pt.y * scale;
+                
+                if (x >= -50 && x <= drawWidth) {
+                    if (firstPoint) {
+                        ctx.moveTo(x, py);
+                        firstPoint = false;
+                    } else {
+                        ctx.lineTo(x, py);
+                    }
+                }
+            }
+            ctx.stroke();
+        }
+        
+        const pointY = h/2 - y * scale;
+        
+        const len = 100;
+        const timeSpan = len / this.paperSpeed;
+        const yChange = dy * timeSpan;
+        const screenDy = yChange * scale;
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.setLineDash([5, 5]);
+        ctx.moveTo(presentX - len, pointY + screenDy);
+        ctx.lineTo(presentX + len, pointY - screenDy);
+        ctx.stroke();
+        ctx.restore();
+        
+        ctx.save();
+        ctx.shadowColor = '#dc2626';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(presentX, pointY, 10, 0, 2*Math.PI);
+        ctx.fillStyle = '#dc2626';
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.restore();
+        
+        document.getElementById('mc-position').textContent = y.toFixed(2);
+        document.getElementById('mc-velocity').textContent = dy.toFixed(2);
+        document.getElementById('mc-acceleration').textContent = d2y.toFixed(2);
+        document.getElementById('mc-time').textContent = time.toFixed(2);
+        document.getElementById('mc-vel-desc').textContent = this.motion.desc(time);
+    }
+    
+    destroy() {
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+        }
+    }
+}
+
+// Graph Controls Motion Animation (Tab 2)
+class GraphControlsAnimation {
+    constructor(canvas) {
+        this.manager = new CanvasManager(canvas);
+        this.motion = MOTION;
+        this.paperPosition = 0;
+        this.paperSpeed = 30;
+        this.animationId = null;
+        this.isAnimating = false;
+        this.animate();
+    }
+    
+    setPaperPosition(pos) {
+        this.paperPosition = parseFloat(pos);
+        this.draw();
+    }
+    
+    start() {
+        this.isAnimating = true;
+    }
+    
+    pause() {
+        this.isAnimating = false;
+    }
+    
+    reset() {
+        this.paperPosition = 0;
+        this.isAnimating = false;
+        document.getElementById('gc-paper-slider').value = 0;
+        this.draw();
+    }
+    
+    animate() {
+        if (this.isAnimating) {
+            this.paperPosition += 0.02;
+            document.getElementById('gc-paper-slider').value = this.paperPosition;
+        }
+        
+        this.draw();
+        this.animationId = requestAnimationFrame(() => this.animate());
+    }
+    
+    draw() {
+        const ctx = this.manager.ctx;
+        const w = this.manager.width;
+        const h = this.manager.height;
+        const scale = 50;
+        const presentX = w * 0.5;
+        
+        const time = this.paperPosition;
+        const y = this.motion.f(time);
+        const dy = this.motion.df(time);
+        const d2y = this.motion.d2f(time);
+        
+        this.manager.clear();
+        
+        const gridOffset = time * this.paperSpeed;
+        this.manager.drawGrid(gridOffset);
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#0f766e';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        let firstPoint = true;
+        for (let i = 0; i <= 400; i++) {
+            const t = time - 20 + i * 0.1;
+            const x = presentX - (t - time) * this.paperSpeed;
+            const fy = h/2 - this.motion.f(t) * scale;
+            
+            if (x >= -100 && x <= w + 100) {
+                if (firstPoint) {
+                    ctx.moveTo(x, fy);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(x, fy);
+                }
+            }
+        }
+        ctx.stroke();
+        ctx.restore();
+        
+        const pointY = h/2 - y * scale;
+        
+        const len = 120;
+        const screenSlope = -dy * scale / this.paperSpeed;
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.setLineDash([5, 5]);
+        ctx.moveTo(presentX - len, pointY + screenSlope * len);
+        ctx.lineTo(presentX + len, pointY - screenSlope * len);
+        ctx.stroke();
+        ctx.restore();
+        
+        ctx.save();
+        ctx.shadowColor = '#dc2626';
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(presentX, pointY, 10, 0, 2*Math.PI);
+        ctx.fillStyle = '#dc2626';
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.restore();
+        
+        document.getElementById('gc-position').textContent = y.toFixed(2);
+        document.getElementById('gc-velocity').textContent = dy.toFixed(2);
+        document.getElementById('gc-time').textContent = time.toFixed(2);
+        document.getElementById('gc-vel-desc').textContent = this.motion.desc(time);
+        document.getElementById('gc-acceleration').textContent = d2y.toFixed(2);
+    }
+    
+    destroy() {
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+        }
+    }
+}
+
+// Simplified Interactive Explorer
+class InteractiveExplorer {
+    constructor(canvas) {
+        this.manager = new CanvasManager(canvas);
+        this.currentFunction = generateRandomFunction();
+        this.paperPosition = 0;
+        this.animationId = null;
+        this.selectedCategory = null;
+        this.score = 0;
+        this.totalQuestions = 0;
+        this.questionMode = 'intro';
+        this.currentQuestion = null;
+        
+        this.animate();
+        this.generateNewQuestion();
+    }
+    
+    setPaperPosition(pos) {
+        this.paperPosition = parseFloat(pos);
+        this.updateInfo();
+    }
+    
+    generateNew() {
+        this.currentFunction = generateRandomFunction();
+        this.paperPosition = 0;
+        this.score = 0;
+        this.totalQuestions = 0;
+        this.selectedCategory = null;
+        this.questionMode = 'intro';
+        document.getElementById('explorer-slider').value = 0;
+        this.generateNewQuestion();
+        this.updateInfo();
+    }
+    
+    generateNewQuestion() {
+        const container = document.getElementById('exploration-content');
+        if (!container) return;
+        
+        if (this.questionMode === 'intro') {
+            this.showIntroduction(container);
+        } else {
+            if (!this.selectedCategory) {
+                this.showCategorySelection(container);
+            } else {
+                this.generateCategoryQuestion(container);
+            }
+        }
+    }
+    
+    showIntroduction(container) {
+        container.innerHTML = `
+            <div style="background: linear-gradient(135deg, #e6fffb 0%, #f0fdf4 100%); 
+                        padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--brand);">
+                <h3 style="color: var(--brand); margin-bottom: 1rem;">Welcome to Interactive Exploration!</h3>
+                <p style="margin-bottom: 1rem;">Discover how <strong>slope = velocity</strong> and <strong>curvature = acceleration</strong>.</p>
+                <ul style="list-style: none; padding-left: 1rem;">
+                    <li style="margin-bottom: 0.5rem;">• The <strong>tangent line's slope</strong> shows how fast the object moves</li>
+                    <li style="margin-bottom: 0.5rem;">• The <strong>curve's bend</strong> shows how velocity changes</li>
+                    <li style="margin-bottom: 0.5rem;">• Move the slider to explore different moments in time</li>
+                </ul>
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <button onclick="explorer.startQuestions()" 
+                            style="padding: 0.75rem 2rem; background: var(--brand); color: white; 
+                                   border: none; border-radius: 8px; font-size: 1rem; 
+                                   font-weight: 600; cursor: pointer;">
+                        Begin Exploration
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    startQuestions() {
+        this.questionMode = 'active';
+        this.generateNewQuestion();
+    }
+    
+    showCategorySelection(container) {
+        container.innerHTML = `
+            <div style="background: white; border: 2px solid var(--brand); 
+                        border-radius: 12px; padding: 1.5rem;">
+                <h3 style="color: var(--brand); margin-bottom: 1rem;">Choose Your Exploration Mode</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+                    Select how you'd like to explore the derivative at this moment (t = ${this.paperPosition.toFixed(2)}):
+                </p>
+                
+                <div style="display: grid; gap: 1rem;">
+                    <button onclick="explorer.selectCategory('local')" 
+                            style="padding: 1rem; background: white; border: 2px solid var(--border); 
+                                   border-radius: 8px; cursor: pointer; text-align: left; 
+                                   transition: all 0.2s ease;"
+                            onmouseover="this.style.borderColor='var(--brand)'; this.style.background='#f0fdf4';"
+                            onmouseout="this.style.borderColor='var(--border)'; this.style.background='white';">
+                        <strong style="color: var(--brand);">Local Analysis</strong>
+                        <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.9rem;">
+                            Explore what's happening right here at t = ${this.paperPosition.toFixed(2)}
+                        </p>
+                    </button>
+                    
+                    <button onclick="explorer.selectCategory('global')" 
+                            style="padding: 1rem; background: white; border: 2px solid var(--border); 
+                                   border-radius: 8px; cursor: pointer; text-align: left; 
+                                   transition: all 0.2s ease;"
+                            onmouseover="this.style.borderColor='var(--brand)'; this.style.background='#f0fdf4';"
+                            onmouseout="this.style.borderColor='var(--border)'; this.style.background='white';">
+                        <strong style="color: var(--brand);">Global Exploration</strong>
+                        <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.9rem;">
+                            Find and analyze patterns across the entire graph
+                        </p>
+                    </button>
+                    
+                    <button onclick="explorer.selectCategory('numerical')" 
+                            style="padding: 1rem; background: white; border: 2px solid var(--border); 
+                                   border-radius: 8px; cursor: pointer; text-align: left; 
+                                   transition: all 0.2s ease;"
+                            onmouseover="this.style.borderColor='var(--brand)'; this.style.background='#f0fdf4';"
+                            onmouseout="this.style.borderColor='var(--border)'; this.style.background='white';">
+                        <strong style="color: var(--brand);">Numerical Intuition</strong>
+                        <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.9rem;">
+                            Build intuition about the meaning of slope and curvature values
+                        </p>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    selectCategory(category) {
+        this.selectedCategory = category;
+        this.generateCategoryQuestion(document.getElementById('exploration-content'));
+    }
+    
+    generateCategoryQuestion(container) {
+        const time = this.paperPosition;
+        const y = this.currentFunction.f(time);
+        const v = this.currentFunction.df(time);
+        const a = this.currentFunction.d2f(time);
+        
+        let question;
+        
+        if (this.selectedCategory === 'local') {
+            question = this.generateLocalQuestion(time, y, v, a);
+        } else if (this.selectedCategory === 'global') {
+            question = this.generateGlobalQuestion();
+        } else if (this.selectedCategory === 'numerical') {
+            question = this.generateNumericalQuestion(time, v, a);
+        }
+        
+        this.currentQuestion = question;
+        this.renderQuestion(container, question);
+    }
+    
+    generateLocalQuestion(time, y, v, a) {
+        const questions = [
+            {
+                id: 'tangent-direction',
+                text: `Look at the tangent line at t = ${time.toFixed(2)}. Which way is it sloping?`,
+                type: 'multiple-choice',
+                options: [
+                    'Upward (object moving up)',
+                    'Horizontal (object at rest)',
+                    'Downward (object moving down)'
+                ],
+                getCorrect: () => {
+                    if (Math.abs(v) < 0.05) return 1;
+                    return v > 0 ? 0 : 2;
+                },
+                feedback: () => {
+                    if (Math.abs(v) < 0.05) return 'Yes! The tangent is horizontal, so the object is momentarily at rest.';
+                    return v > 0 ? 'Correct! The upward slope means the object is moving upward.' : 
+                                  'Right! The downward slope means the object is moving downward.';
+                }
+            },
+            {
+                id: 'curvature-direction',
+                text: `At t = ${time.toFixed(2)}, is the curve bending upward or downward?`,
+                type: 'multiple-choice',
+                options: [
+                    'Upward (velocity increasing)',
+                    'Straight (velocity constant)',
+                    'Downward (velocity decreasing)'
+                ],
+                getCorrect: () => {
+                    if (Math.abs(a) < 0.05) return 1;
+                    return a > 0 ? 0 : 2;
+                },
+                feedback: () => {
+                    if (Math.abs(a) < 0.05) return 'The curve is nearly straight here - velocity is changing very slowly.';
+                    return a > 0 ? 'Yes! Upward curvature means velocity is increasing.' : 
+                                  'Correct! Downward curvature means velocity is decreasing.';
+                }
+            }
+        ];
+        
+        return questions[Math.floor(Math.random() * questions.length)];
+    }
+    
+    generateGlobalQuestion() {
+        const questions = [
+            {
+                id: 'find-rest-point',
+                text: 'Move the slider to find a point where the object is at rest (horizontal tangent)',
+                type: 'exploration-task',
+                checkCondition: () => {
+                    const v = this.currentFunction.df(this.paperPosition);
+                    return Math.abs(v) < 0.1;
+                },
+                feedback: () => {
+                    const v = this.currentFunction.df(this.paperPosition);
+                    if (Math.abs(v) < 0.1) {
+                        return `Perfect! At t = ${this.paperPosition.toFixed(2)}, the tangent is horizontal (velocity ≈ 0).`;
+                    }
+                    return `The tangent here has slope ${v.toFixed(2)}. Keep looking for a horizontal tangent.`;
+                }
+            },
+            {
+                id: 'find-fastest',
+                text: 'Find where the object is moving fastest (steepest tangent, either up or down)',
+                type: 'exploration-task',
+                checkCondition: () => {
+                    const v = this.currentFunction.df(this.paperPosition);
+                    return Math.abs(v) > 1.5;
+                },
+                feedback: () => {
+                    const v = this.currentFunction.df(this.paperPosition);
+                    const speed = Math.abs(v);
+                    if (speed > 1.5) {
+                        return `Excellent! The object has high speed here (|velocity| = ${speed.toFixed(2)}).`;
+                    }
+                    return 'The tangent here is not very steep. Find where it\'s steepest.';
+                }
+            }
+        ];
+        
+        return questions[Math.floor(Math.random() * questions.length)];
+    }
+    
+    generateNumericalQuestion(time, v, a) {
+        const questions = [
+            {
+                id: 'velocity-magnitude',
+                text: `The slope (velocity) here is ${v.toFixed(2)}. What does this number tell us?`,
+                type: 'multiple-choice',
+                options: [
+                    'Object is nearly at rest',
+                    'Object is moving at moderate speed',
+                    'Object is moving very fast'
+                ],
+                getCorrect: () => {
+                    const absV = Math.abs(v);
+                    if (absV < 0.3) return 0;
+                    if (absV < 1.5) return 1;
+                    return 2;
+                },
+                feedback: () => {
+                    const absV = Math.abs(v);
+                    if (absV < 0.3) {
+                        return `|${v.toFixed(2)}| is close to 0 - the tangent is nearly horizontal.`;
+                    }
+                    if (absV < 1.5) {
+                        return `|${v.toFixed(2)}| indicates moderate speed - noticeable but not extreme slope.`;
+                    }
+                    return `|${v.toFixed(2)}| is large - the tangent is steep, indicating rapid motion.`;
+                }
+            }
+        ];
+        
+        return questions[0];
+    }
+    
+    renderQuestion(container, question) {
+        let html = `
+            <div style="background: white; border: 2px solid var(--brand); 
+                        border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="color: var(--brand); margin: 0;">
+                        ${this.getCategoryName()}
+                    </h3>
+                    <button onclick="explorer.changeCategory()" 
+                            style="padding: 0.25rem 0.75rem; background: white; 
+                                   color: var(--brand); border: 1px solid var(--brand); 
+                                   border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                        Change Mode
+                    </button>
+                </div>
+                <p style="font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--text);">
+                    ${question.text}
+                </p>
+        `;
+        
+        if (question.type === 'multiple-choice') {
+            html += '<div style="display: flex; flex-direction: column; gap: 0.75rem;">';
+            question.options.forEach((option, i) => {
+                html += `
+                    <button onclick="explorer.checkAnswer(${i})" 
+                            class="answer-btn"
+                            style="padding: 0.75rem 1rem; background: white; 
+                                   border: 2px solid var(--border); border-radius: 8px; 
+                                   cursor: pointer; text-align: left; font-size: 1rem;
+                                   transition: all 0.2s ease;"
+                            onmouseover="this.style.borderColor='var(--brand)'; this.style.background='#f0fdf4';"
+                            onmouseout="this.style.borderColor='var(--border)'; this.style.background='white';">
+                        ${option}
+                    </button>
+                `;
+            });
+            html += '</div>';
+        } else if (question.type === 'exploration-task') {
+            html += `
+                <div style="background: #f0f9ff; padding: 1rem; border-radius: 8px; 
+                            border-left: 3px solid #3b82f6; margin-bottom: 1rem;">
+                    <p style="margin: 0; color: #1e40af;">
+                        Current position: <strong>t = ${this.paperPosition.toFixed(2)}</strong>
+                    </p>
+                </div>
+                <button onclick="explorer.checkExplorationTask()" 
+                        style="padding: 0.75rem 1.5rem; background: var(--brand); 
+                               color: white; border: none; border-radius: 8px; 
+                               font-size: 1rem; font-weight: 600; cursor: pointer;">
+                    Check Current Position
+                </button>
+            `;
+        }
+        
+        html += `
+                <div id="question-feedback" style="margin-top: 1.5rem;"></div>
+                <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                    <button onclick="explorer.skipQuestion()" 
+                            style="padding: 0.5rem 1rem; background: white; 
+                                   color: var(--text-muted); border: 1px solid var(--border); 
+                                   border-radius: 6px; font-size: 0.9rem; cursor: pointer;">
+                        Skip This
+                    </button>
+                    <button onclick="explorer.newQuestionSameCategory()" 
+                            style="padding: 0.5rem 1rem; background: white; 
+                                   color: var(--brand); border: 2px solid var(--brand); 
+                                   border-radius: 6px; font-size: 0.9rem; cursor: pointer;">
+                        New Question
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    getCategoryName() {
+        if (this.selectedCategory === 'local') return 'Local Analysis';
+        if (this.selectedCategory === 'global') return 'Global Exploration';
+        if (this.selectedCategory === 'numerical') return 'Numerical Intuition';
+        return 'Exploration';
+    }
+    
+    checkAnswer(choiceIndex) {
+        const correct = this.currentQuestion.getCorrect();
+        const isCorrect = choiceIndex === correct;
+        
+        const buttons = document.querySelectorAll('.answer-btn');
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.cursor = 'default';
+        });
+        
+        if (isCorrect) {
+            buttons[choiceIndex].style.background = '#d1fae5';
+            buttons[choiceIndex].style.borderColor = 'var(--success)';
+        } else {
+            buttons[choiceIndex].style.background = '#fee2e2';
+            buttons[choiceIndex].style.borderColor = 'var(--error)';
+            if (buttons[correct]) {
+                buttons[correct].style.background = '#d1fae5';
+                buttons[correct].style.borderColor = 'var(--success)';
+            }
+        }
+        
+        const feedback = this.currentQuestion.feedback();
+        this.showFeedback(isCorrect, feedback);
+        
+        if (isCorrect) {
+            this.score++;
+        }
+        this.totalQuestions++;
+    }
+    
+    checkExplorationTask() {
+        const isCorrect = this.currentQuestion.checkCondition();
+        const feedback = this.currentQuestion.feedback();
+        
+        this.showFeedback(isCorrect, feedback);
+        
+        if (isCorrect) {
+            this.score++;
+            this.totalQuestions++;
+        }
+    }
+    
+    showFeedback(isCorrect, message) {
+        const feedbackDiv = document.getElementById('question-feedback');
+        const color = isCorrect ? '#d1fae5' : '#fee2e2';
+        const border = isCorrect ? 'var(--success)' : 'var(--error)';
+        const icon = isCorrect ? '✓' : '→';
+        
+        feedbackDiv.innerHTML = `
+            <div style="background: ${color}; padding: 1rem; border-radius: 8px; 
+                        border-left: 4px solid ${border};">
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">
+                    ${icon} ${isCorrect ? 'Correct!' : 'Let\'s think about this:'}
+                </div>
+                <div style="color: var(--text); line-height: 1.6;">
+                    ${message}
+                </div>
+            </div>
+        `;
+    }
+    
+    changeCategory() {
+        this.selectedCategory = null;
+        this.generateNewQuestion();
+    }
+    
+    skipQuestion() {
+        this.generateCategoryQuestion(document.getElementById('exploration-content'));
+    }
+    
+    newQuestionSameCategory() {
+        this.generateCategoryQuestion(document.getElementById('exploration-content'));
+    }
+    
+    updateInfo() {
+        const time = this.paperPosition;
+        const y = this.currentFunction.f(time);
+        const v = this.currentFunction.df(time);
+        const a = this.currentFunction.d2f(time);
+        
+        document.getElementById('current-time').textContent = time.toFixed(2);
+        document.getElementById('slider-time').textContent = time.toFixed(2);
+        document.getElementById('explorer-position').textContent = y.toFixed(3);
+        document.getElementById('explorer-velocity').textContent = v.toFixed(3);
+        document.getElementById('explorer-acceleration').textContent = a.toFixed(3);
+        
+        let behavior = '';
+        let behaviorDesc = '';
+        
+        if (Math.abs(v) < 0.05) {
+            behavior = 'At Rest';
+            behaviorDesc = a > 0 ? 'At a valley' : a < 0 ? 'At a peak' : 'Stationary';
+        } else if (v > 0) {
+            behavior = 'Rising';
+            behaviorDesc = a > 0.05 ? 'Getting faster' : a < -0.05 ? 'Slowing down' : 'Steady rise';
+        } else {
+            behavior = 'Falling';
+            behaviorDesc = a < -0.05 ? 'Getting faster' : a > 0.05 ? 'Slowing down' : 'Steady fall';
+        }
+        
+        document.getElementById('explorer-behavior').textContent = behavior;
+        document.getElementById('behavior-desc').textContent = behaviorDesc;
+        
+        document.getElementById('position-desc').textContent = 
+            y > 0.1 ? 'Above baseline' : y < -0.1 ? 'Below baseline' : 'Near baseline';
+        document.getElementById('velocity-desc').textContent = 
+            Math.abs(v) < 0.05 ? 'Nearly horizontal tangent' :
+            v > 0 ? 'Upward slope' : 'Downward slope';
+        document.getElementById('acceleration-desc').textContent = 
+            Math.abs(a) < 0.05 ? 'Nearly straight curve' :
+            a > 0 ? 'Upward bend' : 'Downward bend';
+    }
+    
+    animate() {
+        this.draw();
+        this.animationId = requestAnimationFrame(() => this.animate());
+    }
+    
+    draw() {
+        const ctx = this.manager.ctx;
+        const w = this.manager.width;
+        const h = this.manager.height;
+        const scale = 50;
+        const paperSpeed = 30;
+        const presentX = w * 0.5;
+        
+        const time = this.paperPosition;
+        const y = this.currentFunction.f(time);
+        const dy = this.currentFunction.df(time);
+        
+        this.manager.clear();
+        
+        const gridOffset = -time * paperSpeed;
+        this.manager.drawGrid(gridOffset);
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#0f766e';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        let firstPoint = true;
+        for (let i = 0; i <= 800; i++) {
+            const t = time - 40 + i * 0.1;
+            const x = presentX - (t - time) * paperSpeed;
+            const fy = h/2 - this.currentFunction.f(t) * scale;
+            
+            if (x >= -100 && x <= w + 100) {
+                if (firstPoint) {
+                    ctx.moveTo(x, fy);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(x, fy);
+                }
+            }
+        }
+        ctx.stroke();
+        ctx.restore();
+        
+        const pointY = h/2 - y * scale;
+        
+        const len = 120;
+        const screenSlope = -dy * scale / paperSpeed;
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.setLineDash([5, 5]);
+        ctx.moveTo(presentX - len, pointY + screenSlope * len);
+        ctx.lineTo(presentX + len, pointY - screenSlope * len);
+        ctx.stroke();
+        ctx.restore();
+        
+        ctx.save();
+        ctx.shadowColor = '#dc2626';
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(presentX, pointY, 10, 0, 2*Math.PI);
+        ctx.fillStyle = '#dc2626';
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.restore();
+    }
+    
+    destroy() {
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+        }
+    }
+}
+
+// Initialize
+let mcAnim, gcAnim, explorer;
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        try {
+            mcAnim = new MotionCreatesAnimation(document.getElementById('motion-canvas'));
+            gcAnim = new GraphControlsAnimation(document.getElementById('graph-canvas'));
+            explorer = new InteractiveExplorer(document.getElementById('explorer-canvas'));
+            
+            window.explorer = explorer;
+            
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    const tabId = btn.dataset.tab;
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Tab 1 Controls
+            document.getElementById('mc-start-btn').addEventListener('click', function() {
+                mcAnim.start();
+                this.classList.add('active');
+                document.getElementById('mc-pause-btn').classList.remove('active');
+            });
+            
+            document.getElementById('mc-pause-btn').addEventListener('click', function() {
+                mcAnim.pause();
+                this.classList.add('active');
+                document.getElementById('mc-start-btn').classList.remove('active');
+            });
+            
+            document.getElementById('mc-reset-btn').addEventListener('click', () => {
+                mcAnim.reset();
+                document.getElementById('mc-start-btn').classList.remove('active');
+                document.getElementById('mc-pause-btn').classList.remove('active');
+            });
+            
+            document.getElementById('mc-paper-slider').addEventListener('input', (e) => {
+                mcAnim.setPaperPosition(e.target.value);
+            });
+            
+            // Tab 2 Controls
+            document.getElementById('gc-start-btn').addEventListener('click', function() {
+                gcAnim.start();
+                this.classList.add('active');
+                document.getElementById('gc-pause-btn').classList.remove('active');
+            });
+            
+            document.getElementById('gc-pause-btn').addEventListener('click', function() {
+                gcAnim.pause();
+                this.classList.add('active');
+                document.getElementById('gc-start-btn').classList.remove('active');
+            });
+            
+            document.getElementById('gc-reset-btn').addEventListener('click', () => {
+                gcAnim.reset();
+                document.getElementById('gc-start-btn').classList.remove('active');
+                document.getElementById('gc-pause-btn').classList.remove('active');
+            });
+            
+            document.getElementById('gc-paper-slider').addEventListener('input', (e) => {
+                gcAnim.setPaperPosition(e.target.value);
+            });
+            
+            // Tab 3 Controls
+            document.getElementById('explorer-slider').addEventListener('input', (e) => {
+                explorer.setPaperPosition(e.target.value);
+            });
+            
+            document.getElementById('new-function-btn').addEventListener('click', () => {
+                explorer.generateNew();
+            });
+            
+            console.log('Application initialized successfully');
+            
+        } catch (error) {
+            console.error('Initialization error:', error);
+        }
+        
+        window.addEventListener('beforeunload', () => {
+            if (mcAnim) mcAnim.destroy();
+            if (gcAnim) gcAnim.destroy();
+            if (explorer) explorer.destroy();
+        });
+    }, 50);
+});
+</script>
+</body>
+</html>
