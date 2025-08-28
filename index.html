@@ -712,32 +712,44 @@
     </div>
   </section>
   <!-- About the Founder -->
-  <section id="about-founder" style="padding: 3rem 1rem; border-top: 1px solid #e5e7eb; background: #ffffff;">
-    <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 1.4fr; gap: 2rem; align-items: center;">
-      <figure style="margin:0;">
-        <img src="amir-turing.jpg" alt="Amir Asghari with an Alan Turing quote in the background" style="width:100%; height:auto; border-radius:16px; box-shadow: 0 10px 30px rgba(0,0,0,.08); border:1px solid #e5e7eb;" loading="lazy">
-        <figcaption style="font-size:.85rem; color:#6b7280; margin-top:.5rem;">“Those who can imagine anything can create the impossible.” — Alan Turing</figcaption>
-      </figure>
-      <div>
-        
-        <h2 style="margin-top:0;">About the Founder</h2>
-        <p style="margin-top:0;">
-          I grew up in the North of Tehran (Shemiran), where I first discovered the joy of mathematics before completing a BSc and an MSc in pure mathematics at two of Iran’s leading universities. Because of my excellence in teaching I received a scholarship to pursue a PhD in Mathematics Education at the University of Warwick. After my doctorate I returned to Iran to teach at both universities where I had studied, and to build lasting professional connections with mathematics teachers that still shape my work. Alongside teaching and research, I translated <em>Logicomix: An Epic Search for Truth</em> into Persian, bringing a celebrated mathematical narrative to new readers.
-        </p>
-        <p>
-          Since then, I have combined research, teaching, and innovation across the UK and internationally, publishing in leading journals such as <em>Synthese</em> and <em>Educational Studies in Mathematics</em>, and receiving the “Amazing Teaching Award” at Liverpool John Moores University. Mathswell is the culmination of this journey: a platform dedicated to making deep, meaningful mathematics available to everyone, everywhere. One student captured what that feels like: <em>“It is no longer just a subject with a fixed set of dynamics. It is a whole conceptual system with infinite links and possibilities waiting to be explored. So, thanks, Amir, for showing me that.”</em>
-        </p>
+<section id="about-founder" style="padding:3rem 1rem; border-top:1px solid #e5e7eb; background:#fff;">
+  <div class="about-wrap" style="max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr; gap:1.5rem; align-items:start;">
+    <figure style="margin:0; text-align:center;">
+      <img
+        src="amir-turing.jpg"
+        alt="Amir Asghari with an Alan Turing quote in the background"
+        style="width:100%; max-width:520px; height:auto; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08); border:1px solid #e5e7eb; margin:0 auto;"
+        loading="lazy"
+        sizes="(max-width: 1024px) 100vw, 520px"
+      >
+      <figcaption style="font-size:.85rem; color:#6b7280; margin-top:.5rem;">
+        “Those who can imagine anything can create the impossible.” — Alan Turing
+      </figcaption>
+    </figure>
 
-      </div>
+    <div style="max-width:70ch; margin:0 auto;">
+      <h2 style="margin:0 0 .5rem 0;">About the Founder</h2>
+      <p style="margin:0;">
+        I grew up in the North of Tehran (Shemiran), where I first discovered the joy of mathematics before completing a BSc and an MSc in pure mathematics at two of Iran’s leading universities. Because of my excellence in teaching I received a scholarship to pursue a PhD in Mathematics Education at the University of Warwick. After my doctorate I returned to Iran to teach at both universities where I had studied, and to build lasting professional connections with mathematics teachers that still shape my work. Alongside teaching and research, I translated <em>Logicomix: An Epic Search for Truth</em> into Persian, bringing a celebrated mathematical narrative to new readers.
+      </p>
+      <p style="margin:.9rem 0 0;">
+        Since then, I have combined research, teaching, and innovation across the UK and internationally, publishing in leading journals such as <em>Synthese</em> and <em>Educational Studies in Mathematics</em>, and receiving the “Amazing Teaching Award” at Liverpool John Moores University. Mathswell is the culmination of this journey: a platform dedicated to making deep, meaningful mathematics available to everyone, everywhere.
+      </p>
+      <blockquote style="margin:1rem 0 0; padding:1rem 1.25rem; background:#f8fafc; border-left:4px solid #0f766e; border-radius:8px;">
+        <em>“It is no longer just a subject with a fixed set of dynamics. It is a whole conceptual system with infinite links and possibilities waiting to be explored. So, thanks, Amir, for showing me that.”</em>
+      </blockquote>
     </div>
-    <style>
-      @media (max-width: 900px) {
-        #about-founder > div {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </section>
+  </div>
+
+  <!-- Mobile-first: stack; only go side-by-side on large screens -->
+  <style>
+    @media (min-width: 1100px) {
+      #about-founder .about-wrap { grid-template-columns: 1.1fr 1.4fr; }
+      #about-founder figure { margin: 0; }
+    }
+  </style>
+</section>
+
   <section id="contact">
     <h2>Contact</h2>
     <div class="chips">
