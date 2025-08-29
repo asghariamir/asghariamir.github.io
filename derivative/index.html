@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
 <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
 <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
@@ -490,6 +489,10 @@
                 flex-direction: column;
                 align-items: stretch;
             }
+            /* Stack dual view on mobile */
+            #two-views .main-card > div:first-of-type {
+                grid-template-columns: 1fr !important;
+            }
         }
 
         @media (max-width: 480px) {
@@ -692,26 +695,39 @@
         <div id="two-views" class="tab-content">
             <div class="main-card">
                 <h2>Explore the Connection</h2>
-                <p>Move through time to discover how slope and velocity are one and the same, viewed from different perspectives.</p>
+                <p>Move through time to discover how slope and velocity are one and the same, viewed from different perspectives. The static graph shows the traditional view, while the moving paper shows Sawyer's dynamic visualization.</p>
                 
-                <div class="canvas-wrapper">
-                    <div class="time-display-panel">
-                        <div class="time-label">Current Time</div>
-                        <div class="time-display" id="current-time">0.00</div>
-                    </div>
-                    <div class="canvas-label">Interactive Explorer</div>
-                    <div class="canvas-container">
-                        <div class="present-moment">
-                            <div class="present-label">NOW</div>
+                <!-- Dual View Container -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+                    <!-- Static Graph -->
+                    <div class="canvas-wrapper">
+                        <div class="canvas-label" style="background: rgba(239, 68, 68, 0.9); color: white;">Textbook View</div>
+                        <div class="canvas-container">
+                            <canvas id="static-canvas"></canvas>
                         </div>
-                        <canvas id="explorer-canvas"></canvas>
+                    </div>
+                    
+                    <!-- Moving Paper Graph -->
+                    <div class="canvas-wrapper">
+                        <div class="time-display-panel">
+                            <div class="time-label">Current Time</div>
+                            <div class="time-display" id="current-time">0.00</div>
+                        </div>
+                        <div class="canvas-label" style="background: rgba(15, 118, 110, 0.9); color: white;">Sawyer's View</div>
+                        <div class="canvas-container">
+                            <div class="present-moment">
+                                <div class="present-label">NOW</div>
+                            </div>
+                            <canvas id="explorer-canvas"></canvas>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="paper-control">
+                <!-- Unified Control -->
+                <div class="paper-control" style="margin-top: 1.5rem;">
                     <div class="paper-control-header">
                         <h4>Explore Through Time</h4>
-                        <p>Drag to move through different moments</p>
+                        <p>Move the slider to see how the same moment appears in both views</p>
                     </div>
                     <div class="paper-slider-container">
                         <input type="range" class="paper-slider" id="explorer-slider" min="-10" max="10" step="0.01" value="0">
@@ -1149,10 +1165,11 @@ class GraphControlsAnimation {
     }
 }
 
-// Simplified Interactive Explorer
+// Fixed Interactive Explorer
 class InteractiveExplorer {
-    constructor(canvas) {
-        this.manager = new CanvasManager(canvas);
+    constructor(explorerCanvas, staticCanvas) {
+        this.manager = new CanvasManager(explorerCanvas);
+        this.staticManager = new CanvasManager(staticCanvas);  // Add manager for static canvas
         this.currentFunction = generateRandomFunction();
         this.paperPosition = 0;
         this.animationId = null;
@@ -1161,9 +1178,271 @@ class InteractiveExplorer {
         this.totalQuestions = 0;
         this.questionMode = 'intro';
         this.currentQuestion = null;
+        this.attemptsOnCurrentQuestion = 0;
+        this.intervalWindowOpen = false;
+        this.selectedInterval = [-2, 2];
         
         this.animate();
+        this.updateInfo(); // Update initial values to match the graph
         this.generateNewQuestion();
+    }
+    
+    createIntervalWindow() {
+        const windowHtml = `
+            <div id="interval-window" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    width: 500px; background: white; border: 2px solid var(--brand); border-radius: 12px;
+                    padding: 1.5rem; z-index: 1000; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h4 style="color: var(--brand); margin: 0;">Interval Analysis</h4>
+                    <button onclick="explorer.closeIntervalWindow()" 
+                            style="padding: 0.25rem 0.5rem; background: white; color: var(--text-muted);
+                                   border: 1px solid var(--border); border-radius: 4px; cursor: pointer;">
+                        ✕
+                    </button>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                        Select interval to analyze:
+                    </label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="number" id="interval-start" value="-2" step="0.5" 
+                               style="width: 80px; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                        <span>to</span>
+                        <input type="number" id="interval-end" value="2" step="0.5"
+                               style="width: 80px; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                        <button onclick="explorer.analyzeInterval()" 
+                                style="padding: 0.5rem 1rem; background: var(--brand); color: white;
+                                       border: none; border-radius: 6px; cursor: pointer;">
+                            Analyze
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <button onclick="explorer.setIntervalPreset(-10, -5)" 
+                            style="padding: 0.4rem 0.8rem; background: #f3f4f6; border: 1px solid var(--border);
+                                   border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                        Far Past
+                    </button>
+                    <button onclick="explorer.setIntervalPreset(-2, 2)" 
+                            style="padding: 0.4rem 0.8rem; background: #f3f4f6; border: 1px solid var(--border);
+                                   border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                        Near Origin
+                    </button>
+                    <button onclick="explorer.setIntervalPreset(5, 10)" 
+                            style="padding: 0.4rem 0.8rem; background: #f3f4f6; border: 1px solid var(--border);
+                                   border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                        Far Future
+                    </button>
+                </div>
+                
+                <canvas id="interval-canvas" width="460" height="200" 
+                        style="border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;"></canvas>
+                
+                <div id="interval-analysis" style="padding: 1rem; background: #f9fafb; border-radius: 8px;
+                                                   font-size: 0.9rem; color: var(--text-muted);">
+                    Select an interval to see its analysis...
+                </div>
+            </div>
+        `;
+        
+        // Add to body if not already there
+        if (!document.getElementById('interval-window')) {
+            const div = document.createElement('div');
+            div.innerHTML = windowHtml;
+            document.body.appendChild(div.firstElementChild);
+        }
+    }
+    
+    showIntervalWindow() {
+        const window = document.getElementById('interval-window');
+        if (window) {
+            window.style.display = 'block';
+            this.intervalWindowOpen = true;
+            this.analyzeInterval();
+        }
+    }
+    
+    closeIntervalWindow() {
+        const window = document.getElementById('interval-window');
+        if (window) {
+            window.style.display = 'none';
+            this.intervalWindowOpen = false;
+        }
+    }
+    
+    setIntervalPreset(start, end) {
+        document.getElementById('interval-start').value = start;
+        document.getElementById('interval-end').value = end;
+        this.analyzeInterval();
+    }
+    
+    analyzeInterval() {
+        const start = parseFloat(document.getElementById('interval-start').value);
+        const end = parseFloat(document.getElementById('interval-end').value);
+        
+        if (isNaN(start) || isNaN(end) || start >= end) {
+            document.getElementById('interval-analysis').innerHTML = 
+                '<span style="color: var(--error);">Please enter a valid interval with start < end</span>';
+            return;
+        }
+        
+        this.selectedInterval = [start, end];
+        
+        // Draw the interval graph
+        const canvas = document.getElementById('interval-canvas');
+        if (canvas) {
+            this.drawIntervalGraph(canvas, start, end);
+        }
+        
+        // Analyze the interval
+        const samples = 100;
+        const points = [];
+        let minV = Infinity, maxV = -Infinity;
+        let minA = Infinity, maxA = -Infinity;
+        let criticalPoints = [];
+        let inflectionPoints = [];
+        
+        for (let i = 0; i <= samples; i++) {
+            const t = start + (end - start) * i / samples;
+            const v = this.currentFunction.df(t);
+            const a = this.currentFunction.d2f(t);
+            
+            points.push({ t, v, a });
+            
+            minV = Math.min(minV, v);
+            maxV = Math.max(maxV, v);
+            minA = Math.min(minA, a);
+            maxA = Math.max(maxA, a);
+            
+            if (Math.abs(v) < 0.1) {
+                criticalPoints.push(t);
+            }
+        }
+        
+        // Check for sign changes
+        for (let i = 1; i < points.length; i++) {
+            if (points[i-1].a * points[i].a < 0) {
+                inflectionPoints.push(points[i].t);
+            }
+        }
+        
+        // Generate analysis text
+        let analysis = '<div style="color: var(--text);">';
+        analysis += `<strong>Interval: [${start.toFixed(1)}, ${end.toFixed(1)}]</strong><br><br>`;
+        
+        // Monotonicity
+        if (minV > 0.05) {
+            analysis += '📈 <strong>Strictly increasing</strong> throughout<br>';
+        } else if (maxV < -0.05) {
+            analysis += '📉 <strong>Strictly decreasing</strong> throughout<br>';
+        } else {
+            analysis += '📊 <strong>Mixed behavior</strong> (both increasing and decreasing)<br>';
+            if (criticalPoints.length > 0) {
+                analysis += `&nbsp;&nbsp;&nbsp;Critical points near: ${criticalPoints.slice(0, 3).map(t => t.toFixed(1)).join(', ')}<br>`;
+            }
+        }
+        
+        // Concavity
+        analysis += '<br>';
+        if (minA > 0.05) {
+            analysis += '⌒ <strong>Concave up</strong> throughout<br>';
+        } else if (maxA < -0.05) {
+            analysis += '⌒ <strong>Concave down</strong> throughout<br>';
+        } else {
+            analysis += '〰️ <strong>Mixed concavity</strong><br>';
+            if (inflectionPoints.length > 0) {
+                analysis += `&nbsp;&nbsp;&nbsp;Inflection near: ${inflectionPoints.slice(0, 3).map(t => t.toFixed(1)).join(', ')}<br>`;
+            }
+        }
+        
+        // Speed info
+        analysis += '<br>';
+        analysis += `<strong>Velocity range:</strong> [${minV.toFixed(2)}, ${maxV.toFixed(2)}]<br>`;
+        analysis += `<strong>Max speed:</strong> ${Math.max(Math.abs(minV), Math.abs(maxV)).toFixed(2)}<br>`;
+        
+        analysis += '</div>';
+        
+        document.getElementById('interval-analysis').innerHTML = analysis;
+    }
+    
+    drawIntervalGraph(canvas, start, end) {
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        
+        // Clear
+        ctx.clearRect(0, 0, w, h);
+        
+        // Find y-range for scaling
+        let minY = Infinity, maxY = -Infinity;
+        const samples = 100;
+        for (let i = 0; i <= samples; i++) {
+            const t = start + (end - start) * i / samples;
+            const y = this.currentFunction.f(t);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+        }
+        
+        const yRange = maxY - minY;
+        const yPadding = yRange * 0.1;
+        minY -= yPadding;
+        maxY += yPadding;
+        
+        // Draw axes
+        ctx.strokeStyle = '#6b7280';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        
+        // If zero is in range, draw x-axis
+        if (minY <= 0 && maxY >= 0) {
+            const zeroY = h - (0 - minY) / (maxY - minY) * h;
+            ctx.moveTo(0, zeroY);
+            ctx.lineTo(w, zeroY);
+        }
+        
+        ctx.stroke();
+        
+        // Draw function
+        ctx.strokeStyle = '#0f766e';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        
+        for (let i = 0; i <= samples; i++) {
+            const t = start + (end - start) * i / samples;
+            const y = this.currentFunction.f(t);
+            const x = i / samples * w;
+            const py = h - (y - minY) / (maxY - minY) * h;
+            
+            if (i === 0) {
+                ctx.moveTo(x, py);
+            } else {
+                ctx.lineTo(x, py);
+            }
+        }
+        ctx.stroke();
+        
+        // Draw current position if in range
+        if (this.paperPosition >= start && this.paperPosition <= end) {
+            const currentX = (this.paperPosition - start) / (end - start) * w;
+            const currentY = this.currentFunction.f(this.paperPosition);
+            const currentPY = h - (currentY - minY) / (maxY - minY) * h;
+            
+            ctx.beginPath();
+            ctx.arc(currentX, currentPY, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#dc2626';
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        // Labels
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '11px sans-serif';
+        ctx.fillText(start.toFixed(1), 5, h - 5);
+        ctx.fillText(end.toFixed(1), w - 25, h - 5);
     }
     
     setPaperPosition(pos) {
@@ -1178,14 +1457,17 @@ class InteractiveExplorer {
         this.totalQuestions = 0;
         this.selectedCategory = null;
         this.questionMode = 'intro';
+        this.attemptsOnCurrentQuestion = 0;
         document.getElementById('explorer-slider').value = 0;
+        this.updateInfo(); // Update values for new function
         this.generateNewQuestion();
-        this.updateInfo();
     }
     
     generateNewQuestion() {
         const container = document.getElementById('exploration-content');
         if (!container) return;
+        
+        this.attemptsOnCurrentQuestion = 0; // Reset attempts for new question
         
         if (this.questionMode === 'intro') {
             this.showIntroduction(container);
@@ -1316,10 +1598,25 @@ class InteractiveExplorer {
                     if (Math.abs(v) < 0.05) return 1;
                     return v > 0 ? 0 : 2;
                 },
+                getHint: (attempt) => {
+                    if (attempt === 1) {
+                        return 'Look at the orange dashed tangent line. Does it slope upward (/) or downward (\\)?';
+                    } else if (attempt === 2) {
+                        const actualV = v;
+                        if (Math.abs(actualV) < 0.05) {
+                            return 'The velocity value is very close to 0. What does that mean for the tangent?';
+                        } else if (actualV > 0) {
+                            return `The velocity is positive (${actualV.toFixed(2)}). Positive slope means...?`;
+                        } else {
+                            return `The velocity is negative (${actualV.toFixed(2)}). Negative slope means...?`;
+                        }
+                    }
+                    return null;
+                },
                 feedback: () => {
-                    if (Math.abs(v) < 0.05) return 'Yes! The tangent is horizontal, so the object is momentarily at rest.';
-                    return v > 0 ? 'Correct! The upward slope means the object is moving upward.' : 
-                                  'Right! The downward slope means the object is moving downward.';
+                    if (Math.abs(v) < 0.05) return 'The tangent is horizontal, so the object is momentarily at rest.';
+                    return v > 0 ? 'The upward slope means the object is moving upward.' : 
+                                  'The downward slope means the object is moving downward.';
                 }
             },
             {
@@ -1335,10 +1632,25 @@ class InteractiveExplorer {
                     if (Math.abs(a) < 0.05) return 1;
                     return a > 0 ? 0 : 2;
                 },
+                getHint: (attempt) => {
+                    if (attempt === 1) {
+                        return 'Look at the curve near the red point. Is it shaped like a U (upward) or ∩ (downward)?';
+                    } else if (attempt === 2) {
+                        const actualA = a;
+                        if (Math.abs(actualA) < 0.05) {
+                            return 'The acceleration is nearly 0. This means the curve is almost...?';
+                        } else if (actualA > 0) {
+                            return `Acceleration is positive (${actualA.toFixed(2)}). The curve opens...?`;
+                        } else {
+                            return `Acceleration is negative (${actualA.toFixed(2)}). The curve opens...?`;
+                        }
+                    }
+                    return null;
+                },
                 feedback: () => {
                     if (Math.abs(a) < 0.05) return 'The curve is nearly straight here - velocity is changing very slowly.';
-                    return a > 0 ? 'Yes! Upward curvature means velocity is increasing.' : 
-                                  'Correct! Downward curvature means velocity is decreasing.';
+                    return a > 0 ? 'Upward curvature means velocity is increasing.' : 
+                                  'Downward curvature means velocity is decreasing.';
                 }
             }
         ];
@@ -1347,43 +1659,136 @@ class InteractiveExplorer {
     }
     
     generateGlobalQuestion() {
+        // Analyze the function behavior in the visible range [-10, 10]
+        const analyzeInterval = (start, end, samples = 100) => {
+            const points = [];
+            for (let i = 0; i <= samples; i++) {
+                const t = start + (end - start) * i / samples;
+                points.push({
+                    t: t,
+                    f: this.currentFunction.f(t),
+                    df: this.currentFunction.df(t),
+                    d2f: this.currentFunction.d2f(t)
+                });
+            }
+            return points;
+        };
+        
+        const visibleData = analyzeInterval(-10, 10);
+        
+        // Find critical points (where velocity ≈ 0)
+        const criticalPoints = visibleData.filter(p => Math.abs(p.df) < 0.1);
+        
+        // Find inflection regions (where acceleration changes sign)
+        const inflectionRegions = [];
+        for (let i = 1; i < visibleData.length; i++) {
+            if (visibleData[i-1].d2f * visibleData[i].d2f < 0) {
+                inflectionRegions.push(visibleData[i].t);
+            }
+        }
+        
         const questions = [
             {
                 id: 'find-rest-point',
-                text: 'Move the slider to find a point where the object is at rest (horizontal tangent)',
+                text: 'In the visible range, find a point where the object is momentarily at rest (horizontal tangent)',
                 type: 'exploration-task',
                 checkCondition: () => {
                     const v = this.currentFunction.df(this.paperPosition);
-                    return Math.abs(v) < 0.1;
+                    return Math.abs(v) < 0.1 && Math.abs(this.paperPosition) <= 10;
                 },
                 feedback: () => {
                     const v = this.currentFunction.df(this.paperPosition);
                     if (Math.abs(v) < 0.1) {
                         return `Perfect! At t = ${this.paperPosition.toFixed(2)}, the tangent is horizontal (velocity ≈ 0).`;
                     }
+                    if (criticalPoints.length === 0) {
+                        return 'Actually, there are no rest points in the visible range. The object never stops!';
+                    }
                     return `The tangent here has slope ${v.toFixed(2)}. Keep looking for a horizontal tangent.`;
                 }
             },
             {
-                id: 'find-fastest',
-                text: 'Find where the object is moving fastest (steepest tangent, either up or down)',
-                type: 'exploration-task',
+                id: 'identify-increasing',
+                text: 'Find an interval where the function is increasing (positive velocity)',
+                type: 'interval-analysis',
                 checkCondition: () => {
                     const v = this.currentFunction.df(this.paperPosition);
-                    return Math.abs(v) > 1.5;
+                    return v > 0.2;
                 },
                 feedback: () => {
                     const v = this.currentFunction.df(this.paperPosition);
-                    const speed = Math.abs(v);
-                    if (speed > 1.5) {
-                        return `Excellent! The object has high speed here (|velocity| = ${speed.toFixed(2)}).`;
+                    if (v > 0.2) {
+                        return `Yes! At t = ${this.paperPosition.toFixed(2)}, the function is increasing (velocity = ${v.toFixed(2)} > 0).`;
+                    } else if (v < -0.2) {
+                        return `Here the function is decreasing (velocity = ${v.toFixed(2)} < 0). Look for where the tangent slopes upward.`;
+                    } else {
+                        return `This is near a critical point. Move to where the tangent clearly slopes upward.`;
                     }
-                    return 'The tangent here is not very steep. Find where it\'s steepest.';
+                }
+            },
+            {
+                id: 'identify-concave-up',
+                text: 'Find a region where the curve is concave up (positive acceleration)',
+                type: 'interval-analysis',
+                checkCondition: () => {
+                    const a = this.currentFunction.d2f(this.paperPosition);
+                    return a > 0.1;
+                },
+                feedback: () => {
+                    const a = this.currentFunction.d2f(this.paperPosition);
+                    if (a > 0.1) {
+                        return `Correct! The curve is concave up here (acceleration = ${a.toFixed(2)} > 0). The velocity is increasing.`;
+                    } else if (a < -0.1) {
+                        return `The curve is concave down here (acceleration = ${a.toFixed(2)} < 0). Look for U-shaped regions.`;
+                    } else {
+                        return `This is near an inflection point. Look for clearly U-shaped regions of the curve.`;
+                    }
+                }
+            },
+            {
+                id: 'compare-speeds',
+                text: `Compare the speeds at t = -5 and t = 5. Where is the object moving faster?`,
+                type: 'comparison',
+                options: [
+                    'Faster at t = -5',
+                    'Faster at t = 5',
+                    'Same speed at both points'
+                ],
+                getCorrect: () => {
+                    const v1 = Math.abs(this.currentFunction.df(-5));
+                    const v2 = Math.abs(this.currentFunction.df(5));
+                    if (Math.abs(v1 - v2) < 0.1) return 2;
+                    return v1 > v2 ? 0 : 1;
+                },
+                getHint: (attempt) => {
+                    const v1 = this.currentFunction.df(-5);
+                    const v2 = this.currentFunction.df(5);
+                    if (attempt === 1) {
+                        return 'Move the slider to t = -5 and t = 5. Compare the steepness of the tangent lines.';
+                    } else {
+                        return `At t = -5, velocity = ${v1.toFixed(2)}. At t = 5, velocity = ${v2.toFixed(2)}. Compare the magnitudes.`;
+                    }
+                },
+                feedback: () => {
+                    const v1 = Math.abs(this.currentFunction.df(-5));
+                    const v2 = Math.abs(this.currentFunction.df(5));
+                    return `At t = -5, speed = ${v1.toFixed(2)}. At t = 5, speed = ${v2.toFixed(2)}. ${
+                        Math.abs(v1 - v2) < 0.1 ? 'They\'re essentially the same!' :
+                        v1 > v2 ? 'The object moves faster at t = -5.' : 'The object moves faster at t = 5.'
+                    }`;
                 }
             }
         ];
         
-        return questions[Math.floor(Math.random() * questions.length)];
+        // Filter out questions that don't make sense for this function
+        const validQuestions = questions.filter(q => {
+            if (q.id === 'find-rest-point' && criticalPoints.length === 0) {
+                return false; // Don't ask for rest points if there aren't any
+            }
+            return true;
+        });
+        
+        return validQuestions[Math.floor(Math.random() * validQuestions.length)];
     }
     
     generateNumericalQuestion(time, v, a) {
@@ -1402,6 +1807,21 @@ class InteractiveExplorer {
                     if (absV < 0.3) return 0;
                     if (absV < 1.5) return 1;
                     return 2;
+                },
+                getHint: (attempt) => {
+                    const absV = Math.abs(v);
+                    if (attempt === 1) {
+                        return 'Think about the magnitude of the velocity. Is |' + v.toFixed(2) + '| close to 0, moderate, or large?';
+                    } else if (attempt === 2) {
+                        if (absV < 0.3) {
+                            return 'A velocity magnitude less than 0.3 means the tangent is nearly horizontal.';
+                        } else if (absV < 1.5) {
+                            return 'A velocity magnitude between 0.3 and 1.5 indicates moderate movement.';
+                        } else {
+                            return 'A velocity magnitude greater than 1.5 means rapid motion!';
+                        }
+                    }
+                    return null;
                 },
                 feedback: () => {
                     const absV = Math.abs(v);
@@ -1439,7 +1859,7 @@ class InteractiveExplorer {
                 </p>
         `;
         
-        if (question.type === 'multiple-choice') {
+        if (question.type === 'multiple-choice' || question.type === 'comparison') {
             html += '<div style="display: flex; flex-direction: column; gap: 0.75rem;">';
             question.options.forEach((option, i) => {
                 html += `
@@ -1450,19 +1870,48 @@ class InteractiveExplorer {
                                    cursor: pointer; text-align: left; font-size: 1rem;
                                    transition: all 0.2s ease;"
                             onmouseover="this.style.borderColor='var(--brand)'; this.style.background='#f0fdf4';"
-                            onmouseout="this.style.borderColor='var(--border)'; this.style.background='white';">
+                            onmouseout="if(!this.disabled) { this.style.borderColor='var(--border)'; this.style.background='white'; }">
                         ${option}
                     </button>
                 `;
             });
             html += '</div>';
-        } else if (question.type === 'exploration-task') {
+            
+            // Add interval viewer for comparison questions
+            if (question.type === 'comparison') {
+                html += `
+                    <div style="margin-top: 1rem; padding: 0.75rem; background: #f0f9ff; 
+                               border-radius: 8px; border: 1px solid #93c5fd;">
+                        <div style="font-size: 0.85rem; color: #1e40af; margin-bottom: 0.5rem;">
+                            💡 Tip: Use the slider below to explore both time points
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="explorer.setPaperPosition(-5); document.getElementById('explorer-slider').value = -5;" 
+                                    style="padding: 0.5rem 1rem; background: white; border: 1px solid #3b82f6; 
+                                           border-radius: 6px; color: #3b82f6; font-size: 0.85rem; cursor: pointer;">
+                                Go to t = -5
+                            </button>
+                            <button onclick="explorer.setPaperPosition(5); document.getElementById('explorer-slider').value = 5;" 
+                                    style="padding: 0.5rem 1rem; background: white; border: 1px solid #3b82f6; 
+                                           border-radius: 6px; color: #3b82f6; font-size: 0.85rem; cursor: pointer;">
+                                Go to t = 5
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        } else if (question.type === 'exploration-task' || question.type === 'interval-analysis') {
             html += `
                 <div style="background: #f0f9ff; padding: 1rem; border-radius: 8px; 
                             border-left: 3px solid #3b82f6; margin-bottom: 1rem;">
                     <p style="margin: 0; color: #1e40af;">
                         Current position: <strong>t = ${this.paperPosition.toFixed(2)}</strong>
                     </p>
+                    ${question.type === 'interval-analysis' ? `
+                        <p style="margin: 0.5rem 0 0 0; color: #1e40af; font-size: 0.9rem;">
+                            Visible range: t ∈ [-10, 10]
+                        </p>
+                    ` : ''}
                 </div>
                 <button onclick="explorer.checkExplorationTask()" 
                         style="padding: 0.75rem 1.5rem; background: var(--brand); 
@@ -1470,6 +1919,17 @@ class InteractiveExplorer {
                                font-size: 1rem; font-weight: 600; cursor: pointer;">
                     Check Current Position
                 </button>
+                
+                ${question.type === 'interval-analysis' ? `
+                    <div style="margin-top: 1rem;">
+                        <button onclick="explorer.showIntervalWindow()" 
+                                style="padding: 0.5rem 1rem; background: white; 
+                                       color: var(--brand); border: 2px solid var(--brand); 
+                                       border-radius: 6px; font-size: 0.9rem; cursor: pointer;">
+                            📊 Show Interval Analysis Window
+                        </button>
+                    </div>
+                ` : ''}
             `;
         }
         
@@ -1493,6 +1953,11 @@ class InteractiveExplorer {
         `;
         
         container.innerHTML = html;
+        
+        // Add interval window if it doesn't exist
+        if (!document.getElementById('interval-window')) {
+            this.createIntervalWindow();
+        }
     }
     
     getCategoryName() {
@@ -1505,32 +1970,75 @@ class InteractiveExplorer {
     checkAnswer(choiceIndex) {
         const correct = this.currentQuestion.getCorrect();
         const isCorrect = choiceIndex === correct;
+        this.attemptsOnCurrentQuestion++;
         
         const buttons = document.querySelectorAll('.answer-btn');
-        buttons.forEach(btn => {
-            btn.disabled = true;
-            btn.style.cursor = 'default';
-        });
         
         if (isCorrect) {
-            buttons[choiceIndex].style.background = '#d1fae5';
-            buttons[choiceIndex].style.borderColor = 'var(--success)';
+            // Correct answer - highlight it and disable all buttons
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                btn.style.cursor = 'default';
+                if (i === choiceIndex) {
+                    btn.style.background = '#d1fae5';
+                    btn.style.borderColor = 'var(--success)';
+                }
+            });
+            
+            const feedback = this.currentQuestion.feedback();
+            this.showFeedback(true, feedback);
+            
+            this.score++;
+            this.totalQuestions++;
+            
+            // Automatically generate new question and function after 2 seconds
+            setTimeout(() => {
+                this.currentFunction = generateRandomFunction();
+                this.updateInfo();
+                this.generateCategoryQuestion(document.getElementById('exploration-content'));
+            }, 2000);
+            
         } else {
+            // Wrong answer - give hint but don't reveal answer
             buttons[choiceIndex].style.background = '#fee2e2';
             buttons[choiceIndex].style.borderColor = 'var(--error)';
-            if (buttons[correct]) {
-                buttons[correct].style.background = '#d1fae5';
-                buttons[correct].style.borderColor = 'var(--success)';
+            buttons[choiceIndex].disabled = true;
+            
+            // Provide hint based on number of attempts
+            let hintMessage = '';
+            if (this.currentQuestion.getHint) {
+                hintMessage = this.currentQuestion.getHint(this.attemptsOnCurrentQuestion);
+            }
+            
+            if (!hintMessage) {
+                hintMessage = 'Try looking at the graph more carefully. What do you notice?';
+            }
+            
+            // If they've tried all options, reveal answer and move on
+            if (this.attemptsOnCurrentQuestion >= this.currentQuestion.options.length - 1) {
+                buttons.forEach((btn, i) => {
+                    btn.disabled = true;
+                    btn.style.cursor = 'default';
+                    if (i === correct) {
+                        btn.style.background = '#d1fae5';
+                        btn.style.borderColor = 'var(--success)';
+                    }
+                });
+                
+                const feedback = this.currentQuestion.feedback();
+                this.showFeedback(false, `The correct answer was: "${this.currentQuestion.options[correct]}". ${feedback}`);
+                
+                // Generate new question with new function after delay
+                setTimeout(() => {
+                    this.currentFunction = generateRandomFunction();
+                    this.updateInfo();
+                    this.generateCategoryQuestion(document.getElementById('exploration-content'));
+                }, 3000);
+                
+            } else {
+                this.showFeedback(false, hintMessage);
             }
         }
-        
-        const feedback = this.currentQuestion.feedback();
-        this.showFeedback(isCorrect, feedback);
-        
-        if (isCorrect) {
-            this.score++;
-        }
-        this.totalQuestions++;
     }
     
     checkExplorationTask() {
@@ -1542,20 +2050,28 @@ class InteractiveExplorer {
         if (isCorrect) {
             this.score++;
             this.totalQuestions++;
+            
+            // Generate new question after a short delay
+            setTimeout(() => {
+                this.currentFunction = generateRandomFunction();
+                this.updateInfo();
+                this.generateCategoryQuestion(document.getElementById('exploration-content'));
+            }, 2000);
         }
     }
     
     showFeedback(isCorrect, message) {
         const feedbackDiv = document.getElementById('question-feedback');
-        const color = isCorrect ? '#d1fae5' : '#fee2e2';
-        const border = isCorrect ? 'var(--success)' : 'var(--error)';
-        const icon = isCorrect ? '✓' : '→';
+        const color = isCorrect ? '#d1fae5' : '#fef3c7';
+        const border = isCorrect ? 'var(--success)' : 'var(--warning)';
+        const icon = isCorrect ? '✓' : '💡';
+        const title = isCorrect ? 'Correct!' : 'Hint:';
         
         feedbackDiv.innerHTML = `
             <div style="background: ${color}; padding: 1rem; border-radius: 8px; 
                         border-left: 4px solid ${border};">
                 <div style="font-weight: 600; margin-bottom: 0.5rem;">
-                    ${icon} ${isCorrect ? 'Correct!' : 'Let\'s think about this:'}
+                    ${icon} ${title}
                 </div>
                 <div style="color: var(--text); line-height: 1.6;">
                     ${message}
@@ -1570,10 +2086,14 @@ class InteractiveExplorer {
     }
     
     skipQuestion() {
+        this.currentFunction = generateRandomFunction();
+        this.updateInfo();
         this.generateCategoryQuestion(document.getElementById('exploration-content'));
     }
     
     newQuestionSameCategory() {
+        this.currentFunction = generateRandomFunction();
+        this.updateInfo();
         this.generateCategoryQuestion(document.getElementById('exploration-content'));
     }
     
@@ -1618,7 +2138,92 @@ class InteractiveExplorer {
     
     animate() {
         this.draw();
+        this.drawStatic();  // Add static draw call
         this.animationId = requestAnimationFrame(() => this.animate());
+    }
+    
+    // Add new method to draw the static graph
+    drawStatic() {
+        const ctx = this.staticManager.ctx;
+        const w = this.staticManager.width;
+        const h = this.staticManager.height;
+        const scale = 50;
+        
+        const time = this.paperPosition;
+        const y = this.currentFunction.f(time);
+        const dy = this.currentFunction.df(time);
+        
+        this.staticManager.clear();
+        this.staticManager.drawGrid();
+        
+        // Draw the function curve
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#0f766e';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        let firstPoint = true;
+        for (let i = 0; i <= 400; i++) {
+            const t = -20 + i * 0.1;
+            const x = w/2 + t * 30;
+            const fy = h/2 - this.currentFunction.f(t) * scale;
+            
+            if (x >= 0 && x <= w) {
+                if (firstPoint) {
+                    ctx.moveTo(x, fy);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(x, fy);
+                }
+            }
+        }
+        ctx.stroke();
+        ctx.restore();
+        
+        // Draw current point
+        const pointX = w/2 + time * 30;
+        const pointY = h/2 - y * scale;
+        
+       // Draw tangent line
+const len = 100;
+const slope = -dy * scale / 30;  // Fixed: negative because screen y increases downward
+
+ctx.save();
+ctx.beginPath();
+ctx.strokeStyle = '#f59e0b';
+ctx.lineWidth = 4;
+ctx.lineCap = 'round';
+ctx.setLineDash([5, 5]);
+ctx.moveTo(pointX - len, pointY - slope * len);  // Fixed: corrected signs
+ctx.lineTo(pointX + len, pointY + slope * len);   // Fixed: corrected signs
+        ctx.stroke();
+        ctx.restore();
+        
+        // Draw the point
+        ctx.save();
+        ctx.shadowColor = '#dc2626';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(pointX, pointY, 8, 0, 2*Math.PI);
+        ctx.fillStyle = '#dc2626';
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+        
+        // Draw time marker
+        ctx.save();
+        ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(pointX, 0);
+        ctx.lineTo(pointX, h);
+        ctx.stroke();
+        ctx.restore();
     }
     
     draw() {
@@ -1627,7 +2232,7 @@ class InteractiveExplorer {
         const h = this.manager.height;
         const scale = 50;
         const paperSpeed = 30;
-        const presentX = w * 0.5;
+        const presentX = w * 0.5;  // This should be the center where NOW is
         
         const time = this.paperPosition;
         const y = this.currentFunction.f(time);
@@ -1638,6 +2243,7 @@ class InteractiveExplorer {
         const gridOffset = -time * paperSpeed;
         this.manager.drawGrid(gridOffset);
         
+        // Draw the function curve
         ctx.save();
         ctx.beginPath();
         ctx.strokeStyle = '#0f766e';
@@ -1648,7 +2254,7 @@ class InteractiveExplorer {
         let firstPoint = true;
         for (let i = 0; i <= 800; i++) {
             const t = time - 40 + i * 0.1;
-            const x = presentX - (t - time) * paperSpeed;
+            const x = presentX + (t - time) * paperSpeed;  // Fixed: consistent with paper movement
             const fy = h/2 - this.currentFunction.f(t) * scale;
             
             if (x >= -100 && x <= w + 100) {
@@ -1663,22 +2269,24 @@ class InteractiveExplorer {
         ctx.stroke();
         ctx.restore();
         
+        // The point should be at presentX (the NOW line)
         const pointY = h/2 - y * scale;
-        
-        const len = 120;
-        const screenSlope = -dy * scale / paperSpeed;
-        
-        ctx.save();
-        ctx.beginPath();
-        ctx.strokeStyle = '#f59e0b';
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-        ctx.setLineDash([5, 5]);
-        ctx.moveTo(presentX - len, pointY + screenSlope * len);
-        ctx.lineTo(presentX + len, pointY - screenSlope * len);
+       // Draw tangent line
+const len = 120;
+const screenSlope = -dy * scale / paperSpeed;
+
+ctx.save();
+ctx.beginPath();
+ctx.strokeStyle = '#f59e0b';
+ctx.lineWidth = 5;
+ctx.lineCap = 'round';
+ctx.setLineDash([5, 5]);
+ctx.moveTo(presentX - len, pointY - screenSlope * len);  // Fixed: corrected signs
+ctx.lineTo(presentX + len, pointY + screenSlope * len);   // Fixed: corrected signs
         ctx.stroke();
         ctx.restore();
         
+        // Draw the point exactly at presentX (NOW line)
         ctx.save();
         ctx.shadowColor = '#dc2626';
         ctx.shadowBlur = 20;
@@ -1707,7 +2315,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             mcAnim = new MotionCreatesAnimation(document.getElementById('motion-canvas'));
             gcAnim = new GraphControlsAnimation(document.getElementById('graph-canvas'));
-            explorer = new InteractiveExplorer(document.getElementById('explorer-canvas'));
+            
+            // Pass both canvases to the explorer - static and moving
+            explorer = new InteractiveExplorer(
+                document.getElementById('explorer-canvas'),
+                document.getElementById('static-canvas')
+            );
             
             window.explorer = explorer;
             
