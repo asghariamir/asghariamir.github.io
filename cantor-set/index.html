@@ -1,31 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
-<link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cantor Set Explorer & Box-Dimension Lab</title>
-
+    <title>Cantor Set Explorer - Interactive Fractal Lab</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
     <style>
         :root {
-            --primary-color: #1565c0;
-            --light-gray: #f5f5f5;
-            --medium-gray: #e0e0e0;
-            --dark-gray: #424242;
-            --text-color: #212121;
+            --primary: #0f766e;
+            --primary-light: #14b8a6;
+            --primary-dark: #0a5a53;
+            --accent: #f97316;
+            --bg-main: #fafafa;
+            --bg-white: #ffffff;
+            --card-border: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        /* ---------- Basic Structure & Typography ---------- */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        /* Basic Structure & Typography */
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
-            background-color: var(--light-gray);
-            color: var(--text-color);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             display: flex;
             justify-content: center;
             padding: 1rem;
@@ -35,31 +46,99 @@
             width: 100%;
             max-width: 900px;
             margin: 0 auto;
-            background-color: white;
-            box-shadow: 0 4px_8px rgba(0,0,0,0.1);
-            border-radius: 8px;
+            background-color: var(--bg-white);
+            box-shadow: var(--shadow-lg);
+            border-radius: 12px;
             overflow: hidden;
         }
         
+        /* Mathswell Badge */
+        .mathswell-nav {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .mathswell-nav .mw-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary);
+            padding: .3rem .7rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,.9);
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            transition: all 0.3s ease;
+        }
+        
+        .mathswell-nav .mw-link:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Headers */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
         h2 {
-            color: var(--primary-color);
-            border-bottom: 1px solid var(--medium-gray);
+            color: var(--primary);
+            border-bottom: 1px solid var(--card-border);
             padding-bottom: 0.5rem;
             margin: 0 1.5rem 1rem;
+            font-size: 1.75rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 1.5rem 0 0.75rem;
         }
         
         p.intro {
             font-size: 0.95rem;
-            color: #616161;
+            color: var(--text-secondary);
             max-width: 100%;
             margin: 0 1.5rem 1.5rem;
+            line-height: 1.6;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            padding: 0 1.5rem;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            padding: 0 1.5rem;
         }
         
-        /* ---------- Tabs ---------- */
+        /* Tabs */
         .tabs {
             display: flex;
-            background-color: var(--light-gray);
-            border-bottom: 2px solid var(--medium-gray);
+            background-color: var(--bg-main);
+            border-bottom: 2px solid var(--card-border);
         }
 
         .tab-button {
@@ -68,13 +147,18 @@
             border: none;
             background-color: transparent;
             font-size: 1rem;
-            color: var(--dark-gray);
+            color: var(--text-muted);
             position: relative;
             transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .tab-button:hover {
+            color: var(--text-secondary);
         }
 
         .tab-button.active {
-            color: var(--primary-color);
+            color: var(--primary);
             font-weight: 600;
         }
 
@@ -85,13 +169,23 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background-color: var(--primary-color);
+            background-color: var(--primary);
         }
         
-        .section { display: none; }
-        .section.active { display: block; padding: 0; }
+        .section { 
+            display: none; 
+        }
+        
+        .section.active { 
+            display: block; 
+            padding: 0; 
+        }
 
-        /* ---------- Controls ---------- */
+        .section#introduction {
+            padding: 2rem 1.5rem;
+        }
+
+        /* Controls */
         .controls {
             display: flex;
             justify-content: center;
@@ -109,142 +203,438 @@
 
         label {
             font-size: 0.9rem;
-            color: #616161;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
         
         button {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
             border: none;
             padding: 10px 15px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.9rem;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
 
         button:hover {
-            background-color: #1976d2;
+            background-color: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
         
         .danger-button {
-             background-color: #d32f2f;
+            background-color: #dc2626;
         }
         
         .danger-button:hover {
-            background-color: #c62828;
+            background-color: #ef4444;
         }
 
+        .secondary-button {
+            background-color: #6b7280;
+            font-size: 0.85rem;
+            padding: 8px 12px;
+        }
+
+        .secondary-button:hover {
+            background-color: #4b5563;
+        }
+
+        button:disabled {
+            background-color: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button:disabled:hover {
+            background-color: #d1d5db;
+            transform: none;
+        }
 
         input[type="range"] {
             cursor: pointer;
-            accent-color: var(--primary-color);
+            accent-color: var(--primary);
         }
 
-        /* ---------- Canvases & Tables ---------- */
+        /* Canvases & Tables */
         canvas {
-            border: 1px solid var(--medium-gray);
-            border-radius: 4px;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
             display: block;
             margin: 0 1.5rem 1.5rem;
-            width: calc(100% - 3rem); /* Full width minus padding */
+            width: calc(100% - 3rem);
             height: auto;
+            background: white;
+            position: relative;
         }
 
-        #expCanvas { height: 100px; }
-        #boxCanvas { height: 60px; }
+        #expCanvas { 
+            height: 100px;
+            cursor: grab;
+        }
+        
+        #expCanvas:active {
+            cursor: grabbing;
+        }
+        
+        #boxCanvas { height: 80px; }
         #chartCv { height: 300px; }
         
         table {
             width: calc(100% - 3rem);
             border-collapse: collapse;
             margin: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
 
         th, td {
             text-align: left;
             padding: 8px 12px;
-            border-bottom: 1px solid var(--medium-gray);
+            border-bottom: 1px solid var(--card-border);
         }
         
         th {
-            background-color: var(--light-gray);
+            background-color: var(--bg-main);
             font-weight: 600;
+            color: var(--text-primary);
         }
 
         tr:last-child td {
             border-bottom: none;
         }
+
+        tr:hover td {
+            background-color: var(--bg-main);
+        }
+
+        tr.highlight-row td {
+            animation: highlightFade 1s ease-out;
+        }
+
+        @keyframes highlightFade {
+            0% { background-color: rgba(20, 184, 166, 0.3); }
+            100% { background-color: transparent; }
+        }
         
         .math-display {
             font-family: 'Times New Roman', Times, serif;
             font-size: 1.1rem;
-            background: var(--light-gray);
+            background: var(--bg-main);
             padding: 8px;
             border-radius: 4px;
             text-align: center;
         }
+        
         #slopeTxt {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin: 1rem 1.5rem;
             font-weight: 600;
-            color: var(--primary-color);
+            color: var(--primary);
+            font-size: 1.1rem;
         }
 
+        /* New: Zoom and coordinate display */
+        .canvas-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 1.5rem 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .zoom-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .coord-display {
+            font-family: 'Courier New', monospace;
+            color: var(--text-secondary);
+        }
+
+        /* Box dimension section */
+        .box-controls-section {
+            background: var(--bg-main);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 0 1.5rem 1.5rem;
+        }
+
+        .box-controls-section h3 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin: 0 0 1rem 0;
+        }
+
+        .box-controls-section p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .current-value-display {
+            background: white;
+            border: 1px solid var(--primary-light);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .current-value-display .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        /* Results section */
+        .results-section {
+            background: var(--bg-main);
+            border: 2px solid var(--primary-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem;
+            text-align: center;
+        }
+
+        .results-section h3 {
+            margin: 0 0 1rem 0;
+            color: var(--primary);
+        }
+
+        .dimension-result {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .theory-comparison {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .error-display {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Introduction specific styles */
+        .cantor-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 2rem 1.5rem;
+            padding: 2rem;
+            background: var(--bg-main);
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .cantor-row {
+            display: flex;
+            height: 20px;
+            gap: 0;
+            opacity: 0;
+            animation: fadeInRow 0.5s ease-out forwards;
+        }
+
+        .cantor-row:nth-child(1) { animation-delay: 0.1s; }
+        .cantor-row:nth-child(2) { animation-delay: 0.3s; }
+        .cantor-row:nth-child(3) { animation-delay: 0.5s; }
+        .cantor-row:nth-child(4) { animation-delay: 0.7s; }
+        .cantor-row:nth-child(5) { animation-delay: 0.9s; }
+
+        @keyframes fadeInRow {
+            to { opacity: 1; }
+        }
+
+        .cantor-segment {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 2px;
+        }
+
+        .cantor-gap {
+            background: transparent;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-main);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 0.5rem 0;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Keyboard shortcuts hint */
+        .shortcuts-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin: 0 1.5rem 1rem;
+            padding: 0.5rem;
+            background: var(--bg-main);
+            border-radius: 4px;
+        }
     </style>
-     <!-- Mathswell favicon -->
-
-<!-- Mathswell app navbar styles -->
-<style>
-  .mathswell-nav {
-    display: flex;
-    justify-content: center;
-    margin: .4rem 0 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  .mathswell-nav .mw-link {
-    display: inline-flex;
-    align-items: center;
-    gap: .45rem;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1rem;
-    color: #0f766e;
-    padding: .3rem .7rem;
-    border-radius: 999px;
-    background: rgba(255,255,255,.9);
-    box-shadow: 0 1px 4px rgba(0,0,0,.08);
-  }
-  .mathswell-nav .mw-link img {
-    display: block;
-  }
-</style>
-
 </head>
 <body>
 <div class="container">
+    <!-- Mathswell brand badge -->
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" style="display:block">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+
     <div class="tabs">
-        <button id="tabExp" class="tab-button active">Set Explorer</button>
+        <button id="tabIntro" class="tab-button active">Introduction</button>
+        <button id="tabExp" class="tab-button">Set Explorer</button>
         <button id="tabDim" class="tab-button">Box Dimension</button>
     </div>
 
-    <section id="explorer" class="section active">
-        <h2>Cantor Set Explorer</h2>
-         <!-- Mathswell brand badge -->
-<div style="display:flex;justify-content:center;margin:.75rem 0 1rem;
-            position:relative;z-index:1001;">
-  <a href="/" style="display:inline-flex;align-items:center;gap:.5rem;
-      text-decoration:none;font-weight:800;font-size:1.05rem;color:#0f766e;
-      padding:.4rem .8rem;border-radius:999px;background:#fff;
-      box-shadow:0 1px 4px rgba(0,0,0,.08);">
-    <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" style="display:block">
-    <span>MATHSWELL</span>
-  </a>
-</div>
+    <!-- Introduction Section -->
+    <section id="introduction" class="section active">
+        <h1>The Cantor Set</h1>
+        <p class="intro-text">
+            Discover one of mathematics' most elegant fractals — an infinite set that contains uncountably many points yet has zero length. The Cantor set reveals the surprising nature of infinity and serves as a gateway to understanding fractional dimensions.
+        </p>
 
+        <div class="cantor-visual">
+            <div class="cantor-row">
+                <div class="cantor-segment" style="flex: 1;"></div>
+            </div>
+            <div class="cantor-row">
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 1;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+            </div>
+            <div class="cantor-row">
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 1;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 3;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 1;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+            </div>
+            <div class="cantor-row">
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 2;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 9;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 2;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 9;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 2;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+            </div>
+            <div class="cantor-row">
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 8;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 27;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 8;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 27;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 8;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 27;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+                <div class="cantor-gap" style="flex: 8;"></div>
+                <div class="cantor-segment" style="flex: 1;"></div>
+            </div>
+        </div>
+
+        <h3 style="padding: 0 1.5rem;">How It's Constructed</h3>
+        <p class="description">
+            The Cantor set emerges from a simple iterative process: Start with the unit interval [0,1], remove the middle third (1/3, 2/3), then remove the middle third of each remaining segment, and continue infinitely. What remains is a remarkable mathematical object — uncountably infinite yet measure zero.
+        </p>
+
+        <div class="feature-grid">
+            <a href="#" class="feature-card" onclick="switchTab('tabExp'); return false;">
+                <div class="feature-icon">🔬</div>
+                <h3>Set Explorer</h3>
+                <p>Visualize the iterative construction process. Zoom in to explore the self-similar structure at any scale, and watch how the total length approaches zero while the number of segments grows exponentially.</p>
+            </a>
+            <a href="#" class="feature-card" onclick="switchTab('tabDim'); return false;">
+                <div class="feature-icon">📐</div>
+                <h3>Box Dimension Lab</h3>
+                <p>Calculate the fractal dimension using the box-counting method. Discover that the Cantor set has dimension log(2)/log(3) ≈ 0.631 — neither zero-dimensional like points nor one-dimensional like lines.</p>
+            </a>
+        </div>
+    </section>
+
+    <section id="explorer" class="section">
+        <h2>Cantor Set Explorer</h2>
         <p class="intro">Move the <strong>Depth</strong> slider to generate stages of the Cantor set. Use the mouse-wheel to zoom and drag to pan. Watch the total length shrink as <em>(2/3)<sup>n</sup></em>.</p>
+
+        <div class="canvas-info">
+            <div class="zoom-info">
+                <span id="zoomLevel">Zoom: 1.0×</span>
+                <button id="resetZoom" class="secondary-button">Reset View</button>
+            </div>
+            <span id="coordDisplay" class="coord-display"></span>
+        </div>
 
         <canvas id="expCanvas"></canvas>
 
@@ -257,6 +647,10 @@
             <button id="animBtn">Animate</button>
         </div>
 
+        <div class="shortcuts-hint">
+            Keyboard: ← → arrows for depth | Spacebar for animate | R to reset zoom
+        </div>
+
         <table id="lenTable">
             <thead><tr><th>Depth n</th><th>Segments 2<sup>n</sup></th><th>Total length (2/3)<sup>n</sup></th></tr></thead>
             <tbody></tbody>
@@ -265,27 +659,34 @@
 
     <section id="dimension" class="section">
         <h2>Box-Counting Dimension Lab</h2>
-        <p class="intro">Choose an integer <em>k</em> to partition the unit interval into boxes of length&nbsp;<em>1/3<sup>k</sup></em>. Count how many boxes intersect the Cantor set, then plot <em>log&nbsp;N(s)</em> vs&nbsp;<em>log&nbsp;(1/s)</em> to estimate the box dimension.</p>
-
-        <div class="controls">
-            <div class="control-group">
-                <label for="kRange">k</label>
-                <input id="kRange" type="range" min="1" max="9" step="1" value="4">
-                <span id="kVal" class="math-display">4</span>
-            </div>
-            <div class="control-group">
-                <span id="sDisp" class="math-display">s = 1/3<sup>4</sup> ≈ 0.0123</span>
-                <span id="nDisp" class="math-display">N(s) = 20</span>
-            </div>
-        </div>
+        <p class="intro">Partition the unit interval into boxes of length <em>1/3<sup>k</sup></em> and count how many boxes intersect the Cantor set. Then plot <em>log&nbsp;N(s)</em> vs&nbsp;<em>log&nbsp;(1/s)</em> to estimate the fractal dimension.</p>
 
         <canvas id="boxCanvas"></canvas>
 
-        <div class="controls">
-            <button id="addRow">Add data row</button>
-            <button id="plotBtn">Plot log-log</button>
-            <button id="fitBtn">Fit line &amp; slope</button>
-            <button id="resetTbl" class="danger-button">Reset table</button>
+        <div class="box-controls-section">
+            <h3>Step 1: Collect Data Points</h3>
+            <p>Choose different values of k (from 1 to 9) to see how box size affects the count. Each value of k creates one data point for your analysis.</p>
+            
+            <div class="controls" style="margin: 1rem 0;">
+                <div class="control-group">
+                    <label for="kRange">k =</label>
+                    <input id="kRange" type="range" min="1" max="9" step="1" value="4">
+                    <span id="kVal" class="math-display">4</span>
+                </div>
+            </div>
+
+            <div class="current-value-display">
+                <div>Box size: <span id="sDisp" class="math-display">s = 1/3<sup>4</sup> ≈ 0.0123</span></div>
+                <div class="value">Current: <span id="nDisp">N(s) = 20</span> boxes intersect the Cantor set</div>
+            </div>
+
+            <div style="text-align: center;">
+                <button id="addRow" style="font-size: 1rem; padding: 12px 24px;">Add to Table</button>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 1rem;">
+                Tip: Try collecting data for k = 1, 2, 3... up to 9 for best results
+            </p>
         </div>
 
         <table id="dataTbl">
@@ -293,8 +694,24 @@
             <tbody></tbody>
         </table>
 
-        <canvas id="chartCv"></canvas>
+        <div class="button-group">
+            <button id="plotBtn">Plot Log-Log Graph</button>
+            <button id="fitBtn">Fit Line & Calculate Dimension</button>
+            <button id="resetTbl" class="secondary-button">Reset Table</button>
+        </div>
+
+        <canvas id="chartCv" style="display: none;"></canvas>
         <p id="slopeTxt"></p>
+        
+        <div id="resultsSection" class="results-section" style="display: none;">
+            <h3>Fractal Dimension Results</h3>
+            <div id="estimatedDim" class="dimension-result"></div>
+            <div class="theory-comparison">Theoretical dimension: log(2)/log(3) ≈ 0.6309</div>
+            <div id="errorDisplay" class="error-display"></div>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 1rem;">
+                The slope of the log-log plot gives us the fractal dimension, revealing that the Cantor set is neither 0-dimensional (like points) nor 1-dimensional (like lines).
+            </p>
+        </div>
     </section>
 </div>
 <script>
@@ -318,11 +735,24 @@
     const depthRange = document.getElementById('depthRange');
     const depthVal = document.getElementById('depthVal');
     const lenBody = document.querySelector('#lenTable tbody');
+    const zoomLevel = document.getElementById('zoomLevel');
+    const coordDisplay = document.getElementById('coordDisplay');
 
     let viewStart = 0, viewEnd = 1; // visible window [0,1]
     let animHandle = null, animDir = 1;
+    const ANIM_SPEED = 700; // Fixed animation speed
+
+    function getZoomFactor() {
+        return 1 / (viewEnd - viewStart);
+    }
+
+    function updateZoomDisplay() {
+        const zoom = getZoomFactor();
+        zoomLevel.textContent = `Zoom: ${zoom.toFixed(1)}×`;
+    }
 
     function px(x) { return (x - viewStart) / (viewEnd - viewStart) * expCv.width; }
+    
     function drawExplorer() {
         if (expCv.width === 0 || expCv.offsetParent === null) return;
         const n = +depthRange.value;
@@ -333,10 +763,15 @@
         expCtx.clearRect(0, 0, expCv.width, expCv.height);
         expCtx.fillStyle = '#ffffff';
         expCtx.fillRect(0, 0, expCv.width, expCv.height);
-        expCtx.fillStyle = '#1565c0';
         
+        // Create gradient for Cantor set
         const canvasWidth = expCv.width / dpr;
         const canvasHeight = expCv.height / dpr;
+        const gradient = expCtx.createLinearGradient(0, 0, canvasWidth, 0);
+        gradient.addColorStop(0, '#0f766e');
+        gradient.addColorStop(0.5, '#14b8a6');
+        gradient.addColorStop(1, '#0f766e');
+        expCtx.fillStyle = gradient;
 
         cantorSegments(n).forEach(([a, b]) => {
             const L = Math.max(a, viewStart), R = Math.min(b, viewEnd);
@@ -346,6 +781,7 @@
             expCtx.fillRect(startPx, 0, widthPx, canvasHeight);
         });
         expCtx.restore();
+        updateZoomDisplay();
     }
 
     function refreshLenTable() {
@@ -353,11 +789,12 @@
         lenBody.innerHTML = '';
         for (let i = 0; i <= 9; i++) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${i}</td><td>${2 ** i}</td><td>(2/3)<sup>${i}</sup> &approx; ${((2/3)**i).toFixed(4)}</td>`;
+            tr.innerHTML = `<td>${i}</td><td>${2 ** i}</td><td>(2/3)<sup>${i}</sup> ≈ ${((2/3)**i).toFixed(4)}</td>`;
             tr.style.display = (i <= n) ? 'table-row' : 'none';
             lenBody.appendChild(tr);
         }
     }
+    
     function refreshExplorer() {
         depthVal.textContent = depthRange.value;
         drawExplorer();
@@ -365,6 +802,7 @@
     }
 
     depthRange.oninput = () => { stopAnim(); refreshExplorer(); };
+    
     function startAnim() {
         animHandle = setInterval(() => {
             let d = +depthRange.value;
@@ -372,17 +810,21 @@
             if (d <= +depthRange.min) animDir = 1;
             depthRange.value = d + animDir;
             refreshExplorer();
-        }, 600);
+        }, ANIM_SPEED);
         document.getElementById('animBtn').textContent = 'Stop';
         document.getElementById('animBtn').classList.add('danger-button');
     }
+    
     function stopAnim() {
-        clearInterval(animHandle); animHandle = null;
+        clearInterval(animHandle); 
+        animHandle = null;
         document.getElementById('animBtn').textContent = 'Animate';
         document.getElementById('animBtn').classList.remove('danger-button');
     }
+    
     document.getElementById('animBtn').onclick = () => animHandle ? stopAnim() : startAnim();
 
+    // Zoom functionality
     function zoom(factor, center = 0.5) {
         const span = (viewEnd - viewStart) * factor;
         const mid = viewStart + (viewEnd - viewStart) * center;
@@ -393,7 +835,32 @@
         drawExplorer();
     }
 
-    expCv.addEventListener('wheel', e => { e.preventDefault(); zoom(e.deltaY < 0 ? 0.8 : 1.25, e.offsetX / expCv.getBoundingClientRect().width); }, { passive: false });
+    function resetZoom() {
+        viewStart = 0;
+        viewEnd = 1;
+        drawExplorer();
+    }
+
+    document.getElementById('resetZoom').onclick = resetZoom;
+
+    // Mouse coordinate display
+    expCv.addEventListener('mousemove', (e) => {
+        const rect = expCv.getBoundingClientRect();
+        const x = e.offsetX / rect.width;
+        const coord = viewStart + x * (viewEnd - viewStart);
+        coordDisplay.textContent = `x = ${coord.toFixed(6)}`;
+    });
+
+    expCv.addEventListener('mouseleave', () => {
+        coordDisplay.textContent = '';
+    });
+
+    expCv.addEventListener('wheel', e => { 
+        e.preventDefault(); 
+        const rect = expCv.getBoundingClientRect();
+        zoom(e.deltaY < 0 ? 0.8 : 1.25, e.offsetX / rect.width); 
+    }, { passive: false });
+    
     let dragging = false, lastX = 0;
     expCv.onmousedown = e => { dragging = true; lastX = e.clientX; expCv.style.cursor = 'grabbing'; };
     window.onmousemove = e => {
@@ -408,6 +875,26 @@
     };
     window.onmouseup = () => { dragging = false; expCv.style.cursor = 'grab'; };
 
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (document.getElementById('explorer').classList.contains('active')) {
+            if (e.key === 'ArrowLeft' && depthRange.value > depthRange.min) {
+                depthRange.value = +depthRange.value - 1;
+                stopAnim();
+                refreshExplorer();
+            } else if (e.key === 'ArrowRight' && depthRange.value < depthRange.max) {
+                depthRange.value = +depthRange.value + 1;
+                stopAnim();
+                refreshExplorer();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                document.getElementById('animBtn').click();
+            } else if (e.key.toLowerCase() === 'r') {
+                resetZoom();
+            }
+        }
+    });
+
     /********************** Box-dimension logic  **********************/
     const kRange = document.getElementById('kRange');
     const kVal = document.getElementById('kVal');
@@ -417,14 +904,35 @@
     const boxCtx = boxCv.getContext('2d');
     const dataBody = document.querySelector('#dataTbl tbody');
     const slopeTxt = document.getElementById('slopeTxt');
+    const resultsSection = document.getElementById('resultsSection');
+    const estimatedDim = document.getElementById('estimatedDim');
+    const errorDisplay = document.getElementById('errorDisplay');
+    const chartCanvas = document.getElementById('chartCv');
     let chart = null;
+
+    const THEORETICAL_DIM = Math.log(2) / Math.log(3);
+
+    function countBoxes(k) {
+        const s = 1 / 3 ** k;
+        const seg = cantorSegments(9); // Use max depth for accuracy
+        const boxes = Math.round(1 / s);
+        let occupied = 0;
+        
+        for (let i = 0; i < boxes; i++) {
+            const boxStart = i * s, boxEnd = (i + 1) * s;
+            const hit = seg.some(([segStart, segEnd]) => !(segEnd <= boxStart || segStart >= boxEnd));
+            if (hit) occupied++;
+        }
+        
+        return occupied;
+    }
 
     function updateBoxInfo() {
         const k = +kRange.value;
         kVal.textContent = k;
         const s = 1 / 3 ** k;
-        sDisp.innerHTML = `s = 1/3<sup>${k}</sup> &approx; ${s.toPrecision(4)}`;
-        const seg = cantorSegments(+depthRange.value);
+        sDisp.innerHTML = `s = 1/3<sup>${k}</sup> ≈ ${s.toPrecision(4)}`;
+        const seg = cantorSegments(9);
         const boxes = Math.round(1 / s);
         let occupied = 0;
 
@@ -437,8 +945,12 @@
             boxCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
             boxCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-            // 1. Draw the underlying Cantor Set
-            boxCtx.fillStyle = 'rgba(66, 66, 66, 0.5)'; // Semi-transparent dark grey
+            // Draw white background
+            boxCtx.fillStyle = '#ffffff';
+            boxCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            // 1. Draw the underlying Cantor Set with stronger color
+            boxCtx.fillStyle = 'rgba(15, 118, 110, 0.8)';
             seg.forEach(([a, b]) => {
                 boxCtx.fillRect(a * canvasWidth, canvasHeight * 0.25, (b-a) * canvasWidth, canvasHeight * 0.5);
             });
@@ -453,10 +965,11 @@
                 const w = canvasWidth / boxes;
 
                 if (hit) {
-                    boxCtx.fillStyle = 'rgba(21, 101, 192, 0.6)';
+                    boxCtx.fillStyle = 'rgba(249, 115, 22, 0.25)';
                     boxCtx.fillRect(xPos, 0, w, canvasHeight);
                 }
-                boxCtx.strokeStyle = '#bdbdbd';
+                boxCtx.strokeStyle = '#d1d5db';
+                boxCtx.lineWidth = 0.5;
                 boxCtx.strokeRect(xPos, 0, w, canvasHeight);
             }
             boxCtx.restore();
@@ -467,39 +980,75 @@
 
     kRange.oninput = updateBoxInfo;
 
-    document.getElementById('addRow').onclick = () => {
-        const k = +kRange.value;
-        const { occupied } = updateBoxInfo();
+    function addDataRow(k, highlight = false) {
+        // Check if this k value already exists
+        const existingRows = [...dataBody.children];
+        const exists = existingRows.some(row => +row.children[0].textContent === k);
+        if (exists) {
+            alert(`Data point for k = ${k} already exists in the table`);
+            return;
+        }
+
+        const occupied = countBoxes(k);
         const tr = document.createElement('tr');
         tr.innerHTML = `<td>${k}</td><td>1/3<sup>${k}</sup></td><td>${occupied}</td>`;
+        if (highlight) {
+            tr.classList.add('highlight-row');
+        }
         dataBody.appendChild(tr);
+    }
+
+    document.getElementById('addRow').onclick = () => {
+        const k = +kRange.value;
+        addDataRow(k, true);
     };
 
     function plotChart() {
         const rows = [...dataBody.children];
-        if (!rows.length) { alert('Add data first'); return; }
+        if (!rows.length) { 
+            alert('Please add some data points to the table first'); 
+            return; 
+        }
         const pts = rows.map(r => {
             const k = +r.children[0].textContent;
             const s = 1 / 3 ** k;
             const N = +r.children[2].textContent;
-            if (N === 0) return null; // Avoid log(0)
+            if (N === 0) return null;
             return { x: Math.log(1 / s), y: Math.log(N) };
-        }).filter(p => p !== null); // Filter out null points
+        }).filter(p => p !== null);
+        
+        chartCanvas.style.display = 'block';
         
         if (chart) chart.destroy();
-        chart = new Chart(document.getElementById('chartCv'), {
+        chart = new Chart(chartCanvas, {
             type: 'scatter',
-            data: { datasets: [{ data: pts, backgroundColor: '#1565c0' }] },
-            options: { scales: { x: { title: { display: true, text: 'log(1/s)' } }, y: { title: { display: true, text: 'log N(s)' } } }, plugins: { legend: { display: false } } }
+            data: { datasets: [{ data: pts, backgroundColor: '#0f766e', pointRadius: 6 }] },
+            options: { 
+                scales: { 
+                    x: { title: { display: true, text: 'log(1/s)' } }, 
+                    y: { title: { display: true, text: 'log N(s)' } } 
+                }, 
+                plugins: { legend: { display: false } } 
+            }
         });
         slopeTxt.textContent = '';
+        resultsSection.style.display = 'none';
     }
 
     document.getElementById('plotBtn').onclick = plotChart;
 
     document.getElementById('fitBtn').onclick = () => {
         const rows = [...dataBody.children];
-        if (rows.length < 2) { alert('Need at least 2 points'); return; }
+        if (rows.length < 2) { 
+            alert('Need at least 2 data points to fit a line'); 
+            return; 
+        }
+        
+        // First plot if not already done
+        if (!chart) {
+            plotChart();
+        }
+        
         const xs = [], ys = [];
         rows.forEach(r => {
             const k = +r.children[0].textContent;
@@ -510,36 +1059,70 @@
                  ys.push(Math.log(N));
             }
         });
-        if (xs.length < 2) { alert('Need at least 2 valid points (where N(s)>0)'); return; }
+        if (xs.length < 2) { 
+            alert('Need at least 2 valid points (where N(s) > 0)'); 
+            return; 
+        }
         const n = xs.length;
         const sumX = xs.reduce((a, b) => a + b, 0), sumY = ys.reduce((a, b) => a + b, 0);
         const sumXY = xs.reduce((a, b, i) => a + b * ys[i], 0);
         const sumX2 = xs.reduce((a, b) => a + b * b, 0);
         const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
         const b = (sumY - m * sumX) / n;
-        if (!chart) plotChart();
+        
         const minX = Math.min(...xs), maxX = Math.max(...xs);
-        chart.data.datasets[1] = { type: 'line', data: [{ x: minX, y: m * minX + b }, { x: maxX, y: m * maxX + b }], borderColor: '#d32f2f', borderDash: [6, 4], borderWidth: 2, pointRadius: 0 };
+        chart.data.datasets[1] = { 
+            type: 'line', 
+            data: [{ x: minX, y: m * minX + b }, { x: maxX, y: m * maxX + b }], 
+            borderColor: '#f97316', 
+            borderDash: [6, 4], 
+            borderWidth: 2, 
+            pointRadius: 0 
+        };
         chart.update();
-        slopeTxt.textContent = `Estimated dimension (slope) ≈ ${m.toFixed(4)}`;
+        
+        // Show results
+        resultsSection.style.display = 'block';
+        estimatedDim.textContent = `Estimated dimension: ${m.toFixed(4)}`;
+        
+        // Calculate error from theoretical
+        const error = Math.abs(m - THEORETICAL_DIM);
+        const percentError = (error / THEORETICAL_DIM * 100).toFixed(1);
+        errorDisplay.textContent = `Error: ${error.toFixed(4)} (${percentError}%)`;
     };
 
     document.getElementById('resetTbl').onclick = () => {
         dataBody.innerHTML = '';
         if (chart) { chart.destroy(); chart = null; }
         slopeTxt.textContent = '';
+        chartCanvas.style.display = 'none';
+        resultsSection.style.display = 'none';
     };
 
     /********************** Tabs logic & Responsiveness  **********************/
     function switchTab(id) {
         document.querySelectorAll('.tabs button').forEach(btn => btn.classList.toggle('active', btn.id === id));
-        document.querySelectorAll('.section').forEach(sec => sec.classList.toggle('active', sec.id === (id === 'tabExp' ? 'explorer' : 'dimension')));
+        document.querySelectorAll('.section').forEach(sec => {
+            if (id === 'tabIntro') {
+                sec.classList.toggle('active', sec.id === 'introduction');
+            } else if (id === 'tabExp') {
+                sec.classList.toggle('active', sec.id === 'explorer');
+            } else if (id === 'tabDim') {
+                sec.classList.toggle('active', sec.id === 'dimension');
+            }
+        });
+        // Update URL hash
+        const hashes = { 'tabIntro': 'intro', 'tabExp': 'explorer', 'tabDim': 'dimension' };
+        window.location.hash = hashes[id];
         // Resize canvas on tab switch to ensure correct dimensions
         resizeCanvases();
     }
     
+    // Make switchTab globally available for onclick handlers
+    window.switchTab = switchTab;
+    
     function resizeCanvases() {
-        [expCv, boxCv, document.getElementById('chartCv')].forEach(cv => {
+        [expCv, boxCv, chartCanvas].forEach(cv => {
             if (cv.offsetParent !== null) { // Only resize visible canvases
                 const dpr = window.devicePixelRatio || 1;
                 const rect = cv.getBoundingClientRect();
@@ -554,11 +1137,18 @@
     }
     
     window.addEventListener('DOMContentLoaded', function () {
+        // Set up tab handlers
+        document.getElementById('tabIntro').onclick = () => switchTab('tabIntro');
         document.getElementById('tabExp').onclick = () => switchTab('tabExp');
         document.getElementById('tabDim').onclick = () => switchTab('tabDim');
         
+        // Check URL hash
+        const hash = window.location.hash.slice(1);
+        if (hash === 'explorer') switchTab('tabExp');
+        else if (hash === 'dimension') switchTab('tabDim');
+        
         // Remove fixed canvas sizes from HTML to allow CSS to control them
-        [expCv, boxCv, document.getElementById('chartCv')].forEach(cv => {
+        [expCv, boxCv, chartCanvas].forEach(cv => {
             cv.removeAttribute('width');
             cv.removeAttribute('height');
         });
