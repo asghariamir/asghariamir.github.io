@@ -1126,7 +1126,7 @@ class GraphControlsAnimation {
         const pointY = h/2 - y * scale;
         
         const len = 120;
-        const screenSlope = -dy * scale / this.paperSpeed;
+        const screenSlope = dy * scale / this.paperSpeed;
         
         ctx.save();
         ctx.beginPath();
@@ -1134,8 +1134,8 @@ class GraphControlsAnimation {
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
         ctx.setLineDash([5, 5]);
-        ctx.moveTo(presentX - len, pointY + screenSlope * len);
-        ctx.lineTo(presentX + len, pointY - screenSlope * len);
+        ctx.moveTo(presentX - len, pointY - screenSlope * len);
+        ctx.lineTo(presentX + len, pointY + screenSlope * len);
         ctx.stroke();
         ctx.restore();
         
