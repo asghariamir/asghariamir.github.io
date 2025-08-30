@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sierpinski Dice - Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Mathswell app navbar styles -->
+    <style>
+      .mathswell-nav {
+        display: flex;
+        justify-content: center;
+        margin: .4rem 0 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+      .mathswell-nav .mw-link {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #0f766e;
+        padding: .3rem .7rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,.9);
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      }
+      .mathswell-nav .mw-link img {
+        display: block;
+      }
+    </style>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f7faf9;
+            color: #212121;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .app-header {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .app-title {
+            font-size: 2rem;
+            color: #0f766e;
+            margin-bottom: 8px;
+        }
+        
+        .app-subtitle {
+            color: #4b5563;
+            font-size: 1.1rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: #4b5563;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button:hover {
+            background: #e6fffb;
+        }
+        
+        .tab-button.active {
+            background: #0f766e;
+            color: white;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Content Sections */
+        .content-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #0f766e;
+            margin-bottom: 16px;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #0f766e;
+            margin: 20px 0 12px 0;
+        }
+        
+        /* Concept Cards */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+        
+        .concept-card {
+            background: #e6fffb;
+            border: 2px solid #0f766e;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(15,118,110,0.2);
+        }
+        
+        .concept-card h3 {
+            color: #0f766e;
+            margin-bottom: 8px;
+        }
+        
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-button {
+            padding: 12px 24px;
+            background: #0f766e;
+            color: white;
+            border: none;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background: #10b981;
+            transform: translateY(-2px);
+        }
+        
+        /* Interactive Demo */
+        .demo-container {
+            background: #e6fffb;
+            border: 2px solid #0f766e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .mini-canvas {
+            border: 1px solid #0f766e;
+            border-radius: 6px;
+            margin: 16px auto;
+            display: block;
+            background: white;
+            cursor: crosshair;
+        }
+        
+        /* Main Canvas */
+        .canvas-container {
+            background: white;
+            border: 2px solid #0f766e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        #main-canvas {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            display: block;
+            margin: 0 auto;
+            cursor: crosshair;
+        }
+        
+        /* Controls */
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .control-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .control-button {
+            padding: 10px 20px;
+            background: #0f766e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .control-button:hover {
+            background: #10b981;
+        }
+        
+        .control-button.secondary {
+            background: #e6fffb;
+            color: #0f766e;
+            border: 2px solid #0f766e;
+        }
+        
+        .control-button.secondary:hover {
+            background: #0f766e;
+            color: white;
+        }
+        
+        .control-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Slider */
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0f766e;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            background: #10b981;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0f766e;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .slider::-moz-range-thumb:hover {
+            background: #10b981;
+        }
+        
+        .slider-value {
+            background: #e6fffb;
+            color: #0f766e;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-weight: 600;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        /* Select */
+        .select-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        select {
+            padding: 8px 32px 8px 12px;
+            background: #e6fffb;
+            color: #0f766e;
+            border: 2px solid #0f766e;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+        
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0f766e;
+            pointer-events: none;
+        }
+        
+        /* Checkboxes */
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #4b5563;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        /* Stats */
+        .stats-display {
+            background: #e6fffb;
+            padding: 16px;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #4b5563;
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            color: #0f766e;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        /* Presets */
+        .preset-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 16px 0;
+        }
+        
+        .preset-pill {
+            padding: 8px 16px;
+            background: white;
+            color: #0f766e;
+            border: 2px solid #0f766e;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .preset-pill:hover {
+            background: #e6fffb;
+        }
+        
+        .preset-pill.active {
+            background: #0f766e;
+            color: white;
+        }
+        
+        /* Dice Display */
+        .dice-display {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border: 3px solid #0f766e;
+            border-radius: 8px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0f766e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 12px;
+            animation: none;
+        }
+        
+        .dice-display.rolling {
+            animation: diceRoll 0.5s ease;
+        }
+        
+        @keyframes diceRoll {
+            0%, 100% { transform: rotateX(0) rotateY(0); }
+            25% { transform: rotateX(20deg) rotateY(20deg); }
+            50% { transform: rotateX(-20deg) rotateY(-20deg); }
+            75% { transform: rotateX(10deg) rotateY(-10deg); }
+        }
+        
+        /* Key Insights */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .insight-box {
+            background: linear-gradient(135deg, #e6fffb 0%, #f0fdfa 100%);
+            border-left: 4px solid #0f766e;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .insight-box h4 {
+            color: #0f766e;
+            margin-bottom: 8px;
+        }
+        
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: #0f766e;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(28px);
+        }
+        
+        .toggle-label {
+            color: #4b5563;
+            font-weight: 500;
+        }
+        
+        .toggle-label.active {
+            color: #0f766e;
+            font-weight: 600;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-title {
+                font-size: 1.5rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .slider-container {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mathswell brand badge -->
+    <div style="display:flex;justify-content:center;margin:.75rem 0 1rem;
+                position:relative;z-index:1001;">
+      <a href="/" style="display:inline-flex;align-items:center;gap:.5rem;
+          text-decoration:none;font-weight:800;font-size:1.05rem;color:#0f766e;
+          padding:.4rem .8rem;border-radius:999px;background:#fff;
+          box-shadow:0 1px 4px rgba(0,0,0,.08);">
+        <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" style="display:block">
+        <span>MATHSWELL</span>
+      </a>
+    </div>
+    
+    <div class="app-container">
+        
+        <!-- Header -->
+        <div class="app-header">
+            <h1 class="app-title">🎲 Sierpinski Dice</h1>
+            <p class="app-subtitle">Roll dice, create a fractal — discover how randomness creates perfect patterns</p>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="introduction">Introduction</button>
+            <button class="tab-button" data-tab="game">Play the Game</button>
+            <button class="tab-button" data-tab="explore">Explore Patterns</button>
+        </div>
+        
+        <!-- Tab Content -->
+        <div id="introduction" class="tab-content active">
+            <div class="content-section">
+                <h2 class="section-title">What is the Sierpinski Triangle?</h2>
+                <p>The Sierpinski triangle is one of the most famous fractals — a shape that contains perfect copies of itself at every scale. What's amazing is that we can create this intricate pattern using nothing but dice rolls and a simple rule!</p>
+                
+                <div class="concept-cards">
+                    <div class="concept-card">
+                        <h3>🎯 The Rule</h3>
+                        <p>Pick a random vertex (1, 2, or 3) and move halfway from your current position toward that vertex. That's it!</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>🎲 The Randomness</h3>
+                        <p>Each dice roll (1-3) randomly selects which vertex to move toward. Despite the randomness, a pattern emerges.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>✨ The Magic</h3>
+                        <p>After just a few hundred random moves, the famous Sierpinski triangle pattern appears — order from chaos!</p>
+                    </div>
+                </div>
+                
+                <h3 class="section-subtitle">Try It Yourself!</h3>
+                <div class="demo-container">
+                    <p>Click anywhere in the triangle to place a starting point, then click "Roll Once" to see a single step:</p>
+                    <canvas id="intro-canvas" class="mini-canvas" width="300" height="260"></canvas>
+                    <div class="control-row" style="justify-content: center;">
+                        <button id="intro-roll" class="control-button">Roll Once</button>
+                        <div class="dice-display" id="intro-dice">?</div>
+                        <button id="intro-auto" class="control-button secondary">Auto Roll</button>
+                        <button id="intro-reset" class="control-button secondary">Reset</button>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Points: </span>
+                        <span class="stat-value" id="intro-points">0</span>
+                    </div>
+                </div>
+                
+                <div class="insights-grid">
+                    <div class="insight-box">
+                        <h4>🤔 Why Does This Work?</h4>
+                        <p>The "move halfway" rule creates a contraction mapping. Each iteration shrinks distances, causing points to converge into the fractal pattern. The randomness ensures we eventually visit all parts of the fractal.</p>
+                    </div>
+                    <div class="insight-box">
+                        <h4>🔍 Self-Similarity</h4>
+                        <p>Look closely at the pattern that emerges — you'll see that the whole triangle contains three smaller copies of itself, and each of those contains three even smaller copies, continuing infinitely!</p>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="switchTab('game')">Play the Full Game →</button>
+                    <button class="nav-button" onclick="switchTab('explore')">Explore Patterns →</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="game" class="tab-content">
+            <div class="content-section">
+                <h2 class="section-title">Play the Sierpinski Dice Game</h2>
+                
+                <div class="canvas-container">
+                    <canvas id="main-canvas" width="600" height="520"></canvas>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <button id="reset-btn" class="control-button secondary">Reset</button>
+                        <button id="play-pause-btn" class="control-button">Play</button>
+                        <button id="roll-once-btn" class="control-button">Roll Once</button>
+                        <div class="dice-display" id="main-dice">?</div>
+                    </div>
+                    
+                    <div class="control-row">
+                        <label>Speed:</label>
+                        <div class="slider-container">
+                            <input type="range" id="speed-slider" class="slider" min="1" max="100" value="10">
+                            <span class="slider-value" id="speed-value">10 pts/sec</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-row">
+                        <div class="toggle-container">
+                            <span class="toggle-label" id="mono-label">Monochrome</span>
+                            <div class="toggle-switch active" id="color-toggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                            <span class="toggle-label active" id="vertex-label">By Vertex</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <div class="stat-label">Points Plotted</div>
+                        <div class="stat-value" id="point-count">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Vertex 1</div>
+                        <div class="stat-value" id="vertex1-percent">0%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Vertex 2</div>
+                        <div class="stat-value" id="vertex2-percent">0%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Vertex 3</div>
+                        <div class="stat-value" id="vertex3-percent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="explore" class="tab-content">
+            <div class="content-section">
+                <h2 class="section-title">Explore Different Patterns</h2>
+                <p>Experiment with different starting conditions and variations of the chaos game!</p>
+                
+                <div class="preset-pills">
+                    <button class="preset-pill" data-variation="triangle">Classic Triangle</button>
+                    <button class="preset-pill" data-variation="square">Square (4 vertices)</button>
+                    <button class="preset-pill" data-variation="pentagon">Pentagon (5 vertices)</button>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="explore-canvas" width="600" height="520"></canvas>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <label>Movement Ratio:</label>
+                        <div class="slider-container">
+                            <input type="range" id="ratio-slider" class="slider" min="10" max="90" value="50">
+                            <span class="slider-value" id="ratio-value">50%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-row">
+                        <label>Number of Vertices:</label>
+                        <div class="slider-container">
+                            <input type="range" id="vertex-slider" class="slider" min="3" max="8" value="3">
+                            <span class="slider-value" id="vertex-value">3</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-row">
+                        <button id="explore-reset" class="control-button secondary">Reset</button>
+                        <button id="explore-play" class="control-button">Start Exploration</button>
+                        <button id="explore-step" class="control-button">Step</button>
+                    </div>
+                </div>
+                
+                <div class="insights-grid">
+                    <div class="insight-box">
+                        <h4>📐 Different Shapes</h4>
+                        <p>Try changing the number of vertices. With 4 vertices (square), you need special rules to avoid filling the entire area. With 5 or more, beautiful patterns emerge naturally!</p>
+                    </div>
+                    <div class="insight-box">
+                        <h4>🎚️ Movement Ratio</h4>
+                        <p>The classic Sierpinski uses 50% (halfway). Try other ratios — some create filled shapes, others create intricate lace-like patterns. What happens at 33% or 67%?</p>
+                    </div>
+                </div>
+                
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <div class="stat-label">Pattern Type</div>
+                        <div class="stat-value" id="pattern-type">Sierpinski</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Dimension</div>
+                        <div class="stat-value" id="fractal-dimension">1.585</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Points</div>
+                        <div class="stat-value" id="explore-points">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global configuration
+        const config = {
+            maxPoints: 100000,
+            canvasMargin: 40,
+            vertexRadius: 8,
+            pointSize: 1,
+            colors: {
+                primary: '#0f766e',
+                light: '#10b981',
+                background: '#e6fffb',
+                vertex1: '#ef4444',
+                vertex2: '#10b981', 
+                vertex3: '#3b82f6'
+            }
+        };
+        
+        // State management
+        const state = {
+            intro: {
+                points: [],
+                currentPoint: null,
+                vertexCounts: [0, 0, 0],
+                isPlaying: false,
+                lastDice: null
+            },
+            main: {
+                points: [],
+                currentPoint: null,
+                vertexCounts: [0, 0, 0],
+                isPlaying: false,
+                speed: 10,
+                colorMode: 'vertex',
+                lastDice: null
+            },
+            explore: {
+                points: [],
+                currentPoint: null,
+                vertexCount: 3,
+                ratio: 0.5,
+                isPlaying: false,
+                vertices: []
+            }
+        };
+        
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            
+            // Initialize canvases if needed
+            if (tabName === 'game' && !state.main.vertices) {
+                initMainGame();
+            } else if (tabName === 'explore' && !state.explore.vertices.length) {
+                initExplore();
+            }
+        }
+        
+        // Add tab button listeners
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        
+        // Introduction tab functionality
+        function initIntro() {
+            const canvas = document.getElementById('intro-canvas');
+            const ctx = canvas.getContext('2d');
+            const rollBtn = document.getElementById('intro-roll');
+            const autoBtn = document.getElementById('intro-auto');
+            const resetBtn = document.getElementById('intro-reset');
+            const diceDisplay = document.getElementById('intro-dice');
+            const pointsDisplay = document.getElementById('intro-points');
+            
+            // Calculate vertices for equilateral triangle
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) / 2 - config.canvasMargin;
+            
+            state.intro.vertices = [
+                { x: centerX, y: centerY - radius * 0.866, label: '1' },
+                { x: centerX - radius * 0.75, y: centerY + radius * 0.433, label: '2' },
+                { x: centerX + radius * 0.75, y: centerY + radius * 0.433, label: '3' }
+            ];
+            
+            let animationId = null;
+            
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw triangle outline
+                ctx.strokeStyle = config.colors.primary;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(state.intro.vertices[0].x, state.intro.vertices[0].y);
+                ctx.lineTo(state.intro.vertices[1].x, state.intro.vertices[1].y);
+                ctx.lineTo(state.intro.vertices[2].x, state.intro.vertices[2].y);
+                ctx.closePath();
+                ctx.stroke();
+                
+                // Draw vertices
+                state.intro.vertices.forEach((vertex, i) => {
+                    ctx.fillStyle = [config.colors.vertex1, config.colors.vertex2, config.colors.vertex3][i];
+                    ctx.beginPath();
+                    ctx.arc(vertex.x, vertex.y, config.vertexRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw labels
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(vertex.label, vertex.x, vertex.y);
+                });
+                
+                // Draw points
+                state.intro.points.forEach((point, i) => {
+                    ctx.fillStyle = config.colors.primary;
+                    ctx.globalAlpha = Math.min(1, 0.3 + (i / state.intro.points.length) * 0.7);
+                    ctx.fillRect(point.x - 1, point.y - 1, 2, 2);
+                });
+                ctx.globalAlpha = 1;
+                
+                // Draw current point
+                if (state.intro.currentPoint) {
+                    ctx.fillStyle = config.colors.light;
+                    ctx.beginPath();
+                    ctx.arc(state.intro.currentPoint.x, state.intro.currentPoint.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            function rollDice() {
+                const roll = Math.floor(Math.random() * 3);
+                state.intro.lastDice = roll + 1;
+                
+                // Animate dice
+                diceDisplay.classList.add('rolling');
+                setTimeout(() => {
+                    diceDisplay.textContent = state.intro.lastDice;
+                    diceDisplay.classList.remove('rolling');
+                }, 500);
+                
+                if (!state.intro.currentPoint) {
+                    // Set random starting point inside triangle
+                    const r1 = Math.random();
+                    const r2 = Math.random();
+                    const a = 1 - Math.sqrt(r1);
+                    const b = Math.sqrt(r1) * (1 - r2);
+                    const c = Math.sqrt(r1) * r2;
+                    
+                    state.intro.currentPoint = {
+                        x: a * state.intro.vertices[0].x + b * state.intro.vertices[1].x + c * state.intro.vertices[2].x,
+                        y: a * state.intro.vertices[0].y + b * state.intro.vertices[1].y + c * state.intro.vertices[2].y
+                    };
+                }
+                
+                // Move halfway to selected vertex
+                const targetVertex = state.intro.vertices[roll];
+                const newPoint = {
+                    x: (state.intro.currentPoint.x + targetVertex.x) / 2,
+                    y: (state.intro.currentPoint.y + targetVertex.y) / 2,
+                    vertex: roll
+                };
+                
+                state.intro.points.push(newPoint);
+                state.intro.currentPoint = newPoint;
+                state.intro.vertexCounts[roll]++;
+                
+                // Limit points
+                if (state.intro.points.length > 5000) {
+                    state.intro.points.shift();
+                }
+                
+                pointsDisplay.textContent = state.intro.points.length;
+                draw();
+            }
+            
+            function animate() {
+                if (state.intro.isPlaying) {
+                    rollDice();
+                    animationId = setTimeout(() => requestAnimationFrame(animate), 100);
+                }
+            }
+            
+            // Canvas click handler
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+                
+                state.intro.currentPoint = { x, y };
+                draw();
+            });
+            
+            rollBtn.addEventListener('click', rollDice);
+            
+            autoBtn.addEventListener('click', () => {
+                state.intro.isPlaying = !state.intro.isPlaying;
+                autoBtn.textContent = state.intro.isPlaying ? 'Stop' : 'Auto Roll';
+                if (state.intro.isPlaying) {
+                    animate();
+                } else {
+                    clearTimeout(animationId);
+                }
+            });
+            
+            resetBtn.addEventListener('click', () => {
+                state.intro.points = [];
+                state.intro.currentPoint = null;
+                state.intro.vertexCounts = [0, 0, 0];
+                state.intro.isPlaying = false;
+                state.intro.lastDice = null;
+                diceDisplay.textContent = '?';
+                pointsDisplay.textContent = '0';
+                autoBtn.textContent = 'Auto Roll';
+                clearTimeout(animationId);
+                draw();
+            });
+            
+            draw();
+        }
+        
+        // Main game functionality
+        function initMainGame() {
+            const canvas = document.getElementById('main-canvas');
+            const ctx = canvas.getContext('2d');
+            const playBtn = document.getElementById('play-pause-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const rollOnceBtn = document.getElementById('roll-once-btn');
+            const speedSlider = document.getElementById('speed-slider');
+            const speedValue = document.getElementById('speed-value');
+            const colorToggle = document.getElementById('color-toggle');
+            const monoLabel = document.getElementById('mono-label');
+            const vertexLabel = document.getElementById('vertex-label');
+            const diceDisplay = document.getElementById('main-dice');
+            
+            // Calculate vertices
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) / 2 - config.canvasMargin;
+            
+            state.main.vertices = [
+                { x: centerX, y: centerY - radius * 0.866, label: '1' },
+                { x: centerX - radius * 0.75, y: centerY + radius * 0.433, label: '2' },
+                { x: centerX + radius * 0.75, y: centerY + radius * 0.433, label: '3' }
+            ];
+            
+            let animationId = null;
+            let lastTime = performance.now();
+            let accumulator = 0;
+            
+            function getPointColor(point, index) {
+                switch (state.main.colorMode) {
+                    case 'vertex':
+                        return [config.colors.vertex1, config.colors.vertex2, config.colors.vertex3][point.vertex];
+                    default:
+                        return config.colors.primary;
+                }
+            }
+            
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw points
+                state.main.points.forEach((point, i) => {
+                    ctx.fillStyle = getPointColor(point, i);
+                    ctx.fillRect(point.x - 1, point.y - 1, 2, 2);
+                });
+                
+                // Draw vertices
+                state.main.vertices.forEach((vertex, i) => {
+                    ctx.fillStyle = [config.colors.vertex1, config.colors.vertex2, config.colors.vertex3][i];
+                    ctx.beginPath();
+                    ctx.arc(vertex.x, vertex.y, config.vertexRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(vertex.label, vertex.x, vertex.y);
+                });
+                
+                // Draw current point
+                if (state.main.currentPoint) {
+                    ctx.fillStyle = config.colors.light;
+                    ctx.strokeStyle = config.colors.primary;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(state.main.currentPoint.x, state.main.currentPoint.y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+                
+                updateStats();
+            }
+            
+            function rollDice() {
+                const roll = Math.floor(Math.random() * 3);
+                state.main.lastDice = roll + 1;
+                
+                // Update dice display
+                diceDisplay.classList.add('rolling');
+                setTimeout(() => {
+                    diceDisplay.textContent = state.main.lastDice;
+                    diceDisplay.classList.remove('rolling');
+                }, 200);
+                
+                if (!state.main.currentPoint) {
+                    // Random starting point
+                    const r1 = Math.random();
+                    const r2 = Math.random();
+                    const a = 1 - Math.sqrt(r1);
+                    const b = Math.sqrt(r1) * (1 - r2);
+                    const c = Math.sqrt(r1) * r2;
+                    
+                    state.main.currentPoint = {
+                        x: a * state.main.vertices[0].x + b * state.main.vertices[1].x + c * state.main.vertices[2].x,
+                        y: a * state.main.vertices[0].y + b * state.main.vertices[1].y + c * state.main.vertices[2].y
+                    };
+                }
+                
+                // Move halfway to selected vertex
+                const targetVertex = state.main.vertices[roll];
+                const newPoint = {
+                    x: (state.main.currentPoint.x + targetVertex.x) / 2,
+                    y: (state.main.currentPoint.y + targetVertex.y) / 2,
+                    vertex: roll
+                };
+                
+                state.main.points.push(newPoint);
+                state.main.currentPoint = newPoint;
+                state.main.vertexCounts[roll]++;
+                
+                // Limit points
+                if (state.main.points.length > config.maxPoints) {
+                    const removed = state.main.points.shift();
+                    state.main.vertexCounts[removed.vertex]--;
+                }
+            }
+            
+            function animate(currentTime) {
+                if (state.main.isPlaying) {
+                    const deltaTime = currentTime - lastTime;
+                    lastTime = currentTime;
+                    accumulator += deltaTime;
+                    
+                    const pointsPerFrame = (state.main.speed / 60) * (deltaTime / 16.67);
+                    const pointsToAdd = Math.floor(pointsPerFrame + accumulator / 1000);
+                    accumulator = accumulator % 1000;
+                    
+                    for (let i = 0; i < pointsToAdd; i++) {
+                        rollDice();
+                    }
+                    
+                    draw();
+                    animationId = requestAnimationFrame(animate);
+                }
+            }
+            
+            function updateStats() {
+                document.getElementById('point-count').textContent = state.main.points.length;
+                
+                const total = state.main.vertexCounts.reduce((a, b) => a + b, 0);
+                if (total > 0) {
+                    document.getElementById('vertex1-percent').textContent = 
+                        Math.round((state.main.vertexCounts[0] / total) * 100) + '%';
+                    document.getElementById('vertex2-percent').textContent = 
+                        Math.round((state.main.vertexCounts[1] / total) * 100) + '%';
+                    document.getElementById('vertex3-percent').textContent = 
+                        Math.round((state.main.vertexCounts[2] / total) * 100) + '%';
+                }
+            }
+            
+            // Event listeners
+            playBtn.addEventListener('click', () => {
+                state.main.isPlaying = !state.main.isPlaying;
+                playBtn.textContent = state.main.isPlaying ? 'Pause' : 'Play';
+                if (state.main.isPlaying) {
+                    lastTime = performance.now();
+                    animate(lastTime);
+                } else {
+                    cancelAnimationFrame(animationId);
+                }
+            });
+            
+            resetBtn.addEventListener('click', () => {
+                state.main.points = [];
+                state.main.currentPoint = null;
+                state.main.vertexCounts = [0, 0, 0];
+                state.main.isPlaying = false;
+                playBtn.textContent = 'Play';
+                diceDisplay.textContent = '?';
+                cancelAnimationFrame(animationId);
+                draw();
+            });
+            
+            rollOnceBtn.addEventListener('click', () => {
+                rollDice();
+                draw();
+            });
+            
+            speedSlider.addEventListener('input', (e) => {
+                state.main.speed = parseInt(e.target.value);
+                speedValue.textContent = state.main.speed + ' pts/sec';
+            });
+            
+            colorToggle.addEventListener('click', () => {
+                colorToggle.classList.toggle('active');
+                const isVertex = colorToggle.classList.contains('active');
+                state.main.colorMode = isVertex ? 'vertex' : 'monochrome';
+                
+                // Update labels
+                monoLabel.classList.toggle('active', !isVertex);
+                vertexLabel.classList.toggle('active', isVertex);
+                
+                draw();
+            });
+            
+            // Canvas click
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+                
+                state.main.currentPoint = { x, y };
+                draw();
+            });
+            
+            draw();
+        }
+        
+        // Explore tab functionality
+        function initExplore() {
+            const canvas = document.getElementById('explore-canvas');
+            const ctx = canvas.getContext('2d');
+            const resetBtn = document.getElementById('explore-reset');
+            const playBtn = document.getElementById('explore-play');
+            const stepBtn = document.getElementById('explore-step');
+            const ratioSlider = document.getElementById('ratio-slider');
+            const ratioValue = document.getElementById('ratio-value');
+            const vertexSlider = document.getElementById('vertex-slider');
+            const vertexValue = document.getElementById('vertex-value');
+            
+            let animationId = null;
+            
+            function generateVertices(n) {
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = Math.min(canvas.width, canvas.height) / 2 - config.canvasMargin;
+                
+                const vertices = [];
+                for (let i = 0; i < n; i++) {
+                    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
+                    vertices.push({
+                        x: centerX + radius * Math.cos(angle),
+                        y: centerY + radius * Math.sin(angle),
+                        label: String(i + 1)
+                    });
+                }
+                return vertices;
+            }
+            
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw points
+                state.explore.points.forEach((point, i) => {
+                    const hue = (point.vertex / state.explore.vertexCount) * 360;
+                    ctx.fillStyle = `hsl(${hue}, 70%, 50%)`;
+                    ctx.fillRect(point.x - 1, point.y - 1, 2, 2);
+                });
+                
+                // Draw vertices
+                state.explore.vertices.forEach((vertex, i) => {
+                    const hue = (i / state.explore.vertexCount) * 360;
+                    ctx.fillStyle = `hsl(${hue}, 70%, 50%)`;
+                    ctx.beginPath();
+                    ctx.arc(vertex.x, vertex.y, config.vertexRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(vertex.label, vertex.x, vertex.y);
+                });
+                
+                // Update stats
+                document.getElementById('explore-points').textContent = state.explore.points.length;
+                
+                // Update fractal dimension (approximate)
+                if (state.explore.vertexCount === 3 && state.explore.ratio === 0.5) {
+                    document.getElementById('fractal-dimension').textContent = '1.585';
+                    document.getElementById('pattern-type').textContent = 'Sierpinski';
+                } else if (state.explore.vertexCount === 4) {
+                    document.getElementById('pattern-type').textContent = 'Square Chaos';
+                    document.getElementById('fractal-dimension').textContent = '~2.0';
+                } else if (state.explore.vertexCount === 5) {
+                    document.getElementById('pattern-type').textContent = 'Pentagon';
+                    document.getElementById('fractal-dimension').textContent = '~1.86';
+                } else {
+                    document.getElementById('pattern-type').textContent = 'Custom';
+                    document.getElementById('fractal-dimension').textContent = '?';
+                }
+            }
+            
+            function step() {
+                if (!state.explore.currentPoint) {
+                    // Random starting point
+                    state.explore.currentPoint = {
+                        x: canvas.width / 2 + (Math.random() - 0.5) * 100,
+                        y: canvas.height / 2 + (Math.random() - 0.5) * 100
+                    };
+                }
+                
+                // Select random vertex
+                const vertexIndex = Math.floor(Math.random() * state.explore.vertexCount);
+                const targetVertex = state.explore.vertices[vertexIndex];
+                
+                // Move by ratio toward vertex
+                const newPoint = {
+                    x: state.explore.currentPoint.x + (targetVertex.x - state.explore.currentPoint.x) * state.explore.ratio,
+                    y: state.explore.currentPoint.y + (targetVertex.y - state.explore.currentPoint.y) * state.explore.ratio,
+                    vertex: vertexIndex
+                };
+                
+                state.explore.points.push(newPoint);
+                state.explore.currentPoint = newPoint;
+                
+                // Limit points
+                if (state.explore.points.length > 50000) {
+                    state.explore.points.shift();
+                }
+            }
+            
+            function animate() {
+                if (state.explore.isPlaying) {
+                    for (let i = 0; i < 10; i++) {
+                        step();
+                    }
+                    draw();
+                    animationId = requestAnimationFrame(animate);
+                }
+            }
+            
+            // Event listeners
+            resetBtn.addEventListener('click', () => {
+                state.explore.points = [];
+                state.explore.currentPoint = null;
+                state.explore.isPlaying = false;
+                playBtn.textContent = 'Start Exploration';
+                cancelAnimationFrame(animationId);
+                draw();
+            });
+            
+            playBtn.addEventListener('click', () => {
+                state.explore.isPlaying = !state.explore.isPlaying;
+                playBtn.textContent = state.explore.isPlaying ? 'Stop' : 'Start Exploration';
+                if (state.explore.isPlaying) {
+                    animate();
+                } else {
+                    cancelAnimationFrame(animationId);
+                }
+            });
+            
+            stepBtn.addEventListener('click', () => {
+                step();
+                draw();
+            });
+            
+            ratioSlider.addEventListener('input', (e) => {
+                state.explore.ratio = parseInt(e.target.value) / 100;
+                ratioValue.textContent = e.target.value + '%';
+            });
+            
+            vertexSlider.addEventListener('input', (e) => {
+                state.explore.vertexCount = parseInt(e.target.value);
+                vertexValue.textContent = e.target.value;
+                state.explore.vertices = generateVertices(state.explore.vertexCount);
+                state.explore.points = [];
+                state.explore.currentPoint = null;
+                draw();
+            });
+            
+            // Variation presets
+            document.querySelectorAll('[data-variation]').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    const variation = pill.dataset.variation;
+                    switch (variation) {
+                        case 'triangle':
+                            vertexSlider.value = 3;
+                            ratioSlider.value = 50;
+                            break;
+                        case 'square':
+                            vertexSlider.value = 4;
+                            ratioSlider.value = 50;
+                            break;
+                        case 'pentagon':
+                            vertexSlider.value = 5;
+                            ratioSlider.value = 50;
+                            break;
+                    }
+                    
+                    state.explore.vertexCount = parseInt(vertexSlider.value);
+                    state.explore.ratio = parseInt(ratioSlider.value) / 100;
+                    vertexValue.textContent = vertexSlider.value;
+                    ratioValue.textContent = ratioSlider.value + '%';
+                    state.explore.vertices = generateVertices(state.explore.vertexCount);
+                    state.explore.points = [];
+                    state.explore.currentPoint = null;
+                    draw();
+                });
+            });
+            
+            // Initialize
+            state.explore.vertices = generateVertices(3);
+            draw();
+        }
+        
+        // Initialize the intro on load
+        initIntro();
+    </script>
+</body>
+</html>
