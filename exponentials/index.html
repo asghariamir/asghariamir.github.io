@@ -1,406 +1,1394 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
-<link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Polynomials vs. Exponentials Explorer</title>
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <style>
-    :root {
-      --primary-color: #1565c0; /* Blue */
-      --light-gray: #f5f5f5;
-      --medium-gray: #e0e0e0;
-      --dark-gray: #424242;
-      --text-color: #212121;
-      --accent-orange: #ed6600;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polynomials vs. Exponentials | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+        }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      background-color: var(--light-gray);
-      color: var(--text-color);
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 1rem;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
 
-    .container {
-      width: 100%;
-      max-width: 1000px;
-      background-color: #fff;
-      box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
-      border-radius: 8px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-    }
+        /* Mathswell Navigation Badge */
+        .mathswell-nav {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-    h2 { text-align:center; font-size:1.75rem; color:var(--primary-color); margin-bottom:1rem; }
+        .mw-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            background: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
 
-    /* Tabs */
-    .tabs { display:flex; gap:0.5rem; margin-bottom:1rem; }
-    .tab-btn {
-      flex:1; padding:0.6rem 0.5rem; border:none; border-radius:6px 6px 0 0;
-      background:var(--medium-gray); color:var(--dark-gray); font-weight:600; cursor:pointer;
-    }
-    .tab-btn.active { background:var(--primary-color); color:#fff; }
-    .tab-content { padding:0.5rem 0; }
-    .hidden { display:none; }
+        .mw-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
 
-    /* Info Boxes */
-    .info-box {
-      background:var(--medium-gray);
-      border-left:6px solid var(--primary-color);
-      padding:0.75rem 1rem; border-radius:4px; margin-bottom:1rem; font-size:0.95rem;
-    }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem 2rem;
+        }
 
-    /* Controls */
-    .controls, .fd-controls {
-      background-color: var(--medium-gray);
-      border-radius: 6px;
-      padding: 0.6rem;
-      margin-bottom: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem 1rem;
-      align-items:center; font-size:0.95rem;
-      justify-content: center;
-    }
-    .controls label, .fd-controls label { display:flex; align-items:center; gap:0.35rem; cursor:pointer; }
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
 
-    /* Square buttons for polynomial choice */
-    .square-btn {
-      border:2px solid var(--primary-color);
-      border-radius:4px; padding:0.3rem 0.6rem; user-select:none;
-    }
-    .square-btn input { display:none; }
-    .square-btn span { color:var(--primary-color); font-weight:600; }
-    .square-btn.checked {
-      background:var(--primary-color);
-      border-color:var(--primary-color);
-    }
-    .square-btn.checked span { color:#fff; }
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
 
-    /* Tables */
-    .fd-section { margin-bottom:2rem; }
-    table { border-collapse:collapse; font-size:0.85rem; margin:0 auto; }
-    table th, table td { border:1px solid var(--medium-gray); padding:0.3rem 0.4rem; text-align:right; min-width:2.6rem; }
-    table th.func-label { background:var(--primary-color); color:#fff; text-align:center; }
-    .ellipsis { text-align:center !important; font-weight:600; }
+        .tab-btn:hover {
+            background: var(--interactive);
+        }
 
-    /* Canvas */
-    .chart-box { position:relative; width:100%; max-width:600px; margin:0 auto; }
-    .chart-box canvas { width:100% !important; height:auto !important; aspect-ratio:1 / 1; }
-  </style>
-   <!-- Mathswell favicon -->
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
 
-<!-- Mathswell app navbar styles -->
-<style>
-  .mathswell-nav {
-    display: flex;
-    justify-content: center;
-    margin: .4rem 0 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  .mathswell-nav .mw-link {
-    display: inline-flex;
-    align-items: center;
-    gap: .45rem;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1rem;
-    color: #0f766e;
-    padding: .3rem .7rem;
-    border-radius: 999px;
-    background: rgba(255,255,255,.9);
-    box-shadow: 0 1px 4px rgba(0,0,0,.08);
-  }
-  .mathswell-nav .mw-link img {
-    display: block;
-  }
-</style>
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Section */
+        .hero {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Concept Cards */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .concept-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+            transition: all 0.2s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .concept-card .math {
+            background: var(--interactive);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Interactive Demo */
+        .demo-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Slider Control */
+        .slider-control {
+            background: var(--interactive);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--primary-light);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        /* Navigation CTAs */
+        .nav-ctas {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        /* Explorer Controls - More Attractive */
+        .controls-section {
+            background: linear-gradient(135deg, white 0%, var(--interactive) 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--primary-light);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .control-group strong {
+            color: var(--primary);
+            min-width: 150px;
+            font-size: 1.1rem;
+        }
+
+        .control-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .control-group label:hover {
+            background: var(--interactive);
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .slider-group strong {
+            color: var(--primary);
+            min-width: 150px;
+            font-size: 1.1rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Charts */
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-box {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            height: 400px;
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            max-width: 700px;
+        }
+
+        th, td {
+            padding: 0.5rem;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        td {
+            background: white;
+        }
+
+        tr:nth-child(even) td {
+            background: var(--interactive);
+        }
+
+        .notation-note {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .func-selector {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .func-btn {
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .func-btn:hover, .func-btn.active {
+            background: var(--interactive);
+        }
+
+        /* Challenge Section */
+        .challenge-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .challenge-question {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Improved Challenge Button Layout */
+        .challenge-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--interactive);
+        }
+
+        .feedback-box {
+            background: var(--interactive);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .feedback-box.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .graph-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .graph-option {
+            padding: 1rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-weight: 600;
+            background: white;
+        }
+
+        .graph-option:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+
+        .graph-option.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Change comparison cards for intro */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .comparison-card {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .comparison-card h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .value-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin: 0.5rem 0;
+        }
+
+        .change-info {
+            background: var(--interactive);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .change-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .change-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-amber);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .concept-cards { grid-template-columns: 1fr; }
+            .nav-ctas { flex-direction: column; }
+            .control-group { flex-direction: column; align-items: flex-start; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            .graph-options { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Polynomials vs. Exponentials Explorer</h2>
-    <!-- Mathswell brand badge -->
-<div style="display:flex;justify-content:center;margin:.75rem 0 1rem;
-            position:relative;z-index:1001;">
-  <a href="/" style="display:inline-flex;align-items:center;gap:.5rem;
-      text-decoration:none;font-weight:800;font-size:1.05rem;color:#0f766e;
-      padding:.4rem .8rem;border-radius:999px;background:#fff;
-      box-shadow:0 1px 4px rgba(0,0,0,.08);">
-    <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" style="display:block">
-    <span>MATHSWELL</span>
-  </a>
-</div>
-
-
-    <!-- Tab buttons -->
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="fdTab">Finite Differences</button>
-      <button class="tab-btn" data-tab="graphTab">Continuous Graphs</button>
+    <!-- Mathswell Navigation Badge -->
+    <div class="mathswell-nav">
+        <a href="https://mathswell.com" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28">
+            <span>MATHSWELL</span>
+        </a>
     </div>
-
-    <!-- Finite Differences Tab -->
-    <div id="fdTab" class="tab-content">
-      <div class="info-box">
-        For polynomials the finite‑difference process eventually reaches zero (x³ needs a 3rd difference; x² a 2nd).  
-        For an exponential like 2ˣ each new row is the previous row shifted one step and multiplied by the same constant, so the pattern never ends.
-      </div>
-
-      <!-- Polynomial section -->
-      <div class="fd-section">
-        <div class="fd-controls">
-          <strong>Choose polynomial:</strong>
-          <label class="square-btn checked"><input type="radio" name="poly" value="x2" checked><span>x²</span></label>
-          <label class="square-btn"><input type="radio" name="poly" value="x3"><span>x³</span></label>
+    
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="intro">Introduction</button>
+            <button class="tab-btn" data-tab="explorer">Explorer</button>
+            <button class="tab-btn" data-tab="challenge">Challenge</button>
         </div>
-        <div id="polyTable"></div>
-      </div>
-
-      <!-- 2^x section -->
-      <div class="fd-section">
-        <div class="fd-controls">
-          <strong>2ˣ Finite Differences</strong>
-          <label style="gap:0.3rem;">Levels to show:
-            <input type="number" id="expLevels" value="6" min="1" max="10" style="width:4rem;" />
-          </label>
+        
+        <!-- Introduction Tab -->
+        <div id="intro" class="tab-content active">
+            <div class="hero">
+                <h1>Polynomials vs. Exponentials</h1>
+                <p>Compare two fundamentally different types of growth: polynomial functions where x is the base, and exponential functions where x is in the exponent.</p>
+            </div>
+            
+            <!-- Only TWO boxes at the top -->
+            <div class="concept-cards" style="grid-template-columns: 1fr 1fr; max-width: 800px; margin: 0 auto 2rem;">
+                <div class="concept-card">
+                    <h3>📐 Polynomial Functions</h3>
+                    <div class="math" id="poly-example"></div>
+                    <p><strong>The base is the variable (x), and the exponent is the constant.</strong></p>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>📈 Exponential Functions</h3>
+                    <div class="math" id="exp-example"></div>
+                    <p><strong>The base is the constant, and the exponent is the variable (x).</strong></p>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h2 style="color: var(--primary); margin-bottom: 1rem;">Interactive Comparison</h2>
+                
+                <!-- NEW: Slider control -->
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span style="font-weight: 600;">Adjust value of x:</span>
+                        <span class="slider-value" id="xValue">10</span>
+                    </div>
+                    <input type="range" id="xSlider" min="1" max="30" value="10" step="1">
+                </div>
+                
+                <!-- Comparison cards showing values and changes -->
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>x² (Polynomial)</h4>
+                        <div class="value-display" id="x2-value">100</div>
+                        <div class="change-info">
+                            <div class="change-label">Change from x to x+1:</div>
+                            <div class="change-value" id="x2-change">+21</div>
+                        </div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>2ˣ (Exponential)</h4>
+                        <div class="value-display" id="2x-value">1,024</div>
+                        <div class="change-info">
+                            <div class="change-label">Change from x to x+1:</div>
+                            <div class="change-value" id="2x-change">+1,024</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-box">
+                    <canvas id="introChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Key difference AFTER the graph -->
+            <div class="concept-card" style="max-width: 800px; margin: 2rem auto;">
+                <h3 style="color: var(--primary);">⚡ Understanding the Comparison</h3>
+                <p>Move the slider to see how the functions behave at different values of x. Notice:</p>
+                <p><strong>1. Polynomial growth:</strong> The change itself is a polynomial of one degree less. For x², the change is linear (2x + 1). For x³, the change would be quadratic. You'll see this pattern clearly in the Finite Differences table in the Explorer tab.</p>
+                <p><strong>2. Exponential growth:</strong> The change always equals a constant times the current value. For 2ˣ, each change equals the current value (multiplier = 1). For 3ˣ, each change equals 2× the current value.</p>
+            </div>
+            
+            <div class="nav-ctas">
+                <button class="nav-btn" onclick="switchTab('explorer')">
+                    Explore Functions →
+                </button>
+                <button class="nav-btn" onclick="switchTab('challenge')">
+                    Test Your Understanding →
+                </button>
+            </div>
         </div>
-        <div id="expTable"></div>
-      </div>
+        
+        <!-- Explorer Tab -->
+        <div id="explorer" class="tab-content">
+            <div class="controls-section">
+                <h2 style="color: var(--primary); margin-bottom: 1.5rem; text-align: center;">🔬 Function Explorer</h2>
+                <div class="control-group">
+                    <strong>📐 Polynomials:</strong>
+                    <label><input type="checkbox" class="func-check" data-func="x2" checked> x²</label>
+                    <label><input type="checkbox" class="func-check" data-func="x3" checked> x³</label>
+                </div>
+                <div class="control-group">
+                    <strong>📈 Growth:</strong>
+                    <label><input type="checkbox" class="func-check" data-func="2x" checked> 2ˣ</label>
+                    <label><input type="checkbox" class="func-check" data-func="3x"> 3ˣ</label>
+                    <label><input type="checkbox" class="func-check" data-func="ex"> eˣ</label>
+                </div>
+                <div class="control-group">
+                    <strong>📉 Decay:</strong>
+                    <label><input type="checkbox" class="func-check" data-func="halfx"> (1/2)ˣ</label>
+                    <label><input type="checkbox" class="func-check" data-func="thirdx"> (1/3)ˣ</label>
+                </div>
+                <div class="slider-group">
+                    <strong>🎚️ X-axis range:</strong>
+                    <input type="range" id="xRange" min="5" max="20" value="10" step="1">
+                    <span id="rangeValue" style="font-weight: bold; color: var(--primary); font-size: 1.2rem;">±10</span>
+                </div>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="resetExplorer()">🔄 Reset</button>
+                    <button class="btn-secondary" onclick="autoFit()">📊 Auto-fit Y-axis</button>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-box">
+                    <canvas id="explorerChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">Finite Differences Table</h3>
+                <div class="func-selector">
+                    <strong>Function:</strong>
+                    <button class="func-btn active" onclick="selectFDFunction('x2', this)">x²</button>
+                    <button class="func-btn" onclick="selectFDFunction('x3', this)">x³</button>
+                    <button class="func-btn" onclick="selectFDFunction('2x', this)">2ˣ</button>
+                </div>
+                <div id="fdTable"></div>
+                <p class="notation-note">Notation: Δf means the first difference (f(x+1) - f(x)), Δ²f means the second difference (difference of differences), and so on.</p>
+            </div>
+            
+            <!-- Comparison table showing ratios f(x+1)/f(x) -->
+            <div class="table-container">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">Comparing Growth Patterns Using Ratios</h3>
+                <div id="comparisonTable"></div>
+                <p class="notation-note">The ratio shows f(x+1)/f(x) - how much the function multiplies when x increases by 1</p>
+            </div>
+            
+            <!-- Two Ways to Analyze Growth -->
+            <div class="demo-section">
+                <h2 style="color: var(--primary); margin-bottom: 1rem;">Two Ways to Analyze Growth</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+                    <div>
+                        <h3 style="color: var(--primary-light);">🔢 Using Differences</h3>
+                        <p>Look at the Finite Differences table above. For polynomials, repeated differences eventually become constant (x² reaches constant at Δ²f, x³ at Δ³f). For exponentials, each difference equals (base - 1) times the current value. For 2ˣ, that's (2-1) = 1 times the value, so differences equal the values themselves. For 3ˣ, that's (3-1) = 2 times the value.</p>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--primary-light);">📊 Using Ratios</h3>
+                        <p>Look at the Ratio columns in the comparison table. For 2ˣ, f(x+1)/f(x) always equals 2.00. For x², the ratio decreases: 2.25, 1.78, 1.56... approaching 1 as x gets large.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Challenge Tab - Graph Recognition Only -->
+        <div id="challenge" class="tab-content">
+            <div class="challenge-card">
+                <h2 style="color: var(--primary); margin-bottom: 1.5rem;">Graph Recognition Challenge</h2>
+                <div class="challenge-question" id="challenge-question">Which function does this graph represent?</div>
+                
+                <div class="chart-box" style="height: 350px;">
+                    <canvas id="mysteryChart"></canvas>
+                </div>
+                
+                <div class="graph-options" id="graph-options">
+                    <div class="graph-option" data-func="x2">x²</div>
+                    <div class="graph-option" data-func="x3">x³</div>
+                    <div class="graph-option" data-func="2x">2ˣ</div>
+                    <div class="graph-option" data-func="3x">3ˣ</div>
+                    <div class="graph-option" data-func="halfx">(1/2)ˣ</div>
+                    <div class="graph-option" data-func="ex">eˣ</div>
+                </div>
+                
+                <div class="feedback-box" id="graph-feedback"></div>
+                
+                <div class="challenge-buttons">
+                    <button class="btn-primary" onclick="newGraphChallenge()">New Graph</button>
+                    <button class="btn-secondary" onclick="getGraphHint()">Get Hint</button>
+                </div>
+            </div>
+            
+            <!-- Additional Challenge Info -->
+            <div class="concept-card" style="max-width: 800px; margin: 2rem auto;">
+                <h3 style="color: var(--primary);">🎯 Tips for Graph Recognition</h3>
+                <p><strong>Polynomials (x², x³):</strong></p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                    <li>x²: U-shaped parabola, symmetric around x = 0</li>
+                    <li>x³: S-shaped curve, passes through origin, different on each side</li>
+                </ul>
+                <p><strong>Exponentials (2ˣ, 3ˣ, eˣ):</strong></p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                    <li>Growth: Always positive, increases rapidly for positive x</li>
+                    <li>Decay ((1/2)ˣ): Always positive, decreases toward 0 for positive x</li>
+                    <li>All pass through point (0, 1) since any number to power 0 equals 1</li>
+                </ul>
+            </div>
+        </div>
     </div>
-
-    <!-- Continuous Graphs Tab -->
-    <div id="graphTab" class="tab-content hidden">
-      <div class="info-box">
-        Toggle any combination of functions. The centred axes make growth‑rate comparisons immediate.
-      </div>
-
-      <!-- Main graph controls -->
-      <div class="controls" id="graphControls">
-        <strong>Select Functions:</strong>
-        <label><input type="checkbox" data-func="x2" checked /> x²</label>
-        <label><input type="checkbox" data-func="x3" checked /> x³</label>
-        <label><input type="checkbox" data-func="exp" checked /> eˣ</label>
-        <label><input type="checkbox" data-func="2x" checked /> 2ˣ</label>
-        <label><input type="checkbox" data-func="3x" checked /> 3ˣ</label>
-      </div>
-      <div class="chart-box"><canvas id="chartMain"></canvas></div>
-
-      <!-- a^x exploration -->
-      <div class="info-box" style="margin-top:2rem;">
-        Compare growth and decay of <em>a<sup>x</sup></em> for 0 &lt; a &lt; 1 and a &gt; 1. View (½)<sup>x</sup>, 2<sup>x</sup>, plus a custom base of your choice.
-      </div>
-      <div class="controls" id="axControls">
-        <label><input type="checkbox" id="toggleHalf" checked> (½)ˣ</label>
-        <label><input type="checkbox" id="toggleTwo" checked> 2ˣ</label>
-        <label>Choose a:
-          <input type="number" id="baseA" value="4" min="0.1" max="6" step="0.1" style="width:5rem;" />
-        </label>
-      </div>
-      <div class="chart-box"><canvas id="chartAx"></canvas></div>
-    </div>
-  </div>
-
-<script>
-/***************** Chart.js plugin: centred axes with arrowheads *****************/
-const axesArrows = {
-  id: 'axesArrows',
-  beforeDraw(chart) {
-    const { ctx, chartArea:{top,bottom,left,right}, scales:{x,y} } = chart;
-    ctx.save();
-    ctx.strokeStyle = 'rgba(0,0,0,0.7)';
-    ctx.lineWidth = 1.2;
-    const arrow = 6;
-    const xZero = x.getPixelForValue(0);
-    const yZero = y.getPixelForValue(0);
-    // y‑axis
-    ctx.beginPath(); ctx.moveTo(xZero, top); ctx.lineTo(xZero, bottom); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(xZero, top); ctx.lineTo(xZero - arrow, top + arrow * 1.2); ctx.lineTo(xZero + arrow, top + arrow * 1.2); ctx.stroke();
-    // x‑axis
-    ctx.beginPath(); ctx.moveTo(left, yZero); ctx.lineTo(right, yZero); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(right, yZero); ctx.lineTo(right - arrow * 1.2, yZero - arrow); ctx.lineTo(right - arrow * 1.2, yZero + arrow); ctx.stroke();
-    ctx.restore();
-  }
-};
-Chart.register(axesArrows);
-
-/***************** Helpers *****************/
-const COLORS = {
-  x2   : 'rgba(21,101,192,1)',
-  x3   : 'rgba(21,101,192,0.6)',
-  exp  : 'rgba(237,102,0,1)',
-  '2x' : 'rgba(237,102,0,0.8)',
-  '3x' : 'rgba(237,102,0,0.55)',
-  halfx: 'rgba(21,101,192,0.5)',
-  ax   : 'rgba(66,66,66,0.85)'
-};
-const RANGE = 8; // –RANGE … +RANGE for x‑axis
-const YMAX = 300; // symmetric y‑range for square plot
-
-function evalFunc(key, x, a = 2) {
-  switch (key) {
-    case 'x2': return x ** 2;
-    case 'x3': return x ** 3;
-    case 'exp': return Math.E ** x;
-    case '2x': return 2 ** x;
-    case '3x': return 3 ** x;
-    case 'halfx': return 0.5 ** x;
-    case 'ax': return a ** x;
-    default: return 0;
-  }
-}
-function formatPow2(exp) {
-  return exp < 0 ? `1/${2 ** (-exp)}` : `${2 ** exp}`;
-}
-
-/***************** Finite‑difference builders *****************/
-function buildPolyTable(func) {
-  const xs = [...Array(6).keys()];
-  const firstRow = xs.map(x => func === 'x2' ? x ** 2 : x ** 3);
-  const rows = [firstRow];
-  let current = firstRow;
-  while (!current.every(v => v === 0)) {
-    const next = current.slice(1).map((v,i) => current[i+1] - current[i]);
-    rows.push(next);
-    current = next;
-  }
-  let html = `<table><thead><tr><th class="func-label" colspan="${xs.length}">${func === 'x2' ? 'x²' : 'x³'}</th></tr></thead><tbody>`;
-  rows.forEach(r => {
-    html += '<tr>'; r.forEach(v => html += `<td>${v}</td>`); html += '</tr>'; });
-  html += '</tbody></table>';
-  document.getElementById('polyTable').innerHTML = html;
-}
-
-function buildExpTable(levels) {
-  const xs = Array.from({length:11}, (_,i) => i-5); // –5 … 5
-  const rows = [];
-  for (let k=0;k<levels;k++) {
-    rows.push(xs.map(x => 2 ** (x+k)));
-  }
-  let html = `<table><thead><tr><th class="func-label" colspan="13">2ˣ</th></tr></thead><tbody>`;
-  rows.forEach(r=>{
-    html += '<tr><td class="ellipsis">…</td>';
-    r.forEach(expVal=> html += `<td>${formatPow2(Math.log2(expVal))}</td>`);
-    html += '<td class="ellipsis">…</td></tr>';
-  });
-  html += '</tbody></table>';
-  document.getElementById('expTable').innerHTML = html;
-}
-
-/***************** Chart builders *****************/
-let chartMain=null, chartAx=null;
-function datasetFor(key, aVal) {
-  const data = [];
-  for (let x=-RANGE;x<=RANGE;x+=0.25) data.push({x, y:evalFunc(key,x,aVal)});
-  return {
-    label:key,
-    data,
-    parsing:false,
-    borderColor:COLORS[key],
-    borderWidth:1.8,
-    pointRadius:0
-  };
-}
-function createMainChart() {
-  const ctx=document.getElementById('chartMain');
-  chartMain=new Chart(ctx,{
-    type:'line',
-    data:{datasets:[]},
-    options:{
-      maintainAspectRatio:true,
-      responsive:true,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{type:'linear',min:-RANGE,max:RANGE,display:false},
-        y:{min:-YMAX,max:YMAX,display:false}
-      }
-    },plugins:[axesArrows]
-  });
-  updateMainChart();
-}
-function updateMainChart() {
-  const checks=[...document.querySelectorAll('#graphControls input[type=checkbox]:checked')];
-  const funcs=checks.map(c=>c.dataset.func);
-  chartMain.data.datasets=funcs.map(f=>datasetFor(f,2));
-  chartMain.update();
-}
-function createAxChart() {
-  const ctx=document.getElementById('chartAx');
-  chartAx=new Chart(ctx,{
-    type:'line',
-    data:{datasets:[]},
-    options:{
-      maintainAspectRatio:true,
-      responsive:true,
-      plugins:{legend:{display:false}},
-      scales:{x:{type:'linear',min:-RANGE,max:RANGE,display:false},y:{min:-YMAX,max:YMAX,display:false}}
-    },plugins:[axesArrows]
-  });
-  updateAxChart();
-}
-function updateAxChart() {
-  const datasets=[];
-  if(document.getElementById('toggleHalf').checked) datasets.push(datasetFor('halfx'));
-  if(document.getElementById('toggleTwo').checked) datasets.push(datasetFor('2x'));
-  const a=parseFloat(document.getElementById('baseA').value||2);
-  datasets.push(datasetFor('ax',a));
-  chartAx.data.datasets=datasets;
-  chartAx.update();
-}
-
-/***************** UI wiring *****************/
-window.addEventListener('DOMContentLoaded',()=>{
-  // initial tables
-  buildPolyTable('x2');
-  buildExpTable(parseInt(document.getElementById('expLevels').value,10));
-
-  // poly buttons
-  document.querySelectorAll('.square-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      document.querySelectorAll('.square-btn').forEach(b=>b.classList.remove('checked'));
-      btn.classList.add('checked');
-      const val=btn.querySelector('input').value; buildPolyTable(val);
-    });
-  });
-  // exp levels
-  document.getElementById('expLevels').addEventListener('input',e=>{
-    const lvl=Math.max(1,Math.min(10,parseInt(e.target.value,10)||1));
-    buildExpTable(lvl);
-  });
-
-  // tabs
-  document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(div=>div.classList.add('hidden'));
-    document.getElementById(btn.dataset.tab).classList.remove('hidden');
-  }));
-
-  // charts
-  createMainChart();
-  createAxChart();
-
-  // graph controls
-  document.querySelectorAll('#graphControls input[type=checkbox]').forEach(cb=>cb.addEventListener('change',updateMainChart));
-  // ax controls
-  document.getElementById('toggleHalf').addEventListener('change',updateAxChart);
-  document.getElementById('toggleTwo').addEventListener('change',updateAxChart);
-  document.getElementById('baseA').addEventListener('input',updateAxChart);
-
-  // keep axes centred on resize
-  window.addEventListener('resize',()=>{chartMain.update(); chartAx.update();});
-});
-</script>
+    
+    <script>
+        // Render math examples WITHOUT f(x) notation
+        katex.render("x^2, \\quad x^3, \\quad x^4, \\quad x^5", document.getElementById('poly-example'));
+        katex.render("2^x, \\quad 3^x, \\quad e^x, \\quad (\\frac{1}{2})^x", document.getElementById('exp-example'));
+        
+        // Global chart variables
+        let introChart = null;
+        let explorerChart = null;
+        let mysteryChart = null;
+        let currentGraphFunction = '';
+        let currentFDFunction = 'x2';
+        
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.dataset.tab === tabName) btn.classList.add('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            
+            // Initialize charts when tabs are opened
+            if(tabName === 'explorer') {
+                if(!explorerChart) {
+                    setTimeout(initExplorerChart, 100);
+                } else {
+                    updateComparisonTable();
+                }
+            }
+            if(tabName === 'challenge') {
+                if(!mysteryChart) {
+                    setTimeout(() => {
+                        initMysteryChart();
+                        setTimeout(newGraphChallenge, 200);
+                    }, 100);
+                } else {
+                    setTimeout(newGraphChallenge, 100);
+                }
+            }
+        }
+        
+        // Tab button event listeners
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        
+        // Introduction Demo with Slider
+        function initIntroChart() {
+            const ctx = document.getElementById('introChart');
+            if (!ctx) return;
+            
+            introChart = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'x'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'f(x)'
+                            }
+                        }
+                    }
+                }
+            });
+            updateIntroDemo(10);
+        }
+        
+        function updateIntroDemo(currentX) {
+            const maxX = Math.max(30, currentX + 5);
+            const data = [];
+            for(let x = 0; x <= maxX; x++) {
+                data.push(x);
+            }
+            
+            if(introChart) {
+                // Add a vertical line at current X
+                introChart.data = {
+                    labels: data,
+                    datasets: [
+                        {
+                            label: 'x²',
+                            data: data.map(x => x * x),
+                            borderColor: '#0f766e',
+                            backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: '2ˣ',
+                            data: data.map(x => Math.pow(2, x)),
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: `x = ${currentX}`,
+                            data: data.map(x => x === currentX ? Math.max(Math.pow(2, currentX), currentX * currentX) * 1.1 : null),
+                            borderColor: '#c62828',
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                };
+                introChart.update();
+            }
+            
+            // Update comparison cards
+            const x2_current = currentX * currentX;
+            const x2_next = (currentX + 1) * (currentX + 1);
+            const x2_change = x2_next - x2_current;
+            
+            const exp2_current = Math.pow(2, currentX);
+            const exp2_next = Math.pow(2, currentX + 1);
+            const exp2_change = exp2_next - exp2_current;
+            
+            document.getElementById('x2-value').textContent = x2_current.toLocaleString();
+            document.getElementById('x2-change').textContent = `+${x2_change}`;
+            
+            document.getElementById('2x-value').textContent = exp2_current.toLocaleString();
+            document.getElementById('2x-change').textContent = `+${exp2_change.toLocaleString()}`;
+        }
+        
+        // Slider event listener
+        document.getElementById('xSlider').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            document.getElementById('xValue').textContent = value;
+            updateIntroDemo(value);
+        });
+        
+        // Explorer Chart
+        function initExplorerChart() {
+            const ctx = document.getElementById('explorerChart');
+            if (!ctx) return;
+            
+            explorerChart = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'x'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'f(x)'
+                            }
+                        }
+                    }
+                }
+            });
+            updateExplorerChart();
+            updateComparisonTable();
+        }
+        
+        function updateExplorerChart() {
+            if (!explorerChart) return;
+            
+            const range = parseInt(document.getElementById('xRange').value);
+            document.getElementById('rangeValue').textContent = `±${range}`;
+            
+            const datasets = [];
+            const checkboxes = document.querySelectorAll('.func-check:checked');
+            
+            const colors = {
+                'x2': '#0f766e',
+                'x3': '#10b981',
+                '2x': '#f59e0b',
+                '3x': '#ef4444',
+                'ex': '#8b5cf6',
+                'halfx': '#3b82f6',
+                'thirdx': '#06b6d4'
+            };
+            
+            const labels = {
+                'x2': 'x²',
+                'x3': 'x³',
+                '2x': '2ˣ',
+                '3x': '3ˣ',
+                'ex': 'eˣ',
+                'halfx': '(1/2)ˣ',
+                'thirdx': '(1/3)ˣ'
+            };
+            
+            checkboxes.forEach(cb => {
+                const func = cb.dataset.func;
+                const data = [];
+                
+                for(let x = -range; x <= range; x += 0.5) {
+                    let y;
+                    switch(func) {
+                        case 'x2': y = x * x; break;
+                        case 'x3': y = x * x * x; break;
+                        case '2x': y = Math.pow(2, x); break;
+                        case '3x': y = Math.pow(3, x); break;
+                        case 'ex': y = Math.exp(x); break;
+                        case 'halfx': y = Math.pow(0.5, x); break;
+                        case 'thirdx': y = Math.pow(1/3, x); break;
+                    }
+                    data.push({x: x, y: y});
+                }
+                
+                datasets.push({
+                    label: labels[func],
+                    data: data,
+                    borderColor: colors[func],
+                    backgroundColor: colors[func] + '20',
+                    tension: 0.4,
+                    pointRadius: 0
+                });
+            });
+            
+            explorerChart.data.datasets = datasets;
+            explorerChart.update();
+        }
+        
+        // Explorer controls event listeners
+        document.getElementById('xRange').addEventListener('input', updateExplorerChart);
+        document.querySelectorAll('.func-check').forEach(cb => {
+            cb.addEventListener('change', updateExplorerChart);
+        });
+        
+        function resetExplorer() {
+            document.getElementById('xRange').value = 10;
+            document.querySelectorAll('.func-check').forEach(cb => {
+                cb.checked = ['x2', 'x3', '2x'].includes(cb.dataset.func);
+            });
+            updateExplorerChart();
+        }
+        
+        function autoFit() {
+            if(explorerChart) {
+                // Reset Y-axis to auto-scale
+                explorerChart.options.scales.y = {
+                    title: {
+                        display: true,
+                        text: 'f(x)'
+                    }
+                };
+                explorerChart.update();
+            }
+        }
+        
+        // Function selector for finite differences
+        function selectFDFunction(func, btn) {
+            // Update button states
+            document.querySelectorAll('.func-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            btn.classList.add('active');
+            
+            currentFDFunction = func;
+            updateFiniteDifferences();
+        }
+        
+        // Finite Differences
+        function updateFiniteDifferences() {
+            const fdTable = document.getElementById('fdTable');
+            if (!fdTable) return;
+            
+            const func = currentFDFunction;
+            let html = '<table>';
+            
+            if(func === 'x2' || func === 'x3') {
+                const values = [];
+                for(let x = 0; x < 7; x++) {
+                    values.push(func === 'x2' ? x * x : x * x * x);
+                }
+                
+                html += '<tr><th>x</th>';
+                for(let x = 0; x < 7; x++) html += `<td>${x}</td>`;
+                html += '</tr>';
+                
+                html += '<tr><th>f(x)</th>';
+                values.forEach(v => html += `<td>${v}</td>`);
+                html += '</tr>';
+                
+                let currentRow = values;
+                let level = 1;
+                while(currentRow.length > 1 && level <= 4) {
+                    const nextRow = [];
+                    for(let i = 0; i < currentRow.length - 1; i++) {
+                        nextRow.push(currentRow[i + 1] - currentRow[i]);
+                    }
+                    html += `<tr><th>Δ${level > 1 ? '<sup>' + level + '</sup>' : ''}f</th>`;
+                    nextRow.forEach(v => html += `<td>${v}</td>`);
+                    for(let i = 0; i < level; i++) html += '<td>-</td>';
+                    html += '</tr>';
+                    
+                    if(nextRow.every(v => v === 0)) break;
+                    currentRow = nextRow;
+                    level++;
+                }
+            } else {
+                // 2^x exponential
+                html += '<tr><th>x</th>';
+                for(let x = 0; x < 7; x++) html += `<td>${x}</td>`;
+                html += '</tr>';
+                
+                const values = [];
+                for(let x = 0; x < 7; x++) {
+                    values.push(Math.pow(2, x));
+                }
+                
+                html += '<tr><th>f(x) = 2ˣ</th>';
+                values.forEach(v => html += `<td>${v}</td>`);
+                html += '</tr>';
+                
+                // First differences
+                html += '<tr><th>Δf</th>';
+                for(let i = 0; i < 6; i++) {
+                    html += `<td>${values[i+1] - values[i]}</td>`;
+                }
+                html += '<td>-</td></tr>';
+                
+                // Second differences
+                html += '<tr><th>Δ²f</th>';
+                const firstDiff = [];
+                for(let i = 0; i < 6; i++) {
+                    firstDiff.push(values[i+1] - values[i]);
+                }
+                for(let i = 0; i < 5; i++) {
+                    html += `<td>${firstDiff[i+1] - firstDiff[i]}</td>`;
+                }
+                html += '<td>-</td><td>-</td></tr>';
+                
+                html += '<tr><td colspan="8" style="text-align: center; font-style: italic;">Notice: each difference row equals the previous row (same values shifted)</td></tr>';
+            }
+            
+            html += '</table>';
+            fdTable.innerHTML = html;
+            
+            // Update comparison table if it exists
+            updateComparisonTable();
+        }
+        
+        // Comparison table showing ratios f(x+1)/f(x)
+        function updateComparisonTable() {
+            const container = document.getElementById('comparisonTable');
+            if (!container) return;
+            
+            let html = '<table>';
+            html += '<tr><th>x</th><th>x²</th><th>Ratio f(x+1)/f(x)</th><th>2ˣ</th><th>Ratio f(x+1)/f(x)</th></tr>';
+            
+            for(let x = 1; x <= 7; x++) {  // Stop at 7 since we need x+1
+                const x2_current = x * x;
+                const x2_next = (x + 1) * (x + 1);
+                const exp2_current = Math.pow(2, x);
+                const exp2_next = Math.pow(2, x + 1);
+                
+                html += `<tr><td>${x}</td>`;
+                html += `<td>${x2_current}</td>`;
+                html += `<td>${(x2_next / x2_current).toFixed(2)}</td>`;
+                html += `<td>${exp2_current}</td>`;
+                html += `<td>${(exp2_next / exp2_current).toFixed(2)}</td>`;
+                html += '</tr>';
+            }
+            
+            html += '</table>';
+            
+            container.innerHTML = html;
+        }
+        
+        // Graph Recognition Challenge
+        function initMysteryChart() {
+            const ctx = document.getElementById('mysteryChart');
+            if (!ctx) return;
+            
+            mysteryChart = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        data: [],
+                        borderColor: '#0f766e',
+                        backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'x'
+                            },
+                            grid: {
+                                display: true
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'f(x)'
+                            },
+                            grid: {
+                                display: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function newGraphChallenge() {
+            // Initialize chart if it doesn't exist
+            if (!mysteryChart) {
+                initMysteryChart();
+                setTimeout(() => newGraphChallenge(), 100);
+                return;
+            }
+            
+            const functions = ['x2', 'x3', '2x', '3x', 'halfx', 'ex'];
+            currentGraphFunction = functions[Math.floor(Math.random() * functions.length)];
+            
+            const data = [];
+            let xMin, xMax, step;
+            
+            // Set appropriate ranges for each function type
+            switch(currentGraphFunction) {
+                case 'x2':
+                    xMin = -5; xMax = 5; step = 0.25;
+                    break;
+                case 'x3':
+                    xMin = -3; xMax = 3; step = 0.1;
+                    break;
+                case '2x':
+                    xMin = -3; xMax = 5; step = 0.25;
+                    break;
+                case '3x':
+                    xMin = -2; xMax = 3.5; step = 0.25;
+                    break;
+                case 'ex':
+                    xMin = -2; xMax = 3; step = 0.25;
+                    break;
+                case 'halfx':
+                    xMin = -3; xMax = 5; step = 0.25;
+                    break;
+            }
+            
+            for(let x = xMin; x <= xMax; x += step) {
+                let y;
+                switch(currentGraphFunction) {
+                    case 'x2': y = x * x; break;
+                    case 'x3': y = x * x * x; break;
+                    case '2x': y = Math.pow(2, x); break;
+                    case '3x': y = Math.pow(3, x); break;
+                    case 'ex': y = Math.exp(x); break;
+                    case 'halfx': y = Math.pow(0.5, x); break;
+                }
+                data.push({x: x, y: y});
+            }
+            
+            mysteryChart.data.datasets[0].data = data;
+            
+            // Auto-scale axes to fit the data nicely
+            mysteryChart.options.scales.x.min = xMin;
+            mysteryChart.options.scales.x.max = xMax;
+            mysteryChart.options.scales.y.min = undefined;
+            mysteryChart.options.scales.y.max = undefined;
+            
+            mysteryChart.update();
+            
+            // Clear previous selection and feedback
+            document.querySelectorAll('.graph-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.getElementById('graph-feedback').classList.remove('show');
+        }
+        
+        // Graph option click handlers
+        document.querySelectorAll('.graph-option').forEach(option => {
+            option.addEventListener('click', () => {
+                // Clear other selections
+                document.querySelectorAll('.graph-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                option.classList.add('selected');
+                
+                // Check answer
+                checkGraphAnswer(option.dataset.func);
+            });
+        });
+        
+        function checkGraphAnswer(guess) {
+            const feedback = document.getElementById('graph-feedback');
+            
+            if(guess === currentGraphFunction) {
+                const funcNames = {
+                    'x2': 'x²',
+                    'x3': 'x³',
+                    '2x': '2ˣ',
+                    '3x': '3ˣ',
+                    'ex': 'eˣ',
+                    'halfx': '(1/2)ˣ'
+                };
+                feedback.innerHTML = `<strong style="color: var(--success);">Correct!</strong> This is ${funcNames[currentGraphFunction]}.`;
+                feedback.style.borderLeftColor = 'var(--success)';
+                setTimeout(newGraphChallenge, 2500);
+            } else {
+                feedback.innerHTML = `Not quite. Try again or click "Get Hint" for help.`;
+                feedback.style.borderLeftColor = 'var(--accent-amber)';
+            }
+            
+            feedback.classList.add('show');
+        }
+        
+        function getGraphHint() {
+            const feedback = document.getElementById('graph-feedback');
+            let hint = '';
+            
+            switch(currentGraphFunction) {
+                case 'x2':
+                    hint = 'This is a polynomial. Notice the U-shaped parabola that\'s symmetric around x = 0. The function is always non-negative.';
+                    break;
+                case 'x3':
+                    hint = 'This is a polynomial. It passes through the origin and has different behavior on each side of x = 0. It goes from negative to positive.';
+                    break;
+                case '2x':
+                    hint = 'This is an exponential growth function. It\'s always positive and grows slowly for negative x, then rapidly for positive x. Passes through (0, 1).';
+                    break;
+                case '3x':
+                    hint = 'This is an exponential growth function. Similar to 2ˣ but grows even faster. Notice how steep it gets for positive x values.';
+                    break;
+                case 'ex':
+                    hint = 'This is the natural exponential function. It grows faster than 2ˣ but slower than 3ˣ. The base is approximately 2.718.';
+                    break;
+                case 'halfx':
+                    hint = 'This is an exponential decay function. It decreases as x increases, approaching but never reaching 0. Passes through (0, 1).';
+                    break;
+            }
+            
+            feedback.innerHTML = `<strong>Hint:</strong> ${hint}`;
+            feedback.style.borderLeftColor = 'var(--primary)';
+            feedback.classList.add('show');
+        }
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initIntroChart();
+            updateFiniteDifferences();
+        });
+    </script>
 </body>
 </html>
