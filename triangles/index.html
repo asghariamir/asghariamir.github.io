@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Constructor | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+
+        .mathswell-nav {
+            background: white;
+            padding: 0.75rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            transition: opacity 0.2s ease;
+        }
+
+        .mw-link:hover {
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .hero {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .controls-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .canvas-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            min-height: 500px;
+            position: relative;
+        }
+
+        canvas {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            width: 100%;
+            display: block;
+            cursor: crosshair;
+        }
+
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .construction-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .type-btn {
+            padding: 0.5rem;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .type-btn:hover {
+            background: var(--interactive);
+            border-color: var(--primary);
+        }
+
+        .type-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .input-group {
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-row label {
+            flex: 0 0 80px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-row input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .preset-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .preset-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-row label {
+            font-size: 0.95rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .color-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .color-row label {
+            flex: 0 0 80px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .color-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .color-input-group input[type="color"] {
+            width: 50px;
+            height: 32px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .color-input-group input[type="range"] {
+            flex: 1;
+            height: 4px;
+            accent-color: var(--primary);
+        }
+
+        .color-input-group span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            min-width: 35px;
+            text-align: right;
+        }
+
+        .preset-colors {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .color-preset {
+            flex: 1;
+            padding: 0.4rem;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-preset:hover {
+            background: var(--interactive);
+            border-color: var(--primary);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--interactive);
+        }
+
+        .btn-download {
+            background: var(--accent-amber);
+            color: white;
+        }
+
+        .btn-download:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .info-display {
+            background: var(--interactive);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .info-display h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+        }
+
+        .info-value {
+            font-weight: 500;
+            font-family: 'Monaco', monospace;
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            background: #e6fffb;
+            border: 1px solid var(--success);
+            color: var(--primary);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-panel {
+                max-height: none;
+            }
+
+            .construction-types {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .color-row {
+                flex-wrap: wrap;
+            }
+
+            .color-row label {
+                flex: 0 0 100%;
+                margin-bottom: 0.25rem;
+            }
+
+            .preset-colors {
+                flex-wrap: wrap;
+            }
+
+            .color-preset {
+                flex: 0 0 48%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mathswell Navigation Badge -->
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>🔺 Triangle Constructor</h1>
+            <p>Build triangles using different construction methods. Add labels, measurements, colors, and download your creation!</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Controls Panel -->
+            <div class="controls-panel">
+                <!-- Construction Type -->
+                <div class="section">
+                    <div class="section-title">Construction Method</div>
+                    <div class="construction-types">
+                        <button class="type-btn active" data-type="SSS">SSS</button>
+                        <button class="type-btn" data-type="SAS">SAS</button>
+                        <button class="type-btn" data-type="ASA">ASA</button>
+                        <button class="type-btn" data-type="AAS">AAS</button>
+                        <button class="type-btn" data-type="SSA">SSA</button>
+                        <button class="type-btn" data-type="coordinates">XY</button>
+                    </div>
+                </div>
+
+                <!-- Input Fields -->
+                <div class="section">
+                    <div class="section-title">Triangle Parameters</div>
+                    <div id="inputFields" class="input-group">
+                        <!-- Dynamic input fields will be inserted here -->
+                    </div>
+                    
+                    <!-- Preset Examples -->
+                    <div class="preset-pills" id="presetExamples">
+                        <!-- Dynamic preset pills will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Display Options -->
+                <div class="section">
+                    <div class="section-title">Display Options</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="showLabels" checked>
+                            <label for="showLabels">Show vertex labels (A, B, C)</label>
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="showSides" checked>
+                            <label for="showSides">Show side measurements</label>
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="showAngles">
+                            <label for="showAngles">Show angle measurements</label>
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="showGrid">
+                            <label for="showGrid">Show grid</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Color Options -->
+                <div class="section">
+                    <div class="section-title">Colors & Style</div>
+                    <div class="color-options">
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="fillTriangle" checked>
+                            <label for="fillTriangle">Fill triangle</label>
+                        </div>
+                        <div class="color-row">
+                            <label for="fillColor">Fill color:</label>
+                            <div class="color-input-group">
+                                <input type="color" id="fillColor" value="#0f766e">
+                                <input type="range" id="fillOpacity" min="0" max="100" value="10">
+                                <span id="opacityValue">10%</span>
+                            </div>
+                        </div>
+                        <div class="color-row">
+                            <label for="strokeColor">Line color:</label>
+                            <div class="color-input-group">
+                                <input type="color" id="strokeColor" value="#0f766e">
+                                <input type="range" id="strokeWidth" min="1" max="8" value="2">
+                                <span id="widthValue">2px</span>
+                            </div>
+                        </div>
+                        <div class="preset-colors">
+                            <button class="color-preset" onclick="applyColorPreset('default')">Default</button>
+                            <button class="color-preset" onclick="applyColorPreset('math')">Classic</button>
+                            <button class="color-preset" onclick="applyColorPreset('vibrant')">Vibrant</button>
+                            <button class="color-preset" onclick="applyColorPreset('minimal')">Minimal</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="constructTriangle()">Construct Triangle</button>
+                    <button class="btn btn-secondary" onclick="clearCanvas()">Clear</button>
+                    <button class="btn btn-download" onclick="downloadImage()">📥 Download PNG</button>
+                    <button class="btn btn-secondary" onclick="randomizeTriangle()">🎲 Random</button>
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="feedback"></div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="canvas-container">
+                <canvas id="triangleCanvas" width="500" height="500"></canvas>
+                
+                <!-- Triangle Info Display -->
+                <div class="info-display" id="triangleInfo" style="display: none;">
+                    <h4>Triangle Properties</h4>
+                    <div class="info-grid" id="infoGrid">
+                        <!-- Dynamic info will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let canvas = document.getElementById('triangleCanvas');
+        let ctx = canvas.getContext('2d');
+        let currentTriangle = null;
+        let currentType = 'SSS';
+
+        // Input configurations for different construction types
+        const inputConfigs = {
+            SSS: {
+                fields: [
+                    { name: 'side_a', label: 'Side a', placeholder: '5', value: 5 },
+                    { name: 'side_b', label: 'Side b', placeholder: '7', value: 7 },
+                    { name: 'side_c', label: 'Side c', placeholder: '9', value: 9 }
+                ],
+                presets: [
+                    { name: 'Equilateral', values: [6, 6, 6] },
+                    { name: 'Right 3-4-5', values: [3, 4, 5] },
+                    { name: 'Isosceles', values: [5, 5, 8] },
+                    { name: 'Scalene', values: [4, 7, 10] }
+                ]
+            },
+            SAS: {
+                fields: [
+                    { name: 'side_a', label: 'Side a', placeholder: '6', value: 6 },
+                    { name: 'angle_C', label: 'Angle C°', placeholder: '60', value: 60 },
+                    { name: 'side_b', label: 'Side b', placeholder: '8', value: 8 }
+                ],
+                presets: [
+                    { name: 'Right angle', values: [5, 90, 5] },
+                    { name: '60° angle', values: [6, 60, 6] },
+                    { name: 'Obtuse', values: [4, 120, 5] },
+                    { name: 'Acute', values: [7, 45, 8] }
+                ]
+            },
+            ASA: {
+                fields: [
+                    { name: 'angle_A', label: 'Angle A°', placeholder: '45', value: 45 },
+                    { name: 'side_c', label: 'Side c', placeholder: '8', value: 8 },
+                    { name: 'angle_B', label: 'Angle B°', placeholder: '60', value: 60 }
+                ],
+                presets: [
+                    { name: 'Isosceles', values: [45, 8, 45] },
+                    { name: 'Right', values: [30, 10, 60] },
+                    { name: 'Equilateral', values: [60, 7, 60] },
+                    { name: 'Obtuse', values: [20, 9, 120] }
+                ]
+            },
+            AAS: {
+                fields: [
+                    { name: 'angle_A', label: 'Angle A°', placeholder: '30', value: 30 },
+                    { name: 'angle_B', label: 'Angle B°', placeholder: '60', value: 60 },
+                    { name: 'side_a', label: 'Side a', placeholder: '6', value: 6 }
+                ],
+                presets: [
+                    { name: '30-60-90', values: [30, 60, 5] },
+                    { name: '45-45-90', values: [45, 45, 7] },
+                    { name: 'Acute', values: [40, 50, 8] },
+                    { name: 'Obtuse', values: [25, 115, 6] }
+                ]
+            },
+            SSA: {
+                fields: [
+                    { name: 'side_a', label: 'Side a', placeholder: '7', value: 7 },
+                    { name: 'side_b', label: 'Side b', placeholder: '9', value: 9 },
+                    { name: 'angle_A', label: 'Angle A°', placeholder: '40', value: 40 }
+                ],
+                presets: [
+                    { name: 'Unique', values: [5, 8, 30] },
+                    { name: 'Ambiguous', values: [6, 8, 45] },
+                    { name: 'No solution', values: [3, 10, 80] },
+                    { name: 'Right angle', values: [5, 5, 90] }
+                ]
+            },
+            coordinates: {
+                fields: [
+                    { name: 'ax', label: 'A x', placeholder: '0', value: 0 },
+                    { name: 'ay', label: 'A y', placeholder: '0', value: 0 },
+                    { name: 'bx', label: 'B x', placeholder: '8', value: 8 },
+                    { name: 'by', label: 'B y', placeholder: '0', value: 0 },
+                    { name: 'cx', label: 'C x', placeholder: '4', value: 4 },
+                    { name: 'cy', label: 'C y', placeholder: '6', value: 6 }
+                ],
+                presets: [
+                    { name: 'Right', values: [0, 0, 6, 0, 0, 8] },
+                    { name: 'Equilateral', values: [0, 0, 6, 0, 3, 5.2] },
+                    { name: 'Isosceles', values: [0, 0, 8, 0, 4, 7] },
+                    { name: 'Obtuse', values: [0, 0, 10, 0, 2, 4] }
+                ]
+            }
+        };
+
+        // Initialize
+        function init() {
+            setupEventListeners();
+            updateInputFields();
+            clearCanvas();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Construction type buttons
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentType = this.dataset.type;
+                    updateInputFields();
+                });
+            });
+
+            // Display option checkboxes
+            document.querySelectorAll('.checkbox-row input').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    if (currentTriangle) {
+                        drawTriangle();
+                    }
+                });
+            });
+
+            // Color controls
+            document.getElementById('fillColor').addEventListener('input', () => {
+                if (currentTriangle) drawTriangle();
+            });
+            
+            document.getElementById('strokeColor').addEventListener('input', () => {
+                if (currentTriangle) drawTriangle();
+            });
+            
+            document.getElementById('fillOpacity').addEventListener('input', (e) => {
+                document.getElementById('opacityValue').textContent = e.target.value + '%';
+                if (currentTriangle) drawTriangle();
+            });
+            
+            document.getElementById('strokeWidth').addEventListener('input', (e) => {
+                document.getElementById('widthValue').textContent = e.target.value + 'px';
+                if (currentTriangle) drawTriangle();
+            });
+            
+            document.getElementById('fillTriangle').addEventListener('change', () => {
+                if (currentTriangle) drawTriangle();
+            });
+
+            // Keyboard support - Enter key constructs triangle
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.target.type === 'number') {
+                    constructTriangle();
+                }
+            });
+        }
+
+        // Update input fields based on construction type
+        function updateInputFields() {
+            const config = inputConfigs[currentType];
+            const inputContainer = document.getElementById('inputFields');
+            const presetContainer = document.getElementById('presetExamples');
+            
+            // Create input fields
+            inputContainer.innerHTML = config.fields.map(field => `
+                <div class="input-row">
+                    <label for="${field.name}">${field.label}:</label>
+                    <input type="number" id="${field.name}" placeholder="${field.placeholder}" value="${field.value}" step="any">
+                </div>
+            `).join('');
+            
+            // Create preset pills
+            presetContainer.innerHTML = config.presets.map((preset, index) => `
+                <button class="preset-pill" onclick="loadPreset('${currentType}', ${index})">${preset.name}</button>
+            `).join('');
+            
+            // Clear feedback
+            document.getElementById('feedback').innerHTML = '';
+        }
+
+        // Load preset values
+        function loadPreset(type, index) {
+            const config = inputConfigs[type];
+            const preset = config.presets[index];
+            
+            config.fields.forEach((field, i) => {
+                document.getElementById(field.name).value = preset.values[i];
+            });
+            
+            constructTriangle();
+        }
+
+        // Apply color preset
+        function applyColorPreset(preset) {
+            const presets = {
+                default: {
+                    fill: '#0f766e',
+                    opacity: 10,
+                    stroke: '#0f766e',
+                    width: 2
+                },
+                math: {
+                    fill: '#000080',
+                    opacity: 15,
+                    stroke: '#000080',
+                    width: 2
+                },
+                vibrant: {
+                    fill: '#ff6b6b',
+                    opacity: 25,
+                    stroke: '#ff6b6b',
+                    width: 3
+                },
+                minimal: {
+                    fill: '#333333',
+                    opacity: 0,
+                    stroke: '#333333',
+                    width: 1
+                }
+            };
+            
+            const colors = presets[preset];
+            document.getElementById('fillColor').value = colors.fill;
+            document.getElementById('fillOpacity').value = colors.opacity;
+            document.getElementById('opacityValue').textContent = colors.opacity + '%';
+            document.getElementById('strokeColor').value = colors.stroke;
+            document.getElementById('strokeWidth').value = colors.width;
+            document.getElementById('widthValue').textContent = colors.width + 'px';
+            document.getElementById('fillTriangle').checked = colors.opacity > 0;
+            
+            if (currentTriangle) {
+                drawTriangle();
+            }
+        }
+
+        // Generate random triangle
+        function randomizeTriangle() {
+            const types = ['SSS', 'SAS', 'ASA', 'AAS', 'coordinates'];
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            
+            // Set the type
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.type === randomType) {
+                    btn.classList.add('active');
+                }
+            });
+            currentType = randomType;
+            updateInputFields();
+            
+            // Load a random preset
+            const config = inputConfigs[randomType];
+            const randomPresetIndex = Math.floor(Math.random() * config.presets.length);
+            loadPreset(randomType, randomPresetIndex);
+        }
+
+        // Construct triangle based on current inputs
+        function constructTriangle() {
+            const feedback = document.getElementById('feedback');
+            
+            try {
+                // Get input values
+                const inputs = {};
+                inputConfigs[currentType].fields.forEach(field => {
+                    inputs[field.name] = parseFloat(document.getElementById(field.name).value);
+                    if (isNaN(inputs[field.name])) {
+                        throw new Error(`Please enter a valid number for ${field.label}`);
+                    }
+                });
+                
+                // Calculate triangle based on construction type
+                let triangle;
+                switch (currentType) {
+                    case 'SSS':
+                        triangle = constructSSS(inputs.side_a, inputs.side_b, inputs.side_c);
+                        break;
+                    case 'SAS':
+                        triangle = constructSAS(inputs.side_a, inputs.angle_C, inputs.side_b);
+                        break;
+                    case 'ASA':
+                        triangle = constructASA(inputs.angle_A, inputs.side_c, inputs.angle_B);
+                        break;
+                    case 'AAS':
+                        triangle = constructAAS(inputs.angle_A, inputs.angle_B, inputs.side_a);
+                        break;
+                    case 'SSA':
+                        triangle = constructSSA(inputs.side_a, inputs.side_b, inputs.angle_A);
+                        break;
+                    case 'coordinates':
+                        triangle = constructFromCoordinates(
+                            inputs.ax, inputs.ay, 
+                            inputs.bx, inputs.by, 
+                            inputs.cx, inputs.cy
+                        );
+                        break;
+                }
+                
+                currentTriangle = triangle;
+                drawTriangle();
+                displayTriangleInfo();
+                feedback.innerHTML = '<div class="success-message">✓ Triangle constructed successfully!</div>';
+                
+            } catch (error) {
+                feedback.innerHTML = `<div class="error-message">⚠️ ${error.message}</div>`;
+                currentTriangle = null;
+                clearCanvas();
+            }
+        }
+
+        // SSS Construction (Law of Cosines)
+        function constructSSS(a, b, c) {
+            // Check triangle inequality
+            if (a + b <= c || b + c <= a || a + c <= b) {
+                throw new Error('These sides cannot form a triangle (triangle inequality violated)');
+            }
+            
+            // Place first vertex at origin
+            const A = { x: 0, y: 0 };
+            // Place second vertex on x-axis
+            const B = { x: c, y: 0 };
+            
+            // Calculate third vertex using law of cosines
+            const cosA = (b * b + c * c - a * a) / (2 * b * c);
+            const sinA = Math.sqrt(1 - cosA * cosA);
+            const C = { x: b * cosA, y: b * sinA };
+            
+            return {
+                vertices: { A, B, C },
+                sides: { a, b, c },
+                angles: {
+                    A: Math.acos(cosA) * 180 / Math.PI,
+                    B: Math.acos((a * a + c * c - b * b) / (2 * a * c)) * 180 / Math.PI,
+                    C: Math.acos((a * a + b * b - c * c) / (2 * a * b)) * 180 / Math.PI
+                }
+            };
+        }
+
+        // SAS Construction
+        function constructSAS(a, angleC, b) {
+            const C_rad = angleC * Math.PI / 180;
+            
+            const A = { x: 0, y: 0 };
+            const B = { x: a, y: 0 };
+            const C = { x: b * Math.cos(C_rad), y: b * Math.sin(C_rad) };
+            
+            // Calculate remaining side using law of cosines
+            const c = Math.sqrt(a * a + b * b - 2 * a * b * Math.cos(C_rad));
+            
+            return {
+                vertices: { A, B, C },
+                sides: { a, b, c },
+                angles: {
+                    A: Math.acos((b * b + c * c - a * a) / (2 * b * c)) * 180 / Math.PI,
+                    B: Math.acos((a * a + c * c - b * b) / (2 * a * c)) * 180 / Math.PI,
+                    C: angleC
+                }
+            };
+        }
+
+        // ASA Construction
+        function constructASA(angleA, c, angleB) {
+            const angleC = 180 - angleA - angleB;
+            if (angleC <= 0) {
+                throw new Error('Invalid angles: sum must be less than 180°');
+            }
+            
+            const A_rad = angleA * Math.PI / 180;
+            const B_rad = angleB * Math.PI / 180;
+            const C_rad = angleC * Math.PI / 180;
+            
+            // Use sine rule to find other sides
+            const a = c * Math.sin(A_rad) / Math.sin(C_rad);
+            const b = c * Math.sin(B_rad) / Math.sin(C_rad);
+            
+            const A = { x: 0, y: 0 };
+            const B = { x: c, y: 0 };
+            const C = { x: b * Math.cos(A_rad), y: b * Math.sin(A_rad) };
+            
+            return {
+                vertices: { A, B, C },
+                sides: { a, b, c },
+                angles: { A: angleA, B: angleB, C: angleC }
+            };
+        }
+
+        // AAS Construction
+        function constructAAS(angleA, angleB, a) {
+            const angleC = 180 - angleA - angleB;
+            if (angleC <= 0) {
+                throw new Error('Invalid angles: sum must be less than 180°');
+            }
+            
+            const A_rad = angleA * Math.PI / 180;
+            const B_rad = angleB * Math.PI / 180;
+            const C_rad = angleC * Math.PI / 180;
+            
+            // Use sine rule
+            const b = a * Math.sin(B_rad) / Math.sin(A_rad);
+            const c = a * Math.sin(C_rad) / Math.sin(A_rad);
+            
+            const A = { x: 0, y: 0 };
+            const B = { x: c, y: 0 };
+            const C = { x: b * Math.cos(A_rad), y: b * Math.sin(A_rad) };
+            
+            return {
+                vertices: { A, B, C },
+                sides: { a, b, c },
+                angles: { A: angleA, B: angleB, C: angleC }
+            };
+        }
+
+        // SSA Construction (Ambiguous case)
+        function constructSSA(a, b, angleA) {
+            const A_rad = angleA * Math.PI / 180;
+            
+            // Check for possible solutions using sine rule
+            const sinB = b * Math.sin(A_rad) / a;
+            
+            if (sinB > 1) {
+                throw new Error('No triangle possible with these measurements');
+            }
+            
+            const B_rad = Math.asin(sinB);
+            const angleB = B_rad * 180 / Math.PI;
+            const angleC = 180 - angleA - angleB;
+            
+            if (angleC <= 0) {
+                throw new Error('No valid triangle can be formed');
+            }
+            
+            const C_rad = angleC * Math.PI / 180;
+            const c = a * Math.sin(C_rad) / Math.sin(A_rad);
+            
+            const A = { x: 0, y: 0 };
+            const B = { x: c, y: 0 };
+            const C = { x: b * Math.cos(A_rad), y: b * Math.sin(A_rad) };
+            
+            return {
+                vertices: { A, B, C },
+                sides: { a, b, c },
+                angles: { A: angleA, B: angleB, C: angleC }
+            };
+        }
+
+        // Construct from coordinates
+        function constructFromCoordinates(ax, ay, bx, by, cx, cy) {
+            const A = { x: ax, y: ay };
+            const B = { x: bx, y: by };
+            const C = { x: cx, y: cy };
+            
+            // Calculate sides
+            const a = Math.sqrt((B.x - C.x) ** 2 + (B.y - C.y) ** 2);
+            const b = Math.sqrt((A.x - C.x) ** 2 + (A.y - C.y) ** 2);
+            const c = Math.sqrt((A.x - B.x) ** 2 + (A.y - B.y) ** 2);
+            
+            // Calculate angles using law of cosines
+            const angleA = Math.acos((b * b + c * c - a * a) / (2 * b * c)) * 180 / Math.PI;
+            const angleB = Math.acos((a * a + c * c - b * b) / (2 * a * c)) * 180 / Math.PI;
+            const angleC = 180 - angleA - angleB;
+            
+            return {
+                vertices: { A, B, C },
+                sides: { a, b, c },
+                angles: { A: angleA, B: angleB, C: angleC }
+            };
+        }
+
+        // Draw triangle on canvas
+        function drawTriangle() {
+            if (!currentTriangle) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid if enabled
+            if (document.getElementById('showGrid').checked) {
+                drawGrid();
+            }
+            
+            // Transform coordinates to fit canvas
+            const padding = 50;
+            const vertices = transformToCanvas(currentTriangle.vertices, padding);
+            
+            // Get color settings
+            const fillEnabled = document.getElementById('fillTriangle').checked;
+            const fillColor = document.getElementById('fillColor').value;
+            const fillOpacity = document.getElementById('fillOpacity').value / 100;
+            const strokeColor = document.getElementById('strokeColor').value;
+            const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
+            
+            // Draw triangle
+            ctx.beginPath();
+            ctx.moveTo(vertices.A.x, vertices.A.y);
+            ctx.lineTo(vertices.B.x, vertices.B.y);
+            ctx.lineTo(vertices.C.x, vertices.C.y);
+            ctx.closePath();
+            
+            // Fill if enabled
+            if (fillEnabled) {
+                // Convert hex to rgba with opacity
+                const r = parseInt(fillColor.substr(1, 2), 16);
+                const g = parseInt(fillColor.substr(3, 2), 16);
+                const b = parseInt(fillColor.substr(5, 2), 16);
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${fillOpacity})`;
+                ctx.fill();
+            }
+            
+            // Stroke
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = strokeWidth;
+            ctx.stroke();
+            
+            // Draw vertex labels
+            if (document.getElementById('showLabels').checked) {
+                drawVertexLabels(vertices, strokeColor);
+            }
+            
+            // Draw side measurements
+            if (document.getElementById('showSides').checked) {
+                drawSideMeasurements(vertices, currentTriangle.sides);
+            }
+            
+            // Draw angle measurements
+            if (document.getElementById('showAngles').checked) {
+                drawAngleMeasurements(vertices, currentTriangle.angles);
+            }
+        }
+
+        // Transform triangle to fit canvas
+        function transformToCanvas(vertices, padding) {
+            // Find bounds
+            const allX = [vertices.A.x, vertices.B.x, vertices.C.x];
+            const allY = [vertices.A.y, vertices.B.y, vertices.C.y];
+            
+            const minX = Math.min(...allX);
+            const maxX = Math.max(...allX);
+            const minY = Math.min(...allY);
+            const maxY = Math.max(...allY);
+            
+            const width = maxX - minX;
+            const height = maxY - minY;
+            
+            // Calculate scale to fit canvas
+            const scaleX = (canvas.width - 2 * padding) / width;
+            const scaleY = (canvas.height - 2 * padding) / height;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // Transform vertices
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            return {
+                A: {
+                    x: centerX + (vertices.A.x - (minX + maxX) / 2) * scale,
+                    y: centerY - (vertices.A.y - (minY + maxY) / 2) * scale
+                },
+                B: {
+                    x: centerX + (vertices.B.x - (minX + maxX) / 2) * scale,
+                    y: centerY - (vertices.B.y - (minY + maxY) / 2) * scale
+                },
+                C: {
+                    x: centerX + (vertices.C.x - (minX + maxX) / 2) * scale,
+                    y: centerY - (vertices.C.y - (minY + maxY) / 2) * scale
+                }
+            };
+        }
+
+        // Draw grid
+        function drawGrid() {
+            ctx.save();
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 0.5;
+            
+            const gridSize = 25;
+            
+            for (let x = 0; x <= canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y <= canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+
+        // Draw vertex labels
+        function drawVertexLabels(vertices, color = '#0f766e') {
+            ctx.font = 'bold 16px Arial';
+            ctx.fillStyle = color;
+            
+            // Offset labels based on triangle orientation
+            const offsets = {
+                A: getVertexLabelOffset(vertices.A, vertices.B, vertices.C),
+                B: getVertexLabelOffset(vertices.B, vertices.A, vertices.C),
+                C: getVertexLabelOffset(vertices.C, vertices.A, vertices.B)
+            };
+            
+            Object.entries(vertices).forEach(([label, pos]) => {
+                ctx.fillText(label, pos.x + offsets[label].x, pos.y + offsets[label].y);
+            });
+        }
+
+        // Get optimal label offset for a vertex
+        function getVertexLabelOffset(vertex, other1, other2) {
+            const dx1 = other1.x - vertex.x;
+            const dy1 = other1.y - vertex.y;
+            const dx2 = other2.x - vertex.x;
+            const dy2 = other2.y - vertex.y;
+            
+            const avgDx = (dx1 + dx2) / 2;
+            const avgDy = (dy1 + dy2) / 2;
+            
+            const norm = Math.sqrt(avgDx * avgDx + avgDy * avgDy);
+            
+            return {
+                x: -avgDx / norm * 20,
+                y: -avgDy / norm * 20
+            };
+        }
+
+        // Draw side measurements
+        function drawSideMeasurements(vertices, sides) {
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#4b5563';
+            
+            // Side a (BC)
+            drawSideLabel(vertices.B, vertices.C, sides.a.toFixed(1));
+            
+            // Side b (AC)
+            drawSideLabel(vertices.A, vertices.C, sides.b.toFixed(1));
+            
+            // Side c (AB)
+            drawSideLabel(vertices.A, vertices.B, sides.c.toFixed(1));
+        }
+
+        // Draw label for a side
+        function drawSideLabel(v1, v2, label) {
+            const midX = (v1.x + v2.x) / 2;
+            const midY = (v1.y + v2.y) / 2;
+            
+            // Calculate perpendicular offset
+            const dx = v2.x - v1.x;
+            const dy = v2.y - v1.y;
+            const norm = Math.sqrt(dx * dx + dy * dy);
+            
+            const offsetX = -dy / norm * 15;
+            const offsetY = dx / norm * 15;
+            
+            // Draw background
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(midX + offsetX - 15, midY + offsetY - 8, 30, 16);
+            
+            // Draw text
+            ctx.fillStyle = '#4b5563';
+            ctx.textAlign = 'center';
+            ctx.fillText(label, midX + offsetX, midY + offsetY + 4);
+            ctx.textAlign = 'start';
+        }
+
+        // Draw angle measurements
+        function drawAngleMeasurements(vertices, angles) {
+            ctx.save();
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#f59e0b';
+            
+            drawAngleArc(vertices.A, vertices.B, vertices.C, angles.A);
+            drawAngleArc(vertices.B, vertices.C, vertices.A, angles.B);
+            drawAngleArc(vertices.C, vertices.A, vertices.B, angles.C);
+            
+            ctx.restore();
+        }
+
+        // Draw angle arc and label
+        function drawAngleArc(vertex, v1, v2, angle) {
+            const radius = 25;
+            
+            // Calculate angles to other vertices
+            const angle1 = Math.atan2(v1.y - vertex.y, v1.x - vertex.x);
+            const angle2 = Math.atan2(v2.y - vertex.y, v2.x - vertex.x);
+            
+            // Draw arc
+            ctx.beginPath();
+            ctx.arc(vertex.x, vertex.y, radius, angle1, angle2);
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            
+            // Draw angle label
+            const midAngle = (angle1 + angle2) / 2;
+            const labelX = vertex.x + Math.cos(midAngle) * (radius + 15);
+            const labelY = vertex.y + Math.sin(midAngle) * (radius + 15);
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(labelX - 15, labelY - 8, 30, 16);
+            
+            ctx.fillStyle = '#f59e0b';
+            ctx.textAlign = 'center';
+            ctx.fillText(angle.toFixed(1) + '°', labelX, labelY + 4);
+            ctx.textAlign = 'start';
+        }
+
+        // Display triangle information
+        function displayTriangleInfo() {
+            if (!currentTriangle) return;
+            
+            const infoDiv = document.getElementById('triangleInfo');
+            const infoGrid = document.getElementById('infoGrid');
+            
+            // Calculate perimeter and area
+            const { a, b, c } = currentTriangle.sides;
+            const perimeter = a + b + c;
+            const s = perimeter / 2; // Semi-perimeter
+            const area = Math.sqrt(s * (s - a) * (s - b) * (s - c)); // Heron's formula
+            
+            // Determine triangle type
+            let type = 'Scalene';
+            const tolerance = 0.01;
+            
+            if (Math.abs(a - b) < tolerance && Math.abs(b - c) < tolerance) {
+                type = 'Equilateral';
+            } else if (Math.abs(a - b) < tolerance || Math.abs(b - c) < tolerance || Math.abs(a - c) < tolerance) {
+                type = 'Isosceles';
+            }
+            
+            // Check for right triangle
+            const angles = Object.values(currentTriangle.angles);
+            if (angles.some(angle => Math.abs(angle - 90) < tolerance)) {
+                type += ' Right';
+            }
+            
+            infoGrid.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Type:</span>
+                    <span class="info-value">${type}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Perimeter:</span>
+                    <span class="info-value">${perimeter.toFixed(2)}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Area:</span>
+                    <span class="info-value">${area.toFixed(2)}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Method:</span>
+                    <span class="info-value">${currentType}</span>
+                </div>
+            `;
+            
+            infoDiv.style.display = 'block';
+        }
+
+        // Clear canvas
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            currentTriangle = null;
+            document.getElementById('triangleInfo').style.display = 'none';
+            document.getElementById('feedback').innerHTML = '';
+            
+            // Draw grid if enabled
+            if (document.getElementById('showGrid') && document.getElementById('showGrid').checked) {
+                drawGrid();
+            }
+        }
+
+        // Download image
+        function downloadImage() {
+            if (!currentTriangle) {
+                document.getElementById('feedback').innerHTML = '<div class="error-message">⚠️ Please construct a triangle first</div>';
+                return;
+            }
+            
+            // Create a temporary canvas
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Add white background (PNG doesn't support transparency well in all viewers)
+            tempCtx.fillStyle = 'white';
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // Copy the current canvas content
+            tempCtx.drawImage(canvas, 0, 0);
+            
+            // Create download link
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
+            link.download = `triangle_${currentType}_${timestamp}.png`;
+            
+            // Convert to blob and trigger download
+            tempCanvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                document.getElementById('feedback').innerHTML = '<div class="success-message">✓ Image downloaded successfully!</div>';
+            }, 'image/png');
+        }
+
+        // Initialize on load
+        init();
+        
+        // Construct an initial triangle to show immediately
+        setTimeout(() => {
+            constructTriangle();
+        }, 100);
+    </script>
+</body>
+</html>
