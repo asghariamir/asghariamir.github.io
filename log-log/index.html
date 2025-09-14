@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intro to Logarithmic Graphs | Mathswell</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Intro to Logarithmic Graphs</h1>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="intro">Introduction</button>
+            <button class="tab-btn" data-tab="explorer">Explorer</button>
+            <button class="tab-btn" data-tab="challenge">Challenge</button>
+        </div>
+
+        <main>
+            <section id="intro" class="tab-content active">
+                <div class="hero-section">
+                    <h2>Understanding Logarithmic Graphs</h2>
+                    <p>Discover how logarithmic scales transform curves into straight lines, making it easy to see if a relationship is exponential or a power law.</p>
+                </div>
+                <div class="concept-cards-container">
+                    <div class="card"><h4>📏 What is a Linear Scale?</h4><p>Equal distances represent equal <strong>differences</strong>. The gap between 10 and 20 is the same as between 90 and 100.</p></div>
+                    <div class="card"><h4>⚖️ What is a Log Scale?</h4><p>Equal distances represent equal <strong>ratios</strong> or <strong>multiples</strong>. The gap between 10 and 100 (a ×10 jump) is the same as between 100 and 1000.</p></div>
+                    <div class="card"><h4>🎯 Why Use Them?</h4><p>Log scales help visualize data that spans many orders of magnitude and can "straighten out" certain types of curves.</p></div>
+                </div>
+                <h3>Key Insights: Two Ways to Straighten a Curve</h3>
+                <div class="insights-container">
+                    <p><strong>Exponential Growth (y = A·bˣ)</strong>: Becomes a straight line on a <strong>Semi-Log graph</strong>.</p>
+                    <p><strong>Power-Law Relationship (y = k·xⁿ)</strong>: Becomes a straight line on a <strong>Log-Log graph</strong>.</p>
+                </div>
+                <div class="navigation-cta">
+                    <button class="cta-btn" id="navigateToExplorer">Explore Datasets →</button>
+                </div>
+            </section>
+
+            <section id="explorer" class="tab-content">
+                <h2>Data Explorer</h2>
+                <p>Load sample data to see how changing the axis scale reveals the underlying relationship.</p>
+                <div class="explorer-controls">
+                    <div class="presets">
+                        <strong>Presets:</strong>
+                        <button class="chip" data-preset="bacteria">Bacteria Growth</button>
+                        <button class="chip" data-preset="capacitor">Capacitor Discharge</button>
+                        <button class="chip" data-preset="earthquake">Earthquake Energy</button>
+                    </div>
+                    <div class="axis-modes">
+                        <strong>Axis Mode:</strong>
+                        <button class="mode-btn active" data-mode="linear">Linear</button>
+                        <button class="mode-btn" data-mode="semi-log">Semi-Log (y)</button>
+                        <button class="mode-btn" data-mode="log-log">Log-Log</button>
+                    </div>
+                </div>
+                <div class="visualization-area">
+                    <canvas id="mainChart"></canvas>
+                </div>
+                <div id="infoDisplay" class="info-display" style="display: none;"></div>
+            </section>
+
+            <section id="challenge" class="tab-content">
+                <h2>Identify the Model</h2>
+                <p>For each scenario, choose the graph type that makes the data form a straight line.</p>
+                <div class="progress-bar-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                    <span id="progress-text">Challenge 1 of 6</span>
+                </div>
+                <div class="challenge-area">
+                    <h3 id="challenge-scenario"></h3>
+                    <div class="challenge-choices">
+                        <button class="mode-btn" data-choice="linear">Linear</button>
+                        <button class="mode-btn" data-choice="semi-log">Semi-Log</button>
+                        <button class="mode-btn" data-choice="log-log">Log-Log</button>
+                    </div>
+                    <div id="challenge-feedback"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
