@@ -1,223 +1,1478 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
-<link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
-<meta charset="utf-8" />
-<title>Interactive Trig‑Explorer</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-:root{--blue:#1565c0;--red:#d32f2f;--gray:#d0d0d0;--lite:#fafafa;--purple:#6a1b9a;--blue-light:#e3f2fd;--red-light:#ffebee;--purple-light:#f3e5f5}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(135deg, #fafafa 0%, #f0f4f8 100%);color:#222;min-height:100vh;display:flex;flex-direction:column;line-height:1.5}
-nav{background:linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);box-shadow:0 4px 12px rgba(0,0,0,.1);border-bottom:1px solid rgba(21,101,192,.1)}
-nav ul{display:flex;list-style:none}
-nav button{flex:1;padding:1.2rem;border:none;background:none;border-bottom:4px solid transparent;font-size:1rem;cursor:pointer;transition:all 0.3s ease;position:relative;font-weight:500}
-nav button:hover{background:rgba(21,101,192,.05);transform:translateY(-1px)}
-nav button[aria-selected="true"]{border-color:var(--blue);font-weight:600;background:rgba(21,101,192,.08)}
-nav button[aria-selected="true"]::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg, var(--blue), var(--purple));border-radius:0 0 2px 2px}
-main{flex:1;padding:1.5rem;display:flex;justify-content:center}
-.tab{display:none;width:100%;max-width:1000px;background:linear-gradient(135deg, #ffffff 0%, #fdfdfd 100%);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);padding:1.5rem;border:1px solid rgba(21,101,192,.08)}
-.tab.active{display:block;animation:fadeIn 0.4s ease-in-out}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-h2{font-size:1.4rem;color:var(--blue);margin-bottom:1rem;font-weight:600;display:flex;align-items:center;gap:0.5rem}
-h2::before{content:'';width:4px;height:24px;background:linear-gradient(135deg, var(--blue), var(--purple));border-radius:2px}
-.intro{background:linear-gradient(135deg, var(--blue-light) 0%, rgba(227,242,253,.5) 100%);border:1px solid rgba(21,101,192,.15);border-radius:12px;padding:1rem;margin-bottom:1.5rem;font-size:0.95rem;line-height:1.6}
-.intro h3{color:var(--blue);font-size:1.1rem;margin-bottom:0.5rem;font-weight:600}
-.intro p{margin-bottom:0.5rem}
-.intro strong{color:var(--blue)}
-canvas{background:linear-gradient(135deg, #ffffff 0%, var(--lite) 100%);border:2px solid rgba(21,101,192,.1);border-radius:8px;touch-action:none;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:box-shadow 0.3s ease}
-canvas:hover{box-shadow:0 4px 16px rgba(0,0,0,.12)}
-.output{margin-top:1rem;font-family:monospace;background:rgba(21,101,192,.04);padding:0.75rem;border-radius:8px;border-left:4px solid var(--blue);font-size:0.9rem}
-.pills{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
-.pill{padding:.4rem 1rem;border:2px solid var(--blue);border-radius:20px;font-size:.9rem;cursor:pointer;user-select:none;transition:all 0.3s ease;font-weight:500;background:rgba(255,255,255,.8)}
-.pill:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(21,101,192,.2)}
-.pill.active{background:linear-gradient(135deg, var(--blue), var(--purple));color:#fff;transform:translateY(-1px);box-shadow:0 4px 12px rgba(21,101,192,.3)}
-label{font-size:.9rem;font-weight:500;color:#555;display:flex;align-items:center;gap:0.5rem}
-input[type="range"]{appearance:none;background:transparent;cursor:pointer;flex:1}
-input[type="range"]::-webkit-slider-track{background:linear-gradient(90deg, rgba(21,101,192,.2), rgba(21,101,192,.4));height:6px;border-radius:3px}
-input[type="range"]::-webkit-slider-thumb{appearance:none;height:20px;width:20px;border-radius:50%;background:linear-gradient(135deg, var(--blue), var(--purple));cursor:pointer;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-input[type="range"]::-moz-range-track{background:linear-gradient(90deg, rgba(21,101,192,.2), rgba(21,101,192,.4));height:6px;border-radius:3px;border:none}
-input[type="range"]::-moz-range-thumb{height:20px;width:20px;border-radius:50%;background:linear-gradient(135deg, var(--blue), var(--purple));cursor:pointer;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-.slider-container{display:flex;align-items:center;gap:1rem;margin-top:1rem;max-width:440px;background:rgba(255,255,255,.6);padding:1rem;border-radius:12px;border:1px solid rgba(21,101,192,.1)}
-.angle-value{font-family:monospace;width:60px;text-align:right;font-size:.9rem;font-weight:600;color:var(--blue)}
-select{padding:0.5rem 1rem;border:2px solid var(--blue);border-radius:8px;background:white;font-size:0.9rem;cursor:pointer;transition:all 0.3s ease}
-select:hover{border-color:var(--purple);box-shadow:0 2px 8px rgba(21,101,192,.1)}
-select:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(21,101,192,.1)}
-input[type="checkbox"]{accent-color:var(--blue);transform:scale(1.1)}
-.canvas-group{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;justify-content:center}
-.deg-rad-container{display:flex;gap:1.5rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
-.checkbox-container{margin-bottom:1rem;padding:0.75rem;background:rgba(255,255,255,.6);border-radius:8px;border:1px solid rgba(21,101,192,.1)}
-</style>
-   <!-- Mathswell favicon -->
-
-<!-- Mathswell app navbar styles -->
-<style>
-  .mathswell-nav {
-    display: flex;
-    justify-content: center;
-    margin: .4rem 0 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  .mathswell-nav .mw-link {
-    display: inline-flex;
-    align-items: center;
-    gap: .45rem;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1rem;
-    color: #0f766e;
-    padding: .3rem .7rem;
-    border-radius: 999px;
-    background: rgba(255,255,255,.9);
-    box-shadow: 0 1px 4px rgba(0,0,0,.08);
-  }
-  .mathswell-nav .mw-link img {
-    display: block;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigonometry Explorer | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <style>
+        /* Root variables - Mathswell color palette */
+        :root {
+            --primary: #0f766e;       /* Mathswell teal */
+            --primary-light: #10b981;  /* Light teal */
+            --background: #f7faf9;     /* Very light gray-green */
+            --interactive: #e6fffb;    /* Light teal bg */
+            --text-primary: #212121;   /* Dark gray */
+            --text-muted: #4b5563;     /* Muted text */
+            --accent-amber: #f59e0b;   /* Use sparingly */
+            --accent-red: #c62828;     /* For sine lines */
+            --accent-blue: #1565c0;    /* For cosine lines */
+            --accent-purple: #6a1b9a;  /* For tangent lines */
+            --success: #10b981;        /* Correct answers */
+        }
+        
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding-top: 60px;
+            line-height: 1.5;
+        }
+        
+        /* CENTERED Mathswell Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* CENTERED Tab Navigation */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: var(--interactive);
+            color: var(--primary);
+        }
+        
+        /* Tab content */
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            padding: 2rem;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section headers */
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        /* Intro boxes */
+        .intro {
+            background: var(--interactive);
+            border: 1px solid var(--primary-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .intro h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .intro p {
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        /* Canvas styling */
+        canvas {
+            background: white;
+            border: 2px solid var(--primary-light);
+            border-radius: 8px;
+            touch-action: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s ease;
+            display: block;
+            margin: 1rem auto;
+        }
+        
+        canvas:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* Output display */
+        .output {
+            margin-top: 1rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: var(--interactive);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        /* Pills */
+        .pills {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .pill {
+            padding: 0.4rem 1rem;
+            border: 2px solid var(--primary);
+            border-radius: 999px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            background: white;
+            color: var(--primary);
+        }
+        
+        .pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Identity pills for Unit Circle */
+        .identity-pills {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .identity-pill {
+            padding: 0.3rem 0.8rem;
+            border: 2px solid var(--primary-light);
+            border-radius: 999px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            color: var(--primary);
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+        
+        .identity-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .identity-pill.active {
+            background: var(--primary-light);
+            color: white;
+        }
+        
+        /* Slider styling */
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem auto;
+            max-width: 440px;
+            background: var(--interactive);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--primary-light);
+        }
+        
+        label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        input[type="range"] {
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        input[type="range"]::-webkit-slider-track {
+            background: var(--primary-light);
+            height: 6px;
+            border-radius: 3px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        input[type="range"]::-moz-range-track {
+            background: var(--primary-light);
+            height: 6px;
+            border-radius: 3px;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .angle-value {
+            font-family: 'Monaco', 'Courier New', monospace;
+            min-width: 80px;
+            text-align: right;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Select styling */
+        select {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--primary);
+        }
+        
+        select:hover {
+            background: var(--interactive);
+        }
+        
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+        }
+        
+        /* Checkbox */
+        input[type="checkbox"] {
+            accent-color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .checkbox-container {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--interactive);
+            border-radius: 8px;
+            border: 1px solid var(--primary-light);
+            text-align: center;
+        }
+        
+        /* Canvas group */
+        .canvas-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        
+        .deg-rad-container {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Lock button for Unit Circle */
+        .lock-container {
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .lock-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .lock-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+        }
+        
+        .lock-btn.locked {
+            background: var(--accent-amber);
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .tab-btn {
+                font-size: 0.85rem;
+                padding: 0.6rem 1rem;
+            }
+            
+            .canvas-group {
+                flex-direction: column;
+            }
+            
+            canvas {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-<nav><ul>
-<li><button data-tab="tri" aria-selected="true">Triangle</button></li>
-<li><button data-tab="unit">Unit Circle</button></li>
-<li><button data-tab="deg">Deg ↔ Rad</button></li>
-<li><button data-tab="graph">Graph</button></li>
-</ul></nav>
-<main>
-<section id="tri" class="tab">
-  <h2>Right Triangle</h2>
-  <div class="intro">
-    <h3>Fundamental Trigonometric Ratios</h3>
-     <!-- Mathswell brand badge -->
-<div style="display:flex;justify-content:center;margin:.75rem 0 1rem;
-            position:relative;z-index:1001;">
-  <a href="/" style="display:inline-flex;align-items:center;gap:.5rem;
-      text-decoration:none;font-weight:800;font-size:1.05rem;color:#0f766e;
-      padding:.4rem .8rem;border-radius:999px;background:#fff;
-      box-shadow:0 1px 4px rgba(0,0,0,.08);">
-    <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" style="display:block">
-    <span>MATHSWELL</span>
-  </a>
-</div>
-
-    <p>This tab explores the fundamental trigonometric ratios (sine, cosine, tangent) in the context of a right-angled triangle.</p>
-    <p><strong>How to use:</strong> Drag the slider to change the angle of interest and observe how the side lengths and their ratios change.</p>
-  </div>
-  <canvas id="triC" width="440" height="320"></canvas>
-  <div class="slider-container">
-    <label for="angleSlider">Angle of Interest:</label>
-    <input type="range" id="angleSlider" min="0" max="90" step="0.1">
-    <span id="angleValue" class="angle-value"></span>
-  </div>
-  <div id="triO" class="output"></div>
-</section>
-<section id="unit" class="tab">
-  <h2>Unit Circle</h2>
-  <div class="intro">
-    <h3>Beyond Right-Angled Triangles</h3>
-    <p>The Unit Circle extends trigonometry beyond right-angled triangles to any angle. It's the foundation for understanding periodic functions. The circle has a radius of 1.</p>
-    <p><strong>How to use:</strong> Drag the point on the large circle or the smaller wheel. Click the 'sin', 'cos', and 'tan' pills to visualize their values.</p>
-  </div>
-  <div class="pills" id="ratios">
-    <span class="pill active" data-r="sin">sin</span>
-    <span class="pill" data-r="cos">cos</span>
-    <span class="pill" data-r="tan">tan</span>
-  </div>
-  <canvas id="unitC" width="420" height="420"></canvas>
-  <canvas id="wheelC" width="120" height="120" style="margin-top:.5rem"></canvas>
-  <div id="unitO" class="output"></div>
-</section>
-<section id="deg" class="tab">
-  <h2>Degrees ↔ Radians</h2>
-  <div class="intro">
-    <h3>Two Units for Measuring Angles</h3>
-    <p>This tab helps visualize the relationship between Degrees and Radians, the two primary units for measuring angles. An angle of <code>1π</code> radians is equivalent to a 180° rotation.</p>
-    <p><strong>How to use:</strong> Drag the point on either circle to see the corresponding angles. Use the checkbox to switch between counter-clockwise (positive) and clockwise (negative) angles.</p>
-  </div>
-  <div class="checkbox-container">
-    <label><input type="checkbox" id="negChk"> use CW (negative)</label>
-  </div>
-  <div class="deg-rad-container">
-    <canvas id="degC" width="350" height="350"></canvas>
-    <canvas id="radC" width="350" height="350"></canvas>
-  </div>
-</section>
-<section id="graph" class="tab active">
-  <h2>Graph</h2>
-  <div class="intro">
-    <h3>From Circle to Wave Functions</h3>
-    <p>This tab shows how the trigonometric values from the unit circle unfold into continuous wave functions.</p>
-    <p><strong>How to use:</strong> Use the dropdown to select a function. Drag the point on the unit circle to see how its position corresponds to a point on the graph.</p>
-  </div>
-  <select id="gFn">
-    <option value="sin">sin</option>
-    <option value="cos">cos</option>
-    <option value="tan">tan</option>
-  </select>
-  <div class="canvas-group">
-    <canvas id="gUC" width="310" height="310"></canvas>
-    <canvas id="gPlot" width="640" height="320"></canvas>
-  </div>
-</section>
-</main>
-<script>
-/***** shared helpers *****/
-const TAU = Math.PI*2, SNAP=0.04, COMM=[...Array(24)].map((_,i)=>i*Math.PI/12);
-let angle=Math.PI/6; // global shared state
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const snap=a=>COMM.find(c=>Math.abs(a-c)<SNAP)||a,
-      clr=ctx=>ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height),
-      circ=(ctx,x,y,r)=>{ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();};
-const renders={}, updateAll=()=>Object.values(renders).forEach(f=>f());
-/***** navigation *****/
-$$('nav button').forEach(btn=>btn.onclick=()=>{ $$("nav button").forEach(b=>b.ariaSelected=false); btn.ariaSelected=true; $$('.tab').forEach(tab=>tab.classList.toggle('active',tab.id===btn.dataset.tab));});
-/***** Triangle tab *****/
-(()=>{const cvs=triC,ctx=cvs.getContext('2d');const base={x:40,y:cvs.height-20},diam=360,R=diam/2,center={x:base.x+R,y:base.y};
-const slider=$('#angleSlider'),angleValueSpan=$('#angleValue');
-const point=a=>({x:center.x+R*Math.cos(Math.PI-a),y:center.y-R*Math.sin(Math.PI-a)});
-function protractor(){ctx.strokeStyle='rgba(0,0,0,.15)';for(let d=0;d<=90;d+=10){const a=d*Math.PI/180;ctx.beginPath();ctx.moveTo(base.x,base.y);ctx.lineTo(base.x+40*Math.cos(a),base.y-40*Math.sin(a));ctx.stroke();}ctx.strokeStyle='#000';}
-function draw(){clr(ctx);const p=point(((angle%TAU)+TAU)%Math.PI);ctx.beginPath();ctx.moveTo(base.x,base.y);ctx.lineTo(p.x,p.y);ctx.lineTo(base.x+diam,base.y);ctx.closePath();ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,5,0,TAU);ctx.fill();protractor();
-const cornerAngleRad=angle/2;const targetAngleRad=(Math.PI/2)-cornerAngleRad;const targetAngleDeg=(targetAngleRad*180/Math.PI).toFixed(1);
-triO.innerHTML=`sin(${targetAngleDeg}°) = ${Math.sin(targetAngleRad).toFixed(3)}<br>cos(${targetAngleDeg}°) = ${Math.cos(targetAngleRad).toFixed(3)}<br>tan(${targetAngleDeg}°) = ${Math.tan(targetAngleRad).toFixed(3)}`;
-angleValueSpan.textContent=`${targetAngleDeg}°`;}
-function setup(){const initialCornerAngleRad=angle/2;const initialTargetAngleRad=(Math.PI/2)-initialCornerAngleRad;const initialTargetAngleDeg=initialTargetAngleRad*180/Math.PI;
-slider.value=initialTargetAngleDeg;
-draw();}
-slider.addEventListener('input',()=>{const targetAngleDeg=parseFloat(slider.value);const targetAngleRad=targetAngleDeg*Math.PI/180;
-const cornerAngleRad=(Math.PI/2)-targetAngleRad;
-angle=2*cornerAngleRad;
-draw();updateAll();});
-renders.tri=setup;setup();})();
-/***** Unit Circle tab *****/
-(()=>{const cvs=unitC,ctx=cvs.getContext('2d');const wheel=wheelC,wctx=wheel.getContext('2d');const cx=cvs.width/2,r=cx-40;let dragging=false,dragCanvas=null,prevRaw=0;
-const pills=$$('#ratios .pill'),active=new Set(['sin']);pills.forEach(p=>p.onclick=()=>{p.classList.toggle('active');(p.classList.contains('active')?active.add:active.delete).call(active,p.dataset.r);draw();});
-function drawWheel(){const c=wheel.width/2,R=c-10;clr(wctx);const pa=((angle%TAU)+TAU)%TAU;wctx.fillStyle='rgba(142,36,170,.25)';wctx.beginPath();wctx.moveTo(c,c);wctx.arc(c,c,R,0,-pa,true);wctx.closePath();wctx.fill();circ(wctx,c,c,R);wctx.beginPath();wctx.arc(c+R*Math.cos(angle),c-R*Math.sin(angle),4,0,TAU);wctx.fill();}
-function draw(){clr(ctx);ctx.lineWidth=1;ctx.strokeStyle='#000';circ(ctx,cx,cx,r);ctx.strokeStyle='#bbb';ctx.beginPath();ctx.moveTo(cx-r-30,cx);ctx.lineTo(cx+r+30,cx);ctx.moveTo(cx,cx-r-30);ctx.lineTo(cx,cx+r+30);ctx.stroke();ctx.font='16px sans-serif';ctx.fillStyle='#222';ctx.textAlign='right';ctx.fillText('cos',cx+r+28,cx+5);ctx.textAlign='center';ctx.fillText('sin',cx-5,cx-r-12);
-const px=cx+r*Math.cos(angle),py=cx-r*Math.sin(angle);ctx.fillStyle='#000';ctx.beginPath();ctx.arc(px,py,5,0,TAU);ctx.fill();ctx.lineWidth=3;ctx.font='12px monospace';
-if(active.has('sin')){ctx.strokeStyle='#d32f2f';ctx.beginPath();ctx.moveTo(cx,cx);ctx.lineTo(cx,py);ctx.stroke();ctx.fillStyle='#222';ctx.fillText(Math.sin(angle).toFixed(2),cx-40,(py+cx)/2);} if(active.has('cos')){ctx.strokeStyle='#1565c0';ctx.beginPath();ctx.moveTo(cx,cx);ctx.lineTo(px,cx);ctx.stroke();ctx.fillStyle='#222';ctx.fillText(Math.cos(angle).toFixed(2),(px+cx)/2,cx+20);} if(active.has('tan')){const tx=cx+r,tan_y=cx-r*Math.tan(angle);ctx.lineWidth=1;ctx.strokeStyle='#bbb';ctx.beginPath();ctx.moveTo(tx,cx-r-30);ctx.lineTo(tx,cx+r+30);ctx.stroke();ctx.textAlign='left';ctx.font='16px sans-serif';ctx.fillStyle='#222';ctx.fillText('tan',tx-10,cx-r-12);ctx.strokeStyle='rgba(0,0,0,0.5)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(cx,cx);ctx.lineTo(px,py);ctx.lineTo(tx,tan_y);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#6a1b9a';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(tx,cx);ctx.lineTo(tx,tan_y);ctx.stroke();}
-const deg=(angle*180/Math.PI).toFixed(1);unitO.innerHTML=[...active].map(k=>`${k}(${deg}°) = ${{sin:Math.sin,cos:Math.cos,tan:Math.tan}[k](angle).toFixed(3)}`).join('<br>');drawWheel();}
-const rawA=(e,can)=>{const rect=can.getBoundingClientRect();const c=can.width/2;return Math.atan2(c-(e.clientY-rect.top),(e.clientX-rect.left)-c);} ;
-function move(e){if(!dragging) return;const raw=rawA(e,dragCanvas);let delta=raw-prevRaw;if(delta>Math.PI) delta-=TAU;if(delta<-Math.PI) delta+=TAU;angle=snap(angle+delta);prevRaw=raw;draw();updateAll();}
-function startDrag(e,can){dragging=true;dragCanvas=can;prevRaw=rawA(e,can);move(e);} cvs.onpointerdown=e=>startDrag(e,cvs);wheel.onpointerdown=e=>startDrag(e,wheel);window.addEventListener('pointermove',move);window.addEventListener('pointerup',()=>{dragging=false;dragCanvas=null;});renders.unit=draw;draw();})();
-/***** Degrees ↔ Radians tab *****/
-(()=>{const dctx=degC.getContext('2d'),rctx=radC.getContext('2d');const C=degC.width/2,R=C-10,neg=$('#negChk');let dragging=null;const gcd=(a,b)=>b?gcd(b,a%b):a,lDeg=v=>v+'°',lRad=i=>{if(i===0) return '0';const n=i,g=gcd(Math.abs(n),12),num=n/g,den=12/g;return(num<0?'-':'')+(Math.abs(num)===1?'π':Math.abs(num)+'π')+(den===1?'':'/'+den);};
-function circles(){[dctx,rctx].forEach(ctx=>{clr(ctx);circ(ctx,C,C,R);});const cw=neg.checked?-1:1;for(let i=0;i<24;i++){const th=i*Math.PI/12*cw,x=C+R*Math.cos(th),y=C-R*Math.sin(th);[dctx,rctx].forEach(ctx=>{ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(C+0.9*R*Math.cos(th),C-0.9*R*Math.sin(th));ctx.stroke();});if(i%3===0){dctx.textAlign=rctx.textAlign='center';dctx.textBaseline=rctx.textBaseline='middle';dctx.fillText(lDeg(i*15*cw),C+0.75*R*Math.cos(th),C-0.75*R*Math.sin(th));rctx.fillText(lRad(i*cw),C+0.75*R*Math.cos(th),C+0.75*R*Math.sin(th));}}}
-function pointer(){const x=C+R*Math.cos(angle),y=C-R*Math.sin(angle);[dctx,rctx].forEach(ctx=>{ctx.fillStyle='var(--red)';ctx.beginPath();ctx.arc(x,y,5,0,TAU);ctx.fill();});}
-function draw(){circles();pointer();}
-const aFrom=(e,cv)=>{const r=cv.getBoundingClientRect();return Math.atan2(cv.height/2-(e.clientY-r.top),(e.clientX-r.left)-cv.width/2);};
-function move(e){if(!dragging) return;angle=snap(aFrom(e,dragging==='deg'?degC:radC));draw();updateAll();}
-degC.onpointerdown=e=>{dragging='deg';move(e);};radC.onpointerdown=e=>{dragging='rad';move(e);};window.addEventListener('pointermove',move);window.addEventListener('pointerup',()=>dragging=null);neg.onchange=draw;renders.deg=draw;draw();})();
-/***** Graph tab *****/
-(()=>{const uc=gUC,uctx=uc.getContext('2d');const gp=gPlot,gx=gp.getContext('2d');const CC=uc.width/2,R=CC-30;let dragging=false;const range=[-2*Math.PI,2*Math.PI];
-function drawUC(){clr(uctx);uctx.lineWidth=1;uctx.strokeStyle='#000';circ(uctx,CC,CC,R);uctx.strokeStyle='#bbb';uctx.beginPath();uctx.moveTo(CC-R-20,CC);uctx.lineTo(CC+R+20,CC);uctx.moveTo(CC,CC-R-20);uctx.lineTo(CC,CC+R+20);uctx.stroke();uctx.font='14px sans-serif';uctx.fillStyle='#222';uctx.textAlign='left';uctx.fillText('cos',CC+R+5,CC+5);uctx.textAlign='center';uctx.fillText('sin',CC,CC-R-10);const px=CC+R*Math.cos(angle),py=CC-R*Math.sin(angle);uctx.fillStyle='#000';uctx.beginPath();uctx.arc(px,py,5,0,TAU);uctx.fill();uctx.lineWidth=3;const fn=gFn.value;if(fn==='sin'){uctx.strokeStyle='#d32f2f';uctx.beginPath();uctx.moveTo(CC,CC);uctx.lineTo(CC,py);uctx.stroke();}else if(fn==='cos'){uctx.strokeStyle='#1565c0';uctx.beginPath();uctx.moveTo(CC,CC);uctx.lineTo(px,CC);uctx.stroke();}else{const tx=CC+R,tan_y=CC-R*Math.tan(angle);uctx.lineWidth=1;uctx.strokeStyle='#bbb';uctx.beginPath();uctx.moveTo(tx,CC-R-20);uctx.lineTo(tx,CC+R+20);uctx.stroke();uctx.textAlign='left';uctx.font='14px sans-serif';uctx.fillStyle='#222';uctx.fillText('tan',tx-10,CC-R-5);uctx.strokeStyle='rgba(0,0,0,0.5)';uctx.setLineDash([4,4]);uctx.beginPath();uctx.moveTo(CC,CC);uctx.lineTo(px,py);uctx.lineTo(tx,tan_y);uctx.stroke();uctx.setLineDash([]);uctx.strokeStyle='#6a1b9a';uctx.lineWidth=3;uctx.beginPath();uctx.moveTo(tx,CC);uctx.lineTo(tx,tan_y);uctx.stroke();}}
-function plot(){gx.clearRect(0,0,gp.width,gp.height);const [x0,x1]=range,w=gp.width,h=gp.height,sx=w/(x1-x0),sy=h/2*0.9,ox=-x0*sx,oy=h/2;gx.strokeStyle='#bbb';gx.beginPath();gx.moveTo(0,oy);gx.lineTo(w,oy);gx.moveTo(ox,0);gx.lineTo(ox,h);gx.stroke();const fn=gFn.value,F={sin:Math.sin,cos:Math.cos,tan:Math.tan}[fn];gx.beginPath();let first=true;for(let x=x0;x<=x1;x+=0.02){let y=F(x);if(!isFinite(y)){first=true;continue;}const px=ox+x*sx,py=oy-y*sy;if(first){gx.moveTo(px,py);first=false;}else gx.lineTo(px,py);}gx.strokeStyle='var(--blue)';gx.stroke();if(fn==='tan'){gx.strokeStyle='#aaa';gx.setLineDash([4,4]);for(let k=Math.ceil(x0/(Math.PI/2));k<=Math.floor(x1/(Math.PI/2));k++){if(k%2===0) continue;const px=ox+k*Math.PI/2*sx;gx.beginPath();gx.moveTo(px,0);gx.lineTo(px,h);gx.stroke();}gx.setLineDash([]);}const vx=ox+angle*sx,vy=oy-F(angle)*sy;gx.fillStyle='var(--red)';gx.beginPath();gx.arc(vx,vy,5,0,TAU);gx.fill();gx.strokeStyle='var(--red)';gx.beginPath();gx.moveTo(vx,vy);gx.lineTo(vx,oy);gx.stroke();}
-function redraw(){drawUC();plot();}
-function getA(e){const rect=uc.getBoundingClientRect();return Math.atan2(CC-(e.clientY-rect.top),(e.clientX-rect.left)-CC);}
-function move(e){if(!dragging) return;angle=snap(getA(e));redraw();updateAll();}
-uc.onpointerdown=e=>{dragging=true;move(e);};window.addEventListener('pointermove',move);window.addEventListener('pointerup',()=>dragging=false);gFn.onchange=redraw;renders.graph=redraw;redraw();})();
-</script>
+    <!-- Centered Mathswell Navigation -->
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    
+    <div class="container">
+        <!-- Centered Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="triangle">Triangle</button>
+            <button class="tab-btn" data-tab="unit">Unit Circle</button>
+            <button class="tab-btn" data-tab="degrees">Deg ↔ Rad</button>
+            <button class="tab-btn" data-tab="graph">Graph</button>
+        </div>
+        
+        <!-- Triangle Tab -->
+        <div id="triangle" class="tab-content active">
+            <h2>Right Triangle</h2>
+            <div class="intro">
+                <h3>Fundamental Trigonometric Ratios</h3>
+                <p>This tab explores the fundamental trigonometric ratios (sine, cosine, tangent) in the context of a right-angled triangle.</p>
+                <p><strong>How to use:</strong> Drag the slider to change the angle of interest and observe how the side lengths and their ratios change.</p>
+            </div>
+            <canvas id="triCanvas" width="440" height="320"></canvas>
+            <div class="slider-container">
+                <label for="angleSlider">Angle:</label>
+                <input type="range" id="angleSlider" min="0" max="90" step="0.1">
+                <span id="angleValue" class="angle-value"></span>
+            </div>
+            <div id="triOutput" class="output"></div>
+        </div>
+        
+        <!-- Unit Circle Tab -->
+        <div id="unit" class="tab-content">
+            <h2>Unit Circle</h2>
+            <div class="intro">
+                <h3>Beyond Right-Angled Triangles</h3>
+                <p>The Unit Circle extends trigonometry to any angle. Explore trigonometric identities by locking an angle and comparing it with related angles.</p>
+                <p><strong>How to use:</strong> Drag the point on the circle or wheel. Lock an angle, then explore identities like sin(-θ), cos(π/2 + θ), and more!</p>
+            </div>
+            
+            <div class="pills" id="ratios">
+                <span class="pill active" data-r="sin">sin</span>
+                <span class="pill" data-r="cos">cos</span>
+                <span class="pill" data-r="tan">tan</span>
+            </div>
+            
+            <div class="lock-container">
+                <button id="lockBtn" class="lock-btn">🔓 Lock Current Angle</button>
+            </div>
+            
+            <div class="identity-pills" id="identities">
+                <span class="identity-pill" data-transform="original">θ</span>
+                <span class="identity-pill" data-transform="negative">-θ</span>
+                <span class="identity-pill" data-transform="pi-minus">π - θ</span>
+                <span class="identity-pill" data-transform="pi-plus">π + θ</span>
+                <span class="identity-pill" data-transform="half-pi-plus">π/2 + θ</span>
+                <span class="identity-pill" data-transform="half-pi-minus">π/2 - θ</span>
+                <span class="identity-pill" data-transform="two-pi-minus">2π - θ</span>
+            </div>
+            
+            <canvas id="unitCanvas" width="420" height="420"></canvas>
+            <canvas id="wheelCanvas" width="120" height="120"></canvas>
+            <div id="unitOutput" class="output"></div>
+        </div>
+        
+        <!-- Degrees ↔ Radians Tab -->
+        <div id="degrees" class="tab-content">
+            <h2>Degrees ↔ Radians</h2>
+            <div class="intro">
+                <h3>Two Units for Measuring Angles</h3>
+                <p>This tab helps visualize the relationship between Degrees and Radians. An angle of π radians equals 180°.</p>
+                <p><strong>How to use:</strong> Drag the point on either circle. Use the checkbox to switch between counter-clockwise (positive) and clockwise (negative) angles.</p>
+            </div>
+            <div class="checkbox-container">
+                <label><input type="checkbox" id="negCheck"> Use clockwise (negative) angles</label>
+            </div>
+            <div class="deg-rad-container">
+                <canvas id="degCanvas" width="350" height="350"></canvas>
+                <canvas id="radCanvas" width="350" height="350"></canvas>
+            </div>
+        </div>
+        
+        <!-- Graph Tab -->
+        <div id="graph" class="tab-content">
+            <h2>Graph</h2>
+            <div class="intro">
+                <h3>From Circle to Wave Functions</h3>
+                <p>See how trigonometric values from the unit circle unfold into continuous wave functions.</p>
+                <p><strong>How to use:</strong> Select a function and drag the point on the unit circle to see its corresponding position on the graph.</p>
+            </div>
+            <select id="graphFunc">
+                <option value="sin">sin</option>
+                <option value="cos">cos</option>
+                <option value="tan">tan</option>
+            </select>
+            <div class="canvas-group">
+                <canvas id="graphUnitCircle" width="310" height="310"></canvas>
+                <canvas id="graphPlot" width="640" height="320"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Shared helpers
+        const TAU = Math.PI * 2;
+        const SNAP = 0.04;
+        const COMMON_ANGLES = [...Array(24)].map((_, i) => i * Math.PI / 12);
+        let angle = Math.PI / 6; // Global shared angle state
+        
+        const $ = s => document.querySelector(s);
+        const $$ = s => [...document.querySelectorAll(s)];
+        
+        const snap = a => {
+            const found = COMMON_ANGLES.find(c => Math.abs(a - c) < SNAP);
+            return found !== undefined ? found : a;
+        };
+        
+        const clear = ctx => ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        
+        const circle = (ctx, x, y, r) => {
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, TAU);
+            ctx.stroke();
+        };
+        
+        const renders = {};
+        const updateAll = () => Object.values(renders).forEach(f => f());
+        
+        // Tab switching
+        $$('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                $$('.tab-content').forEach(c => c.classList.remove('active'));
+                $(`#${btn.dataset.tab}`).classList.add('active');
+            });
+        });
+        
+        // Triangle Tab
+        (() => {
+            const canvas = $('#triCanvas');
+            const ctx = canvas.getContext('2d');
+            const base = { x: 40, y: canvas.height - 20 };
+            const diam = 360;
+            const R = diam / 2;
+            const center = { x: base.x + R, y: base.y };
+            const slider = $('#angleSlider');
+            const angleValueSpan = $('#angleValue');
+            
+            const point = a => ({
+                x: center.x + R * Math.cos(Math.PI - a),
+                y: center.y - R * Math.sin(Math.PI - a)
+            });
+            
+            function protractor() {
+                ctx.strokeStyle = 'rgba(15, 118, 110, 0.2)';
+                for (let d = 0; d <= 90; d += 10) {
+                    const a = d * Math.PI / 180;
+                    ctx.beginPath();
+                    ctx.moveTo(base.x, base.y);
+                    ctx.lineTo(base.x + 40 * Math.cos(a), base.y - 40 * Math.sin(a));
+                    ctx.stroke();
+                }
+                ctx.strokeStyle = '#000';
+            }
+            
+            function draw() {
+                clear(ctx);
+                const p = point(((angle % TAU) + TAU) % Math.PI);
+                
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(base.x, base.y);
+                ctx.lineTo(p.x, p.y);
+                ctx.lineTo(base.x + diam, base.y);
+                ctx.closePath();
+                ctx.stroke();
+                
+                ctx.fillStyle = '#0f766e';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 5, 0, TAU);
+                ctx.fill();
+                
+                protractor();
+                
+                const cornerAngleRad = angle / 2;
+                const targetAngleRad = (Math.PI / 2) - cornerAngleRad;
+                const targetAngleDeg = (targetAngleRad * 180 / Math.PI).toFixed(1);
+                
+                $('#triOutput').innerHTML = `sin(${targetAngleDeg}°) = ${Math.sin(targetAngleRad).toFixed(3)}<br>` +
+                    `cos(${targetAngleDeg}°) = ${Math.cos(targetAngleRad).toFixed(3)}<br>` +
+                    `tan(${targetAngleDeg}°) = ${Math.tan(targetAngleRad).toFixed(3)}`;
+                
+                angleValueSpan.textContent = `${targetAngleDeg}°`;
+            }
+            
+            function setup() {
+                const initialCornerAngleRad = angle / 2;
+                const initialTargetAngleRad = (Math.PI / 2) - initialCornerAngleRad;
+                const initialTargetAngleDeg = initialTargetAngleRad * 180 / Math.PI;
+                slider.value = initialTargetAngleDeg;
+                draw();
+            }
+            
+            slider.addEventListener('input', () => {
+                const targetAngleDeg = parseFloat(slider.value);
+                const targetAngleRad = targetAngleDeg * Math.PI / 180;
+                const cornerAngleRad = (Math.PI / 2) - targetAngleRad;
+                angle = 2 * cornerAngleRad;
+                draw();
+                updateAll();
+            });
+            
+            renders.tri = setup;
+            setup();
+        })();
+        
+        // Unit Circle Tab with Identity Explorer
+        (() => {
+            const canvas = $('#unitCanvas');
+            const ctx = canvas.getContext('2d');
+            const wheel = $('#wheelCanvas');
+            const wctx = wheel.getContext('2d');
+            const cx = canvas.width / 2;
+            const r = cx - 40;
+            let dragging = false;
+            let dragCanvas = null;
+            let prevRaw = 0;
+            let lockedAngle = null;
+            let currentTransform = 'original';
+            
+            const pills = $$('#ratios .pill');
+            const active = new Set(['sin']);
+            const lockBtn = $('#lockBtn');
+            const identityPills = $$('#identities .identity-pill');
+            
+            // Format angle in radians as a nice fraction
+            function formatRadians(rad) {
+                // Handle negative angles
+                const isNegative = rad < -0.01;
+                const absRad = Math.abs(rad);
+                
+                // Normalize to [0, 2π)
+                const normalized = ((absRad % TAU) + TAU) % TAU;
+                const piMultiple = normalized / Math.PI;
+                
+                // Check for common fractions with correct values
+                const fractions = [
+                    [0, '0'],
+                    [1/6, 'π/6'],     // 30°
+                    [1/4, 'π/4'],     // 45°
+                    [1/3, 'π/3'],     // 60°
+                    [1/2, 'π/2'],     // 90°
+                    [2/3, '2π/3'],    // 120°
+                    [3/4, '3π/4'],    // 135°
+                    [5/6, '5π/6'],    // 150°
+                    [1, 'π'],         // 180°
+                    [7/6, '7π/6'],    // 210°
+                    [5/4, '5π/4'],    // 225°
+                    [4/3, '4π/3'],    // 240°
+                    [3/2, '3π/2'],    // 270°
+                    [5/3, '5π/3'],    // 300°
+                    [7/4, '7π/4'],    // 315°
+                    [11/6, '11π/6'],  // 330°
+                    [2, '2π']         // 360°
+                ];
+                
+                for (let [val, str] of fractions) {
+                    if (Math.abs(piMultiple - val) < 0.01) {
+                        if (isNegative && str !== '0') {
+                            return '-' + str;
+                        }
+                        return str;
+                    }
+                }
+                
+                // Not a common fraction
+                const result = `${piMultiple.toFixed(2)}π`;
+                return isNegative ? '-' + result : result;
+            }
+            
+            // Get exact values for famous angles
+            function getExactValue(func, angleRad) {
+                const eps = 0.01;
+                // Normalize to [0, 2π)
+                let norm = angleRad % TAU;
+                if (norm < 0) norm += TAU;
+                
+                // Get the actual numeric value
+                const actualValue = { sin: Math.sin, cos: Math.cos, tan: Math.tan }[func](angleRad);
+                
+                // Special cases first
+                if (Math.abs(actualValue) < eps) return '0';
+                if (Math.abs(actualValue - 1) < eps) return '1';
+                if (Math.abs(actualValue + 1) < eps) return '-1';
+                
+                // For tan at π/2 and 3π/2
+                if (func === 'tan' && (Math.abs(norm - Math.PI/2) < eps || Math.abs(norm - 3*Math.PI/2) < eps)) {
+                    return 'undefined';
+                }
+                
+                // Check reference angle (always positive, between 0 and π/2)
+                let refAngle;
+                if (norm <= Math.PI/2) {
+                    refAngle = norm;
+                } else if (norm <= Math.PI) {
+                    refAngle = Math.PI - norm;
+                } else if (norm <= 3*Math.PI/2) {
+                    refAngle = norm - Math.PI;
+                } else {
+                    refAngle = TAU - norm;
+                }
+                refAngle = Math.abs(refAngle);
+                
+                // Check if it's a famous angle
+                let baseValue = null;
+                
+                if (Math.abs(refAngle - Math.PI/6) < eps) {
+                    // 30° reference
+                    if (func === 'sin') baseValue = '1/2';
+                    else if (func === 'cos') baseValue = '√3/2';
+                    else if (func === 'tan') baseValue = '1/√3';
+                } else if (Math.abs(refAngle - Math.PI/4) < eps) {
+                    // 45° reference
+                    if (func === 'sin') baseValue = '√2/2';
+                    else if (func === 'cos') baseValue = '√2/2';
+                    else if (func === 'tan') baseValue = '1';
+                } else if (Math.abs(refAngle - Math.PI/3) < eps) {
+                    // 60° reference
+                    if (func === 'sin') baseValue = '√3/2';
+                    else if (func === 'cos') baseValue = '1/2';
+                    else if (func === 'tan') baseValue = '√3';
+                }
+                
+                if (baseValue !== null) {
+                    // Apply sign based on actual value
+                    if (actualValue < -eps) {
+                        return '-' + baseValue;
+                    } else {
+                        return baseValue;
+                    }
+                }
+                
+                // Not a famous angle, return decimal
+                return actualValue.toFixed(3);
+            }
+            
+            // Format the transformation expression
+            function getTransformExpression() {
+                if (!lockedAngle || currentTransform === 'original') return '';
+                
+                const lockedRad = formatRadians(lockedAngle);
+                
+                let expression = '';
+                switch (currentTransform) {
+                    case 'negative':
+                        expression = `-${lockedRad}`;
+                        if (lockedRad === '0') expression = '0';
+                        break;
+                    case 'pi-minus':
+                        expression = `π - ${lockedRad}`;
+                        break;
+                    case 'pi-plus':
+                        expression = `π + ${lockedRad}`;
+                        break;
+                    case 'half-pi-plus':
+                        expression = `π/2 + ${lockedRad}`;
+                        break;
+                    case 'half-pi-minus':
+                        expression = `π/2 - ${lockedRad}`;
+                        break;
+                    case 'two-pi-minus':
+                        expression = `2π - ${lockedRad}`;
+                        break;
+                }
+                
+                return expression;
+            }
+            
+            pills.forEach(p => p.onclick = () => {
+                p.classList.toggle('active');
+                if (p.classList.contains('active')) {
+                    active.add(p.dataset.r);
+                } else {
+                    active.delete(p.dataset.r);
+                }
+                draw();
+            });
+            
+            // Lock/unlock functionality
+            lockBtn.onclick = () => {
+                if (lockedAngle === null) {
+                    lockedAngle = angle;
+                    lockBtn.textContent = '🔒 Unlock Angle';
+                    lockBtn.classList.add('locked');
+                    identityPills[0].click(); // Reset to original
+                } else {
+                    lockedAngle = null;
+                    lockBtn.textContent = '🔓 Lock Current Angle';
+                    lockBtn.classList.remove('locked');
+                    currentTransform = 'original';
+                    identityPills.forEach(p => p.classList.remove('active'));
+                }
+                draw();
+            };
+            
+            // Identity transformation
+            identityPills.forEach(pill => {
+                pill.onclick = () => {
+                    if (lockedAngle === null) return;
+                    
+                    identityPills.forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    currentTransform = pill.dataset.transform;
+                    
+                    // Apply transformation
+                    switch (currentTransform) {
+                        case 'original':
+                            angle = lockedAngle;
+                            break;
+                        case 'negative':
+                            angle = -lockedAngle;
+                            break;
+                        case 'pi-minus':
+                            angle = Math.PI - lockedAngle;
+                            break;
+                        case 'pi-plus':
+                            angle = Math.PI + lockedAngle;
+                            break;
+                        case 'half-pi-plus':
+                            angle = Math.PI/2 + lockedAngle;
+                            break;
+                        case 'half-pi-minus':
+                            angle = Math.PI/2 - lockedAngle;
+                            break;
+                        case 'two-pi-minus':
+                            angle = TAU - lockedAngle;
+                            break;
+                    }
+                    draw();
+                    updateAll();
+                };
+            });
+            
+            function drawWheel() {
+                const c = wheel.width / 2;
+                const R = c - 10;
+                clear(wctx);
+                
+                const pa = ((angle % TAU) + TAU) % TAU;
+                wctx.fillStyle = 'rgba(15, 118, 110, 0.25)';
+                wctx.beginPath();
+                wctx.moveTo(c, c);
+                wctx.arc(c, c, R, 0, -pa, true);
+                wctx.closePath();
+                wctx.fill();
+                
+                wctx.strokeStyle = '#0f766e';
+                wctx.lineWidth = 2;
+                circle(wctx, c, c, R);
+                
+                wctx.fillStyle = '#0f766e';
+                wctx.beginPath();
+                wctx.arc(c + R * Math.cos(angle), c - R * Math.sin(angle), 4, 0, TAU);
+                wctx.fill();
+            }
+            
+            function draw() {
+                clear(ctx);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#000';
+                circle(ctx, cx, cx, r);
+                
+                // Axes
+                ctx.strokeStyle = '#bbb';
+                ctx.beginPath();
+                ctx.moveTo(cx - r - 30, cx);
+                ctx.lineTo(cx + r + 30, cx);
+                ctx.moveTo(cx, cx - r - 30);
+                ctx.lineTo(cx, cx + r + 30);
+                ctx.stroke();
+                
+                ctx.font = '16px sans-serif';
+                ctx.fillStyle = '#222';
+                ctx.textAlign = 'right';
+                ctx.fillText('cos', cx + r + 28, cx + 5);
+                ctx.textAlign = 'center';
+                ctx.fillText('sin', cx - 5, cx - r - 12);
+                
+                // Draw locked angle reference if exists
+                if (lockedAngle !== null) {
+                    const lx = cx + r * Math.cos(lockedAngle);
+                    const ly = cx - r * Math.sin(lockedAngle);
+                    
+                    ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cx);
+                    ctx.lineTo(lx, ly);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    ctx.fillStyle = 'rgba(245, 158, 11, 0.5)';
+                    ctx.beginPath();
+                    ctx.arc(lx, ly, 4, 0, TAU);
+                    ctx.fill();
+                }
+                
+                // Current point
+                const px = cx + r * Math.cos(angle);
+                const py = cx - r * Math.sin(angle);
+                
+                ctx.fillStyle = '#0f766e';
+                ctx.beginPath();
+                ctx.arc(px, py, 6, 0, TAU);
+                ctx.fill();
+                
+                ctx.lineWidth = 3;
+                ctx.font = '12px monospace';
+                
+                // Draw trigonometric lines
+                if (active.has('sin')) {
+                    ctx.strokeStyle = '#c62828';
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cx);
+                    ctx.lineTo(cx, py);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#222';
+                    ctx.fillText(Math.sin(angle).toFixed(2), cx - 40, (py + cx) / 2);
+                }
+                
+                if (active.has('cos')) {
+                    ctx.strokeStyle = '#1565c0';
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cx);
+                    ctx.lineTo(px, cx);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#222';
+                    ctx.fillText(Math.cos(angle).toFixed(2), (px + cx) / 2, cx + 20);
+                }
+                
+                if (active.has('tan') && Math.abs(Math.cos(angle)) > 0.01) {
+                    const tx = cx + r;
+                    const tan_y = cx - r * Math.tan(angle);
+                    
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#bbb';
+                    ctx.beginPath();
+                    ctx.moveTo(tx, cx - r - 30);
+                    ctx.lineTo(tx, cx + r + 30);
+                    ctx.stroke();
+                    
+                    ctx.textAlign = 'left';
+                    ctx.font = '16px sans-serif';
+                    ctx.fillStyle = '#222';
+                    ctx.fillText('tan', tx - 10, cx - r - 12);
+                    
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.setLineDash([4, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cx);
+                    ctx.lineTo(px, py);
+                    ctx.lineTo(tx, tan_y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    ctx.strokeStyle = '#6a1b9a';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(tx, cx);
+                    ctx.lineTo(tx, tan_y);
+                    ctx.stroke();
+                }
+                
+                // Output display with both degrees and radians
+                const deg = (angle * 180 / Math.PI).toFixed(1);
+                const rad = formatRadians(angle);
+                
+                let output = `<strong>Angle:</strong> ${deg}° = ${rad}<br>`;
+                
+                if (lockedAngle !== null) {
+                    const lockedDeg = (lockedAngle * 180 / Math.PI).toFixed(1);
+                    const lockedRad = formatRadians(lockedAngle);
+                    output += `<strong>Locked θ:</strong> ${lockedDeg}° = ${lockedRad}<br>`;
+                    output += `<strong>Current:</strong> ${currentTransform.replace(/-/g, ' ')}<br>`;
+                }
+                
+                output += '<br>';
+                
+                // Show identity relationships when locked
+                if (lockedAngle !== null && currentTransform !== 'original') {
+                    const expr = getTransformExpression();
+                    const lockedRad = formatRadians(lockedAngle);
+                    
+                    [...active].forEach(func => {
+                        const currentVal = getExactValue(func, angle);
+                        
+                        // Calculate the values we need
+                        const sinLocked = Math.sin(lockedAngle);
+                        const cosLocked = Math.cos(lockedAngle);
+                        const tanLocked = Math.tan(lockedAngle);
+                        const currentNum = { sin: Math.sin, cos: Math.cos, tan: Math.tan }[func](angle);
+                        
+                        let fullExpression = `<strong>${func}(${expr})</strong> = `;
+                        
+                        // Apply the correct trigonometric identity based on the transformation
+                        switch (currentTransform) {
+                            case 'negative':  // -θ
+                                if (func === 'sin') {
+                                    fullExpression += `-sin(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'cos') {
+                                    fullExpression += `cos(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'tan') {
+                                    fullExpression += `-tan(${lockedRad}) = ${currentVal}`;
+                                }
+                                break;
+                                
+                            case 'pi-minus':  // π - θ
+                                if (func === 'sin') {
+                                    fullExpression += `sin(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'cos') {
+                                    fullExpression += `-cos(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'tan') {
+                                    fullExpression += `-tan(${lockedRad}) = ${currentVal}`;
+                                }
+                                break;
+                                
+                            case 'pi-plus':  // π + θ
+                                if (func === 'sin') {
+                                    fullExpression += `-sin(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'cos') {
+                                    fullExpression += `-cos(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'tan') {
+                                    fullExpression += `tan(${lockedRad}) = ${currentVal}`;
+                                }
+                                break;
+                                
+                            case 'half-pi-plus':  // π/2 + θ
+                                if (func === 'sin') {
+                                    fullExpression += `cos(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'cos') {
+                                    fullExpression += `-sin(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'tan') {
+                                    if (Math.abs(cosLocked) > 0.001) {
+                                        fullExpression += `-cot(${lockedRad}) = ${currentVal}`;
+                                    } else {
+                                        fullExpression += `undefined`;
+                                    }
+                                }
+                                break;
+                                
+                            case 'half-pi-minus':  // π/2 - θ
+                                if (func === 'sin') {
+                                    fullExpression += `cos(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'cos') {
+                                    fullExpression += `sin(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'tan') {
+                                    if (Math.abs(sinLocked) > 0.001) {
+                                        fullExpression += `cot(${lockedRad}) = ${currentVal}`;
+                                    } else {
+                                        fullExpression += `undefined`;
+                                    }
+                                }
+                                break;
+                                
+                            case 'two-pi-minus':  // 2π - θ
+                                if (func === 'sin') {
+                                    fullExpression += `-sin(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'cos') {
+                                    fullExpression += `cos(${lockedRad}) = ${currentVal}`;
+                                } else if (func === 'tan') {
+                                    fullExpression += `-tan(${lockedRad}) = ${currentVal}`;
+                                }
+                                break;
+                                
+                            default:
+                                fullExpression += `${currentVal}`;
+                        }
+                        
+                        output += fullExpression + '<br>';
+                    });
+                } else {
+                    // Normal display
+                    [...active].forEach(func => {
+                        const exactVal = getExactValue(func, angle);
+                        output += `${func}(${deg}°) = ${exactVal}<br>`;
+                    });
+                }
+                
+                $('#unitOutput').innerHTML = output;
+                drawWheel();
+            }
+            
+            const rawAngle = (e, can) => {
+                const rect = can.getBoundingClientRect();
+                const c = can.width / 2;
+                return Math.atan2(c - (e.clientY - rect.top), (e.clientX - rect.left) - c);
+            };
+            
+            function move(e) {
+                if (!dragging || lockedAngle !== null) return;
+                const raw = rawAngle(e, dragCanvas);
+                let delta = raw - prevRaw;
+                if (delta > Math.PI) delta -= TAU;
+                if (delta < -Math.PI) delta += TAU;
+                angle = snap(angle + delta);
+                prevRaw = raw;
+                draw();
+                updateAll();
+            }
+            
+            function startDrag(e, can) {
+                if (lockedAngle !== null) return;
+                dragging = true;
+                dragCanvas = can;
+                prevRaw = rawAngle(e, can);
+                move(e);
+            }
+            
+            canvas.onpointerdown = e => startDrag(e, canvas);
+            wheel.onpointerdown = e => startDrag(e, wheel);
+            window.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', () => {
+                dragging = false;
+                dragCanvas = null;
+            });
+            
+            renders.unit = draw;
+            draw();
+        })();
+        
+        // Degrees ↔ Radians Tab
+        (() => {
+            const degCtx = $('#degCanvas').getContext('2d');
+            const radCtx = $('#radCanvas').getContext('2d');
+            const C = $('#degCanvas').width / 2;
+            const R = C - 10;
+            const negCheck = $('#negCheck');
+            let dragging = null;
+            
+            const gcd = (a, b) => b ? gcd(b, a % b) : a;
+            
+            const labelDeg = v => v + '°';
+            
+            const labelRad = i => {
+                if (i === 0) return '0';
+                const n = i;
+                const g = gcd(Math.abs(n), 12);
+                const num = n / g;
+                const den = 12 / g;
+                return (num < 0 ? '-' : '') +
+                    (Math.abs(num) === 1 ? 'π' : Math.abs(num) + 'π') +
+                    (den === 1 ? '' : '/' + den);
+            };
+            
+            function drawCircles() {
+                [degCtx, radCtx].forEach(ctx => {
+                    clear(ctx);
+                    ctx.strokeStyle = '#0f766e';
+                    ctx.lineWidth = 2;
+                    circle(ctx, C, C, R);
+                });
+                
+                const cw = negCheck.checked ? -1 : 1;
+                
+                for (let i = 0; i < 24; i++) {
+                    const th = i * Math.PI / 12 * cw;
+                    const x = C + R * Math.cos(th);
+                    const y = C - R * Math.sin(th);
+                    
+                    [degCtx, radCtx].forEach(ctx => {
+                        ctx.strokeStyle = '#bbb';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(x, y);
+                        ctx.lineTo(C + 0.9 * R * Math.cos(th), C - 0.9 * R * Math.sin(th));
+                        ctx.stroke();
+                    });
+                    
+                    if (i % 3 === 0) {
+                        degCtx.textAlign = radCtx.textAlign = 'center';
+                        degCtx.textBaseline = radCtx.textBaseline = 'middle';
+                        degCtx.fillStyle = radCtx.fillStyle = '#0f766e';
+                        degCtx.font = radCtx.font = '14px sans-serif';
+                        
+                        degCtx.fillText(labelDeg(i * 15 * cw),
+                            C + 0.75 * R * Math.cos(th),
+                            C - 0.75 * R * Math.sin(th));
+                        
+                        radCtx.fillText(labelRad(i * cw),
+                            C + 0.75 * R * Math.cos(th),
+                            C - 0.75 * R * Math.sin(th));
+                    }
+                }
+            }
+            
+            function drawPointer() {
+                const x = C + R * Math.cos(angle);
+                const y = C - R * Math.sin(angle);
+                
+                [degCtx, radCtx].forEach(ctx => {
+                    ctx.fillStyle = '#0f766e';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, TAU);
+                    ctx.fill();
+                });
+            }
+            
+            function draw() {
+                drawCircles();
+                drawPointer();
+            }
+            
+            const angleFromEvent = (e, cv) => {
+                const rect = cv.getBoundingClientRect();
+                return Math.atan2(
+                    cv.height / 2 - (e.clientY - rect.top),
+                    (e.clientX - rect.left) - cv.width / 2
+                );
+            };
+            
+            function move(e) {
+                if (!dragging) return;
+                angle = snap(angleFromEvent(e, dragging === 'deg' ? $('#degCanvas') : $('#radCanvas')));
+                draw();
+                updateAll();
+            }
+            
+            $('#degCanvas').onpointerdown = e => {
+                dragging = 'deg';
+                move(e);
+            };
+            
+            $('#radCanvas').onpointerdown = e => {
+                dragging = 'rad';
+                move(e);
+            };
+            
+            window.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', () => dragging = null);
+            
+            negCheck.onchange = draw;
+            
+            renders.deg = draw;
+            draw();
+        })();
+        
+        // Graph Tab
+        (() => {
+            const uc = $('#graphUnitCircle');
+            const uctx = uc.getContext('2d');
+            const gp = $('#graphPlot');
+            const gctx = gp.getContext('2d');
+            const CC = uc.width / 2;
+            const R = CC - 30;
+            let dragging = false;
+            const range = [-2 * Math.PI, 2 * Math.PI];
+            
+            function drawUnitCircle() {
+                clear(uctx);
+                uctx.lineWidth = 1;
+                uctx.strokeStyle = '#000';
+                circle(uctx, CC, CC, R);
+                
+                // Axes
+                uctx.strokeStyle = '#bbb';
+                uctx.beginPath();
+                uctx.moveTo(CC - R - 20, CC);
+                uctx.lineTo(CC + R + 20, CC);
+                uctx.moveTo(CC, CC - R - 20);
+                uctx.lineTo(CC, CC + R + 20);
+                uctx.stroke();
+                
+                uctx.font = '14px sans-serif';
+                uctx.fillStyle = '#222';
+                uctx.textAlign = 'left';
+                uctx.fillText('cos', CC + R + 5, CC + 5);
+                uctx.textAlign = 'center';
+                uctx.fillText('sin', CC, CC - R - 10);
+                
+                const px = CC + R * Math.cos(angle);
+                const py = CC - R * Math.sin(angle);
+                
+                uctx.fillStyle = '#0f766e';
+                uctx.beginPath();
+                uctx.arc(px, py, 5, 0, TAU);
+                uctx.fill();
+                
+                uctx.lineWidth = 3;
+                const fn = $('#graphFunc').value;
+                
+                if (fn === 'sin') {
+                    uctx.strokeStyle = '#c62828';
+                    uctx.beginPath();
+                    uctx.moveTo(CC, CC);
+                    uctx.lineTo(CC, py);
+                    uctx.stroke();
+                } else if (fn === 'cos') {
+                    uctx.strokeStyle = '#1565c0';
+                    uctx.beginPath();
+                    uctx.moveTo(CC, CC);
+                    uctx.lineTo(px, CC);
+                    uctx.stroke();
+                } else {
+                    const tx = CC + R;
+                    const tan_y = CC - R * Math.tan(angle);
+                    
+                    uctx.lineWidth = 1;
+                    uctx.strokeStyle = '#bbb';
+                    uctx.beginPath();
+                    uctx.moveTo(tx, CC - R - 20);
+                    uctx.lineTo(tx, CC + R + 20);
+                    uctx.stroke();
+                    
+                    uctx.textAlign = 'left';
+                    uctx.font = '14px sans-serif';
+                    uctx.fillStyle = '#222';
+                    uctx.fillText('tan', tx - 10, CC - R - 5);
+                    
+                    uctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                    uctx.setLineDash([4, 4]);
+                    uctx.beginPath();
+                    uctx.moveTo(CC, CC);
+                    uctx.lineTo(px, py);
+                    uctx.lineTo(tx, tan_y);
+                    uctx.stroke();
+                    uctx.setLineDash([]);
+                    
+                    uctx.strokeStyle = '#6a1b9a';
+                    uctx.lineWidth = 3;
+                    uctx.beginPath();
+                    uctx.moveTo(tx, CC);
+                    uctx.lineTo(tx, tan_y);
+                    uctx.stroke();
+                }
+            }
+            
+            function plotGraph() {
+                clear(gctx);
+                const [x0, x1] = range;
+                const w = gp.width;
+                const h = gp.height;
+                const sx = w / (x1 - x0);
+                const sy = h / 2 * 0.9;
+                const ox = -x0 * sx;
+                const oy = h / 2;
+                
+                // Axes
+                gctx.strokeStyle = '#bbb';
+                gctx.beginPath();
+                gctx.moveTo(0, oy);
+                gctx.lineTo(w, oy);
+                gctx.moveTo(ox, 0);
+                gctx.lineTo(ox, h);
+                gctx.stroke();
+                
+                const fn = $('#graphFunc').value;
+                const F = { sin: Math.sin, cos: Math.cos, tan: Math.tan }[fn];
+                
+                gctx.strokeStyle = '#0f766e';
+                gctx.lineWidth = 2;
+                gctx.beginPath();
+                
+                let first = true;
+                for (let x = x0; x <= x1; x += 0.02) {
+                    let y = F(x);
+                    if (!isFinite(y)) {
+                        first = true;
+                        continue;
+                    }
+                    
+                    const px = ox + x * sx;
+                    const py = oy - y * sy;
+                    
+                    if (first) {
+                        gctx.moveTo(px, py);
+                        first = false;
+                    } else {
+                        gctx.lineTo(px, py);
+                    }
+                }
+                gctx.stroke();
+                
+                // Asymptotes for tan
+                if (fn === 'tan') {
+                    gctx.strokeStyle = '#aaa';
+                    gctx.setLineDash([4, 4]);
+                    for (let k = Math.ceil(x0 / (Math.PI / 2));
+                         k <= Math.floor(x1 / (Math.PI / 2)); k++) {
+                        if (k % 2 === 0) continue;
+                        const px = ox + k * Math.PI / 2 * sx;
+                        gctx.beginPath();
+                        gctx.moveTo(px, 0);
+                        gctx.lineTo(px, h);
+                        gctx.stroke();
+                    }
+                    gctx.setLineDash([]);
+                }
+                
+                // Current value point
+                const vx = ox + angle * sx;
+                const vy = oy - F(angle) * sy;
+                
+                gctx.fillStyle = '#c62828';
+                gctx.beginPath();
+                gctx.arc(vx, vy, 5, 0, TAU);
+                gctx.fill();
+                
+                gctx.strokeStyle = '#c62828';
+                gctx.beginPath();
+                gctx.moveTo(vx, vy);
+                gctx.lineTo(vx, oy);
+                gctx.stroke();
+            }
+            
+            function redraw() {
+                drawUnitCircle();
+                plotGraph();
+            }
+            
+            function getAngle(e) {
+                const rect = uc.getBoundingClientRect();
+                return Math.atan2(
+                    CC - (e.clientY - rect.top),
+                    (e.clientX - rect.left) - CC
+                );
+            }
+            
+            function move(e) {
+                if (!dragging) return;
+                angle = snap(getAngle(e));
+                redraw();
+                updateAll();
+            }
+            
+            uc.onpointerdown = e => {
+                dragging = true;
+                move(e);
+            };
+            
+            window.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', () => dragging = false);
+            
+            $('#graphFunc').onchange = redraw;
+            
+            renders.graph = redraw;
+            redraw();
+        })();
+    </script>
 </body>
 </html>
