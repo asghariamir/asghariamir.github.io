@@ -1,1 +1,973 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riemann Rearrangement Explorer | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding-top: 60px;
+            min-height: 100vh;
+        }
+        
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .control-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .visualization {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .preset-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .preset-section h3 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .preset-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .controls {
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            margin-bottom: 1rem;
+        }
+        
+        .control-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            background: var(--interactive);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary);
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: var(--primary);
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+        
+        .slider-value {
+            min-width: 40px;
+            text-align: right;
+            font-family: 'Monaco', monospace;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .info-display {
+            background: var(--interactive);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .info-value {
+            font-family: 'Monaco', monospace;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+        
+        .btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-light);
+        }
+        
+        #canvas {
+            width: 100%;
+            height: 500px;
+            border: 2px solid var(--interactive);
+            border-radius: 8px;
+            display: block;
+        }
+        
+        .explanation-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--interactive);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+        }
+        
+        .card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        .math-display {
+            background: var(--interactive);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .preset-pills {
+                flex-direction: column;
+            }
+            
+            .preset-pill {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        
+        .animation-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--interactive);
+        }
+        
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .speed-control input[type="range"] {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mathswell-nav">
+        <a href="https://mathswell.com" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>🎯 Riemann Rearrangement Theorem</h1>
+            <p>Discover how rearranging the terms of a conditionally convergent series can make it sum to any value you want—or even diverge!</p>
+        </div>
+        
+        <div class="explanation-cards">
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>The Staircase View</h3>
+                <p>Watch as partial sums create a staircase that climbs toward different "floors" based on how we order the terms.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔀</div>
+                <h3>Rearrangement Magic</h3>
+                <p>The alternating harmonic series converges to ln(2) ≈ 0.693, but rearrange it and you can reach any value!</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>Conditional Convergence</h3>
+                <p>This only works for conditionally convergent series—ones that converge but not absolutely.</p>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="control-panel">
+                <div class="preset-section">
+                    <h3>Rearrangement Strategy</h3>
+                    <div class="preset-pills">
+                        <button class="preset-pill active" data-strategy="original">Original (→ ln(2))</button>
+                        <button class="preset-pill" data-strategy="to-zero">Target: 0</button>
+                        <button class="preset-pill" data-strategy="to-two">Target: 2</button>
+                        <button class="preset-pill" data-strategy="to-negative">Target: -1</button>
+                        <button class="preset-pill" data-strategy="diverge">Diverge to ∞</button>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Number of Terms</label>
+                        <div class="slider-container">
+                            <input type="range" id="termsSlider" min="10" max="500" value="100">
+                            <span class="slider-value" id="termsValue">100</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Custom Target Value</label>
+                        <div class="slider-container">
+                            <input type="range" id="targetSlider" min="-3" max="3" step="0.1" value="0.693">
+                            <span class="slider-value" id="targetValue">0.7</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-display">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Current Sum:</span>
+                            <span class="info-value" id="currentSum">0.693</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Target:</span>
+                            <span class="info-value" id="targetInfo">ln(2)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Pos Terms:</span>
+                            <span class="info-value" id="posTerms">50</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Neg Terms:</span>
+                            <span class="info-value" id="negTerms">50</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="animateBtn">🎬 Animate</button>
+                    <button class="btn" id="resetBtn">↺ Reset</button>
+                    <button class="btn" id="customBtn">🎯 Custom Target</button>
+                </div>
+                
+                <div class="animation-controls">
+                    <div class="speed-control">
+                        <label>Animation Speed:</label>
+                        <input type="range" id="speedSlider" min="1" max="10" value="5">
+                        <span id="speedValue">5</span>
+                    </div>
+                </div>
+                
+                <div class="math-display">
+                    <div id="seriesFormula"></div>
+                </div>
+            </div>
+            
+            <div class="visualization">
+                <canvas id="canvas"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #0f766e;"></div>
+                        <span>Partial Sums Staircase</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f59e0b;"></div>
+                        <span>Target Value</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10b981;"></div>
+                        <span>Positive Terms</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #c62828;"></div>
+                        <span>Negative Terms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let canvas, ctx;
+        let currentStrategy = 'original';
+        let animationId = null;
+        let animationFrame = 0;
+        let partialSums = [];
+        let terms = [];
+        
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+        
+        function initializeApp() {
+            // Get canvas and context
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set up canvas
+            setupCanvas();
+            
+            // Add event listeners for preset pills
+            document.querySelectorAll('.preset-pill').forEach(pill => {
+                pill.addEventListener('click', function() {
+                    setStrategy(this.dataset.strategy, this);
+                });
+            });
+            
+            // Add event listeners for sliders
+            document.getElementById('termsSlider').addEventListener('input', function(e) {
+                document.getElementById('termsValue').textContent = e.target.value;
+                updateSeries();
+            });
+            
+            document.getElementById('targetSlider').addEventListener('input', function(e) {
+                document.getElementById('targetValue').textContent = parseFloat(e.target.value).toFixed(1);
+                if (currentStrategy === 'custom') {
+                    document.getElementById('targetInfo').textContent = e.target.value;
+                    updateSeries();
+                }
+            });
+            
+            document.getElementById('speedSlider').addEventListener('input', function(e) {
+                document.getElementById('speedValue').textContent = e.target.value;
+            });
+            
+            // Add event listeners for buttons
+            document.getElementById('animateBtn').addEventListener('click', toggleAnimation);
+            document.getElementById('resetBtn').addEventListener('click', resetView);
+            document.getElementById('customBtn').addEventListener('click', setCustomTarget);
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                setupCanvas();
+                drawPlot();
+            });
+            
+            // Initial update
+            updateSeries();
+        }
+        
+        function setupCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        
+        function generateOriginalSeries(n) {
+            const series = [];
+            for (let i = 1; i <= n; i++) {
+                series.push(Math.pow(-1, i+1) / i);
+            }
+            return series;
+        }
+        
+        function rearrangeToTarget(target, n) {
+            const positiveTerms = [];
+            const negativeTerms = [];
+            
+            // Generate pool of positive and negative terms
+            // We need a large pool, so n*2 or more is safer
+            for (let i = 1; i <= n * 2; i++) {
+                if (i % 2 === 1) {
+                    positiveTerms.push(1 / i);
+                } else {
+                    negativeTerms.push(-1 / i);
+                }
+            }
+            
+            const rearranged = [];
+            let currentSum = 0;
+            let posIndex = 0;
+            let negIndex = 0;
+            
+            // Rearrangement algorithm --- THIS IS THE FIXED BLOCK ---
+            while (rearranged.length < n) {
+                // Priority 1: If at or below target, add positive terms (if available)
+                if (currentSum <= target && posIndex < positiveTerms.length) {
+                    while (currentSum <= target && posIndex < positiveTerms.length && rearranged.length < n) {
+                        rearranged.push(positiveTerms[posIndex]);
+                        currentSum += positiveTerms[posIndex];
+                        posIndex++;
+                    }
+                } 
+                // Priority 2: If above target, add negative terms (if available)
+                else if (currentSum > target && negIndex < negativeTerms.length) {
+                    while (currentSum > target && negIndex < negativeTerms.length && rearranged.length < n) {
+                        rearranged.push(negativeTerms[negIndex]);
+                        currentSum += negativeTerms[negIndex];
+                        negIndex++;
+                    }
+                } 
+                // Handle running out of one type of term
+                else if (posIndex < positiveTerms.length) {
+                     // Ran out of negative terms, but still need to fill array
+                    rearranged.push(positiveTerms[posIndex]);
+                    currentSum += positiveTerms[posIndex];
+                    posIndex++;
+                }
+                else if (negIndex < negativeTerms.length) {
+                    // Ran out of positive terms, but still need to fill array
+                    rearranged.push(negativeTerms[negIndex]);
+                    currentSum += negativeTerms[negIndex];
+                    negIndex++;
+                }
+                // If we're out of all terms
+                else {
+                    break;
+                }
+            }
+            // --- END OF FIXED BLOCK ---
+            
+            return rearranged;
+        }
+        
+        function generateSeries(strategy, n, customTarget) {
+            switch (strategy) {
+                case 'original':
+                    return generateOriginalSeries(n);
+                case 'to-zero':
+                    return rearrangeToTarget(0, n);
+                case 'to-two':
+                    return rearrangeToTarget(2, n);
+                case 'to-negative':
+                    return rearrangeToTarget(-1, n);
+                case 'diverge':
+                    // Create a diverging series by using mostly positive terms
+                    const diverge = [];
+                    for (let i = 1; i <= n; i++) {
+                        if (i % 10 !== 0) {
+                            diverge.push(1 / Math.ceil(i / 2));
+                        } else {
+                            diverge.push(-1 / i);
+                        }
+                    }
+                    return diverge;
+                case 'custom':
+                    return rearrangeToTarget(customTarget || 0, n);
+                default:
+                    return generateOriginalSeries(n);
+            }
+        }
+        
+        function calculatePartialSums(series) {
+            const sums = [0];
+            let sum = 0;
+            for (let i = 0; i < series.length; i++) {
+                sum += series[i];
+                sums.push(sum);
+            }
+            return sums;
+        }
+        
+        function updateSeries() {
+            const n = parseInt(document.getElementById('termsSlider').value);
+            const customTarget = parseFloat(document.getElementById('targetSlider').value);
+            
+            terms = generateSeries(currentStrategy, n, currentStrategy === 'custom' ? customTarget : null);
+            partialSums = calculatePartialSums(terms);
+            
+            // Update info display
+            const currentSum = partialSums[partialSums.length - 1];
+            document.getElementById('currentSum').textContent = currentSum.toFixed(4);
+            
+            const posTerms = terms.filter(t => t > 0).length;
+            const negTerms = terms.filter(t => t < 0).length;
+            document.getElementById('posTerms').textContent = posTerms;
+            document.getElementById('negTerms').textContent = negTerms;
+            
+            drawPlot();
+            updateFormula();
+        }
+        
+        function drawPlot() {
+            if (!ctx || !canvas) return;
+            
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            if (!partialSums || partialSums.length === 0) return;
+            
+            // Calculate bounds
+            let minY = Math.min(...partialSums);
+            let maxY = Math.max(...partialSums);
+            const padding = 40;
+            const range = maxY - minY;
+            const yPadding = range * 0.1 || 0.5;
+            minY -= yPadding;
+            maxY += yPadding;
+            
+            // Draw grid lines
+            ctx.strokeStyle = '#f0f0f0';
+            ctx.lineWidth = 0.5;
+            for (let i = -5; i <= 5; i += 0.5) {
+                if (i >= minY && i <= maxY) {
+                    const y = height - padding - ((i - minY) / (maxY - minY)) * (height - 2 * padding);
+                    ctx.beginPath();
+                    ctx.moveTo(padding, y);
+                    ctx.lineTo(width - padding, y);
+                    ctx.stroke();
+                }
+            }
+            
+            // Draw axes
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            // X-axis at y=0
+            const y0 = height - padding - ((0 - minY) / (maxY - minY)) * (height - 2 * padding);
+            ctx.moveTo(padding, y0);
+            ctx.lineTo(width - padding, y0);
+            // Y-axis
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.stroke();
+            
+            // Draw target line
+            if (currentStrategy !== 'original' && currentStrategy !== 'diverge') {
+                const targetValue = currentStrategy === 'custom' 
+                    ? parseFloat(document.getElementById('targetSlider').value)
+                    : currentStrategy === 'to-zero' ? 0
+                    : currentStrategy === 'to-two' ? 2
+                    : currentStrategy === 'to-negative' ? -1
+                    : null;
+                    
+                if (targetValue !== null && targetValue >= minY && targetValue <= maxY) {
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    const targetY = height - padding - ((targetValue - minY) / (maxY - minY)) * (height - 2 * padding);
+                    ctx.moveTo(padding, targetY);
+                    ctx.lineTo(width - padding, targetY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    // Label for target
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText('Target', width - padding + 5, targetY + 4);
+                }
+            }
+            
+            // Draw staircase
+            const xStep = (width - 2 * padding) / Math.max(partialSums.length - 1, 1);
+            const framesToShow = animationId ? Math.min(animationFrame, partialSums.length) : partialSums.length;
+            
+            // Draw the staircase lines
+            for (let i = 1; i < framesToShow; i++) {
+                const prevX = padding + (i - 1) * xStep;
+                const x = padding + i * xStep;
+                const prevY = height - padding - ((partialSums[i - 1] - minY) / (maxY - minY)) * (height - 2 * padding);
+                const y = height - padding - ((partialSums[i] - minY) / (maxY - minY)) * (height - 2 * padding);
+                
+                // Color based on whether term is positive or negative
+                ctx.strokeStyle = terms[i - 1] > 0 ? '#10b981' : '#c62828';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                // Horizontal line
+                ctx.moveTo(prevX, prevY);
+                ctx.lineTo(x, prevY);
+                // Vertical line
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+            
+            // Draw points
+            for (let i = 0; i < framesToShow; i++) {
+                const x = padding + i * xStep;
+                const y = height - padding - ((partialSums[i] - minY) / (maxY - minY)) * (height - 2 * padding);
+                
+                ctx.fillStyle = '#0f766e';
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Draw labels
+            ctx.fillStyle = '#4b5563';
+            ctx.font = '12px sans-serif';
+            
+            // Y-axis labels
+            for (let i = Math.ceil(minY); i <= Math.floor(maxY); i++) {
+                const y = height - padding - ((i - minY) / (maxY - minY)) * (height - 2 * padding);
+                ctx.fillText(i.toFixed(0), 10, y + 4);
+            }
+            
+            // X-axis label
+            ctx.fillText('Terms →', width / 2 - 20, height - 10);
+            
+            // Y-axis label
+            ctx.save();
+            ctx.translate(15, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('Partial Sum', -30, 0);
+            ctx.restore();
+        }
+        
+        function updateFormula() {
+            const formula = document.getElementById('seriesFormula');
+            let tex = '';
+            
+            if (currentStrategy === 'original') {
+                tex = '\\sum_{n=1}^{\\infty} \\frac{(-1)^{n+1}}{n} = \\ln(2)';
+            } else {
+                tex = '\\text{Rearranged: } ';
+                const preview = terms.slice(0, 4);
+                preview.forEach((term, i) => {
+                    if (i > 0) tex += term >= 0 ? ' + ' : ' ';
+                    const denominator = Math.round(1 / Math.abs(term));
+                    // Avoid division by zero in formula if term is tiny
+                    if (denominator === Infinity || denominator === 0) {
+                         tex += (term < 0 ? '-' : '') + '\\dots';
+                    } else {
+                         tex += '\\frac{' + (term < 0 ? '-' : '') + '1}{' + denominator + '}';
+                    }
+                });
+                tex += ' + \\cdots';
+            }
+            
+            try {
+                katex.render(tex, formula, { displayMode: true });
+            } catch (e) {
+                formula.innerHTML = '<em>Loading formula...</em>';
+            }
+        }
+        
+        function animate() {
+            if (animationFrame < partialSums.length) {
+                animationFrame++;
+                drawPlot();
+                const speed = parseInt(document.getElementById('speedSlider').value);
+                const delay = 1000 / (speed * 2);
+                animationId = setTimeout(() => requestAnimationFrame(animate), delay);
+            } else {
+                stopAnimation();
+            }
+        }
+        
+        function stopAnimation() {
+            if (animationId) {
+                clearTimeout(animationId);
+                animationId = null;
+            }
+            document.getElementById('animateBtn').textContent = '🎬 Animate';
+        }
+        
+        function setStrategy(strategy, button) {
+            // Update active state
+            document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
+            button.classList.add('active');
+            
+            currentStrategy = strategy;
+            
+            // Update target info
+            const targetInfo = document.getElementById('targetInfo');
+            switch (strategy) {
+                case 'original':
+                    targetInfo.textContent = 'ln(2)';
+                    break;
+                case 'to-zero':
+                    targetInfo.textContent = '0';
+                    break;
+                case 'to-two':
+                    targetInfo.textContent = '2';
+                    break;
+                case 'to-negative':
+                    targetInfo.textContent = '-1';
+                    break;
+                case 'diverge':
+                    targetInfo.textContent = '∞';
+                    break;
+                case 'custom':
+                    targetInfo.textContent = document.getElementById('targetSlider').value;
+                    break;
+            }
+            
+            // Reset animation
+            stopAnimation();
+            animationFrame = 0;
+            updateSeries();
+        }
+        
+        function toggleAnimation() {
+            if (animationId) {
+                stopAnimation();
+            } else {
+                animationFrame = 0;
+                document.getElementById('animateBtn').textContent = '⏸ Pause';
+                animate();
+            }
+        }
+        
+        function resetView() {
+            stopAnimation();
+            animationFrame = 0;
+            document.getElementById('termsSlider').value = 100;
+            document.getElementById('termsValue').textContent = '100';
+            document.getElementById('targetSlider').value = 0.693;
+            document.getElementById('targetValue').textContent = '0.7';
+            // Set strategy back to original
+            setStrategy('original', document.querySelector('.preset-pill[data-strategy="original"]'));
+            // updateSeries() is called inside setStrategy
+        }
+        
+        function setCustomTarget() {
+            document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
+            currentStrategy = 'custom';
+            document.getElementById('targetInfo').textContent = document.getElementById('targetSlider').value;
+            stopAnimation();
+            animationFrame = 0;
+            updateSeries();
+        }
+    </script>
+</body>
+</html>
