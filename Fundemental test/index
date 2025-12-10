@@ -1,1 +1,1618 @@
-Fu
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundamentals Exam Builder | Mathswell</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding-top: 60px;
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: var(--interactive);
+            color: var(--primary);
+        }
+        
+        .tab-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Form elements */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            background-color: white;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Preset pills */
+        .preset-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preset-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--interactive);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        
+        /* Info display */
+        .info-box {
+            background: var(--interactive);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .math-display {
+            text-align: center;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Exam preview */
+        .exam-preview {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 2rem;
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .exam-preview h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .exam-preview h2 {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: normal;
+            margin-bottom: 1.5rem;
+        }
+        
+        .exam-preview .problem {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-left: 3px solid var(--primary);
+            background: #fafafa;
+        }
+        
+        .exam-preview .problem h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Solution key */
+        .solution-section {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+        }
+        
+        .solution-section h3 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .solution-step {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #fafafa;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-light);
+        }
+        
+        .solution-step h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .marks-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        .mark-breakdown {
+            background: var(--interactive);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .mark-breakdown table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .mark-breakdown td, .mark-breakdown th {
+            padding: 0.5rem;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        .mark-breakdown th {
+            color: var(--primary);
+        }
+        
+        /* Lock status */
+        .lock-banner {
+            background: var(--accent-amber);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .lock-banner.locked {
+            background: var(--success);
+        }
+        
+        /* Custom input toggle */
+        .custom-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .custom-toggle input[type="checkbox"] {
+            width: auto;
+        }
+        
+        /* Print styles */
+        @media print {
+            .mathswell-nav, .tabs, .btn-group, .lock-banner {
+                display: none !important;
+            }
+            
+            .container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs {
+                gap: 0.25rem;
+            }
+            
+            .tab-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mathswell-nav">
+        <a href="https://mathswell.com" class="mw-link">
+            <span style="font-size: 1.5rem;">📐</span>
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="intro">Introduction</button>
+            <button class="tab-btn" data-tab="builder">Problem Builder</button>
+            <button class="tab-btn" data-tab="preview">Exam Preview</button>
+            <button class="tab-btn" data-tab="solutions" id="solutionsTab" disabled>Solution Key 🔒</button>
+        </div>
+        
+        <div id="intro" class="tab-content active">
+            <div class="card">
+                <h3>📝 Fundamentals Exam Builder</h3>
+                <p>Create custom exam problems for practice, marking, or review. This tool lets you:</p>
+                <ul style="margin: 1rem 0 1rem 1.5rem;">
+                    <li><strong>Build problems</strong> - Use presets or create custom variants</li>
+                    <li><strong>Preview the exam</strong> - See formatted problems ready for paper work</li>
+                    <li><strong>Generate solutions</strong> - Get detailed worked solutions with mark breakdowns</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>📋 Problem Types</h3>
+                
+                <div class="info-box">
+                    <h4>Problem 1: Complex Numbers (20 marks)</h4>
+                    <p>Convert complex numbers to polar form and compute powers.</p>
+                    <div class="math-display">$z_1^N + z_2^M$ where $z_1, z_2$ are on the unit circle</div>
+                </div>
+                
+                <div class="info-box">
+                    <h4>Problem 2: If-then Logic and Congruence (20 marks)</h4>
+                    <p>Analyze modular arithmetic statements and their converses.</p>
+                    <div class="math-display">If $n \equiv a \pmod{m}$, then $n^k \equiv a \pmod{m}$</div>
+                </div>
+                
+                <div class="info-box">
+                    <h4>Problem 3: Series and Rational/Irrational Numbers (20 marks)</h4>
+                    <p>Use convergence tests and identify rational decimals.</p>
+                    <div class="math-display">$\sum a_n$ convergence and $0.\overline{ab}$ vs non-repeating</div>
+                </div>
+            </div>
+            
+            <div class="btn-group" style="justify-content: center;">
+                <button class="btn btn-primary" onclick="switchTab('builder')">Start Building →</button>
+            </div>
+        </div>
+        
+        <div id="builder" class="tab-content">
+            <div class="card">
+                <h3>1️⃣ Complex Numbers</h3>
+                
+                <div class="form-group">
+                    <label>Choose $z_1$ (preset or custom):</label>
+                    <div class="preset-container" id="z1Presets">
+                        <button class="preset-pill active" data-value="A" onclick="selectZ1Preset('A')">$-\frac{\sqrt{3}}{2} - \frac{1}{2}i$</button>
+                        <button class="preset-pill" data-value="B" onclick="selectZ1Preset('B')">$-\frac{\sqrt{2}}{2} - \frac{\sqrt{2}}{2}i$</button>
+                        <button class="preset-pill" data-value="C" onclick="selectZ1Preset('C')">$-\frac{1}{2} - \frac{\sqrt{3}}{2}i$</button>
+                        <button class="preset-pill" data-value="custom" onclick="selectZ1Preset('custom')">Custom...</button>
+                    </div>
+                    <div id="z1CustomInputs" style="display: none;">
+                        <div class="form-row">
+                            <div>
+                                <label>Real part (cos θ):</label>
+                                <input type="text" id="z1Real" placeholder="e.g., -√3/2 or -0.866">
+                            </div>
+                            <div>
+                                <label>Imaginary part (sin θ):</label>
+                                <input type="text" id="z1Imag" placeholder="e.g., -1/2 or -0.5">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Choose $z_2$ (preset or custom):</label>
+                    <div class="preset-container" id="z2Presets">
+                        <button class="preset-pill active" data-value="A" onclick="selectZ2Preset('A')">$\frac{1}{2} - \frac{\sqrt{3}}{2}i$</button>
+                        <button class="preset-pill" data-value="B" onclick="selectZ2Preset('B')">$\frac{\sqrt{3}}{2} - \frac{1}{2}i$</button>
+                        <button class="preset-pill" data-value="C" onclick="selectZ2Preset('C')">$\frac{\sqrt{2}}{2} - \frac{\sqrt{2}}{2}i$</button>
+                        <button class="preset-pill" data-value="D" onclick="selectZ2Preset('D')">$-\frac{\sqrt{2}}{2} - \frac{\sqrt{2}}{2}i$</button>
+                        <button class="preset-pill" data-value="custom" onclick="selectZ2Preset('custom')">Custom...</button>
+                    </div>
+                    <div id="z2CustomInputs" style="display: none;">
+                        <div class="form-row">
+                            <div>
+                                <label>Real part (cos θ):</label>
+                                <input type="text" id="z2Real" placeholder="e.g., 1/2 or 0.5">
+                            </div>
+                            <div>
+                                <label>Imaginary part (sin θ):</label>
+                                <input type="text" id="z2Imag" placeholder="e.g., -√3/2 or -0.866">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Power N (for $z_1^N$):</label>
+                        <input type="number" id="powerN" value="101" min="1" max="1000">
+                    </div>
+                    <div class="form-group">
+                        <label>Power M (for $z_2^M$):</label>
+                        <input type="number" id="powerM" value="58" min="1" max="1000">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>2️⃣ If-then Logic and Congruence</h3>
+                
+                <div class="form-group">
+                    <label>Statement 1:</label>
+                    <div class="preset-container" id="stmt1Presets">
+                        <button class="preset-pill active" data-value="A" onclick="selectStmt1('A')">$n≡1 \pmod 5 \Rightarrow n^5≡1$</button>
+                        <button class="preset-pill" data-value="B" onclick="selectStmt1('B')">$n≡2 \pmod 5 \Rightarrow n^5≡2$</button>
+                        <button class="preset-pill" data-value="C" onclick="selectStmt1('C')">$n≡3 \pmod 7 \Rightarrow n^7≡3$</button>
+                        <button class="preset-pill" data-value="custom" onclick="selectStmt1('custom')">Custom...</button>
+                    </div>
+                    <div id="stmt1CustomInputs" style="display: none;">
+                        <div class="form-row">
+                            <div>
+                                <label>Residue a:</label>
+                                <input type="number" id="stmt1A" value="1" min="0">
+                            </div>
+                            <div>
+                                <label>Modulus m:</label>
+                                <input type="number" id="stmt1M" value="5" min="2">
+                            </div>
+                            <div>
+                                <label>Power k:</label>
+                                <input type="number" id="stmt1K" value="5" min="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Statement 2:</label>
+                    <div class="preset-container" id="stmt2Presets">
+                        <button class="preset-pill active" data-value="A" onclick="selectStmt2('A')">$n≡1 \pmod 6 \Rightarrow n^6≡1$</button>
+                        <button class="preset-pill" data-value="B" onclick="selectStmt2('B')">$n≡5 \pmod 6 \Rightarrow n^6≡5$</button>
+                        <button class="preset-pill" data-value="C" onclick="selectStmt2('C')">$n≡1 \pmod{10} \Rightarrow n^{10}≡1$</button>
+                        <button class="preset-pill" data-value="custom" onclick="selectStmt2('custom')">Custom...</button>
+                    </div>
+                    <div id="stmt2CustomInputs" style="display: none;">
+                        <div class="form-row">
+                            <div>
+                                <label>Residue a:</label>
+                                <input type="number" id="stmt2A" value="1" min="0">
+                            </div>
+                            <div>
+                                <label>Modulus m:</label>
+                                <input type="number" id="stmt2M" value="6" min="2">
+                            </div>
+                            <div>
+                                <label>Power k:</label>
+                                <input type="number" id="stmt2K" value="6" min="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>3️⃣ Series and Rational/Irrational Numbers</h3>
+                
+                <div class="form-group">
+                    <label>Part A - Series (choose two):</label>
+                    <div class="form-row">
+                        <div>
+                            <label>Series 1:</label>
+                            <select id="series1">
+                                <option value="(3n+2)/(2n+1)">∑ (3n+2)/(2n+1)</option>
+                                <option value="(-1)^n">∑ (-1)ⁿ</option>
+                                <option value="(3n+5)/(5n+1)">∑ (3n+5)/(5n+1)</option>
+                                <option value="n/(n+1)">∑ n/(n+1)</option>
+                                <option value="(5n+3)/(4n+1)">∑ (5n+3)/(4n+1)</option>
+                                <option value="custom">Custom...</option>
+                            </select>
+                            <input type="text" id="series1Custom" placeholder="e.g., n^2/(n^3+1)" style="display: none; margin-top: 0.5rem;">
+                        </div>
+                        <div>
+                            <label>Series 2:</label>
+                            <select id="series2">
+                                <option value="1/n">∑ 1/n</option>
+                                <option value="(-1)^n/n">∑ (-1)ⁿ/n</option>
+                                <option value="1/(n^2+n)">∑ 1/(n²+n)</option>
+                                <option value="1/2^n">∑ 1/2ⁿ</option>
+                                <option value="1/n^3">∑ 1/n³</option>
+                                <option value="custom">Custom...</option>
+                            </select>
+                            <input type="text" id="series2Custom" placeholder="e.g., 1/n!" style="display: none; margin-top: 0.5rem;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Part B - Decimal Expansions:</label>
+                    <div class="form-row">
+                        <div>
+                            <label>Decimal 1 (repeating block):</label>
+                            <input type="text" id="decimal1" value="27" placeholder="e.g., 27 for 0.272727...">
+                            <small style="color: var(--text-muted);">Enter the repeating digits</small>
+                        </div>
+                        <div>
+                            <label>Decimal 2 (Irrational Pattern):</label>
+                            <select id="decimal2">
+                                <option value="zeros">Pattern: 1010010001... (Increasing Zeros)</option>
+                                <option value="onestwos">Pattern: 121122111222... (Increasing Repetitions)</option>
+                                <option value="naturals">Sequence of Natural Numbers (1,2,3...)</option>
+                                <option value="primes">Sequence of Prime Numbers (2,3,5...)</option>
+                            </select>
+                            <small style="color: var(--text-muted);">Select a non-repeating pattern type</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group" style="justify-content: center;">
+                <button class="btn btn-secondary" onclick="randomizeAll()">🎲 Randomize All</button>
+                <button class="btn btn-primary" onclick="previewExam()">Preview Exam →</button>
+            </div>
+        </div>
+        
+        <div id="preview" class="tab-content">
+            <div id="lockBanner" class="lock-banner">
+                ⚠️ Review your exam below, then lock it to generate solutions
+            </div>
+            
+            <div class="exam-preview" id="examPreviewContent">
+                </div>
+            
+            <div class="btn-group" style="justify-content: center;">
+                <button class="btn btn-secondary" onclick="switchTab('builder')">← Edit Problems</button>
+                <button class="btn btn-primary" onclick="window.print()">🖨️ Print Exam</button>
+                <button class="btn btn-success" id="lockBtn" onclick="lockExam()">🔒 Lock & Generate Solutions</button>
+            </div>
+        </div>
+        
+        <div id="solutions" class="tab-content">
+            <div class="lock-banner locked">
+                ✅ Exam Locked - Solution Key Generated
+            </div>
+            
+            <div id="solutionsContent">
+                </div>
+            
+            <div class="btn-group" style="justify-content: center;">
+                <button class="btn btn-secondary" onclick="resetExam()">🔄 Create New Exam</button>
+                <button class="btn btn-primary" onclick="window.print()">🖨️ Print Solutions</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        
+        let examState = {
+            locked: false,
+            problem1: {
+                z1: { preset: 'A', real: -Math.sqrt(3)/2, imag: -0.5, latex: '-\\frac{\\sqrt{3}}{2} - \\frac{1}{2}i' },
+                z2: { preset: 'A', real: 0.5, imag: -Math.sqrt(3)/2, latex: '\\frac{1}{2} - \\frac{\\sqrt{3}}{2}i' },
+                N: 101,
+                M: 58
+            },
+            problem2: {
+                stmt1: { a: 1, m: 5, k: 5 },
+                stmt2: { a: 1, m: 6, k: 6 }
+            },
+            problem3: {
+                series1: '(3n+2)/(2n+1)',
+                series2: '1/n',
+                decimal1: '27',
+                decimal2: 'zeros' // stores the type now, not digits
+            }
+        };
+        
+        // Z1 presets
+        const z1Presets = {
+            'A': { real: -Math.sqrt(3)/2, imag: -0.5, latex: '-\\frac{\\sqrt{3}}{2} - \\frac{1}{2}i', angle: 7*Math.PI/6 },
+            'B': { real: -Math.sqrt(2)/2, imag: -Math.sqrt(2)/2, latex: '-\\frac{\\sqrt{2}}{2} - \\frac{\\sqrt{2}}{2}i', angle: 5*Math.PI/4 },
+            'C': { real: -0.5, imag: -Math.sqrt(3)/2, latex: '-\\frac{1}{2} - \\frac{\\sqrt{3}}{2}i', angle: 4*Math.PI/3 }
+        };
+        
+        // Z2 presets
+        const z2Presets = {
+            'A': { real: 0.5, imag: -Math.sqrt(3)/2, latex: '\\frac{1}{2} - \\frac{\\sqrt{3}}{2}i', angle: 5*Math.PI/3 },
+            'B': { real: Math.sqrt(3)/2, imag: -0.5, latex: '\\frac{\\sqrt{3}}{2} - \\frac{1}{2}i', angle: 11*Math.PI/6 },
+            'C': { real: Math.sqrt(2)/2, imag: -Math.sqrt(2)/2, latex: '\\frac{\\sqrt{2}}{2} - \\frac{\\sqrt{2}}{2}i', angle: 7*Math.PI/4 },
+            'D': { real: -Math.sqrt(2)/2, imag: -Math.sqrt(2)/2, latex: '-\\frac{\\sqrt{2}}{2} - \\frac{\\sqrt{2}}{2}i', angle: 5*Math.PI/4 }
+        };
+        
+        // Statement presets
+        const stmt1Presets = {
+            'A': { a: 1, m: 5, k: 5 },
+            'B': { a: 2, m: 5, k: 5 },
+            'C': { a: 3, m: 7, k: 7 }
+        };
+        
+        const stmt2Presets = {
+            'A': { a: 1, m: 6, k: 6 },
+            'B': { a: 5, m: 6, k: 6 },
+            'C': { a: 1, m: 10, k: 10 }
+        };
+        
+        // ============================================
+        // TAB SWITCHING
+        // ============================================
+        
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'preview') {
+                generateExamPreview();
+            }
+            
+            renderMath();
+        }
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!btn.disabled) {
+                    switchTab(btn.dataset.tab);
+                }
+            });
+        });
+        
+        // ============================================
+        // PRESET SELECTION
+        // ============================================
+        
+        function selectZ1Preset(value) {
+            document.querySelectorAll('#z1Presets .preset-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector(`#z1Presets [data-value="${value}"]`).classList.add('active');
+            
+            if (value === 'custom') {
+                document.getElementById('z1CustomInputs').style.display = 'block';
+                examState.problem1.z1.preset = 'custom';
+            } else {
+                document.getElementById('z1CustomInputs').style.display = 'none';
+                examState.problem1.z1 = { preset: value, ...z1Presets[value] };
+            }
+        }
+        
+        function selectZ2Preset(value) {
+            document.querySelectorAll('#z2Presets .preset-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector(`#z2Presets [data-value="${value}"]`).classList.add('active');
+            
+            if (value === 'custom') {
+                document.getElementById('z2CustomInputs').style.display = 'block';
+                examState.problem1.z2.preset = 'custom';
+            } else {
+                document.getElementById('z2CustomInputs').style.display = 'none';
+                examState.problem1.z2 = { preset: value, ...z2Presets[value] };
+            }
+        }
+        
+        function selectStmt1(value) {
+            document.querySelectorAll('#stmt1Presets .preset-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector(`#stmt1Presets [data-value="${value}"]`).classList.add('active');
+            
+            if (value === 'custom') {
+                document.getElementById('stmt1CustomInputs').style.display = 'block';
+            } else {
+                document.getElementById('stmt1CustomInputs').style.display = 'none';
+                examState.problem2.stmt1 = { ...stmt1Presets[value] };
+            }
+        }
+        
+        function selectStmt2(value) {
+            document.querySelectorAll('#stmt2Presets .preset-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector(`#stmt2Presets [data-value="${value}"]`).classList.add('active');
+            
+            if (value === 'custom') {
+                document.getElementById('stmt2CustomInputs').style.display = 'block';
+            } else {
+                document.getElementById('stmt2CustomInputs').style.display = 'none';
+                examState.problem2.stmt2 = { ...stmt2Presets[value] };
+            }
+        }
+        
+        // Series selection handlers
+        document.getElementById('series1').addEventListener('change', (e) => {
+            const custom = document.getElementById('series1Custom');
+            if (e.target.value === 'custom') {
+                custom.style.display = 'block';
+            } else {
+                custom.style.display = 'none';
+                examState.problem3.series1 = e.target.value;
+            }
+        });
+        
+        document.getElementById('series2').addEventListener('change', (e) => {
+            const custom = document.getElementById('series2Custom');
+            if (e.target.value === 'custom') {
+                custom.style.display = 'block';
+            } else {
+                custom.style.display = 'none';
+                examState.problem3.series2 = e.target.value;
+            }
+        });
+        
+        // ============================================
+        // UPDATE STATE FROM INPUTS
+        // ============================================
+        
+        function updateStateFromInputs() {
+            // Problem 1
+            examState.problem1.N = parseInt(document.getElementById('powerN').value) || 101;
+            examState.problem1.M = parseInt(document.getElementById('powerM').value) || 58;
+            
+            if (examState.problem1.z1.preset === 'custom') {
+                const real = parseNumberInput(document.getElementById('z1Real').value);
+                const imag = parseNumberInput(document.getElementById('z1Imag').value);
+                examState.problem1.z1.real = real;
+                examState.problem1.z1.imag = imag;
+                examState.problem1.z1.angle = Math.atan2(imag, real);
+                if (examState.problem1.z1.angle < 0) examState.problem1.z1.angle += 2 * Math.PI;
+                examState.problem1.z1.latex = formatComplexLatex(real, imag);
+            }
+            
+            if (examState.problem1.z2.preset === 'custom') {
+                const real = parseNumberInput(document.getElementById('z2Real').value);
+                const imag = parseNumberInput(document.getElementById('z2Imag').value);
+                examState.problem1.z2.real = real;
+                examState.problem1.z2.imag = imag;
+                examState.problem1.z2.angle = Math.atan2(imag, real);
+                if (examState.problem1.z2.angle < 0) examState.problem1.z2.angle += 2 * Math.PI;
+                examState.problem1.z2.latex = formatComplexLatex(real, imag);
+            }
+            
+            // Problem 2 custom
+            if (document.getElementById('stmt1CustomInputs').style.display !== 'none') {
+                examState.problem2.stmt1 = {
+                    a: parseInt(document.getElementById('stmt1A').value) || 1,
+                    m: parseInt(document.getElementById('stmt1M').value) || 5,
+                    k: parseInt(document.getElementById('stmt1K').value) || 5
+                };
+            }
+            
+            if (document.getElementById('stmt2CustomInputs').style.display !== 'none') {
+                examState.problem2.stmt2 = {
+                    a: parseInt(document.getElementById('stmt2A').value) || 1,
+                    m: parseInt(document.getElementById('stmt2M').value) || 6,
+                    k: parseInt(document.getElementById('stmt2K').value) || 6
+                };
+            }
+            
+            // Problem 3
+            const s1 = document.getElementById('series1').value;
+            examState.problem3.series1 = s1 === 'custom' ? document.getElementById('series1Custom').value : s1;
+            
+            const s2 = document.getElementById('series2').value;
+            examState.problem3.series2 = s2 === 'custom' ? document.getElementById('series2Custom').value : s2;
+            
+            examState.problem3.decimal1 = document.getElementById('decimal1').value || '27';
+            // Store the selected preset type instead of hardcoded digits
+            examState.problem3.decimal2 = document.getElementById('decimal2').value || 'zeros';
+        }
+        
+        function parseNumberInput(str) {
+            if (!str) return 0;
+            str = str.trim().toLowerCase();
+            
+            // Handle sqrt expressions
+            if (str.includes('√') || str.includes('sqrt')) {
+                str = str.replace(/√/g, 'sqrt');
+                if (str.includes('sqrt3')) {
+                    const val = Math.sqrt(3);
+                    if (str.includes('-sqrt3/2')) return -val/2;
+                    if (str.includes('sqrt3/2')) return val/2;
+                    if (str.includes('-sqrt3')) return -val;
+                    return val;
+                }
+                if (str.includes('sqrt2')) {
+                    const val = Math.sqrt(2);
+                    if (str.includes('-sqrt2/2')) return -val/2;
+                    if (str.includes('sqrt2/2')) return val/2;
+                    if (str.includes('-sqrt2')) return -val;
+                    return val;
+                }
+            }
+            
+            // Handle fractions
+            if (str.includes('/')) {
+                const parts = str.split('/');
+                return parseFloat(parts[0]) / parseFloat(parts[1]);
+            }
+            
+            return parseFloat(str) || 0;
+        }
+        
+        function formatComplexLatex(real, imag) {
+            let realStr = formatNumberLatex(real);
+            let imagStr = formatNumberLatex(Math.abs(imag));
+            let sign = imag >= 0 ? '+' : '-';
+            return `${realStr} ${sign} ${imagStr}i`;
+        }
+        
+        function formatNumberLatex(num) {
+            const tol = 0.0001;
+            if (Math.abs(num - Math.sqrt(3)/2) < tol) return '\\frac{\\sqrt{3}}{2}';
+            if (Math.abs(num + Math.sqrt(3)/2) < tol) return '-\\frac{\\sqrt{3}}{2}';
+            if (Math.abs(num - Math.sqrt(2)/2) < tol) return '\\frac{\\sqrt{2}}{2}';
+            if (Math.abs(num + Math.sqrt(2)/2) < tol) return '-\\frac{\\sqrt{2}}{2}';
+            if (Math.abs(num - 0.5) < tol) return '\\frac{1}{2}';
+            if (Math.abs(num + 0.5) < tol) return '-\\frac{1}{2}';
+            if (Math.abs(num - 1) < tol) return '1';
+            if (Math.abs(num + 1) < tol) return '-1';
+            if (Math.abs(num) < tol) return '0';
+            return num.toFixed(4);
+        }
+        
+        // ============================================
+        // GENERATE DECIMAL PREVIEW DIGITS
+        // ============================================
+        
+        function getIrrationalDigits(type) {
+            const types = {
+                'zeros': '101001000100001000001',
+                'onestwos': '12112211122211112222',
+                'naturals': '12345678910111213',
+                'primes': '235711131719232931'
+            };
+            return types[type] || '1010010001...';
+        }
+
+        // ============================================
+        // EXAM PREVIEW GENERATION
+        // ============================================
+        
+        function previewExam() {
+            updateStateFromInputs();
+            generateExamPreview();
+            switchTab('preview');
+        }
+        
+        function generateExamPreview() {
+            const { problem1, problem2, problem3 } = examState;
+            
+            const seriesLatex1 = getSeriesLatex(problem3.series1);
+            const seriesLatex2 = getSeriesLatex(problem3.series2);
+            const irrDigits = getIrrationalDigits(problem3.decimal2);
+            
+            const html = `
+                <h1>Fundamentals of Mathematics</h1>
+                <h2>In-Class Test</h2>
+                
+                <div class="problem">
+                    <h3>Problem 1 — Complex Numbers [20 marks]</h3>
+                    <p>Given that</p>
+                    <div class="math-display">
+                        $z_1 = ${problem1.z1.latex} \\qquad \\text{and} \\qquad z_2 = ${problem1.z2.latex}$
+                    </div>
+                    <p>(a) Write $z_1$ and $z_2$ in <strong>polar form</strong> $r(\\cos\\alpha + i\\sin\\alpha)$, showing clearly how you calculate $r$ and how you determine the angle $\\alpha$ using a related angle to $\\frac{\\pi}{6}$, $\\frac{\\pi}{4}$, or $\\frac{\\pi}{3}$. Plot each number on the coordinate grid. <em>[5 marks]</em></p>
+                    <p>(b) Compute $z_1^{${problem1.N}} + z_2^{${problem1.M}}$ and write your answer in the form $a + bi$. <em>[15 marks]</em></p>
+                </div>
+                
+                <div class="problem">
+                    <h3>Problem 2 — If-then Logic and Congruence [20 marks]</h3>
+                    <p><strong>Statement 1:</strong> If $n \\equiv ${problem2.stmt1.a} \\pmod{${problem2.stmt1.m}}$, then $n^{${problem2.stmt1.k}} \\equiv ${problem2.stmt1.a} \\pmod{${problem2.stmt1.m}}$.</p>
+                    <p>(a) Decide whether the statement is true or false. If true, prove it. If false, provide a counterexample. <em>[5 marks]</em></p>
+                    <p>(b) Write the converse. Then decide if the converse is true or false. If true, prove it. If false, provide a counterexample. <em>[5 marks]</em></p>
+                    
+                    <p style="margin-top: 1.5rem;"><strong>Statement 2:</strong> If $n \\equiv ${problem2.stmt2.a} \\pmod{${problem2.stmt2.m}}$, then $n^{${problem2.stmt2.k}} \\equiv ${problem2.stmt2.a} \\pmod{${problem2.stmt2.m}}$.</p>
+                    <p>(a) Decide whether the statement is true or false. If true, prove it. If false, provide a counterexample. <em>[5 marks]</em></p>
+                    <p>(b) Write the converse. Then decide if the converse is true or false. If true, prove it. If false, provide a counterexample. <em>[5 marks]</em></p>
+                </div>
+                
+                <div class="problem">
+                    <h3>Problem 3 — Series and Rational/Irrational Numbers [20 marks]</h3>
+                    <p>Recall: <strong>(S)</strong> If $\\sum_{n=1}^{\\infty} a_n$ converges, then $a_n \\to 0$.</p>
+                    
+                    <p style="margin-top: 1rem;"><strong>Part A: Series</strong> <em>[10 marks]</em></p>
+                    <p>For each series, use (S) to determine whether it must diverge, or whether (S) is not sufficient to decide:</p>
+                    <div class="math-display">$${seriesLatex1}, \\qquad ${seriesLatex2}$</div>
+                    
+                    <p style="margin-top: 1rem;"><strong>Part B: Decimal Expansions</strong> <em>[10 marks]</em></p>
+                    <p>For each decimal: (i) determine if rational or irrational with justification; (ii) if rational, write as a fraction using a geometric series.</p>
+                    <div class="math-display">$0.${problem3.decimal1}${problem3.decimal1}${problem3.decimal1}\\ldots, \\qquad 0.${irrDigits}\\ldots$</div>
+                </div>
+            `;
+            
+            document.getElementById('examPreviewContent').innerHTML = html;
+            renderMath();
+        }
+        
+        function getSeriesLatex(series) {
+            const seriesMap = {
+                '(3n+2)/(2n+1)': '\\sum \\frac{3n+2}{2n+1}',
+                '(-1)^n': '\\sum (-1)^n',
+                '(3n+5)/(5n+1)': '\\sum \\frac{3n+5}{5n+1}',
+                'n/(n+1)': '\\sum \\frac{n}{n+1}',
+                '(5n+3)/(4n+1)': '\\sum \\frac{5n+3}{4n+1}',
+                '1/n': '\\sum \\frac{1}{n}',
+                '(-1)^n/n': '\\sum \\frac{(-1)^n}{n}',
+                '1/(n^2+n)': '\\sum \\frac{1}{n^2+n}',
+                '1/2^n': '\\sum \\frac{1}{2^n}',
+                '1/n^3': '\\sum \\frac{1}{n^3}'
+            };
+            return seriesMap[series] || `\\sum ${series}`;
+        }
+        
+        // ============================================
+        // LOCK EXAM AND GENERATE SOLUTIONS
+        // ============================================
+        
+        function lockExam() {
+            examState.locked = true;
+            document.getElementById('lockBtn').disabled = true;
+            document.getElementById('lockBanner').innerHTML = '✅ Exam Locked';
+            document.getElementById('lockBanner').classList.add('locked');
+            document.getElementById('solutionsTab').disabled = false;
+            
+            generateSolutions();
+            switchTab('solutions');
+        }
+        
+        function resetExam() {
+            examState.locked = false;
+            document.getElementById('lockBtn').disabled = false;
+            document.getElementById('lockBanner').innerHTML = '⚠️ Review your exam below, then lock it to generate solutions';
+            document.getElementById('lockBanner').classList.remove('locked');
+            document.getElementById('solutionsTab').disabled = true;
+            switchTab('builder');
+        }
+        
+        // ============================================
+        // SOLUTION GENERATION (ALGORITHMIC)
+        // ============================================
+        
+        function generateSolutions() {
+            const { problem1, problem2, problem3 } = examState;
+            
+            const sol1 = solveProblem1(problem1);
+            const sol2 = solveProblem2(problem2);
+            const sol3 = solveProblem3(problem3);
+            
+            const html = `
+                <div class="solution-section">
+                    <h3>Problem 1 — Complex Numbers [20 marks]</h3>
+                    ${sol1}
+                </div>
+                
+                <div class="solution-section">
+                    <h3>Problem 2 — If-then Logic and Congruence [20 marks]</h3>
+                    ${sol2}
+                </div>
+                
+                <div class="solution-section">
+                    <h3>Problem 3 — Series and Rational/Irrational Numbers [20 marks]</h3>
+                    ${sol3}
+                </div>
+            `;
+            
+            document.getElementById('solutionsContent').innerHTML = html;
+            renderMath();
+        }
+        
+        function solveProblem1(p) {
+            const z1 = p.z1;
+            const z2 = p.z2;
+            const N = p.N;
+            const M = p.M;
+            
+            // Calculate modulus (should be 1 for unit circle)
+            const r1 = Math.sqrt(z1.real * z1.real + z1.imag * z1.imag);
+            const r2 = Math.sqrt(z2.real * z2.real + z2.imag * z2.imag);
+            
+            // Angles
+            const theta1 = z1.angle;
+            const theta2 = z2.angle;
+            
+            // Angle after power (mod 2π)
+            const newTheta1 = (N * theta1) % (2 * Math.PI);
+            const newTheta2 = (M * theta2) % (2 * Math.PI);
+            
+            // Results
+            const res1Real = Math.pow(r1, N) * Math.cos(newTheta1);
+            const res1Imag = Math.pow(r1, N) * Math.sin(newTheta1);
+            const res2Real = Math.pow(r2, M) * Math.cos(newTheta2);
+            const res2Imag = Math.pow(r2, M) * Math.sin(newTheta2);
+            
+            const sumReal = res1Real + res2Real;
+            const sumImag = res1Imag + res2Imag;
+            
+            // Format angles nicely
+            const theta1Latex = formatAngleLatex(theta1);
+            const theta2Latex = formatAngleLatex(theta2);
+            const newTheta1Latex = formatAngleLatex(newTheta1);
+            const newTheta2Latex = formatAngleLatex(newTheta2);
+            
+            return `
+                <div class="solution-step">
+                    <h4>Part (a): Polar Form <span class="marks-badge">5 marks</span></h4>
+                    <p><strong>For $z_1 = ${z1.latex}$:</strong></p>
+                    <p>Modulus: $r_1 = \\sqrt{(${formatNumberLatex(z1.real)})^2 + (${formatNumberLatex(z1.imag)})^2} = ${r1.toFixed(4) === '1.0000' ? '1' : r1.toFixed(4)}$</p>
+                    <p>The point is in quadrant ${getQuadrant(z1.real, z1.imag)}. Using reference angles:</p>
+                    <p>Argument: $\\theta_1 = ${theta1Latex}$</p>
+                    <p><strong>Polar form:</strong> $z_1 = \\cos(${theta1Latex}) + i\\sin(${theta1Latex})$</p>
+                    
+                    <p style="margin-top: 1rem;"><strong>For $z_2 = ${z2.latex}$:</strong></p>
+                    <p>Modulus: $r_2 = \\sqrt{(${formatNumberLatex(z2.real)})^2 + (${formatNumberLatex(z2.imag)})^2} = ${r2.toFixed(4) === '1.0000' ? '1' : r2.toFixed(4)}$</p>
+                    <p>The point is in quadrant ${getQuadrant(z2.real, z2.imag)}. Using reference angles:</p>
+                    <p>Argument: $\\theta_2 = ${theta2Latex}$</p>
+                    <p><strong>Polar form:</strong> $z_2 = \\cos(${theta2Latex}) + i\\sin(${theta2Latex})$</p>
+                    
+                    <div class="mark-breakdown">
+                        <table>
+                            <tr><th>Component</th><th>Marks</th></tr>
+                            <tr><td>Correct $r_1 = 1$</td><td>1</td></tr>
+                            <tr><td>Correct $\\theta_1$ with quadrant reasoning</td><td>1.5</td></tr>
+                            <tr><td>Correct $r_2 = 1$</td><td>1</td></tr>
+                            <tr><td>Correct $\\theta_2$ with quadrant reasoning</td><td>1.5</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="solution-step">
+                    <h4>Part (b): Computing $z_1^{${N}} + z_2^{${M}}$ <span class="marks-badge">15 marks</span></h4>
+                    
+                    <p><strong>Using De Moivre's Theorem:</strong></p>
+                    <p>$z_1^{${N}} = \\cos(${N} \\cdot ${theta1Latex}) + i\\sin(${N} \\cdot ${theta1Latex})$</p>
+                    <p>Since angles are periodic with period $2\\pi$, we reduce: $${N} \\cdot ${theta1Latex} \\equiv ${newTheta1Latex} \\pmod{2\\pi}$</p>
+                    <p>$z_1^{${N}} = \\cos(${newTheta1Latex}) + i\\sin(${newTheta1Latex}) = ${formatNumberLatex(res1Real)} + ${formatNumberLatex(res1Imag)}i$</p>
+                    
+                    <p style="margin-top: 1rem;">$z_2^{${M}} = \\cos(${M} \\cdot ${theta2Latex}) + i\\sin(${M} \\cdot ${theta2Latex})$</p>
+                    <p>Reducing: $${M} \\cdot ${theta2Latex} \\equiv ${newTheta2Latex} \\pmod{2\\pi}$</p>
+                    <p>$z_2^{${M}} = \\cos(${newTheta2Latex}) + i\\sin(${newTheta2Latex}) = ${formatNumberLatex(res2Real)} + ${formatNumberLatex(res2Imag)}i$</p>
+                    
+                    <p style="margin-top: 1rem;"><strong>Final Sum:</strong></p>
+                    <p>$z_1^{${N}} + z_2^{${M}} = (${formatNumberLatex(res1Real)} + ${formatNumberLatex(res2Real)}) + (${formatNumberLatex(res1Imag)} + ${formatNumberLatex(res2Imag)})i$</p>
+                    <div class="info-box">
+                        <strong>Answer:</strong> $z_1^{${N}} + z_2^{${M}} = ${formatNumberLatex(sumReal)} + ${formatNumberLatex(sumImag)}i$
+                    </div>
+                    
+                    <div class="mark-breakdown">
+                        <table>
+                            <tr><th>Component</th><th>Marks</th></tr>
+                            <tr><td>Applying De Moivre correctly</td><td>3</td></tr>
+                            <tr><td>Correct angle multiplication for $z_1^{${N}}$</td><td>3</td></tr>
+                            <tr><td>Correct angle reduction mod $2\\pi$</td><td>2</td></tr>
+                            <tr><td>Correct angle multiplication for $z_2^{${M}}$</td><td>3</td></tr>
+                            <tr><td>Correct final values</td><td>2</td></tr>
+                            <tr><td>Correct sum in $a + bi$ form</td><td>2</td></tr>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function solveProblem2(p) {
+            const stmt1Solution = solveCongruenceStatement(p.stmt1.a, p.stmt1.m, p.stmt1.k);
+            const stmt2Solution = solveCongruenceStatement(p.stmt2.a, p.stmt2.m, p.stmt2.k);
+            
+            return `
+                <div class="solution-step">
+                    <h4>Statement 1: If $n \\equiv ${p.stmt1.a} \\pmod{${p.stmt1.m}}$, then $n^{${p.stmt1.k}} \\equiv ${p.stmt1.a} \\pmod{${p.stmt1.m}}$</h4>
+                    
+                    <p><strong>Part (a): Original Statement</strong> <span class="marks-badge">5 marks</span></p>
+                    ${stmt1Solution.forward}
+                    
+                    <p style="margin-top: 1rem;"><strong>Part (b): Converse</strong> <span class="marks-badge">5 marks</span></p>
+                    <p><em>Converse:</em> If $n^{${p.stmt1.k}} \\equiv ${p.stmt1.a} \\pmod{${p.stmt1.m}}$, then $n \\equiv ${p.stmt1.a} \\pmod{${p.stmt1.m}}$.</p>
+                    ${stmt1Solution.converse}
+                    
+                    <div class="mark-breakdown">
+                        <table>
+                            <tr><th>Component</th><th>Marks</th></tr>
+                            <tr><td>Correct determination of statement truth value</td><td>2</td></tr>
+                            <tr><td>Valid proof or counterexample</td><td>3</td></tr>
+                            <tr><td>Correct converse written</td><td>1</td></tr>
+                            <tr><td>Correct determination of converse truth value</td><td>1</td></tr>
+                            <tr><td>Valid proof or counterexample for converse</td><td>3</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="solution-step">
+                    <h4>Statement 2: If $n \\equiv ${p.stmt2.a} \\pmod{${p.stmt2.m}}$, then $n^{${p.stmt2.k}} \\equiv ${p.stmt2.a} \\pmod{${p.stmt2.m}}$</h4>
+                    
+                    <p><strong>Part (a): Original Statement</strong> <span class="marks-badge">5 marks</span></p>
+                    ${stmt2Solution.forward}
+                    
+                    <p style="margin-top: 1rem;"><strong>Part (b): Converse</strong> <span class="marks-badge">5 marks</span></p>
+                    <p><em>Converse:</em> If $n^{${p.stmt2.k}} \\equiv ${p.stmt2.a} \\pmod{${p.stmt2.m}}$, then $n \\equiv ${p.stmt2.a} \\pmod{${p.stmt2.m}}$.</p>
+                    ${stmt2Solution.converse}
+                    
+                    <div class="mark-breakdown">
+                        <table>
+                            <tr><th>Component</th><th>Marks</th></tr>
+                            <tr><td>Correct determination of statement truth value</td><td>2</td></tr>
+                            <tr><td>Valid proof or counterexample</td><td>3</td></tr>
+                            <tr><td>Correct converse written</td><td>1</td></tr>
+                            <tr><td>Correct determination of converse truth value</td><td>1</td></tr>
+                            <tr><td>Valid proof or counterexample for converse</td><td>3</td></tr>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function solveCongruenceStatement(a, m, k) {
+            // Check forward direction: if n ≡ a (mod m), then n^k ≡ a (mod m)
+            // This is true iff a^k ≡ a (mod m)
+            const akModM = modPow(a, k, m);
+            const forwardTrue = (akModM === a % m);
+            
+            let forwardHtml;
+            if (forwardTrue) {
+                forwardHtml = `
+                    <p><strong>TRUE</strong></p>
+                    <p><em>Proof:</em> Let $n \\equiv ${a} \\pmod{${m}}$, so $n = ${a} + ${m}t$ for some integer $t$.</p>
+                    <p>Then $n^{${k}} = (${a} + ${m}t)^{${k}}$.</p>
+                    <p>Expanding using the binomial theorem, every term except ${a}$^{${k}} contains a factor of ${m}.</p>
+                    <p>So $n^{${k}} \\equiv ${a}^{${k}} \\equiv ${akModM} \\equiv ${a} \\pmod{${m}}$. ✓</p>
+                `;
+            } else {
+                forwardHtml = `
+                    <p><strong>FALSE</strong></p>
+                    <p><em>Counterexample:</em> Take $n = ${a}$.</p>
+                    <p>Then $n \\equiv ${a} \\pmod{${m}}$ ✓</p>
+                    <p>But $n^{${k}} = ${a}^{${k}} \\equiv ${akModM} \\pmod{${m}}$</p>
+                    <p>Since ${akModM} \\neq ${a}, the statement is false.</p>
+                `;
+            }
+            
+            // Check converse: if n^k ≡ a (mod m), then n ≡ a (mod m)
+            // Find all residues r where r^k ≡ a (mod m)
+            let residuesWithPower = [];
+            for (let r = 0; r < m; r++) {
+                if (modPow(r, k, m) === a % m) {
+                    residuesWithPower.push(r);
+                }
+            }
+            
+            const converseTrue = (residuesWithPower.length === 1 && residuesWithPower[0] === a % m);
+            
+            let converseHtml;
+            if (converseTrue) {
+                converseHtml = `
+                    <p><strong>TRUE</strong></p>
+                    <p><em>Proof:</em> We check all residues mod ${m}:</p>
+                    <p>The only $r$ with $0 \\le r < ${m}$ such that $r^{${k}} \\equiv ${a} \\pmod{${m}}$ is $r = ${a}$.</p>
+                    <p>Therefore, $n^{${k}} \\equiv ${a} \\pmod{${m}}$ implies $n \\equiv ${a} \\pmod{${m}}$. ✓</p>
+                `;
+            } else {
+                const counterexample = residuesWithPower.find(r => r !== a % m);
+                if (counterexample !== undefined) {
+                    converseHtml = `
+                        <p><strong>FALSE</strong></p>
+                        <p><em>Counterexample:</em> Take $n = ${counterexample}$.</p>
+                        <p>Then $n^{${k}} = ${counterexample}^{${k}} \\equiv ${modPow(counterexample, k, m)} \\equiv ${a} \\pmod{${m}}$ ✓</p>
+                        <p>But $n = ${counterexample} \\not\\equiv ${a} \\pmod{${m}}$.</p>
+                    `;
+                } else {
+                    converseHtml = `
+                        <p><strong>FALSE</strong></p>
+                        <p>No residue $r$ satisfies $r^{${k}} \\equiv ${a} \\pmod{${m}}$, so the hypothesis is never satisfied, making the converse vacuously analyzable but practically false.</p>
+                    `;
+                }
+            }
+            
+            return { forward: forwardHtml, converse: converseHtml };
+        }
+        
+        function modPow(base, exp, mod) {
+            let result = 1;
+            base = base % mod;
+            while (exp > 0) {
+                if (exp % 2 === 1) {
+                    result = (result * base) % mod;
+                }
+                exp = Math.floor(exp / 2);
+                base = (base * base) % mod;
+            }
+            return result;
+        }
+        
+        function solveProblem3(p) {
+            const series1Analysis = analyzeSeriesConvergence(p.series1);
+            const series2Analysis = analyzeSeriesConvergence(p.series2);
+            const decimal1Analysis = analyzeDecimal(p.decimal1, true, null);
+            const decimal2Analysis = analyzeDecimal(null, false, p.decimal2);
+            
+            return `
+                <div class="solution-step">
+                    <h4>Part A: Series <span class="marks-badge">10 marks</span></h4>
+                    
+                    <p><strong>Series 1: $${getSeriesLatex(p.series1)}$</strong></p>
+                    ${series1Analysis}
+                    
+                    <p style="margin-top: 1rem;"><strong>Series 2: $${getSeriesLatex(p.series2)}$</strong></p>
+                    ${series2Analysis}
+                    
+                    <div class="mark-breakdown">
+                        <table>
+                            <tr><th>Component</th><th>Marks</th></tr>
+                            <tr><td>Correct limit analysis for series 1</td><td>2</td></tr>
+                            <tr><td>Correct conclusion for series 1</td><td>3</td></tr>
+                            <tr><td>Correct limit analysis for series 2</td><td>2</td></tr>
+                            <tr><td>Correct conclusion for series 2</td><td>3</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="solution-step">
+                    <h4>Part B: Decimal Expansions <span class="marks-badge">10 marks</span></h4>
+                    
+                    <p><strong>Decimal 1: $0.${p.decimal1}${p.decimal1}${p.decimal1}\\ldots$</strong></p>
+                    ${decimal1Analysis}
+                    
+                    <p style="margin-top: 1rem;"><strong>Decimal 2: $0.${getIrrationalDigits(p.decimal2)}\\ldots$</strong></p>
+                    ${decimal2Analysis}
+                    
+                    <div class="mark-breakdown">
+                        <table>
+                            <tr><th>Component</th><th>Marks</th></tr>
+                            <tr><td>Correct identification (rational/irrational) for decimal 1</td><td>1</td></tr>
+                            <tr><td>Correct justification for decimal 1</td><td>2</td></tr>
+                            <tr><td>Correct fraction using geometric series</td><td>2</td></tr>
+                            <tr><td>Correct identification (rational/irrational) for decimal 2</td><td>1</td></tr>
+                            <tr><td>Correct justification for decimal 2</td><td>4</td></tr>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function analyzeSeriesConvergence(series) {
+            // Analyze if the terms go to 0
+            // Added explicit symbol notation (a_n \nrightarrow 0) alongside \neq 0 for clarity
+            const analyses = {
+                '(3n+2)/(2n+1)': {
+                    limit: '3/2',
+                    goesToZero: false,
+                    conclusion: 'must diverge',
+                    explanation: '$\\lim_{n \\to \\infty} \\frac{3n+2}{2n+1} = \\frac{3}{2} \\neq 0 \\quad (a_n \\nrightarrow 0)$'
+                },
+                '(-1)^n': {
+                    limit: 'does not exist',
+                    goesToZero: false,
+                    conclusion: 'must diverge',
+                    explanation: '$\\lim_{n \\to \\infty} (-1)^n$ does not exist (oscillates between -1 and 1).'
+                },
+                '(3n+5)/(5n+1)': {
+                    limit: '3/5',
+                    goesToZero: false,
+                    conclusion: 'must diverge',
+                    explanation: '$\\lim_{n \\to \\infty} \\frac{3n+5}{5n+1} = \\frac{3}{5} \\neq 0 \\quad (a_n \\nrightarrow 0)$'
+                },
+                'n/(n+1)': {
+                    limit: '1',
+                    goesToZero: false,
+                    conclusion: 'must diverge',
+                    explanation: '$\\lim_{n \\to \\infty} \\frac{n}{n+1} = 1 \\neq 0 \\quad (a_n \\nrightarrow 0)$'
+                },
+                '(5n+3)/(4n+1)': {
+                    limit: '5/4',
+                    goesToZero: false,
+                    conclusion: 'must diverge',
+                    explanation: '$\\lim_{n \\to \\infty} \\frac{5n+3}{4n+1} = \\frac{5}{4} \\neq 0 \\quad (a_n \\nrightarrow 0)$'
+                },
+                '1/n': {
+                    limit: '0',
+                    goesToZero: true,
+                    conclusion: '(S) is not sufficient',
+                    explanation: '$\\lim_{n \\to \\infty} \\frac{1}{n} = 0$, so (S) does not apply. The series actually diverges (harmonic series), but (S) alone cannot tell us this.'
+                },
+                '(-1)^n/n': {
+                    limit: '0',
+                    goesToZero: true,
+                    conclusion: '(S) is not sufficient',
+                    explanation: '$\\lim_{n \\to \\infty} \\frac{(-1)^n}{n} = 0$, so (S) does not apply. The series actually converges (alternating series), but (S) alone cannot tell us this.'
+                },
+                '1/(n^2+n)': {
+                    limit: '0',
+                    goesToZero: true,
+                    conclusion: '(S) is not sufficient',
+                    explanation: '$\\lim_{n \\to \\infty} \\frac{1}{n^2+n} = 0$, so (S) does not apply.'
+                },
+                '1/2^n': {
+                    limit: '0',
+                    goesToZero: true,
+                    conclusion: '(S) is not sufficient',
+                    explanation: '$\\lim_{n \\to \\infty} \\frac{1}{2^n} = 0$, so (S) does not apply.'
+                },
+                '1/n^3': {
+                    limit: '0',
+                    goesToZero: true,
+                    conclusion: '(S) is not sufficient',
+                    explanation: '$\\lim_{n \\to \\infty} \\frac{1}{n^3} = 0$, so (S) does not apply.'
+                }
+            };
+            
+            const analysis = analyses[series];
+            if (analysis) {
+                return `
+                    <p>${analysis.explanation}</p>
+                    <div class="info-box">
+                        <strong>Conclusion:</strong> By (S), the series <strong>${analysis.conclusion}</strong>.
+                    </div>
+                `;
+            }
+            
+            return `<p>Custom series: Analyze if $\\lim_{n \\to \\infty} a_n = 0$. If not, series must diverge by (S). If yes, (S) is not sufficient.</p>`;
+        }
+        
+        function analyzeDecimal(digits, isRepeating, type) {
+            if (isRepeating) {
+                const block = digits;
+                const len = block.length;
+                const numerator = parseInt(block);
+                const denominator = parseInt('9'.repeat(len));
+                const gcd = findGCD(numerator, denominator);
+                const simplifiedNum = numerator / gcd;
+                const simplifiedDen = denominator / gcd;
+                
+                return `
+                    <p><strong>RATIONAL</strong></p>
+                    <p><em>Justification:</em> The decimal has a repeating block "${block}" of length ${len}, so it is rational.</p>
+                    <p><em>Geometric series:</em></p>
+                    <p>$0.\\overline{${block}} = \\frac{${block}}{10^{${len}}} + \\frac{${block}}{10^{${2*len}}} + \\frac{${block}}{10^{${3*len}}} + \\cdots$</p>
+                    <p>$= \\frac{${block}}{10^{${len}}} \\cdot \\frac{1}{1 - \\frac{1}{10^{${len}}}} = \\frac{${block}}{10^{${len}} - 1} = \\frac{${numerator}}{${denominator}}$</p>
+                    <div class="info-box">
+                        <strong>Answer:</strong> $0.\\overline{${block}} = \\frac{${simplifiedNum}}{${simplifiedDen}}$
+                    </div>
+                `;
+            } else {
+                // Return description based on pattern type
+                const descriptions = {
+                    'zeros': 'a pattern where the number of zeros between the ones increases by one each time (1, 2, 3...).',
+                    'onestwos': 'a pattern where the blocks of 1s and 2s increase in length by one each time.',
+                    'naturals': 'concatenating the sequence of natural numbers (1, 2, 3, 4, 5...).',
+                    'primes': 'concatenating the sequence of prime numbers (2, 3, 5, 7, 11...).'
+                };
+                const desc = descriptions[type] || 'a non-repeating pattern.';
+                
+                return `
+                    <p><strong>IRRATIONAL</strong></p>
+                    <p><em>Justification:</em> The digits are formed by ${desc} This pattern never repeats periodically.</p>
+                    <p>Since a number is rational if and only if its decimal expansion eventually repeats, this number is irrational.</p>
+                    <div class="info-box">
+                        <strong>Answer:</strong> The number is <strong>irrational</strong> because its decimal expansion is non-repeating.
+                    </div>
+                `;
+            }
+        }
+        
+        function findGCD(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                [a, b] = [b, a % b];
+            }
+            return a;
+        }
+        
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        
+        function formatAngleLatex(angle) {
+            const pi = Math.PI;
+            const tol = 0.01;
+            
+            const specialAngles = [
+                { val: 0, latex: '0' },
+                { val: pi/6, latex: '\\frac{\\pi}{6}' },
+                { val: pi/4, latex: '\\frac{\\pi}{4}' },
+                { val: pi/3, latex: '\\frac{\\pi}{3}' },
+                { val: pi/2, latex: '\\frac{\\pi}{2}' },
+                { val: 2*pi/3, latex: '\\frac{2\\pi}{3}' },
+                { val: 3*pi/4, latex: '\\frac{3\\pi}{4}' },
+                { val: 5*pi/6, latex: '\\frac{5\\pi}{6}' },
+                { val: pi, latex: '\\pi' },
+                { val: 7*pi/6, latex: '\\frac{7\\pi}{6}' },
+                { val: 5*pi/4, latex: '\\frac{5\\pi}{4}' },
+                { val: 4*pi/3, latex: '\\frac{4\\pi}{3}' },
+                { val: 3*pi/2, latex: '\\frac{3\\pi}{2}' },
+                { val: 5*pi/3, latex: '\\frac{5\\pi}{3}' },
+                { val: 7*pi/4, latex: '\\frac{7\\pi}{4}' },
+                { val: 11*pi/6, latex: '\\frac{11\\pi}{6}' },
+                { val: 2*pi, latex: '2\\pi' }
+            ];
+            
+            for (const sa of specialAngles) {
+                if (Math.abs(angle - sa.val) < tol) {
+                    return sa.latex;
+                }
+            }
+            
+            // Try to express as fraction of pi
+            const coeff = angle / pi;
+            if (Math.abs(coeff - Math.round(coeff * 12) / 12) < tol) {
+                const num = Math.round(coeff * 12);
+                if (num % 12 === 0) return `${num/12}\\pi`;
+                return `\\frac{${num}\\pi}{12}`;
+            }
+            
+            return angle.toFixed(4);
+        }
+        
+        function getPeriod(theta) {
+            // Returns the period in terms of full rotations for common angles
+            const pi = Math.PI;
+            const tol = 0.01;
+            
+            // Check if angle is multiple of pi/6, pi/4, pi/3
+            if (Math.abs((theta / (pi/6)) - Math.round(theta / (pi/6))) < tol) {
+                return 12; // 12 * (pi/6) = 2pi
+            }
+            if (Math.abs((theta / (pi/4)) - Math.round(theta / (pi/4))) < tol) {
+                return 8; // 8 * (pi/4) = 2pi
+            }
+            if (Math.abs((theta / (pi/3)) - Math.round(theta / (pi/3))) < tol) {
+                return 6; // 6 * (pi/3) = 2pi
+            }
+            
+            return 1; // Default
+        }
+        
+        function getQuadrant(real, imag) {
+            if (real > 0 && imag >= 0) return 'I';
+            if (real <= 0 && imag > 0) return 'II';
+            if (real < 0 && imag <= 0) return 'III';
+            if (real >= 0 && imag < 0) return 'IV';
+            return 'I';
+        }
+        
+        function randomizeAll() {
+            // Randomize Problem 1
+            const z1Keys = Object.keys(z1Presets);
+            const z2Keys = Object.keys(z2Presets);
+            selectZ1Preset(z1Keys[Math.floor(Math.random() * z1Keys.length)]);
+            selectZ2Preset(z2Keys[Math.floor(Math.random() * z2Keys.length)]);
+            document.getElementById('powerN').value = Math.floor(Math.random() * 200) + 50;
+            document.getElementById('powerM').value = Math.floor(Math.random() * 200) + 50;
+            
+            // Randomize Problem 2
+            const stmt1Keys = Object.keys(stmt1Presets);
+            const stmt2Keys = Object.keys(stmt2Presets);
+            selectStmt1(stmt1Keys[Math.floor(Math.random() * stmt1Keys.length)]);
+            selectStmt2(stmt2Keys[Math.floor(Math.random() * stmt2Keys.length)]);
+            
+            // Randomize Problem 3
+            const series1Options = document.getElementById('series1').options;
+            const series2Options = document.getElementById('series2').options;
+            document.getElementById('series1').selectedIndex = Math.floor(Math.random() * (series1Options.length - 1));
+            document.getElementById('series2').selectedIndex = Math.floor(Math.random() * (series2Options.length - 1));
+            
+            const repeatingBlocks = ['12', '27', '34', '45', '54', '67', '81', '123', '142', '857'];
+            document.getElementById('decimal1').value = repeatingBlocks[Math.floor(Math.random() * repeatingBlocks.length)];
+            
+            // Randomize Decimal 2 Pattern
+            const patterns = ['zeros', 'onestwos', 'naturals', 'primes'];
+            document.getElementById('decimal2').value = patterns[Math.floor(Math.random() * patterns.length)];
+            
+            renderMath();
+        }
+        
+        function renderMath() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMath();
+        });
+    </script>
+</body>
+</html>
