@@ -1277,9 +1277,17 @@
             if (Math.abs(num - 1) < tol) return '1';
             if (Math.abs(num + 1) < tol) return '-1';
             
+            // Check for ±2
+            if (Math.abs(num - 2) < tol) return '2';
+            if (Math.abs(num + 2) < tol) return '-2';
+            
             // Check for ±1/2
             if (Math.abs(num - 0.5) < tol) return '\\frac{1}{2}';
             if (Math.abs(num + 0.5) < tol) return '-\\frac{1}{2}';
+            
+            // Check for ±3/2
+            if (Math.abs(num - 1.5) < tol) return '\\frac{3}{2}';
+            if (Math.abs(num + 1.5) < tol) return '-\\frac{3}{2}';
             
             // Check for ±√2/2
             const sqrt2over2 = Math.sqrt(2) / 2;
@@ -1299,43 +1307,91 @@
             if (Math.abs(num - Math.sqrt(3)) < tol) return '\\sqrt{3}';
             if (Math.abs(num + Math.sqrt(3)) < tol) return '-\\sqrt{3}';
             
-            // Check for ±1/√3
+            // Check for ±1/√3 = √3/3
             const oneOverSqrt3 = 1 / Math.sqrt(3);
-            if (Math.abs(num - oneOverSqrt3) < tol) return '\\frac{1}{\\sqrt{3}}';
-            if (Math.abs(num + oneOverSqrt3) < tol) return '-\\frac{1}{\\sqrt{3}}';
+            if (Math.abs(num - oneOverSqrt3) < tol) return '\\frac{\\sqrt{3}}{3}';
+            if (Math.abs(num + oneOverSqrt3) < tol) return '-\\frac{\\sqrt{3}}{3}';
             
-            // Check for common sums/differences involving √2 and √3
-            // (√3 - 1)/2
+            // Sums involving 1/2 and √2/2: (1 + √2)/2 and (1 - √2)/2
+            if (Math.abs(num - (1 + Math.sqrt(2)) / 2) < tol) return '\\frac{1 + \\sqrt{2}}{2}';
+            if (Math.abs(num + (1 + Math.sqrt(2)) / 2) < tol) return '-\\frac{1 + \\sqrt{2}}{2}';
+            if (Math.abs(num - (1 - Math.sqrt(2)) / 2) < tol) return '\\frac{1 - \\sqrt{2}}{2}';
+            if (Math.abs(num + (1 - Math.sqrt(2)) / 2) < tol) return '-\\frac{1 - \\sqrt{2}}{2}';
+            if (Math.abs(num - (Math.sqrt(2) - 1) / 2) < tol) return '\\frac{\\sqrt{2} - 1}{2}';
+            if (Math.abs(num + (Math.sqrt(2) - 1) / 2) < tol) return '-\\frac{\\sqrt{2} - 1}{2}';
+            
+            // Sums involving 1/2 and √3/2: (1 + √3)/2 and (1 - √3)/2
+            if (Math.abs(num - (1 + Math.sqrt(3)) / 2) < tol) return '\\frac{1 + \\sqrt{3}}{2}';
+            if (Math.abs(num + (1 + Math.sqrt(3)) / 2) < tol) return '-\\frac{1 + \\sqrt{3}}{2}';
+            if (Math.abs(num - (1 - Math.sqrt(3)) / 2) < tol) return '\\frac{1 - \\sqrt{3}}{2}';
+            if (Math.abs(num + (1 - Math.sqrt(3)) / 2) < tol) return '-\\frac{1 - \\sqrt{3}}{2}';
             if (Math.abs(num - (Math.sqrt(3) - 1) / 2) < tol) return '\\frac{\\sqrt{3} - 1}{2}';
             if (Math.abs(num + (Math.sqrt(3) - 1) / 2) < tol) return '-\\frac{\\sqrt{3} - 1}{2}';
             
-            // (√3 + 1)/2
-            if (Math.abs(num - (Math.sqrt(3) + 1) / 2) < tol) return '\\frac{\\sqrt{3} + 1}{2}';
-            if (Math.abs(num + (Math.sqrt(3) + 1) / 2) < tol) return '-\\frac{\\sqrt{3} + 1}{2}';
-            
-            // (√2 + √3)/2
+            // Sums involving √2/2 and √3/2: (√2 + √3)/2 and (√3 - √2)/2
             if (Math.abs(num - (Math.sqrt(2) + Math.sqrt(3)) / 2) < tol) return '\\frac{\\sqrt{2} + \\sqrt{3}}{2}';
             if (Math.abs(num + (Math.sqrt(2) + Math.sqrt(3)) / 2) < tol) return '-\\frac{\\sqrt{2} + \\sqrt{3}}{2}';
-            
-            // (√3 - √2)/2
             if (Math.abs(num - (Math.sqrt(3) - Math.sqrt(2)) / 2) < tol) return '\\frac{\\sqrt{3} - \\sqrt{2}}{2}';
             if (Math.abs(num + (Math.sqrt(3) - Math.sqrt(2)) / 2) < tol) return '-\\frac{\\sqrt{3} - \\sqrt{2}}{2}';
-            
-            // (√2 - √3)/2
             if (Math.abs(num - (Math.sqrt(2) - Math.sqrt(3)) / 2) < tol) return '\\frac{\\sqrt{2} - \\sqrt{3}}{2}';
             if (Math.abs(num + (Math.sqrt(2) - Math.sqrt(3)) / 2) < tol) return '-\\frac{\\sqrt{2} - \\sqrt{3}}{2}';
             
-            // (1 - √3)/2
-            if (Math.abs(num - (1 - Math.sqrt(3)) / 2) < tol) return '\\frac{1 - \\sqrt{3}}{2}';
-            if (Math.abs(num + (1 - Math.sqrt(3)) / 2) < tol) return '-\\frac{1 - \\sqrt{3}}{2}';
+            // Sums involving 1 and √2/2: (2 + √2)/2 and (2 - √2)/2
+            if (Math.abs(num - (2 + Math.sqrt(2)) / 2) < tol) return '\\frac{2 + \\sqrt{2}}{2}';
+            if (Math.abs(num + (2 + Math.sqrt(2)) / 2) < tol) return '-\\frac{2 + \\sqrt{2}}{2}';
+            if (Math.abs(num - (2 - Math.sqrt(2)) / 2) < tol) return '\\frac{2 - \\sqrt{2}}{2}';
+            if (Math.abs(num + (2 - Math.sqrt(2)) / 2) < tol) return '-\\frac{2 - \\sqrt{2}}{2}';
             
-            // √2 + 1, √2 - 1, etc.
-            if (Math.abs(num - (Math.sqrt(2) + 1)) < tol) return '\\sqrt{2} + 1';
+            // Sums involving 1 and √3/2: (2 + √3)/2 and (2 - √3)/2
+            if (Math.abs(num - (2 + Math.sqrt(3)) / 2) < tol) return '\\frac{2 + \\sqrt{3}}{2}';
+            if (Math.abs(num + (2 + Math.sqrt(3)) / 2) < tol) return '-\\frac{2 + \\sqrt{3}}{2}';
+            if (Math.abs(num - (2 - Math.sqrt(3)) / 2) < tol) return '\\frac{2 - \\sqrt{3}}{2}';
+            if (Math.abs(num + (2 - Math.sqrt(3)) / 2) < tol) return '-\\frac{2 - \\sqrt{3}}{2}';
+            
+            // √2 + 1, √2 - 1, 1 - √2
+            if (Math.abs(num - (Math.sqrt(2) + 1)) < tol) return '1 + \\sqrt{2}';
+            if (Math.abs(num + (Math.sqrt(2) + 1)) < tol) return '-1 - \\sqrt{2}';
             if (Math.abs(num - (Math.sqrt(2) - 1)) < tol) return '\\sqrt{2} - 1';
+            if (Math.abs(num + (Math.sqrt(2) - 1)) < tol) return '1 - \\sqrt{2}';
             if (Math.abs(num - (1 - Math.sqrt(2))) < tol) return '1 - \\sqrt{2}';
+            if (Math.abs(num + (1 - Math.sqrt(2))) < tol) return '\\sqrt{2} - 1';
             
-            // Fallback: return as fraction approximation or simple decimal
-            return num.toFixed(4);
+            // √3 + 1, √3 - 1, 1 - √3
+            if (Math.abs(num - (Math.sqrt(3) + 1)) < tol) return '1 + \\sqrt{3}';
+            if (Math.abs(num + (Math.sqrt(3) + 1)) < tol) return '-1 - \\sqrt{3}';
+            if (Math.abs(num - (Math.sqrt(3) - 1)) < tol) return '\\sqrt{3} - 1';
+            if (Math.abs(num + (Math.sqrt(3) - 1)) < tol) return '1 - \\sqrt{3}';
+            if (Math.abs(num - (1 - Math.sqrt(3))) < tol) return '1 - \\sqrt{3}';
+            if (Math.abs(num + (1 - Math.sqrt(3))) < tol) return '\\sqrt{3} - 1';
+            
+            // √2 + √3, √3 - √2
+            if (Math.abs(num - (Math.sqrt(2) + Math.sqrt(3))) < tol) return '\\sqrt{2} + \\sqrt{3}';
+            if (Math.abs(num + (Math.sqrt(2) + Math.sqrt(3))) < tol) return '-\\sqrt{2} - \\sqrt{3}';
+            if (Math.abs(num - (Math.sqrt(3) - Math.sqrt(2))) < tol) return '\\sqrt{3} - \\sqrt{2}';
+            if (Math.abs(num + (Math.sqrt(3) - Math.sqrt(2))) < tol) return '\\sqrt{2} - \\sqrt{3}';
+            
+            // Fallback: should not happen for unit circle angles, but keep for safety
+            // Try to express as a simple fraction if close to one
+            for (let denom = 2; denom <= 6; denom++) {
+                for (let numer = -denom * 2; numer <= denom * 2; numer++) {
+                    if (Math.abs(num - numer / denom) < tol) {
+                        if (numer === 0) return '0';
+                        const g = gcd(Math.abs(numer), denom);
+                        const n = numer / g;
+                        const d = denom / g;
+                        if (d === 1) return `${n}`;
+                        return n > 0 ? `\\frac{${n}}{${d}}` : `-\\frac{${-n}}{${d}}`;
+                    }
+                }
+            }
+            
+            // Last resort: return with a note that this is unexpected
+            console.warn('formatExactValue: unexpected value', num);
+            return `${num.toFixed(4)}`;
+        }
+        
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
         }
         
         function formatExactComplexSum(real, imag) {
@@ -1428,7 +1484,7 @@
                     <p><em>Counterexample:</em> Take $n = ${a}$.</p>
                     <p>Then $n \\equiv ${a} \\pmod{${m}}$ ✓</p>
                     <p>But $n^{${k}} = ${a}^{${k}} \\equiv ${akModM} \\pmod{${m}}$</p>
-                    <p>Since ${akModM} \\neq ${a}, the statement is false.</p>
+                    <p>Since $${akModM} \\neq ${a}$, the statement is false.</p>
                 `;
             }
             
@@ -1441,10 +1497,22 @@
                 }
             }
             
-            const converseTrue = (residuesWithPower.length === 1 && residuesWithPower[0] === a % m);
+            // Converse is true if:
+            // 1. No residues satisfy the hypothesis (vacuously true), OR
+            // 2. The only residue that satisfies it is a itself
+            const converseVacuouslyTrue = (residuesWithPower.length === 0);
+            const converseSubstantivelyTrue = (residuesWithPower.length === 1 && residuesWithPower[0] === a % m);
+            const converseTrue = converseVacuouslyTrue || converseSubstantivelyTrue;
             
             let converseHtml;
-            if (converseTrue) {
+            if (converseVacuouslyTrue) {
+                converseHtml = `
+                    <p><strong>TRUE</strong> (vacuously)</p>
+                    <p><em>Proof:</em> We check all residues mod ${m}:</p>
+                    <p>No residue $r$ with $0 \\le r < ${m}$ satisfies $r^{${k}} \\equiv ${a} \\pmod{${m}}$.</p>
+                    <p>Since the hypothesis is never satisfied, the implication "If $n^{${k}} \\equiv ${a}$, then $n \\equiv ${a}$" is <strong>vacuously true</strong>. ✓</p>
+                `;
+            } else if (converseSubstantivelyTrue) {
                 converseHtml = `
                     <p><strong>TRUE</strong></p>
                     <p><em>Proof:</em> We check all residues mod ${m}:</p>
@@ -1453,19 +1521,12 @@
                 `;
             } else {
                 const counterexample = residuesWithPower.find(r => r !== a % m);
-                if (counterexample !== undefined) {
-                    converseHtml = `
-                        <p><strong>FALSE</strong></p>
-                        <p><em>Counterexample:</em> Take $n = ${counterexample}$.</p>
-                        <p>Then $n^{${k}} = ${counterexample}^{${k}} \\equiv ${modPow(counterexample, k, m)} \\equiv ${a} \\pmod{${m}}$ ✓</p>
-                        <p>But $n = ${counterexample} \\not\\equiv ${a} \\pmod{${m}}$.</p>
-                    `;
-                } else {
-                    converseHtml = `
-                        <p><strong>FALSE</strong></p>
-                        <p>No residue $r$ satisfies $r^{${k}} \\equiv ${a} \\pmod{${m}}$, so the hypothesis is never satisfied, making the converse vacuously analyzable but practically false.</p>
-                    `;
-                }
+                converseHtml = `
+                    <p><strong>FALSE</strong></p>
+                    <p><em>Counterexample:</em> Take $n = ${counterexample}$.</p>
+                    <p>Then $n^{${k}} = ${counterexample}^{${k}} \\equiv ${modPow(counterexample, k, m)} \\equiv ${a} \\pmod{${m}}$ ✓</p>
+                    <p>But $n = ${counterexample}$, which is not congruent to $${a} \\pmod{${m}}$.</p>
+                `;
             }
             
             return { forward: forwardHtml, converse: converseHtml };
@@ -1778,4 +1839,4 @@
         });
     </script>
 </body>
-</html>
+    </html>
