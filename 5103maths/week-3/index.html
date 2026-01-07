@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 3: Newton's Method | Numerical Methods | Mathswell</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #065f5b;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --text-light: #6b7280;
+            --accent-amber: #f59e0b;
+            --accent-red: #dc2626;
+            --accent-blue: #3b82f6;
+            --success: #10b981;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 8px rgba(15, 118, 110, 0.08);
+            --shadow-md: 0 4px 16px rgba(15, 118, 110, 0.12);
+            --shadow-lg: 0 8px 32px rgba(15, 118, 110, 0.16);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 1.1rem;
+        }
+
+        .mw-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .breadcrumb-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: var(--text-muted);
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Week Header */
+        .week-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .week-header h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .week-header .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        /* Learning Aims */
+        .learning-aims {
+            background: var(--interactive);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .learning-aims-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .learning-aims ul {
+            margin-left: 1.5rem;
+        }
+
+        .learning-aims li {
+            margin-bottom: 0.4rem;
+            color: var(--text-primary);
+        }
+
+        /* Core Problems Reference */
+        .core-problems-ref {
+            background: var(--white);
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .core-problems-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .core-problems-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .core-problems-toggle {
+            color: var(--primary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .core-problems-content {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .core-problems-content.show {
+            display: block;
+        }
+
+        .core-problems-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .core-problem-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .core-problem-num {
+            background: var(--primary);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* Accordion */
+        .accordion {
+            margin-bottom: 1rem;
+        }
+
+        .accordion-item {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .accordion-header:hover {
+            background: var(--background);
+        }
+
+        .accordion-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .accordion-icon {
+            font-size: 1.2rem;
+        }
+
+        .accordion-chevron {
+            transition: transform 0.3s ease;
+            color: var(--primary);
+        }
+
+        .accordion-item.open .accordion-chevron {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 3000px;
+        }
+
+        .accordion-body {
+            padding: 0 1.25rem 1.25rem 1.25rem;
+        }
+
+        /* Content Boxes */
+        .theory-box {
+            background: #f3f4f6;
+            border-left: 4px solid var(--text-muted);
+            border-radius: 0 8px 8px 0;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .theory-box h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .key-idea-box {
+            background: #dbeafe;
+            border-left: 4px solid var(--accent-blue);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .key-idea-box .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .work-box {
+            background: #d1fae5;
+            border-left: 4px solid var(--success);
+            border-radius: 0 8px 8px 0;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .work-box h4 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .reflect-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+        }
+
+        .reflect-box .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #b45309;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Math Display */
+        .math-block {
+            background: var(--white);
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        /* Apps Section */
+        .apps-section {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .apps-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .app-card {
+            background: var(--background);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            display: block;
+        }
+
+        .app-card:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .app-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .app-card-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .app-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .preset-tag {
+            font-size: 0.75rem;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Self-Test Section */
+        .self-test {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .self-test-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .self-test-intro {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .question {
+            background: var(--background);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .question-number {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .question-type {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-core-ref {
+            font-size: 0.75rem;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+
+        .question-text {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .question-input-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .question-input {
+            padding: 0.6rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 150px;
+            transition: border-color 0.2s ease;
+        }
+
+        .question-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .question-input.correct {
+            border-color: var(--success);
+            background: #d1fae5;
+        }
+
+        .question-input.incorrect {
+            border-color: var(--accent-red);
+            background: #fee2e2;
+        }
+
+        .check-btn {
+            padding: 0.6rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .check-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d1fae5;
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .feedback.incorrect {
+            background: #fee2e2;
+            border: 1px solid var(--accent-red);
+            color: #991b1b;
+        }
+
+        .feedback.hint {
+            background: #fef3c7;
+            border: 1px solid var(--accent-amber);
+            color: #92400e;
+        }
+
+        /* Multiple choice */
+        .mc-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mc-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--white);
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mc-option:hover {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+
+        .mc-option.selected {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+
+        .mc-option.correct {
+            border-color: var(--success);
+            background: #d1fae5;
+        }
+
+        .mc-option.incorrect {
+            border-color: var(--accent-red);
+            background: #fee2e2;
+        }
+
+        .mc-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #9ca3af;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .mc-option.selected .mc-radio {
+            border-color: var(--primary);
+        }
+
+        .mc-option.selected .mc-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        /* Multi-step */
+        .step-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .step-label {
+            min-width: 120px;
+            font-weight: 500;
+        }
+
+        /* Week Navigation */
+        .week-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .week-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .week-nav-link:hover {
+            background: var(--interactive);
+        }
+
+        .week-nav-link.next {
+            margin-left: auto;
+        }
+
+        /* MathPal Float */
+        .mathpal-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+        }
+
+        .mathpal-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--white);
+            border: 2px solid var(--primary);
+            border-radius: 999px;
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .mathpal-button:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mathpal-avatar {
+            width: 40px;
+            height: 40px;
+            animation: mathpal-bob 3s ease-in-out infinite;
+        }
+
+        @keyframes mathpal-bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes robot-blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.1; }
+        }
+
+        .robot-eye {
+            animation: robot-blink 5s infinite;
+        }
+
+        .mathpal-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .mathpal-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .mathpal-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .week-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .core-problems-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .question-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .question-input {
+                width: 100%;
+            }
+
+            .mathpal-text {
+                display: none;
+            }
+
+            .mathpal-float {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .week-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .week-nav-link.next {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="../" class="mw-link">
+            <div class="mw-logo">M</div>
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="breadcrumb-inner">
+            <a href="../">Numerical Methods</a>
+            <span>›</span>
+            <span>Week 3: Newton's Method</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        
+        <!-- Week Header -->
+        <header class="week-header">
+            <span class="week-badge">WEEK 3</span>
+            <h1>Newton's Method</h1>
+            <p class="subtitle">Speed vs Guarantee</p>
+        </header>
+
+        <!-- Learning Aims -->
+        <section class="learning-aims">
+            <div class="learning-aims-header">
+                <span>📎</span> Learning Aims
+            </div>
+            <p>By the end of Week 3, you should be able to:</p>
+            <ul>
+                <li>Derive Newton's update from a tangent-line approximation.</li>
+                <li>Carry out Newton iterations and interpret what the method is doing geometrically.</li>
+                <li>Understand (informally) why Newton can converge very fast near a simple root.</li>
+            </ul>
+        </section>
+
+        <!-- Core Problems Reference -->
+        <div class="core-problems-ref">
+            <div class="core-problems-header" onclick="toggleCoreProblems()">
+                <div class="core-problems-title">
+                    <span>📋</span> Core Problems (Weeks 1–5)
+                </div>
+                <div class="core-problems-toggle">
+                    <span id="toggle-text">Show</span>
+                    <svg id="toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.3s;">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="core-problems-content" id="core-problems-content">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    These 9 problems are used throughout Weeks 1–5. This week adds <strong>Layer C: Newton's Method</strong>.
+                </p>
+                <div class="core-problems-grid">
+                    <div class="core-problem-item"><span class="core-problem-num">1</span> $\cos x - x$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">2</span> $x^3 - x - 1$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">3</span> $x^3 - 0.01$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">4</span> $x^3 - 6x^2 + 11x - 6$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">5</span> $e^x - 3$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">6</span> $x^3$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">7</span> $\sin x - x$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">8</span> $x^2 - 2$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">9</span> $\cos(2x) - x$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion Sections -->
+        <div class="accordion">
+            
+            <!-- Essential Theory -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">📐</span>
+                        Essential Theory
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="theory-box">
+                            <h4>Newton's Method</h4>
+                            <p>Starting from $x_0$, define</p>
+                            <div class="math-block">
+                                $$x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}$$
+                            </div>
+                            <p>Geometrically: $x_{n+1}$ is where the tangent line at $(x_n, f(x_n))$ crosses the $x$-axis.</p>
+                        </div>
+
+                        <div class="key-idea-box">
+                            <div class="label">Key Idea</div>
+                            <p>Newton is a <em>local linear model</em>. The speed comes from the fact that the model matches the curve very well near a simple root.</p>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>Convergence Behaviour</h4>
+                            <p>If $x_0$ is sufficiently close to a simple root and $f'(x^*) \neq 0$, Newton's method typically converges very rapidly. In practice, this rapid convergence is often described as <strong>quadratic</strong>.</p>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>Quadratic Convergence (Informal but Precise)</h4>
+                            <p>Let $e_n = |x_n - x^*|$ denote the error at step $n$. "Quadratic convergence" means that, once you are close enough to the root,</p>
+                            <div class="math-block">
+                                $$e_{n+1} \approx C \cdot e_n^2$$
+                            </div>
+                            <p>for some constant $C > 0$. In practical terms: once Newton is in its stable regime, the <strong>number of correct digits roughly doubles at each step</strong>.</p>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>What This Looks Like in Data</h4>
+                            <p>A quick diagnostic is to compute</p>
+                            <div class="math-block">
+                                $$\frac{e_{n+1}}{e_n^2}$$
+                            </div>
+                            <p>which should become approximately constant when quadratic convergence has "kicked in".</p>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>Failure Modes</h4>
+                            <p>Newton's method may fail if:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>the derivative is zero or very small near the iterate,</li>
+                                <li>the initial guess is too far from the root,</li>
+                                <li>the function has multiple roots or poor local behaviour.</li>
+                            </ul>
+                        </div>
+
+                        <div class="key-idea-box">
+                            <div class="label">Key Idea</div>
+                            <p>Newton's method trades <em>guarantee</em> for <em>speed</em>. When it works, it is extremely fast; when it fails, it can fail dramatically.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session 1: Geometry and First Iterations -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">✏️</span>
+                        Session 1: Geometry and First Iterations
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="work-box">
+                            <h4>Problem 1: Tangent Interpretation</h4>
+                            <p>Sketch $y = f(x)$ and the tangent line at $x_0$ for a simple function (e.g., $f(x) = x^2 - 2$). Explain how the tangent's $x$-intercept gives the next iterate.</p>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 2: Newton by Hand (Core 8)</h4>
+                            <p>Apply Newton's method to $f(x) = x^2 - 2$ starting from $x_0 = 1.5$.</p>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">Compute $x_1$ and $x_2$.</li>
+                                <li>Compare your results with two steps of bisection.</li>
+                            </ol>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 3: Quadratic Convergence in Numbers (Core 8)</h4>
+                            <p>Continue Problem 2 for one more step to compute $x_3$. Using $x^* = \sqrt{2} \approx 1.41421356$ as a reference:</p>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">Compute errors $e_1 = |x_1 - x^*|$, $e_2 = |x_2 - x^*|$, $e_3 = |x_3 - x^*|$.</li>
+                                <li style="margin-bottom: 0.3rem;">Compute the ratios $\displaystyle\frac{e_2}{e_1^2}$ and $\displaystyle\frac{e_3}{e_2^2}$.</li>
+                                <li>What do you notice? (This is the numerical fingerprint of quadratic convergence.)</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session 2: Comparison and Failure -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">📊</span>
+                        Session 2: Comparison and Failure
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="work-box">
+                            <h4>Problem 4: Newton vs Fixed-Point (Core 1)</h4>
+                            <p>For $f(x) = \cos x - x$:</p>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">Write down the Newton iteration.</li>
+                                <li style="margin-bottom: 0.3rem;">Perform two Newton steps from $x_0 = 0.5$.</li>
+                                <li>Compare with the fixed-point iteration $x = \cos x$.</li>
+                            </ol>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 5: Failure Example (Core 6)</h4>
+                            <p>Apply Newton's method to $f(x) = x^3$ starting from $x_0 = 0.1$.</p>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">Compute the iteration formula.</li>
+                                <li>Describe what happens to the sequence.</li>
+                            </ol>
+                        </div>
+
+                        <div class="reflect-box">
+                            <div class="label">Problem 6: Reflection</div>
+                            <p>In one or two sentences: When would you <em>not</em> trust Newton's method?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Consolidation -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">💭</span>
+                        Weekly Consolidation
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 1rem;">Attempt the following after the lectures:</p>
+                        <ol style="margin-left: 1.5rem;">
+                            <li style="margin-bottom: 0.5rem;">Explain Newton's method without using formulas.</li>
+                            <li style="margin-bottom: 0.5rem;">Why is Newton's method considered fast?</li>
+                            <li style="margin-bottom: 0.5rem;">What information does Newton use that bisection does not?</li>
+                            <li>Why is bisection still valuable?</li>
+                        </ol>
+
+                        <div class="key-idea-box" style="margin-top: 1.5rem;">
+                            <div class="label">Viva Prompts</div>
+                            <p>Be prepared to answer questions such as:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>How is Newton's method derived?</li>
+                                <li>What does quadratic convergence mean informally?</li>
+                                <li>Give an example where Newton fails.</li>
+                                <li>Compare Newton's method with bisection.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Apps Section -->
+        <section class="apps-section">
+            <div class="apps-header">
+                <span>🔧</span> App for This Week
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Use this tool to visualize Newton's tangent-line steps and verify your calculations. Compare with bisection and fixed-point iteration on the same problems.</p>
+            
+            <a href="https://mathswell.com/secant-newton-methods/" class="app-card" target="_blank">
+                <div class="app-card-title">
+                    <span>📈</span> Newton & Secant Methods Explorer
+                </div>
+                <p class="app-card-desc">Watch tangent lines intersect the x-axis step by step. See quadratic convergence in action — and watch it break down on Core 6.</p>
+                <div class="app-presets">
+                    <span class="preset-tag">Core 1</span>
+                    <span class="preset-tag">Core 2</span>
+                    <span class="preset-tag">Core 3</span>
+                    <span class="preset-tag">Core 4</span>
+                    <span class="preset-tag">Core 5</span>
+                    <span class="preset-tag">Core 6</span>
+                    <span class="preset-tag">Core 7</span>
+                    <span class="preset-tag">Core 8</span>
+                    <span class="preset-tag">Core 9</span>
+                </div>
+            </a>
+        </section>
+
+        <!-- Self-Test Section -->
+        <section class="self-test">
+            <div class="self-test-header">
+                <span>✓</span> Self-Test
+            </div>
+            <p class="self-test-intro">Verify your understanding with these exercises. Work them by hand first, then check your answers.</p>
+
+            <!-- Question 1: Newton Step from Problem 2 -->
+            <div class="question" id="q1">
+                <div class="question-header">
+                    <span class="question-number">1</span>
+                    <span class="question-type">Newton Step</span>
+                    <span class="question-core-ref">Core 8</span>
+                </div>
+                <div class="question-text">
+                    <p>For $f(x) = x^2 - 2$, starting from $x_0 = 1.5$, compute $x_1$ using Newton's method.</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">(Give 4 decimal places)</p>
+                </div>
+                <div class="question-input-group">
+                    <input type="text" class="question-input" id="q1-input" placeholder="e.g., 1.4167">
+                    <button class="check-btn" onclick="checkQ1()">Check</button>
+                </div>
+                <div class="feedback" id="q1-feedback"></div>
+            </div>
+
+            <!-- Question 2: Error Ratios from Problem 3 -->
+            <div class="question" id="q2">
+                <div class="question-header">
+                    <span class="question-number">2</span>
+                    <span class="question-type">Quadratic Convergence</span>
+                    <span class="question-core-ref">Core 8</span>
+                </div>
+                <div class="question-text">
+                    <p>Continuing from Q1: If $x_1 \approx 1.4167$ and $x_2 \approx 1.4142$, compute the errors $e_1$ and $e_2$ using $x^* = \sqrt{2} \approx 1.41421356$.</p>
+                    <p>Then compute $\displaystyle\frac{e_2}{e_1^2}$. What value do you get approximately?</p>
+                </div>
+                <div class="step-group">
+                    <div class="step-row">
+                        <span class="step-label">$e_1 \approx$</span>
+                        <input type="text" class="question-input" id="q2-e1" placeholder="e.g., 0.002">
+                    </div>
+                    <div class="step-row">
+                        <span class="step-label">$e_2 \approx$</span>
+                        <input type="text" class="question-input" id="q2-e2" placeholder="e.g., 0.00001">
+                    </div>
+                    <div class="step-row">
+                        <span class="step-label">$e_2 / e_1^2 \approx$</span>
+                        <input type="text" class="question-input" id="q2-ratio" placeholder="e.g., 0.35">
+                    </div>
+                </div>
+                <button class="check-btn" onclick="checkQ2()">Check All</button>
+                <div class="feedback" id="q2-feedback"></div>
+            </div>
+
+            <!-- Question 3: Failure Case from Problem 5 -->
+            <div class="question" id="q3">
+                <div class="question-header">
+                    <span class="question-number">3</span>
+                    <span class="question-type">When Newton Slows</span>
+                    <span class="question-core-ref">Core 6</span>
+                </div>
+                <div class="question-text">
+                    <p>For $f(x) = x^3$, apply Newton's method starting from $x_0 = 0.1$.</p>
+                    <p>What is $x_1$? (Give 4 decimal places)</p>
+                </div>
+                <div class="question-input-group">
+                    <input type="text" class="question-input" id="q3-input" placeholder="e.g., 0.0667">
+                    <button class="check-btn" onclick="checkQ3()">Check</button>
+                </div>
+                <div class="feedback" id="q3-feedback"></div>
+            </div>
+
+            <!-- Question 4: Conceptual from Problem 6 -->
+            <div class="question" id="q4">
+                <div class="question-header">
+                    <span class="question-number">4</span>
+                    <span class="question-type">Conceptual</span>
+                </div>
+                <div class="question-text">
+                    <p>Why does Newton's method lose its quadratic convergence on $f(x) = x^3$ at the root $x = 0$?</p>
+                </div>
+                <div class="mc-options" id="q4-options">
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Because $f(0) = 0$ exactly</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Because $f'(0) = 0$ (the root is not simple)</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Because the function is a polynomial</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Because the starting point $x_0 = 0.1$ is too small</span>
+                    </div>
+                </div>
+                <button class="check-btn" onclick="checkQ4()">Check</button>
+                <div class="feedback" id="q4-feedback"></div>
+            </div>
+
+        </section>
+
+        <!-- Week Navigation -->
+        <nav class="week-nav">
+            <a href="../week-2/" class="week-nav-link prev">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Week 2: Fixed-Point Iteration
+            </a>
+            <a href="../week-4/" class="week-nav-link next">
+                Week 4: Secant Method
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </nav>
+
+    </main>
+
+    <!-- MathPal Floating Button -->
+    <div class="mathpal-float">
+        <button class="mathpal-button" onclick="openMathPal()">
+            <svg class="mathpal-avatar" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="#e6fffb"/>
+                <rect x="35" y="60" width="30" height="25" fill="#0f766e" rx="3"/>
+                <rect x="30" y="35" width="40" height="30" fill="#10b981" rx="8"/>
+                <line x1="50" y1="35" x2="50" y2="25" stroke="#0f766e" stroke-width="2"/>
+                <circle cx="50" cy="23" r="3" fill="#f59e0b"/>
+                <circle cx="40" cy="47" r="5" fill="white"/>
+                <circle cx="60" cy="47" r="5" fill="white"/>
+                <circle cx="40" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                <circle cx="60" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                <path d="M 40 55 Q 50 60 60 55" stroke="#0f766e" stroke-width="2" fill="none"/>
+            </svg>
+            <div class="mathpal-text">
+                <span class="mathpal-name">MathPal</span>
+                <span class="mathpal-hint">Got a question?</span>
+            </div>
+        </button>
+    </div>
+
+    <script>
+        // Render KaTeX
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        });
+
+        // Core Problems toggle
+        function toggleCoreProblems() {
+            const content = document.getElementById('core-problems-content');
+            const text = document.getElementById('toggle-text');
+            const chevron = document.getElementById('toggle-chevron');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                text.textContent = 'Show';
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('show');
+                text.textContent = 'Hide';
+                chevron.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Accordion toggle
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            const wasOpen = item.classList.contains('open');
+            
+            // Close all
+            document.querySelectorAll('.accordion-item').forEach(i => {
+                i.classList.remove('open');
+            });
+            
+            // Open clicked if it was closed
+            if (!wasOpen) {
+                item.classList.add('open');
+            }
+        }
+
+        // Question 1: Newton step for x^2 - 2 from x0=1.5
+        // f(1.5) = 2.25 - 2 = 0.25, f'(1.5) = 3
+        // x1 = 1.5 - 0.25/3 = 1.5 - 0.0833... ≈ 1.4167
+        function checkQ1() {
+            const input = document.getElementById('q1-input');
+            const feedback = document.getElementById('q1-feedback');
+            const value = parseFloat(input.value.trim());
+            
+            if (isNaN(value)) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Enter a number. Use the formula $x_1 = x_0 - \\frac{f(x_0)}{f\'(x_0)}$.';
+                renderMathInElement(feedback);
+                return;
+            }
+            
+            if (Math.abs(value - 1.4167) < 0.001) {
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> $f(1.5) = 0.25$, $f\'(1.5) = 3$, so $x_1 = 1.5 - \\frac{0.25}{3} \\approx 1.4167$.';
+                renderMathInElement(feedback);
+            } else {
+                input.classList.remove('correct');
+                input.classList.add('incorrect');
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Check your calculation. $f(x) = x^2 - 2$, so $f(1.5) = ?$ and $f\'(1.5) = ?$';
+                renderMathInElement(feedback);
+            }
+        }
+
+        // Question 2: Error ratios
+        // x1 ≈ 1.4167, x2 ≈ 1.4142, x* ≈ 1.41421356
+        // e1 = |1.4167 - 1.41421356| ≈ 0.00249
+        // e2 = |1.4142 - 1.41421356| ≈ 0.00001 (approximately)
+        // e2/e1^2 ≈ 0.00001 / 0.0000062 ≈ 1.6 or so (but depends on precision)
+        // Let's use more precise: x1 = 17/12 ≈ 1.41666..., x2 = 577/408 ≈ 1.41421568...
+        // e1 = |17/12 - √2| ≈ 0.00245
+        // e2 = |577/408 - √2| ≈ 0.0000021
+        // e2/e1^2 ≈ 0.35
+        function checkQ2() {
+            const e1Input = document.getElementById('q2-e1');
+            const e2Input = document.getElementById('q2-e2');
+            const ratioInput = document.getElementById('q2-ratio');
+            const feedback = document.getElementById('q2-feedback');
+            
+            const e1 = parseFloat(e1Input.value.trim());
+            const e2 = parseFloat(e2Input.value.trim());
+            const ratio = parseFloat(ratioInput.value.trim());
+            
+            let correct = 0;
+            let errors = [];
+            
+            // Check e1 ≈ 0.0025 (accept range 0.002 to 0.003)
+            if (!isNaN(e1) && e1 > 0.001 && e1 < 0.004) {
+                e1Input.classList.remove('incorrect');
+                e1Input.classList.add('correct');
+                correct++;
+            } else if (!isNaN(e1)) {
+                e1Input.classList.remove('correct');
+                e1Input.classList.add('incorrect');
+                errors.push('$e_1 = |1.4167 - 1.41421| \\approx 0.0025$');
+            }
+            
+            // Check e2 ≈ 0.00001 to 0.00003 (very small)
+            if (!isNaN(e2) && e2 > 0 && e2 < 0.0001) {
+                e2Input.classList.remove('incorrect');
+                e2Input.classList.add('correct');
+                correct++;
+            } else if (!isNaN(e2)) {
+                e2Input.classList.remove('correct');
+                e2Input.classList.add('incorrect');
+                errors.push('$e_2 = |1.4142 - 1.41421| \\approx 0.00001$ (very small!)');
+            }
+            
+            // Check ratio ≈ 0.3 to 0.5 (depends on precision used)
+            if (!isNaN(ratio) && ratio > 0.2 && ratio < 1.0) {
+                ratioInput.classList.remove('incorrect');
+                ratioInput.classList.add('correct');
+                correct++;
+            } else if (!isNaN(ratio)) {
+                ratioInput.classList.remove('correct');
+                ratioInput.classList.add('incorrect');
+                errors.push('The ratio $e_2/e_1^2$ should be roughly constant (around 0.35)');
+            }
+            
+            if (correct === 3) {
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Excellent!</strong> The ratio $e_2/e_1^2$ being roughly constant is the numerical fingerprint of quadratic convergence. Notice how dramatically $e_2$ is smaller than $e_1$!';
+                renderMathInElement(feedback);
+            } else if (errors.length > 0) {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Check: ' + errors.join('<br>');
+                renderMathInElement(feedback);
+            } else {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Fill in all three values to check your work.';
+            }
+        }
+
+        // Question 3: Newton for x^3 from x0=0.1
+        // f(0.1) = 0.001, f'(0.1) = 3(0.01) = 0.03
+        // x1 = 0.1 - 0.001/0.03 = 0.1 - 0.0333... = 0.0667
+        function checkQ3() {
+            const input = document.getElementById('q3-input');
+            const feedback = document.getElementById('q3-feedback');
+            const value = parseFloat(input.value.trim());
+            
+            if (isNaN(value)) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Use Newton\'s formula with $f(x) = x^3$ and $f\'(x) = 3x^2$.';
+                renderMathInElement(feedback);
+                return;
+            }
+            
+            // Accept 0.0667 or 2/30 = 1/15 ≈ 0.0667
+            if (Math.abs(value - 0.0667) < 0.001) {
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> $x_1 = 0.1 - \\frac{0.001}{0.03} = 0.1 - \\frac{1}{30} \\approx 0.0667$. Notice: each step multiplies by $\\frac{2}{3}$, so convergence is only <em>linear</em>, not quadratic!';
+                renderMathInElement(feedback);
+            } else {
+                input.classList.remove('correct');
+                input.classList.add('incorrect');
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Check: $f(0.1) = (0.1)^3 = 0.001$, $f\'(0.1) = 3(0.1)^2 = 0.03$, so $x_1 = 0.1 - \\frac{0.001}{0.03} = ?$';
+                renderMathInElement(feedback);
+            }
+        }
+
+        // Multiple choice
+        let selectedMC = {};
+        
+        function selectMC(option, qId) {
+            const options = document.querySelectorAll(`#${qId}-options .mc-option`);
+            options.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            selectedMC[qId] = Array.from(options).indexOf(option);
+        }
+
+        // Question 4: Why Newton slows on x^3
+        function checkQ4() {
+            const feedback = document.getElementById('q4-feedback');
+            const options = document.querySelectorAll('#q4-options .mc-option');
+            
+            if (selectedMC['q4'] === undefined) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Select an answer first.';
+                return;
+            }
+            
+            // Correct answer is index 1: f'(0) = 0
+            options.forEach((opt, i) => {
+                opt.classList.remove('correct', 'incorrect');
+                if (i === 1) {
+                    opt.classList.add('correct');
+                } else if (i === selectedMC['q4'] && i !== 1) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedMC['q4'] === 1) {
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> For $f(x) = x^3$, we have $f\'(0) = 0$. This means $x = 0$ is a <em>multiple root</em> (specifically, a triple root). The proof of quadratic convergence requires $f\'(x^*) \\neq 0$. When this fails, Newton degrades to linear convergence.';
+            } else if (selectedMC['q4'] === 0) {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ The fact that $f(0) = 0$ is what <em>makes</em> 0 a root — that\'s not the problem. The issue is with the derivative at the root.';
+            } else if (selectedMC['q4'] === 2) {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Polynomials work fine with Newton\'s method — Core 2 ($x^3 - x - 1$) and Core 8 ($x^2 - 2$) both have quadratic convergence.';
+            } else {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ The starting point $x_0 = 0.1$ is actually close to the root. The problem is intrinsic to the root itself (it\'s a triple root).';
+            }
+            
+            renderMathInElement(feedback);
+        }
+
+        // MathPal placeholder
+        function openMathPal() {
+            alert('MathPal would open here.\n\n"Hi! I see you\'re working on Week 3 - Newton\'s method. Confused about why it\'s so fast, or why it fails on x³? I\'m here to help!"');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 5: Error and Order | Numerical Methods | Mathswell</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #065f5b;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --text-light: #6b7280;
+            --accent-amber: #f59e0b;
+            --accent-red: #dc2626;
+            --accent-blue: #3b82f6;
+            --success: #10b981;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 8px rgba(15, 118, 110, 0.08);
+            --shadow-md: 0 4px 16px rgba(15, 118, 110, 0.12);
+            --shadow-lg: 0 8px 32px rgba(15, 118, 110, 0.16);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 1.1rem;
+        }
+
+        .mw-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .breadcrumb-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: var(--text-muted);
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Week Header */
+        .week-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .week-header h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .week-header .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        /* Learning Aims */
+        .learning-aims {
+            background: var(--interactive);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .learning-aims-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .learning-aims ul {
+            margin-left: 1.5rem;
+        }
+
+        .learning-aims li {
+            margin-bottom: 0.4rem;
+            color: var(--text-primary);
+        }
+
+        /* Core Problems Reference */
+        .core-problems-ref {
+            background: var(--white);
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .core-problems-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .core-problems-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .core-problems-toggle {
+            color: var(--primary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .core-problems-content {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .core-problems-content.show {
+            display: block;
+        }
+
+        .core-problems-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .core-problem-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .core-problem-num {
+            background: var(--primary);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* Accordion */
+        .accordion {
+            margin-bottom: 1rem;
+        }
+
+        .accordion-item {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .accordion-header:hover {
+            background: var(--background);
+        }
+
+        .accordion-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .accordion-icon {
+            font-size: 1.2rem;
+        }
+
+        .accordion-chevron {
+            transition: transform 0.3s ease;
+            color: var(--primary);
+        }
+
+        .accordion-item.open .accordion-chevron {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 4000px;
+        }
+
+        .accordion-body {
+            padding: 0 1.25rem 1.25rem 1.25rem;
+        }
+
+        /* Content Boxes */
+        .theory-box {
+            background: #f3f4f6;
+            border-left: 4px solid var(--text-muted);
+            border-radius: 0 8px 8px 0;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .theory-box h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .key-idea-box {
+            background: #dbeafe;
+            border-left: 4px solid var(--accent-blue);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .key-idea-box .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .work-box {
+            background: #d1fae5;
+            border-left: 4px solid var(--success);
+            border-radius: 0 8px 8px 0;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .work-box h4 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .reflect-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+        }
+
+        .reflect-box .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #b45309;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Math Display */
+        .math-block {
+            background: var(--white);
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        /* Apps Section */
+        .apps-section {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .apps-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .app-card {
+            background: var(--background);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .app-card:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .app-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .app-card-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .app-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .preset-tag {
+            font-size: 0.75rem;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Self-Test Section */
+        .self-test {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .self-test-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .self-test-intro {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .question {
+            background: var(--background);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .question-number {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .question-type {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-text {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .question-input-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .question-input {
+            padding: 0.6rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 150px;
+            transition: border-color 0.2s ease;
+        }
+
+        .question-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .question-input.correct {
+            border-color: var(--success);
+            background: #d1fae5;
+        }
+
+        .question-input.incorrect {
+            border-color: var(--accent-red);
+            background: #fee2e2;
+        }
+
+        .check-btn {
+            padding: 0.6rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .check-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d1fae5;
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .feedback.incorrect {
+            background: #fee2e2;
+            border: 1px solid var(--accent-red);
+            color: #991b1b;
+        }
+
+        .feedback.hint {
+            background: #fef3c7;
+            border: 1px solid var(--accent-amber);
+            color: #92400e;
+        }
+
+        /* Multiple choice */
+        .mc-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mc-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--white);
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mc-option:hover {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+
+        .mc-option.selected {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+
+        .mc-option.correct {
+            border-color: var(--success);
+            background: #d1fae5;
+        }
+
+        .mc-option.incorrect {
+            border-color: var(--accent-red);
+            background: #fee2e2;
+        }
+
+        .mc-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #9ca3af;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .mc-option.selected .mc-radio {
+            border-color: var(--primary);
+        }
+
+        .mc-option.selected .mc-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        /* Week Navigation */
+        .week-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .week-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .week-nav-link:hover {
+            background: var(--interactive);
+        }
+
+        .week-nav-link.next {
+            margin-left: auto;
+        }
+
+        /* MathPal Float */
+        .mathpal-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+        }
+
+        .mathpal-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--white);
+            border: 2px solid var(--primary);
+            border-radius: 999px;
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .mathpal-button:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mathpal-avatar {
+            width: 40px;
+            height: 40px;
+            animation: mathpal-bob 3s ease-in-out infinite;
+        }
+
+        @keyframes mathpal-bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes robot-blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.1; }
+        }
+
+        .robot-eye {
+            animation: robot-blink 5s infinite;
+        }
+
+        .mathpal-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .mathpal-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .mathpal-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .week-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .core-problems-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .question-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .question-input {
+                width: 100%;
+            }
+
+            .mathpal-text {
+                display: none;
+            }
+
+            .mathpal-float {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .week-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .week-nav-link.next {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="../" class="mw-link">
+            <div class="mw-logo">M</div>
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="breadcrumb-inner">
+            <a href="../">Numerical Methods</a>
+            <span>›</span>
+            <span>Week 5: Error and Order</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        
+        <!-- Week Header -->
+        <header class="week-header">
+            <span class="week-badge">WEEK 5</span>
+            <h1>Error and Order</h1>
+            <p class="subtitle">Taylor Expansion and Richardson Extrapolation</p>
+        </header>
+
+        <!-- Learning Aims -->
+        <section class="learning-aims">
+            <div class="learning-aims-header">
+                <span>📎</span> Learning Aims
+            </div>
+            <p>By the end of Week 5, you should be able to:</p>
+            <ul>
+                <li>Construct Taylor expansions with remainder terms.</li>
+                <li>Identify the order of truncation error in numerical methods.</li>
+                <li>Explain the connection between Taylor error and order of convergence.</li>
+                <li>Apply Richardson extrapolation to improve accuracy.</li>
+                <li>Recognise the idea behind Romberg extrapolation as repeated Richardson extrapolation.</li>
+            </ul>
+        </section>
+
+        <!-- Core Problems Reference -->
+        <div class="core-problems-ref">
+            <div class="core-problems-header" onclick="toggleCoreProblems()">
+                <div class="core-problems-title">
+                    <span>📋</span> Core Problems (Weeks 1–5)
+                </div>
+                <div class="core-problems-toggle">
+                    <span id="toggle-text">Show</span>
+                    <svg id="toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.3s;">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="core-problems-content" id="core-problems-content">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    This week adds <strong>Layer E: Error Analysis and Order</strong> — analysing <em>why</em> methods converge at their rates.
+                </p>
+                <div class="core-problems-grid">
+                    <div class="core-problem-item"><span class="core-problem-num">1</span> $\cos x - x$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">2</span> $x^3 - x - 1$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">3</span> $x^3 - 0.01$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">4</span> $x^3 - 6x^2 + 11x - 6$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">5</span> $e^x - 3$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">6</span> $x^3$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">7</span> $\sin x - x$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">8</span> $x^2 - 2$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">9</span> $\cos(2x) - x$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion Sections -->
+        <div class="accordion">
+            
+            <!-- Essential Theory -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">📐</span>
+                        Essential Theory
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="theory-box">
+                            <h4>Taylor Expansion with Remainder</h4>
+                            <p>If $f$ is sufficiently smooth near $x = a$, then for small $h$:</p>
+                            <div class="math-block">
+                                $$f(a+h) = f(a) + hf'(a) + \frac{h^2}{2}f''(a) + \cdots + \frac{h^n}{n!}f^{(n)}(a) + R_n(h)$$
+                            </div>
+                            <p>where the remainder term satisfies $R_n(h) = O(h^{n+1})$.</p>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>Truncation Error</h4>
+                            <p>When a numerical method replaces an infinite expansion by finitely many terms, the neglected remainder is called the <strong>truncation error</strong>. Its order describes how fast the error decreases as the step size decreases.</p>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>Order Revisited</h4>
+                            <p>If a numerical approximation $A(h)$ satisfies</p>
+                            <div class="math-block">
+                                $$A(h) = A + Ch^p + O(h^{p+1})$$
+                            </div>
+                            <p>then the method is said to be of <strong>order $p$</strong>.</p>
+                        </div>
+
+                        <div class="key-idea-box">
+                            <div class="label">Key Idea</div>
+                            <p>Order of convergence is not magic: it comes directly from Taylor expansions and the size of the neglected terms.</p>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>Richardson Extrapolation</h4>
+                            <p>Given two approximations with step sizes $h$ and $h/2$:</p>
+                            <div class="math-block">
+                                $$A(h) = A + Ch^p + O(h^{p+1})$$
+                                $$A(h/2) = A + C\left(\frac{h}{2}\right)^p + O(h^{p+1})$$
+                            </div>
+                            <p>We can eliminate the leading error term and form a more accurate approximation:</p>
+                            <div class="math-block">
+                                $$A_{\text{rich}} = \frac{2^p A(h/2) - A(h)}{2^p - 1}$$
+                            </div>
+                        </div>
+
+                        <div class="key-idea-box">
+                            <div class="label">Key Idea</div>
+                            <p>Extrapolation is a deliberate "error-cancellation move". You run the same method twice at two step sizes, then combine the answers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session 1: Taylor Expansions and Error -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">✏️</span>
+                        Session 1: Taylor Expansions and Error
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="work-box">
+                            <h4>Problem 1: Taylor Approximation</h4>
+                            <p>Expand $e^x$ about $x = 0$ up to and including the $x^2$ term. Identify the order of the remainder.</p>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 2: Error Interpretation</h4>
+                            <p>Use the expansion in Problem 1 to estimate the error when approximating $e^{0.1}$ by $1 + 0.1 + \frac{0.1^2}{2}$.</p>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 3: Method Order</h4>
+                            <p>Suppose a numerical method satisfies $A(h) = A + Ch^2 + O(h^3)$. What happens to the error when $h$ is halved?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session 2: Richardson Extrapolation -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">📊</span>
+                        Session 2: Richardson Extrapolation and the Romberg Idea
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="work-box">
+                            <h4>Problem 4: Richardson by Hand</h4>
+                            <p>You are given approximations $A(h) = 1.234$ and $A(h/2) = 1.245$ for a quantity $A$, where the method is known to be second order.</p>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">Compute the Richardson extrapolated value.</li>
+                                <li>Compare its accuracy conceptually with $A(h)$ and $A(h/2)$.</li>
+                            </ol>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 5: Repeated Extrapolation (The Romberg Idea)</h4>
+                            <p>Suppose a numerical method produces approximations</p>
+                            <div class="math-block" style="text-align: left; padding-left: 2rem;">
+                                $A(h) = A + Ch^2 + O(h^4)$<br>
+                                $A(h/2) = A + C(h/2)^2 + O(h^4)$<br>
+                                $A(h/4) = A + C(h/4)^2 + O(h^4)$
+                            </div>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">Use Richardson extrapolation to form $R_{1,1} = \frac{4A(h/2) - A(h)}{3}$.</li>
+                                <li style="margin-bottom: 0.3rem;">Form $R_{2,1} = \frac{4A(h/4) - A(h/2)}{3}$.</li>
+                                <li style="margin-bottom: 0.3rem;">Extrapolate again to obtain $R_{2,2} = \frac{16R_{2,1} - R_{1,1}}{15}$.</li>
+                                <li>What is the order of the leading error term in $R_{2,2}$?</li>
+                            </ol>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 6: Interpretation</h4>
+                            <p>Explain, in words, what repeated Richardson extrapolation is doing to the error terms.</p>
+                        </div>
+
+                        <div class="reflect-box">
+                            <div class="label">Problem 7: Reflection</div>
+                            <p>Why is decreasing $h$ not always the best strategy for improving accuracy? (Hint: cost and round-off.)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Consolidation -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">💭</span>
+                        Weekly Consolidation
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 1rem;">Attempt the following after the lectures:</p>
+                        <ol style="margin-left: 1.5rem;">
+                            <li style="margin-bottom: 0.5rem;">What does the remainder term tell you?</li>
+                            <li style="margin-bottom: 0.5rem;">How does order predict error reduction?</li>
+                            <li style="margin-bottom: 0.5rem;">Why does Richardson extrapolation work?</li>
+                            <li>How does this connect to methods you studied earlier?</li>
+                        </ol>
+
+                        <div class="key-idea-box" style="margin-top: 1.5rem;">
+                            <div class="label">Viva Prompts</div>
+                            <p>Be prepared to answer questions such as:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>How does Taylor expansion explain method order?</li>
+                                <li>What assumptions are needed for Richardson extrapolation?</li>
+                                <li>Why might round-off error limit accuracy?</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Apps Section -->
+        <section class="apps-section">
+            <div class="apps-header">
+                <span>🔧</span> Apps for This Week
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Use these tools to verify your calculations and explore error behaviour.</p>
+            
+            <a href="https://mathswell.com/taylor-series/" class="app-card" target="_blank">
+                <div class="app-card-title">
+                    <span>📈</span> Taylor Series Explorer
+                </div>
+                <p class="app-card-desc">Visualise Taylor approximations and see how adding more terms reduces error. Watch the remainder shrink as you increase the order.</p>
+            </a>
+
+            <a href="https://mathswell.com/romberg-integration/" class="app-card" target="_blank">
+                <div class="app-card-title">
+                    <span>📊</span> Romberg Integration Explorer
+                </div>
+                <p class="app-card-desc">Build Romberg tables step by step. See Richardson extrapolation in action — watch how combining approximations cancels error terms.</p>
+            </a>
+        </section>
+
+        <!-- Self-Test Section -->
+        <section class="self-test">
+            <div class="self-test-header">
+                <span>✓</span> Self-Test
+            </div>
+            <p class="self-test-intro">Verify your understanding with these exercises. Work them by hand first, then check your answers.</p>
+
+            <!-- Question 1: Order prediction -->
+            <div class="question" id="q1">
+                <div class="question-header">
+                    <span class="question-number">1</span>
+                    <span class="question-type">Order Prediction</span>
+                </div>
+                <div class="question-text">
+                    <p>A method has error $O(h^2)$. If halving $h$ changes the error from $0.04$ to approximately what value?</p>
+                </div>
+                <div class="question-input-group">
+                    <input type="text" class="question-input" id="q1-input" placeholder="e.g., 0.01">
+                    <button class="check-btn" onclick="checkQ1()">Check</button>
+                </div>
+                <div class="feedback" id="q1-feedback"></div>
+            </div>
+
+            <!-- Question 2: Richardson formula -->
+            <div class="question" id="q2">
+                <div class="question-header">
+                    <span class="question-number">2</span>
+                    <span class="question-type">Richardson Extrapolation</span>
+                </div>
+                <div class="question-text">
+                    <p>Given $A(h) = 1.234$ and $A(h/2) = 1.245$ for a second-order method ($p = 2$), compute the Richardson extrapolated value.</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Use: $A_{\text{rich}} = \frac{4 A(h/2) - A(h)}{3}$</p>
+                </div>
+                <div class="question-input-group">
+                    <input type="text" class="question-input" id="q2-input" placeholder="e.g., 1.2487">
+                    <button class="check-btn" onclick="checkQ2()">Check</button>
+                </div>
+                <div class="feedback" id="q2-feedback"></div>
+            </div>
+
+            <!-- Question 3: Order meaning -->
+            <div class="question" id="q3">
+                <div class="question-header">
+                    <span class="question-number">3</span>
+                    <span class="question-type">Conceptual</span>
+                </div>
+                <div class="question-text">
+                    <p>After Richardson extrapolation on a second-order method, the new approximation has what order?</p>
+                </div>
+                <div class="mc-options" id="q3-options">
+                    <div class="mc-option" onclick="selectMC(this, 'q3')">
+                        <div class="mc-radio"></div>
+                        <span>Order 2 (same as before)</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q3')">
+                        <div class="mc-radio"></div>
+                        <span>Order 3</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q3')">
+                        <div class="mc-radio"></div>
+                        <span>Order 4</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q3')">
+                        <div class="mc-radio"></div>
+                        <span>Order 6</span>
+                    </div>
+                </div>
+                <button class="check-btn" onclick="checkQ3()">Check</button>
+                <div class="feedback" id="q3-feedback"></div>
+            </div>
+
+            <!-- Question 4: Limitation -->
+            <div class="question" id="q4">
+                <div class="question-header">
+                    <span class="question-number">4</span>
+                    <span class="question-type">Conceptual</span>
+                </div>
+                <div class="question-text">
+                    <p>Why can't we just keep making $h$ smaller to get arbitrarily accurate results?</p>
+                </div>
+                <div class="mc-options" id="q4-options">
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Smaller $h$ always gives better results</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Round-off error eventually dominates as $h$ becomes very small</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Taylor series only work for large $h$</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>The order of the method decreases as $h$ decreases</span>
+                    </div>
+                </div>
+                <button class="check-btn" onclick="checkQ4()">Check</button>
+                <div class="feedback" id="q4-feedback"></div>
+            </div>
+
+        </section>
+
+        <!-- Week Navigation -->
+        <nav class="week-nav">
+            <a href="../week-4/" class="week-nav-link prev">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Week 4: Secant Method
+            </a>
+            <a href="../week-6/" class="week-nav-link next">
+                Week 6: Numerical Integration
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </nav>
+
+    </main>
+
+    <!-- MathPal Floating Button -->
+    <div class="mathpal-float">
+        <button class="mathpal-button" onclick="openMathPal()">
+            <svg class="mathpal-avatar" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="#e6fffb"/>
+                <rect x="35" y="60" width="30" height="25" fill="#0f766e" rx="3"/>
+                <rect x="30" y="35" width="40" height="30" fill="#10b981" rx="8"/>
+                <line x1="50" y1="35" x2="50" y2="25" stroke="#0f766e" stroke-width="2"/>
+                <circle cx="50" cy="23" r="3" fill="#f59e0b"/>
+                <circle cx="40" cy="47" r="5" fill="white"/>
+                <circle cx="60" cy="47" r="5" fill="white"/>
+                <circle cx="40" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                <circle cx="60" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                <path d="M 40 55 Q 50 60 60 55" stroke="#0f766e" stroke-width="2" fill="none"/>
+            </svg>
+            <div class="mathpal-text">
+                <span class="mathpal-name">MathPal</span>
+                <span class="mathpal-hint">Got a question?</span>
+            </div>
+        </button>
+    </div>
+
+    <script>
+        // Render KaTeX
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        });
+
+        // Core Problems toggle
+        function toggleCoreProblems() {
+            const content = document.getElementById('core-problems-content');
+            const text = document.getElementById('toggle-text');
+            const chevron = document.getElementById('toggle-chevron');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                text.textContent = 'Show';
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('show');
+                text.textContent = 'Hide';
+                chevron.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Accordion toggle
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            const wasOpen = item.classList.contains('open');
+            
+            // Close all
+            document.querySelectorAll('.accordion-item').forEach(i => {
+                i.classList.remove('open');
+            });
+            
+            // Open clicked if it was closed
+            if (!wasOpen) {
+                item.classList.add('open');
+            }
+        }
+
+        // Question 1: Order prediction
+        // Error is O(h^2), so halving h quarters the error
+        // 0.04 / 4 = 0.01
+        function checkQ1() {
+            const input = document.getElementById('q1-input');
+            const feedback = document.getElementById('q1-feedback');
+            const value = parseFloat(input.value.trim());
+            
+            if (isNaN(value)) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 For $O(h^2)$, halving $h$ means the error is multiplied by $(1/2)^2 = 1/4$.';
+                renderMathInElement(feedback);
+                return;
+            }
+            
+            if (Math.abs(value - 0.01) < 0.002) {
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> For order 2, halving $h$ quarters the error: $0.04 \\times (1/2)^2 = 0.01$. This is exactly what "order 2" means in practice!';
+                renderMathInElement(feedback);
+            } else {
+                input.classList.remove('correct');
+                input.classList.add('incorrect');
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Think about what $O(h^2)$ means: error is proportional to $h^2$. If $h \\to h/2$, what happens to $h^2$?';
+                renderMathInElement(feedback);
+            }
+        }
+
+        // Question 2: Richardson extrapolation
+        // A_rich = (4 * 1.245 - 1.234) / 3 = (4.98 - 1.234) / 3 = 3.746 / 3 ≈ 1.2487
+        function checkQ2() {
+            const input = document.getElementById('q2-input');
+            const feedback = document.getElementById('q2-feedback');
+            const value = parseFloat(input.value.trim());
+            
+            if (isNaN(value)) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Substitute into the formula: $A_{\\text{rich}} = \\frac{4(1.245) - 1.234}{3}$';
+                renderMathInElement(feedback);
+                return;
+            }
+            
+            if (Math.abs(value - 1.2487) < 0.001) {
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> $A_{\\text{rich}} = \\frac{4(1.245) - 1.234}{3} = \\frac{3.746}{3} \\approx 1.2487$. The extrapolated value is more accurate than either $A(h)$ or $A(h/2)$ alone.';
+                renderMathInElement(feedback);
+            } else {
+                input.classList.remove('correct');
+                input.classList.add('incorrect');
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Check: $4 \\times 1.245 = 4.98$, then $4.98 - 1.234 = 3.746$, then $3.746 / 3 = ?$';
+                renderMathInElement(feedback);
+            }
+        }
+
+        // Multiple choice
+        let selectedMC = {};
+        
+        function selectMC(option, qId) {
+            const options = document.querySelectorAll(`#${qId}-options .mc-option`);
+            options.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            selectedMC[qId] = Array.from(options).indexOf(option);
+        }
+
+        // Question 3: Order after extrapolation
+        function checkQ3() {
+            const feedback = document.getElementById('q3-feedback');
+            const options = document.querySelectorAll('#q3-options .mc-option');
+            
+            if (selectedMC['q3'] === undefined) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Select an answer first.';
+                return;
+            }
+            
+            // Correct answer is index 2: Order 4
+            options.forEach((opt, i) => {
+                opt.classList.remove('correct', 'incorrect');
+                if (i === 2) {
+                    opt.classList.add('correct');
+                } else if (i === selectedMC['q3'] && i !== 2) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedMC['q3'] === 2) {
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> Richardson extrapolation on an order-2 method cancels the $h^2$ term, leaving error of order $h^4$. This is why Simpson\'s rule (extrapolated trapezium) is order 4!';
+            } else if (selectedMC['q3'] === 0) {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ The whole point of Richardson extrapolation is to <em>improve</em> the order. We\'re cancelling the leading error term.';
+            } else if (selectedMC['q3'] === 1) {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Close, but the improvement jumps by 2, not 1. The $h^2$ term cancels, and the next error term is $h^4$.';
+            } else {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Order 6 would require <em>another</em> round of extrapolation. One Richardson step: order 2 → order 4.';
+            }
+            
+            renderMathInElement(feedback);
+        }
+
+        // Question 4: Limitation of small h
+        function checkQ4() {
+            const feedback = document.getElementById('q4-feedback');
+            const options = document.querySelectorAll('#q4-options .mc-option');
+            
+            if (selectedMC['q4'] === undefined) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Select an answer first.';
+                return;
+            }
+            
+            // Correct answer is index 1: round-off error
+            options.forEach((opt, i) => {
+                opt.classList.remove('correct', 'incorrect');
+                if (i === 1) {
+                    opt.classList.add('correct');
+                } else if (i === selectedMC['q4'] && i !== 1) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedMC['q4'] === 1) {
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> As $h$ becomes very small, we subtract nearly equal numbers, amplifying round-off error. There\'s always an optimal $h$ that balances truncation error (wants small $h$) against round-off error (wants larger $h$). This is why extrapolation is often better than just reducing $h$.';
+            } else if (selectedMC['q4'] === 0) {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ This is false! There\'s a practical limit. Try computing $(1.0000001 - 1.0000000)$ on a calculator — round-off becomes a problem.';
+            } else if (selectedMC['q4'] === 2) {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Actually, Taylor series work <em>better</em> for small $h$ — that\'s when the approximation is most accurate. The issue is numerical, not mathematical.';
+            } else {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ The method\'s order is a property of the <em>algorithm</em>, not the step size. Order doesn\'t change with $h$.';
+            }
+            
+            renderMathInElement(feedback);
+        }
+
+        // MathPal placeholder
+        function openMathPal() {
+            alert('MathPal would open here.\n\n"Hi! Working on error and order? This is where all the previous weeks come together — now we understand WHY methods converge at different rates!"');
+        }
+    </script>
+</body>
+</html>

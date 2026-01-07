@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 2: Fixed-Point Iteration | Numerical Methods | Mathswell</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #065f5b;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --text-light: #6b7280;
+            --accent-amber: #f59e0b;
+            --accent-red: #dc2626;
+            --accent-blue: #3b82f6;
+            --success: #10b981;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 8px rgba(15, 118, 110, 0.08);
+            --shadow-md: 0 4px 16px rgba(15, 118, 110, 0.12);
+            --shadow-lg: 0 8px 32px rgba(15, 118, 110, 0.16);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 1.1rem;
+        }
+
+        .mw-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .breadcrumb-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: var(--text-muted);
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Week Header */
+        .week-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .week-header h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .week-header .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        /* Learning Aims */
+        .learning-aims {
+            background: var(--interactive);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .learning-aims-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .learning-aims ul {
+            margin-left: 1.5rem;
+        }
+
+        .learning-aims li {
+            margin-bottom: 0.4rem;
+            color: var(--text-primary);
+        }
+
+        /* Core Problems Reference */
+        .core-problems-ref {
+            background: var(--white);
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .core-problems-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .core-problems-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .core-problems-toggle {
+            color: var(--primary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .core-problems-content {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .core-problems-content.show {
+            display: block;
+        }
+
+        .core-problems-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .core-problem-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .core-problem-num {
+            background: var(--primary);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* Accordion */
+        .accordion {
+            margin-bottom: 1rem;
+        }
+
+        .accordion-item {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .accordion-header:hover {
+            background: var(--background);
+        }
+
+        .accordion-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .accordion-icon {
+            font-size: 1.2rem;
+        }
+
+        .accordion-chevron {
+            transition: transform 0.3s ease;
+            color: var(--primary);
+        }
+
+        .accordion-item.open .accordion-chevron {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 3000px;
+        }
+
+        .accordion-body {
+            padding: 0 1.25rem 1.25rem 1.25rem;
+        }
+
+        /* Content Boxes */
+        .theory-box {
+            background: #f3f4f6;
+            border-left: 4px solid var(--text-muted);
+            border-radius: 0 8px 8px 0;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .theory-box h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .key-idea-box {
+            background: #dbeafe;
+            border-left: 4px solid var(--accent-blue);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .key-idea-box .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .work-box {
+            background: #d1fae5;
+            border-left: 4px solid var(--success);
+            border-radius: 0 8px 8px 0;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .work-box h4 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .reflect-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+        }
+
+        .reflect-box .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #b45309;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Math Display */
+        .math-block {
+            background: var(--white);
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        /* Apps Section */
+        .apps-section {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .apps-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .app-card {
+            background: var(--background);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            display: block;
+        }
+
+        .app-card:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .app-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .app-card-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .app-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .preset-tag {
+            font-size: 0.75rem;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Self-Test Section */
+        .self-test {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .self-test-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .self-test-intro {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .question {
+            background: var(--background);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .question-number {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .question-type {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-core-ref {
+            font-size: 0.75rem;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+
+        .question-text {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .question-input-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .question-input {
+            padding: 0.6rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 150px;
+            transition: border-color 0.2s ease;
+        }
+
+        .question-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .question-input.correct {
+            border-color: var(--success);
+            background: #d1fae5;
+        }
+
+        .question-input.incorrect {
+            border-color: var(--accent-red);
+            background: #fee2e2;
+        }
+
+        .check-btn {
+            padding: 0.6rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .check-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d1fae5;
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .feedback.incorrect {
+            background: #fee2e2;
+            border: 1px solid var(--accent-red);
+            color: #991b1b;
+        }
+
+        .feedback.hint {
+            background: #fef3c7;
+            border: 1px solid var(--accent-amber);
+            color: #92400e;
+        }
+
+        /* Multiple choice */
+        .mc-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mc-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--white);
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mc-option:hover {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+
+        .mc-option.selected {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+
+        .mc-option.correct {
+            border-color: var(--success);
+            background: #d1fae5;
+        }
+
+        .mc-option.incorrect {
+            border-color: var(--accent-red);
+            background: #fee2e2;
+        }
+
+        .mc-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #9ca3af;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .mc-option.selected .mc-radio {
+            border-color: var(--primary);
+        }
+
+        .mc-option.selected .mc-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        /* Multi-step */
+        .step-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .step-label {
+            min-width: 100px;
+            font-weight: 500;
+        }
+
+        /* Week Navigation */
+        .week-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .week-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .week-nav-link:hover {
+            background: var(--interactive);
+        }
+
+        .week-nav-link.next {
+            margin-left: auto;
+        }
+
+        /* MathPal Float */
+        .mathpal-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+        }
+
+        .mathpal-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--white);
+            border: 2px solid var(--primary);
+            border-radius: 999px;
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .mathpal-button:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mathpal-avatar {
+            width: 40px;
+            height: 40px;
+            animation: mathpal-bob 3s ease-in-out infinite;
+        }
+
+        @keyframes mathpal-bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes robot-blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.1; }
+        }
+
+        .robot-eye {
+            animation: robot-blink 5s infinite;
+        }
+
+        .mathpal-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .mathpal-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .mathpal-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .week-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .core-problems-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .question-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .question-input {
+                width: 100%;
+            }
+
+            .mathpal-text {
+                display: none;
+            }
+
+            .mathpal-float {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .week-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .week-nav-link.next {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="../" class="mw-link">
+            <div class="mw-logo">M</div>
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="breadcrumb-inner">
+            <a href="../">Numerical Methods</a>
+            <span>›</span>
+            <span>Week 2: Fixed-Point Iteration</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        
+        <!-- Week Header -->
+        <header class="week-header">
+            <span class="week-badge">WEEK 2</span>
+            <h1>Fixed-Point Iteration</h1>
+            <p class="subtitle">When does iteration converge?</p>
+        </header>
+
+        <!-- Learning Aims -->
+        <section class="learning-aims">
+            <div class="learning-aims-header">
+                <span>📎</span> Learning Aims
+            </div>
+            <p>By the end of Week 2, you should be able to:</p>
+            <ul>
+                <li>Rewrite a root-finding problem as a fixed-point problem.</li>
+                <li>Define a fixed point of a function.</li>
+                <li>Apply fixed-point iteration numerically.</li>
+                <li>Distinguish between convergence and divergence of an iteration.</li>
+                <li>Explain, in words, why some iterations converge and others fail.</li>
+                <li>Empirically identify linear convergence.</li>
+            </ul>
+        </section>
+
+        <!-- Core Problems Reference -->
+        <div class="core-problems-ref">
+            <div class="core-problems-header" onclick="toggleCoreProblems()">
+                <div class="core-problems-title">
+                    <span>📋</span> Core Problems (Weeks 1–5)
+                </div>
+                <div class="core-problems-toggle">
+                    <span id="toggle-text">Show</span>
+                    <svg id="toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.3s;">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="core-problems-content" id="core-problems-content">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    These 9 problems are used throughout Weeks 1–5. This week adds <strong>Layer B: Fixed-Point Iteration</strong>.
+                </p>
+                <div class="core-problems-grid">
+                    <div class="core-problem-item"><span class="core-problem-num">1</span> $\cos x - x$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">2</span> $x^3 - x - 1$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">3</span> $x^3 - 0.01$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">4</span> $x^3 - 6x^2 + 11x - 6$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">5</span> $e^x - 3$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">6</span> $x^3$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">7</span> $\sin x - x$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">8</span> $x^2 - 2$</div>
+                    <div class="core-problem-item"><span class="core-problem-num">9</span> $\cos(2x) - x$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion Sections -->
+        <div class="accordion">
+            
+            <!-- Essential Theory -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">📐</span>
+                        Essential Theory
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="theory-box">
+                            <h4>Fixed Points</h4>
+                            <p>A number $x^*$ is called a <strong>fixed point</strong> of a function $g$ if</p>
+                            <div class="math-block">
+                                $$x^* = g(x^*)$$
+                            </div>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>From Roots to Fixed Points</h4>
+                            <p>A root of $f(x) = 0$ can often be found by rewriting the equation in the form $x = g(x)$. Any solution of this equation is a fixed point of $g$.</p>
+                            <p style="margin-top: 0.5rem;"><strong>Example:</strong> $x^3 - x - 1 = 0$ can be rewritten as:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>$x = \sqrt[3]{x + 1}$ (take cube root)</li>
+                                <li>$x = x^3 - 1$ (rearrange differently)</li>
+                            </ul>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>Fixed-Point Iteration</h4>
+                            <p>Starting from an initial guess $x_0$, define a sequence:</p>
+                            <div class="math-block">
+                                $$x_{n+1} = g(x_n), \quad n = 0, 1, 2, \ldots$$
+                            </div>
+                            <p>If the sequence converges to $x^*$, then $x^*$ is a fixed point of $g$.</p>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>Convergence and Divergence</h4>
+                            <p>An iteration <strong>converges</strong> if $x_n \to x^*$ as $n \to \infty$. It <strong>diverges</strong> if the sequence does not approach a finite limit.</p>
+                        </div>
+
+                        <div class="theory-box">
+                            <h4>Linear Convergence (Informal)</h4>
+                            <p>If the error satisfies</p>
+                            <div class="math-block">
+                                $$|x_{n+1} - x^*| \approx C|x_n - x^*|$$
+                            </div>
+                            <p>for some constant $0 < C < 1$, the convergence is called <strong>linear</strong>.</p>
+                        </div>
+
+                        <div class="key-idea-box">
+                            <div class="label">Key Idea</div>
+                            <p>A numerical method is an iterative process. Understanding its <em>behaviour</em> matters more than writing down its formula.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session 1: Fixed-Point Iteration -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">✏️</span>
+                        Session 1: Fixed-Point Iteration
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="work-box">
+                            <h4>Problem 1: Fixed Points and Graphs (Core 1)</h4>
+                            <p>Consider the function $g(x) = \cos x$.</p>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">Sketch $y = g(x)$ and $y = x$ on the same axes.</li>
+                                <li>Use the sketch to estimate the fixed point.</li>
+                            </ol>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 2: Iteration by Hand (Core 1)</h4>
+                            <p>Starting with $x_0 = 0.5$, compute:</p>
+                            <div class="math-block">
+                                $$x_1 = g(x_0), \quad x_2 = g(x_1), \quad x_3 = g(x_2)$$
+                            </div>
+                            <p>Do the values appear to be converging?</p>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 3: Alternative Rearrangements (Core 2)</h4>
+                            <p>The equation $x^3 - x - 1 = 0$ can be rearranged in many ways. Consider:</p>
+                            <div class="math-block">
+                                $$g_1(x) = \sqrt[3]{x + 1}, \qquad g_2(x) = x^3 - 1$$
+                            </div>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">Use the same starting value $x_0 = 1$.</li>
+                                <li style="margin-bottom: 0.3rem;">Perform three iterations for each $g$.</li>
+                                <li>Compare the behaviour of the two sequences.</li>
+                            </ol>
+                        </div>
+
+                        <div class="key-idea-box">
+                            <div class="label">Key Observation</div>
+                            <p>The same equation can give radically different iteration behaviour depending on how you rearrange it. The choice of $g(x)$ matters!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session 2: Convergence Behaviour -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">📊</span>
+                        Session 2: Convergence Behaviour
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="work-box">
+                            <h4>Problem 4: Convergent or Divergent?</h4>
+                            <p>For each iteration below, decide whether you expect convergence or divergence. Justify your answer qualitatively.</p>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">$x_{n+1} = \cos x_n$</li>
+                                <li style="margin-bottom: 0.3rem;">$x_{n+1} = 2x_n$</li>
+                                <li>$x_{n+1} = \frac{1}{2}x_n$</li>
+                            </ol>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 5: Error Behaviour</h4>
+                            <p>Assume the fixed point is $x^*$.</p>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">Define the error $e_n = x_n - x^*$.</li>
+                                <li>Describe what it means for the error to decrease linearly.</li>
+                            </ol>
+                        </div>
+
+                        <div class="work-box">
+                            <h4>Problem 6: Comparison with Bisection</h4>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li style="margin-bottom: 0.3rem;">What information does fixed-point iteration <em>not</em> guarantee that bisection does?</li>
+                                <li>What advantage might fixed-point iteration have?</li>
+                            </ol>
+                        </div>
+
+                        <div class="reflect-box">
+                            <div class="label">Reflect</div>
+                            <p>What seems to control convergence: the shape of $y = g(x)$ near the intersection, or the starting point, or both?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Consolidation -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">💭</span>
+                        Weekly Consolidation
+                    </div>
+                    <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 1rem;">Attempt the following after the lectures:</p>
+                        <ol style="margin-left: 1.5rem;">
+                            <li style="margin-bottom: 0.5rem;">Explain the difference between a root and a fixed point.</li>
+                            <li style="margin-bottom: 0.5rem;">Give an example of a convergent and a divergent iteration.</li>
+                            <li style="margin-bottom: 0.5rem;">Why does the choice of $g(x)$ matter?</li>
+                            <li>Why is convergence speed not the only consideration?</li>
+                        </ol>
+
+                        <div class="key-idea-box" style="margin-top: 1.5rem;">
+                            <div class="label">Viva Prompts</div>
+                            <p>Be prepared to answer questions such as:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>What is a fixed point?</li>
+                                <li>Why can the same equation give different iteration behaviour?</li>
+                                <li>How can an iteration fail even if a solution exists?</li>
+                                <li>What does linear convergence mean in practice?</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Apps Section -->
+        <section class="apps-section">
+            <div class="apps-header">
+                <span>🔧</span> App for This Week
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Use this tool to visualize fixed-point iteration and verify your calculations. Watch the cobweb diagram to see convergence or divergence in action.</p>
+            
+            <a href="https://mathswell.com/fixed-point-iteration/" class="app-card" target="_blank">
+                <div class="app-card-title">
+                    <span>🔄</span> Fixed-Point Iteration Explorer
+                </div>
+                <p class="app-card-desc">Visualize iteration with cobweb diagrams. Compare different rearrangements of the same equation and see why some converge while others diverge.</p>
+                <div class="app-presets">
+                    <span class="preset-tag">Core 1</span>
+                    <span class="preset-tag">Core 2</span>
+                    <span class="preset-tag">Core 3</span>
+                    <span class="preset-tag">Core 4</span>
+                    <span class="preset-tag">Core 5</span>
+                    <span class="preset-tag">Core 6</span>
+                    <span class="preset-tag">Core 7</span>
+                    <span class="preset-tag">Core 8</span>
+                    <span class="preset-tag">Core 9</span>
+                </div>
+            </a>
+        </section>
+
+        <!-- Self-Test Section -->
+        <section class="self-test">
+            <div class="self-test-header">
+                <span>✓</span> Self-Test
+            </div>
+            <p class="self-test-intro">Verify your understanding with these exercises. Work them by hand first, then check your answers.</p>
+
+            <!-- Question 1: Iteration Calculation -->
+            <div class="question" id="q1">
+                <div class="question-header">
+                    <span class="question-number">1</span>
+                    <span class="question-type">Iteration Calculation</span>
+                    <span class="question-core-ref">Core 1</span>
+                </div>
+                <div class="question-text">
+                    <p>For $g(x) = \cos x$, starting from $x_0 = 0.5$, compute $x_1 = g(x_0)$.</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">(Give 4 decimal places)</p>
+                </div>
+                <div class="question-input-group">
+                    <input type="text" class="question-input" id="q1-input" placeholder="e.g., 0.8776">
+                    <button class="check-btn" onclick="checkQ1()">Check</button>
+                </div>
+                <div class="feedback" id="q1-feedback"></div>
+            </div>
+
+            <!-- Question 2: Rearrangement Comparison -->
+            <div class="question" id="q2">
+                <div class="question-header">
+                    <span class="question-number">2</span>
+                    <span class="question-type">Rearrangement Comparison</span>
+                    <span class="question-core-ref">Core 2</span>
+                </div>
+                <div class="question-text">
+                    <p>For $x^3 - x - 1 = 0$, compare two rearrangements starting from $x_0 = 1$:</p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                        <li>$g_1(x) = \sqrt[3]{x + 1}$</li>
+                        <li>$g_2(x) = x^3 - 1$</li>
+                    </ul>
+                    <p>Compute $x_1$ for each:</p>
+                </div>
+                <div class="step-group">
+                    <div class="step-row">
+                        <span class="step-label">$x_1$ using $g_1$:</span>
+                        <input type="text" class="question-input" id="q2-g1" placeholder="e.g., 1.26">
+                    </div>
+                    <div class="step-row">
+                        <span class="step-label">$x_1$ using $g_2$:</span>
+                        <input type="text" class="question-input" id="q2-g2" placeholder="e.g., 0">
+                    </div>
+                </div>
+                <button class="check-btn" onclick="checkQ2()">Check Both</button>
+                <div class="feedback" id="q2-feedback"></div>
+            </div>
+
+            <!-- Question 3: Convergence Prediction -->
+            <div class="question" id="q3">
+                <div class="question-header">
+                    <span class="question-number">3</span>
+                    <span class="question-type">Convergence Prediction</span>
+                    <span class="question-core-ref">Core 2</span>
+                </div>
+                <div class="question-text">
+                    <p>Based on the previous question, which rearrangement of $x^3 - x - 1 = 0$ will converge to the root?</p>
+                </div>
+                <div class="mc-options" id="q3-options">
+                    <div class="mc-option" onclick="selectMC(this, 'q3')">
+                        <div class="mc-radio"></div>
+                        <span>$g_1(x) = \sqrt[3]{x + 1}$ converges</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q3')">
+                        <div class="mc-radio"></div>
+                        <span>$g_2(x) = x^3 - 1$ converges</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q3')">
+                        <div class="mc-radio"></div>
+                        <span>Both converge</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q3')">
+                        <div class="mc-radio"></div>
+                        <span>Neither converges</span>
+                    </div>
+                </div>
+                <button class="check-btn" onclick="checkQ3()">Check</button>
+                <div class="feedback" id="q3-feedback"></div>
+            </div>
+
+            <!-- Question 4: Conceptual -->
+            <div class="question" id="q4">
+                <div class="question-header">
+                    <span class="question-number">4</span>
+                    <span class="question-type">Conceptual</span>
+                </div>
+                <div class="question-text">
+                    <p>What does fixed-point iteration <strong>not guarantee</strong> that bisection does?</p>
+                </div>
+                <div class="mc-options" id="q4-options">
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Finding a root quickly</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Convergence and an error bound at each step</span>
+                    </div>
+                    <div class="mc-option" onclick="selectMC(this, 'q4')">
+                        <div class="mc-radio"></div>
+                        <span>Using derivatives</span>
+                    </div>
+                </div>
+                <button class="check-btn" onclick="checkQ4()">Check</button>
+                <div class="feedback" id="q4-feedback"></div>
+            </div>
+
+        </section>
+
+        <!-- Week Navigation -->
+        <nav class="week-nav">
+            <a href="../week-1/" class="week-nav-link prev">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Week 1: Approximation & Bisection
+            </a>
+            <a href="../week-3/" class="week-nav-link next">
+                Week 3: Newton's Method
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </nav>
+
+    </main>
+
+    <!-- MathPal Floating Button -->
+    <div class="mathpal-float">
+        <button class="mathpal-button" onclick="openMathPal()">
+            <svg class="mathpal-avatar" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="#e6fffb"/>
+                <rect x="35" y="60" width="30" height="25" fill="#0f766e" rx="3"/>
+                <rect x="30" y="35" width="40" height="30" fill="#10b981" rx="8"/>
+                <line x1="50" y1="35" x2="50" y2="25" stroke="#0f766e" stroke-width="2"/>
+                <circle cx="50" cy="23" r="3" fill="#f59e0b"/>
+                <circle cx="40" cy="47" r="5" fill="white"/>
+                <circle cx="60" cy="47" r="5" fill="white"/>
+                <circle cx="40" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                <circle cx="60" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                <path d="M 40 55 Q 50 60 60 55" stroke="#0f766e" stroke-width="2" fill="none"/>
+            </svg>
+            <div class="mathpal-text">
+                <span class="mathpal-name">MathPal</span>
+                <span class="mathpal-hint">Got a question?</span>
+            </div>
+        </button>
+    </div>
+
+    <script>
+        // Render KaTeX
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        });
+
+        // Core Problems toggle
+        function toggleCoreProblems() {
+            const content = document.getElementById('core-problems-content');
+            const text = document.getElementById('toggle-text');
+            const chevron = document.getElementById('toggle-chevron');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                text.textContent = 'Show';
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('show');
+                text.textContent = 'Hide';
+                chevron.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Accordion toggle
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            const wasOpen = item.classList.contains('open');
+            
+            // Close all
+            document.querySelectorAll('.accordion-item').forEach(i => {
+                i.classList.remove('open');
+            });
+            
+            // Open clicked if it was closed
+            if (!wasOpen) {
+                item.classList.add('open');
+            }
+        }
+
+        // Question 1: cos(0.5)
+        function checkQ1() {
+            const input = document.getElementById('q1-input');
+            const feedback = document.getElementById('q1-feedback');
+            const value = parseFloat(input.value.trim());
+            
+            // cos(0.5) ≈ 0.8776
+            if (isNaN(value)) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Enter a number. Calculate $\\cos(0.5)$ using a calculator.';
+                renderMathInElement(feedback);
+                return;
+            }
+            
+            if (Math.abs(value - 0.8776) < 0.001) {
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> $x_1 = \\cos(0.5) \\approx 0.8776$. The iteration is moving toward the fixed point.';
+                renderMathInElement(feedback);
+            } else {
+                input.classList.remove('correct');
+                input.classList.add('incorrect');
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Not quite. Calculate $\\cos(0.5)$ — make sure your calculator is in radians mode.';
+                renderMathInElement(feedback);
+            }
+        }
+
+        // Question 2: Two rearrangements
+        function checkQ2() {
+            const g1Input = document.getElementById('q2-g1');
+            const g2Input = document.getElementById('q2-g2');
+            const feedback = document.getElementById('q2-feedback');
+            
+            const g1 = parseFloat(g1Input.value.trim());
+            const g2 = parseFloat(g2Input.value.trim());
+            
+            // g1(1) = (1+1)^(1/3) = 2^(1/3) ≈ 1.26
+            // g2(1) = 1^3 - 1 = 0
+            
+            let g1Correct = false;
+            let g2Correct = false;
+            
+            if (!isNaN(g1) && Math.abs(g1 - 1.26) < 0.02) {
+                g1Input.classList.remove('incorrect');
+                g1Input.classList.add('correct');
+                g1Correct = true;
+            } else if (!isNaN(g1)) {
+                g1Input.classList.remove('correct');
+                g1Input.classList.add('incorrect');
+            }
+            
+            if (!isNaN(g2) && Math.abs(g2 - 0) < 0.01) {
+                g2Input.classList.remove('incorrect');
+                g2Input.classList.add('correct');
+                g2Correct = true;
+            } else if (!isNaN(g2)) {
+                g2Input.classList.remove('correct');
+                g2Input.classList.add('incorrect');
+            }
+            
+            if (g1Correct && g2Correct) {
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Both correct!</strong> Notice: $g_1(1) = \\sqrt[3]{2} \\approx 1.26$ stays near the root, while $g_2(1) = 0$ moves far away. This hints at very different convergence behaviour!';
+                renderMathInElement(feedback);
+            } else if (isNaN(g1) || isNaN(g2)) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Enter both values to check your work.';
+            } else {
+                feedback.className = 'feedback show incorrect';
+                let hints = [];
+                if (!g1Correct) hints.push('$g_1(1) = \\sqrt[3]{1+1} = \\sqrt[3]{2}$');
+                if (!g2Correct) hints.push('$g_2(1) = 1^3 - 1 = 0$');
+                feedback.innerHTML = '✗ Check: ' + hints.join(' and ');
+                renderMathInElement(feedback);
+            }
+        }
+
+        // Multiple choice
+        let selectedMC = {};
+        
+        function selectMC(option, qId) {
+            const options = document.querySelectorAll(`#${qId}-options .mc-option`);
+            options.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            selectedMC[qId] = Array.from(options).indexOf(option);
+        }
+
+        // Question 3: Which converges
+        function checkQ3() {
+            const feedback = document.getElementById('q3-feedback');
+            const options = document.querySelectorAll('#q3-options .mc-option');
+            
+            if (selectedMC['q3'] === undefined) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Select an answer first.';
+                return;
+            }
+            
+            // Correct answer is index 0: g1 converges
+            options.forEach((opt, i) => {
+                opt.classList.remove('correct', 'incorrect');
+                if (i === 0) {
+                    opt.classList.add('correct');
+                } else if (i === selectedMC['q3'] && i !== 0) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedMC['q3'] === 0) {
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> $g_1(x) = \\sqrt[3]{x+1}$ converges because the slope $|g_1\'(x)|$ is small near the root. Meanwhile, $g_2(x) = x^3 - 1$ diverges because $|g_2\'(x)| = |3x^2| > 1$ near the root. Use the app to see the cobweb diagrams!';
+            } else {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Try computing a few more iterations for each. With $g_2$: $x_0 = 1 \\to x_1 = 0 \\to x_2 = -1 \\to x_3 = -2 \\to \\ldots$ — it\'s moving away from the root!';
+            }
+            
+            renderMathInElement(feedback);
+        }
+
+        // Question 4: What bisection guarantees
+        function checkQ4() {
+            const feedback = document.getElementById('q4-feedback');
+            const options = document.querySelectorAll('#q4-options .mc-option');
+            
+            if (selectedMC['q4'] === undefined) {
+                feedback.className = 'feedback show hint';
+                feedback.innerHTML = '💡 Select an answer first.';
+                return;
+            }
+            
+            // Correct answer is index 1
+            options.forEach((opt, i) => {
+                opt.classList.remove('correct', 'incorrect');
+                if (i === 1) {
+                    opt.classList.add('correct');
+                } else if (i === selectedMC['q4'] && i !== 1) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedMC['q4'] === 1) {
+                feedback.className = 'feedback show correct';
+                feedback.innerHTML = '✓ <strong>Correct!</strong> Bisection guarantees: (1) the root stays bracketed, and (2) error is at most $(b-a)/2^n$. Fixed-point iteration provides neither — it can diverge, and even when it converges, there\'s no simple error bound per step.';
+            } else if (selectedMC['q4'] === 0) {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Actually, fixed-point iteration can be faster than bisection when it works. The key difference is about <em>guarantees</em>, not speed.';
+            } else {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = '✗ Neither bisection nor fixed-point iteration uses derivatives. (That\'s Newton\'s method — coming in Week 3!)';
+            }
+            
+            renderMathInElement(feedback);
+        }
+
+        // MathPal placeholder
+        function openMathPal() {
+            alert('MathPal would open here.\n\n"Hi! I see you\'re working on Week 2 - fixed-point iteration. Trying to understand why some rearrangements converge and others don\'t? I\'m here to help!"');
+        }
+    </script>
+</body>
+</html>

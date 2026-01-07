@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numerical Methods | Mathswell</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #065f5b;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --text-light: #6b7280;
+            --accent-amber: #f59e0b;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 8px rgba(15, 118, 110, 0.08);
+            --shadow-md: 0 4px 16px rgba(15, 118, 110, 0.12);
+            --shadow-lg: 0 8px 32px rgba(15, 118, 110, 0.16);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 1.1rem;
+        }
+
+        .mw-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            margin-bottom: 1rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Key Idea */
+        .key-idea {
+            background: var(--interactive);
+            border-left: 4px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem;
+            margin: 2rem auto;
+            max-width: 800px;
+        }
+
+        .key-idea-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .key-idea p {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+
+        /* Quick Links */
+        .quick-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--white);
+            border: 2px solid var(--primary);
+            border-radius: 999px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .quick-link:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Section Header */
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.75rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Phase Divider */
+        .phase-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 2.5rem 0 1.5rem 0;
+        }
+
+        .phase-divider::before,
+        .phase-divider::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+        }
+
+        .phase-label {
+            background: var(--primary);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Week Cards Grid */
+        .weeks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .week-card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .week-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .week-card-header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .week-number {
+            background: rgba(255,255,255,0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .week-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .week-card-body {
+            padding: 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .week-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .week-topics {
+            list-style: none;
+            margin-bottom: 1rem;
+            flex: 1;
+        }
+
+        .week-topics li {
+            padding: 0.3rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .week-topics li::before {
+            content: "•";
+            position: absolute;
+            left: 0.5rem;
+            color: var(--primary-light);
+            font-weight: bold;
+        }
+
+        .week-apps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .app-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: var(--interactive);
+            color: var(--primary);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .week-card-footer {
+            padding: 1rem 1.25rem;
+            background: var(--background);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .enter-week {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .enter-week svg {
+            transition: transform 0.2s ease;
+        }
+
+        .week-card:hover .enter-week svg {
+            transform: translateX(4px);
+        }
+
+        /* Synthesis Card */
+        .week-card.synthesis .week-card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+
+        /* Core Problems Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: 16px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .problem-set {
+            margin-bottom: 2rem;
+        }
+
+        .problem-set:last-child {
+            margin-bottom: 0;
+        }
+
+        .problem-set-header {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--interactive);
+        }
+
+        .problem-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .problem-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--background);
+            border-radius: 6px;
+        }
+
+        .problem-num {
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .problem-func {
+            font-family: 'Times New Roman', serif;
+            font-size: 1rem;
+        }
+
+        /* MathPal Float */
+        .mathpal-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+        }
+
+        .mathpal-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--white);
+            border: 2px solid var(--primary);
+            border-radius: 999px;
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .mathpal-button:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mathpal-avatar {
+            width: 40px;
+            height: 40px;
+            animation: mathpal-bob 3s ease-in-out infinite;
+        }
+
+        @keyframes mathpal-bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes robot-blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.1; }
+        }
+
+        .robot-eye {
+            animation: robot-blink 5s infinite;
+        }
+
+        .mathpal-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .mathpal-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .mathpal-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        .module-footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .weeks-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mathpal-text {
+                display: none;
+            }
+
+            .mathpal-float {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .quick-links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .problem-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <div class="mw-logo">M</div>
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Numerical Methods</h1>
+            <p class="hero-subtitle">5103MATHS — A journey through approximation, iteration, and error</p>
+            <div class="hero-meta">
+                <span>📚 Level 5 • BSc Mathematics</span>
+                <span>👤 Dr Amir Asghari</span>
+                <span>📅 7 Weeks + Synthesis</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container">
+        
+        <!-- Key Idea -->
+        <div class="key-idea">
+            <div class="key-idea-label">Core Philosophy</div>
+            <p>Replace a complicated object by a simpler one that we can compute, and then justify what we did.</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links">
+            <a href="#" class="quick-link">
+                <span>📄</span> Syllabus PDF
+            </a>
+            <a href="#" class="quick-link">
+                <span>📖</span> Book Reference
+            </a>
+            <a href="#" class="quick-link" onclick="openCoreProblems(); return false;">
+                <span>📋</span> Core Problems
+            </a>
+            <a href="#" class="quick-link">
+                <span>🔧</span> All Apps
+            </a>
+        </div>
+
+        <!-- Section Header -->
+        <div class="section-header">
+            <h2>Weekly Modules</h2>
+            <p>Click any week to access learning materials, interactive apps, and self-test exercises</p>
+        </div>
+
+        <!-- Phase 1: Root Finding -->
+        <div class="phase-divider">
+            <span class="phase-label">Weeks 1–5: Root Finding</span>
+        </div>
+
+        <div class="weeks-grid">
+            
+            <!-- Week 1 -->
+            <a href="week-1/" class="week-card">
+                <div class="week-card-header">
+                    <span class="week-number">WEEK 1</span>
+                    <span class="week-title">Approximation & Bisection</span>
+                </div>
+                <div class="week-card-body">
+                    <p class="week-subtitle">What is a numerical approximation?</p>
+                    <ul class="week-topics">
+                        <li>Exact vs numerical solutions</li>
+                        <li>Absolute and relative error</li>
+                        <li>The bisection method</li>
+                        <li>Error bounds and convergence</li>
+                    </ul>
+                    <div class="week-apps">
+                        <span class="app-badge">🔧 Root Finding</span>
+                    </div>
+                </div>
+                <div class="week-card-footer">
+                    <span class="enter-week">
+                        Enter Week 1
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Week 2 -->
+            <a href="week-2/" class="week-card">
+                <div class="week-card-header">
+                    <span class="week-number">WEEK 2</span>
+                    <span class="week-title">Fixed-Point Iteration</span>
+                </div>
+                <div class="week-card-body">
+                    <p class="week-subtitle">When does iteration converge?</p>
+                    <ul class="week-topics">
+                        <li>Fixed points and rearrangements</li>
+                        <li>Iteration by repeated substitution</li>
+                        <li>Convergence vs divergence</li>
+                        <li>Linear convergence (informal)</li>
+                    </ul>
+                    <div class="week-apps">
+                        <span class="app-badge">🔧 Fixed-Point</span>
+                    </div>
+                </div>
+                <div class="week-card-footer">
+                    <span class="enter-week">
+                        Enter Week 2
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Week 3 -->
+            <a href="week-3/" class="week-card">
+                <div class="week-card-header">
+                    <span class="week-number">WEEK 3</span>
+                    <span class="week-title">Newton's Method</span>
+                </div>
+                <div class="week-card-body">
+                    <p class="week-subtitle">Fast convergence via tangent lines</p>
+                    <ul class="week-topics">
+                        <li>Tangent-line derivation</li>
+                        <li>Geometric interpretation</li>
+                        <li>Quadratic convergence</li>
+                        <li>When Newton fails</li>
+                    </ul>
+                    <div class="week-apps">
+                        <span class="app-badge">🔧 Newton-Secant</span>
+                    </div>
+                </div>
+                <div class="week-card-footer">
+                    <span class="enter-week">
+                        Enter Week 3
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Week 4 -->
+            <a href="week-4/" class="week-card">
+                <div class="week-card-header">
+                    <span class="week-number">WEEK 4</span>
+                    <span class="week-title">Secant Method</span>
+                </div>
+                <div class="week-card-body">
+                    <p class="week-subtitle">Derivative-free speed</p>
+                    <ul class="week-topics">
+                        <li>Secant as derivative-free Newton</li>
+                        <li>Two-point iteration</li>
+                        <li>Method comparison</li>
+                        <li>Choosing the right method</li>
+                    </ul>
+                    <div class="week-apps">
+                        <span class="app-badge">🔧 Newton-Secant</span>
+                    </div>
+                </div>
+                <div class="week-card-footer">
+                    <span class="enter-week">
+                        Enter Week 4
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Week 5 -->
+            <a href="week-5/" class="week-card">
+                <div class="week-card-header">
+                    <span class="week-number">WEEK 5</span>
+                    <span class="week-title">Error & Order</span>
+                </div>
+                <div class="week-card-body">
+                    <p class="week-subtitle">Quantifying convergence</p>
+                    <ul class="week-topics">
+                        <li>Taylor expansion and truncation</li>
+                        <li>Order as practical language</li>
+                        <li>Richardson extrapolation</li>
+                        <li>Error estimation</li>
+                    </ul>
+                    <div class="week-apps">
+                        <span class="app-badge">🔧 Taylor Series</span>
+                    </div>
+                </div>
+                <div class="week-card-footer">
+                    <span class="enter-week">
+                        Enter Week 5
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Phase 2: Integration -->
+        <div class="phase-divider">
+            <span class="phase-label">Week 6: Numerical Integration</span>
+        </div>
+
+        <div class="weeks-grid">
+            
+            <!-- Week 6 -->
+            <a href="week-6/" class="week-card">
+                <div class="week-card-header">
+                    <span class="week-number">WEEK 6</span>
+                    <span class="week-title">Numerical Integration</span>
+                </div>
+                <div class="week-card-body">
+                    <p class="week-subtitle">Midpoint, trapezium, Simpson, Romberg</p>
+                    <ul class="week-topics">
+                        <li>Composite quadrature rules</li>
+                        <li>Simpson as extrapolated trapezium</li>
+                        <li>Romberg integration</li>
+                        <li>Error cancellation</li>
+                    </ul>
+                    <div class="week-apps">
+                        <span class="app-badge">🔧 Integration</span>
+                        <span class="app-badge">🔧 Romberg</span>
+                    </div>
+                </div>
+                <div class="week-card-footer">
+                    <span class="enter-week">
+                        Enter Week 6
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Phase 3: ODEs -->
+        <div class="phase-divider">
+            <span class="phase-label">Week 7: Ordinary Differential Equations</span>
+        </div>
+
+        <div class="weeks-grid">
+            
+            <!-- Week 7 -->
+            <a href="week-7/" class="week-card">
+                <div class="week-card-header">
+                    <span class="week-number">WEEK 7</span>
+                    <span class="week-title">ODEs</span>
+                </div>
+                <div class="week-card-body">
+                    <p class="week-subtitle">Euler, Modified Euler, RK4</p>
+                    <ul class="week-topics">
+                        <li>Initial value problems</li>
+                        <li>Euler method (order 1)</li>
+                        <li>Modified Euler / Heun (order 2)</li>
+                        <li>Runge-Kutta 4 (order 4)</li>
+                    </ul>
+                    <div class="week-apps">
+                        <span class="app-badge">🔧 ODE Explorer</span>
+                    </div>
+                </div>
+                <div class="week-card-footer">
+                    <span class="enter-week">
+                        Enter Week 7
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Synthesis -->
+        <div class="phase-divider">
+            <span class="phase-label">Synthesis</span>
+        </div>
+
+        <div class="weeks-grid">
+            
+            <!-- Synthesis -->
+            <a href="synthesis/" class="week-card synthesis-card">
+                <div class="week-card-header">
+                    <span class="week-number">SYNTHESIS</span>
+                    <span class="week-title">Cross-Week Connections</span>
+                </div>
+                <div class="week-card-body">
+                    <p class="week-subtitle">Putting it all together</p>
+                    <ul class="week-topics">
+                        <li>Taylor + truncation + order = engine</li>
+                        <li>Three problem types, one story</li>
+                        <li>Step-halving as universal diagnostic</li>
+                        <li>Method selection principles</li>
+                    </ul>
+                    <div class="week-apps">
+                        <span class="app-badge">📝 Review</span>
+                    </div>
+                </div>
+                <div class="week-card-footer">
+                    <span class="enter-week">
+                        Enter Synthesis
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="module-footer">
+        <p>5103MATHS Numerical Methods • Level 5 BSc Mathematics</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem;">Core text: Burden & Faires, Numerical Analysis, 10th edition</p>
+    </footer>
+
+    <!-- Core Problems Modal -->
+    <div class="modal-overlay" id="core-problems-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>📋 Core Problems</h3>
+                <button class="modal-close" onclick="closeCoreProblems()">&times;</button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Weeks 1-5 -->
+                <div class="problem-set">
+                    <div class="problem-set-header">Weeks 1–5: Root Finding</div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                        These 9 problems are used throughout the first five weeks. Each week adds a new method layer.
+                    </p>
+                    <div class="problem-list">
+                        <div class="problem-item">
+                            <span class="problem-num">1</span>
+                            <span class="problem-func">$f(x) = \cos x - x$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">2</span>
+                            <span class="problem-func">$f(x) = x^3 - x - 1$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">3</span>
+                            <span class="problem-func">$f(x) = x^3 - 0.01$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">4</span>
+                            <span class="problem-func">$f(x) = x^3 - 6x^2 + 11x - 6$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">5</span>
+                            <span class="problem-func">$f(x) = e^x - 3$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">6</span>
+                            <span class="problem-func">$f(x) = x^3$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">7</span>
+                            <span class="problem-func">$f(x) = \sin x - x$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">8</span>
+                            <span class="problem-func">$f(x) = x^2 - 2$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">9</span>
+                            <span class="problem-func">$f(x) = \cos(2x) - x$</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Week 6 -->
+                <div class="problem-set">
+                    <div class="problem-set-header">Week 6: Numerical Integration</div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                        Integrals that genuinely require numerical methods.
+                    </p>
+                    <div class="problem-list">
+                        <div class="problem-item">
+                            <span class="problem-num">1</span>
+                            <span class="problem-func">$\int_0^1 e^{-x^2}\,dx$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">2</span>
+                            <span class="problem-func">$\int_0^1 \frac{1}{1+100x^2}\,dx$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">3</span>
+                            <span class="problem-func">$\int_0^\infty e^{-x}\,dx$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">4</span>
+                            <span class="problem-func">$\int_0^1 \sqrt{x}\,dx$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">5</span>
+                            <span class="problem-func">$\int_0^{2\pi} \sin(50x)\,dx$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">6</span>
+                            <span class="problem-func">$\int_0^1 e^{-ax^2}\,dx$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">7</span>
+                            <span class="problem-func">Romberg table for Prob 1</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">8</span>
+                            <span class="problem-func">Data-only integration</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">9</span>
+                            <span class="problem-func">Method choice tasks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Week 7 -->
+                <div class="problem-set">
+                    <div class="problem-set-header">Week 7: ODEs</div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                        Initial value problems requiring numerical solvers.
+                    </p>
+                    <div class="problem-list">
+                        <div class="problem-item">
+                            <span class="problem-num">1</span>
+                            <span class="problem-func">$y' = y^2 - t$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">2</span>
+                            <span class="problem-func">$y' = -0.5(y-20) + 5\sin t$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">3</span>
+                            <span class="problem-func">$y' = -10y$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">4</span>
+                            <span class="problem-func">$y' = y(1-y)$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">5</span>
+                            <span class="problem-func">$y' = t\sin(y)$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">6</span>
+                            <span class="problem-func">$y' = \cos t$</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">7</span>
+                            <span class="problem-func">Method choice tasks</span>
+                        </div>
+                        <div class="problem-item">
+                            <span class="problem-num">8</span>
+                            <span class="problem-func">Integration ↔ ODE connection</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MathPal Floating Button -->
+    <div class="mathpal-float">
+        <button class="mathpal-button" onclick="openMathPal()">
+            <svg class="mathpal-avatar" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="#e6fffb"/>
+                <rect x="35" y="60" width="30" height="25" fill="#0f766e" rx="3"/>
+                <rect x="30" y="35" width="40" height="30" fill="#10b981" rx="8"/>
+                <line x1="50" y1="35" x2="50" y2="25" stroke="#0f766e" stroke-width="2"/>
+                <circle cx="50" cy="23" r="3" fill="#f59e0b"/>
+                <circle cx="40" cy="47" r="5" fill="white"/>
+                <circle cx="60" cy="47" r="5" fill="white"/>
+                <circle cx="40" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                <circle cx="60" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                <path d="M 40 55 Q 50 60 60 55" stroke="#0f766e" stroke-width="2" fill="none"/>
+            </svg>
+            <div class="mathpal-text">
+                <span class="mathpal-name">MathPal</span>
+                <span class="mathpal-hint">Got a question?</span>
+            </div>
+        </button>
+    </div>
+
+    <script>
+        // Render KaTeX
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        });
+
+        // Core Problems Modal
+        function openCoreProblems() {
+            document.getElementById('core-problems-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCoreProblems() {
+            document.getElementById('core-problems-modal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal on overlay click
+        document.getElementById('core-problems-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCoreProblems();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCoreProblems();
+            }
+        });
+
+        // MathPal placeholder
+        function openMathPal() {
+            alert('MathPal would open here.\n\n"Hi! I\'m MathPal, your study buddy for Numerical Methods. What would you like to explore together?"');
+        }
+    </script>
+</body>
+</html>
