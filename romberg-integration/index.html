@@ -1607,16 +1607,42 @@
         };
         
         function generateTrapeziumProblem() {
-            // Problem variants for trapezium calculation
-            const problems = [
-                { f: 'x²', a: 0, b: 1, n: 2, fFunc: x => x*x },
-                { f: 'x²', a: 0, b: 1, n: 4, fFunc: x => x*x },
-                { f: 'x³', a: 0, b: 1, n: 2, fFunc: x => x*x*x },
-                { f: 'x', a: 0, b: 2, n: 2, fFunc: x => x },
-                { f: 'x', a: 0, b: 2, n: 4, fFunc: x => x },
+            // Dynamic problem generation with random parameters
+            const functions = [
+                { f: 'x^2', label: 'x²', fFunc: x => x*x },
+                { f: 'x^3', label: 'x³', fFunc: x => x*x*x },
+                { f: 'x', label: 'x', fFunc: x => x },
+                { f: '2*x', label: '2x', fFunc: x => 2*x },
+                { f: 'x^2 + 1', label: 'x² + 1', fFunc: x => x*x + 1 },
+                { f: '3*x^2', label: '3x²', fFunc: x => 3*x*x },
+                { f: 'x^4', label: 'x⁴', fFunc: x => x*x*x*x },
+                { f: '1 + x', label: '1 + x', fFunc: x => 1 + x },
             ];
             
-            const p = problems[Math.floor(Math.random() * problems.length)];
+            const intervals = [
+                { a: 0, b: 1 },
+                { a: 0, b: 2 },
+                { a: 1, b: 2 },
+                { a: 0, b: 4 },
+                { a: 1, b: 3 },
+            ];
+            
+            const nValues = [2, 4, 8];
+            
+            // Random selection
+            const func = functions[Math.floor(Math.random() * functions.length)];
+            const interval = intervals[Math.floor(Math.random() * intervals.length)];
+            const n = nValues[Math.floor(Math.random() * nValues.length)];
+            
+            const p = {
+                f: func.f,
+                fLabel: func.label,
+                fFunc: func.fFunc,
+                a: interval.a,
+                b: interval.b,
+                n: n
+            };
+            
             const h = (p.b - p.a) / p.n;
             
             // Calculate answer
@@ -1629,7 +1655,8 @@
             challengeState.currentProblem = {
                 type: 'trapezium',
                 answer: answer,
-                data: p
+                data: p,
+                h: h
             };
             
             document.getElementById('problem-question').innerHTML = `
@@ -1638,7 +1665,7 @@
                 <p>Use <strong>n = ${p.n}</strong> subintervals (so h = ${h}).</p>
             `;
             
-            katex.render(`\\int_{${p.a}}^{${p.b}} ${p.f} \\, dx`, document.getElementById('trap-problem-integral'), {displayMode: true});
+            katex.render(`\\int_{${p.a}}^{${p.b}} ${p.fLabel.replace('²', '^2').replace('³', '^3').replace('⁴', '^4')} \\, dx`, document.getElementById('trap-problem-integral'), {displayMode: true});
             
             document.getElementById('problem-input-area').innerHTML = `
                 <input type="text" id="challenge-answer-input" placeholder="Enter T${p.n} (e.g., 0.375)">
@@ -1649,24 +1676,22 @@
         }
         
         function generateTrapeziumWorkedExample(p, h, answer) {
-            let nodesStr = '';
-            let sumStr = '';
             const nodes = [];
-            
             for (let i = 0; i <= p.n; i++) {
                 const x = p.a + i * h;
                 const fx = p.fFunc(x);
-                nodes.push({ x, fx });
+                nodes.push({ x: x, fx: fx });
             }
             
-            nodesStr = nodes.map((n, i) => `f(${n.x}) = ${n.fx}`).join(', ');
+            const nodesStr = nodes.map(n => `f(${n.x}) = ${n.fx}`).join(', ');
+            const midSum = nodes.slice(1, -1).map(n => n.fx).reduce((a, b) => a + b, 0);
             
             const stepsHtml = `
                 <div class="worked-example-step">
                     <div class="step-label">Step 1: Identify the setup</div>
                     <div class="step-content">
-                        We need T<sub>${p.n}</sub> for ∫<sub>${p.a}</sub><sup>${p.b}</sup> ${p.f} dx with n = ${p.n} subintervals.<br>
-                        Step size: h = (${p.b} - ${p.a}) / ${p.n} = ${h}
+                        We need T<sub>${p.n}</sub> for ∫<sub>${p.a}</sub><sup>${p.b}</sup> ${p.fLabel} dx with n = ${p.n} subintervals.<br>
+                        Step size: h = (${p.b} − ${p.a}) / ${p.n} = ${h}
                     </div>
                 </div>
                 <div class="worked-example-step">
@@ -1685,7 +1710,10 @@
                 <div class="worked-example-step">
                     <div class="step-label">Step 4: Apply the formula</div>
                     <div class="step-content">
-                        <div class="step-math" id="trap-we-calc"></div>
+                        T<sub>${p.n}</sub> = (${h}/2) × [${nodes[0].fx} + 2(${midSum}) + ${nodes[nodes.length-1].fx}]<br>
+                        = (${h}/2) × [${nodes[0].fx} + ${2*midSum} + ${nodes[nodes.length-1].fx}]<br>
+                        = (${h}/2) × ${nodes[0].fx + 2*midSum + nodes[nodes.length-1].fx}<br>
+                        = ${(h/2) * (nodes[0].fx + 2*midSum + nodes[nodes.length-1].fx)}
                     </div>
                 </div>
                 <div class="worked-example-step">
@@ -1700,161 +1728,248 @@
             
             katex.render(`T_n = \\frac{h}{2}\\left[f(a) + 2\\sum_{i=1}^{n-1} f(a+ih) + f(b)\\right]`, 
                 document.getElementById('trap-we-formula'), {displayMode: true});
-            
-            const midTerms = nodes.slice(1, -1).map(n => `2(${n.fx})`).join(' + ');
-            const calcStr = `T_{${p.n}} = \\frac{${h}}{2}\\left[${nodes[0].fx} + ${midTerms || '0'} + ${nodes[nodes.length-1].fx}\\right] = ${answer}`;
-            katex.render(calcStr, document.getElementById('trap-we-calc'), {displayMode: true});
         }
         
         function generateExtrapolationProblem() {
-            const problems = [
-                { T_prev: 0.375, T_curr: 0.34375, j: 1, label_prev: 'T₂', label_curr: 'T₄', result_label: 'R(2,1)' },
-                { T_prev: 0.34375, T_curr: 0.328125, j: 1, label_prev: 'T₄', label_curr: 'T₈', result_label: 'R(3,1)' },
-                { R_prev: 0.3333333, R_curr: 0.3333333, j: 2, label_prev: 'R(1,1)', label_curr: 'R(2,1)', result_label: 'R(2,2)', coef: 16, denom: 15 },
-            ];
+            // Randomly choose problem subtype
+            const subtypes = ['simpson', 'simpson', 'simpson', 'higher_order']; // weight toward simpson
+            const subtype = subtypes[Math.floor(Math.random() * subtypes.length)];
             
-            const p = problems[Math.floor(Math.random() * problems.length)];
-            
-            let answer, questionHtml;
-            
-            if (p.j === 1) {
-                // Simpson extrapolation
-                answer = (4 * p.T_curr - p.T_prev) / 3;
-                questionHtml = `
-                    <p>Given <strong>${p.label_prev} = ${p.T_prev}</strong> and <strong>${p.label_curr} = ${p.T_curr}</strong>, compute the Simpson extrapolation <strong>${p.result_label}</strong>.</p>
-                    <p>Use the formula: R(k,1) = (4·T<sub>2n</sub> - T<sub>n</sub>) / 3</p>
+            if (subtype === 'simpson') {
+                // Generate Simpson extrapolation problems with varied values
+                // Use actual trapezium values from simple functions
+                const scenarios = [
+                    // f = x², [0,1]
+                    { T_n: 0.5, T_2n: 0.375, n: 1, label_n: 'T₁', label_2n: 'T₂', k: 1 },
+                    { T_n: 0.375, T_2n: 0.34375, n: 2, label_n: 'T₂', label_2n: 'T₄', k: 2 },
+                    { T_n: 0.34375, T_2n: 0.3359375, n: 4, label_n: 'T₄', label_2n: 'T₈', k: 3 },
+                    // f = x³, [0,1]
+                    { T_n: 0.5, T_2n: 0.3125, n: 1, label_n: 'T₁', label_2n: 'T₂', k: 1 },
+                    { T_n: 0.3125, T_2n: 0.265625, n: 2, label_n: 'T₂', label_2n: 'T₄', k: 2 },
+                    // f = x, [0,2]
+                    { T_n: 2, T_2n: 2, n: 1, label_n: 'T₁', label_2n: 'T₂', k: 1 },
+                    // f = x², [0,2]
+                    { T_n: 4, T_2n: 3, n: 1, label_n: 'T₁', label_2n: 'T₂', k: 1 },
+                    { T_n: 3, T_2n: 2.75, n: 2, label_n: 'T₂', label_2n: 'T₄', k: 2 },
+                ];
+                
+                const s = scenarios[Math.floor(Math.random() * scenarios.length)];
+                const answer = (4 * s.T_2n - s.T_n) / 3;
+                
+                challengeState.currentProblem = {
+                    type: 'extrapolation',
+                    answer: answer,
+                    data: { ...s, j: 1 }
+                };
+                
+                document.getElementById('problem-question').innerHTML = `
+                    <p>Given <strong>${s.label_n} = ${s.T_n}</strong> and <strong>${s.label_2n} = ${s.T_2n}</strong>, compute the Simpson extrapolation <strong>R(${s.k + 1},1)</strong>.</p>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Hint: Use R(k,1) = (4·T<sub>2n</sub> − T<sub>n</sub>) / 3</p>
                 `;
+                
+                generateSimpsonWorkedExample(s, answer);
+                
             } else {
-                // Higher-order extrapolation
-                answer = (p.coef * p.R_curr - p.R_prev) / p.denom;
-                questionHtml = `
-                    <p>Given <strong>${p.label_prev} = ${p.R_prev}</strong> and <strong>${p.label_curr} = ${p.R_curr}</strong>, compute <strong>${p.result_label}</strong>.</p>
-                    <p>Use the formula with j = ${p.j}: R(k,j) = (4<sup>j</sup>·R(k,j-1) - R(k-1,j-1)) / (4<sup>j</sup> - 1)</p>
+                // Higher-order extrapolation (column 2 or 3)
+                const j = Math.random() < 0.7 ? 2 : 3;
+                const coef = Math.pow(4, j);
+                const denom = coef - 1;
+                
+                // Generate plausible R values
+                const baseVal = 0.3 + Math.random() * 0.4; // random between 0.3 and 0.7
+                const R_prev = parseFloat(baseVal.toFixed(6));
+                const R_curr = parseFloat((baseVal + (Math.random() - 0.5) * 0.01).toFixed(6));
+                
+                const answer = (coef * R_curr - R_prev) / denom;
+                const k = j + Math.floor(Math.random() * 2) + 1;
+                
+                challengeState.currentProblem = {
+                    type: 'extrapolation',
+                    answer: answer,
+                    data: { R_prev, R_curr, j, coef, denom, k }
+                };
+                
+                document.getElementById('problem-question').innerHTML = `
+                    <p>Given <strong>R(${k-1},${j-1}) = ${R_prev}</strong> and <strong>R(${k},${j-1}) = ${R_curr}</strong>, compute <strong>R(${k},${j})</strong>.</p>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Hint: For column j = ${j}, use coefficient 4<sup>${j}</sup> = ${coef}</p>
                 `;
+                
+                generateHigherOrderWorkedExample({ R_prev, R_curr, j, coef, denom, k }, answer);
             }
-            
-            challengeState.currentProblem = {
-                type: 'extrapolation',
-                answer: answer,
-                data: p
-            };
-            
-            document.getElementById('problem-question').innerHTML = questionHtml;
             
             document.getElementById('problem-input-area').innerHTML = `
-                <input type="text" id="challenge-answer-input" placeholder="Enter ${p.result_label} (e.g., 0.3333)">
+                <input type="text" id="challenge-answer-input" placeholder="Enter your answer (e.g., 0.3333)">
             `;
-            
-            generateExtrapolationWorkedExample(p, answer);
         }
         
-        function generateExtrapolationWorkedExample(p, answer) {
-            let stepsHtml;
+        function generateSimpsonWorkedExample(s, answer) {
+            const stepsHtml = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Identify the values</div>
+                    <div class="step-content">
+                        We have ${s.label_n} = ${s.T_n} and ${s.label_2n} = ${s.T_2n}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Recall Simpson's extrapolation formula</div>
+                    <div class="step-content">
+                        <div class="step-math" id="extrap-we-formula"></div>
+                        This is column j = 1, which cancels the O(h²) error term.
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Substitute values</div>
+                    <div class="step-content">
+                        R(${s.k + 1},1) = (4 × ${s.T_2n} − ${s.T_n}) / 3<br>
+                        = (${4 * s.T_2n} − ${s.T_n}) / 3<br>
+                        = ${4 * s.T_2n - s.T_n} / 3
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 4: Calculate</div>
+                    <div class="step-content">
+                        <strong>R(${s.k + 1},1) = ${answer}</strong>
+                    </div>
+                </div>
+            `;
             
-            if (p.j === 1) {
-                stepsHtml = `
-                    <div class="worked-example-step">
-                        <div class="step-label">Step 1: Identify the values</div>
-                        <div class="step-content">
-                            We have ${p.label_prev} = ${p.T_prev} and ${p.label_curr} = ${p.T_curr}
-                        </div>
+            document.getElementById('worked-example-steps').innerHTML = stepsHtml;
+            katex.render(`R(k,1) = \\frac{4 T_{2n} - T_n}{3}`, document.getElementById('extrap-we-formula'), {displayMode: true});
+        }
+        
+        function generateHigherOrderWorkedExample(p, answer) {
+            const stepsHtml = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Identify column and coefficient</div>
+                    <div class="step-content">
+                        We're computing column j = ${p.j}<br>
+                        Coefficient: 4<sup>${p.j}</sup> = ${p.coef}<br>
+                        Denominator: ${p.coef} − 1 = ${p.denom}
                     </div>
-                    <div class="worked-example-step">
-                        <div class="step-label">Step 2: Recall Simpson's extrapolation formula</div>
-                        <div class="step-content">
-                            <div class="step-math" id="extrap-we-formula"></div>
-                            This cancels the O(h²) error term.
-                        </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Recall the general formula</div>
+                    <div class="step-content">
+                        <div class="step-math" id="extrap-we-formula"></div>
                     </div>
-                    <div class="worked-example-step">
-                        <div class="step-label">Step 3: Substitute values</div>
-                        <div class="step-content">
-                            <div class="step-math" id="extrap-we-calc"></div>
-                        </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Substitute values</div>
+                    <div class="step-content">
+                        R(${p.k},${p.j}) = (${p.coef} × ${p.R_curr} − ${p.R_prev}) / ${p.denom}<br>
+                        = (${(p.coef * p.R_curr).toFixed(6)} − ${p.R_prev}) / ${p.denom}<br>
+                        = ${(p.coef * p.R_curr - p.R_prev).toFixed(6)} / ${p.denom}
                     </div>
-                    <div class="worked-example-step">
-                        <div class="step-label">Step 4: Calculate</div>
-                        <div class="step-content">
-                            = (${4 * p.T_curr} - ${p.T_prev}) / 3 = ${(4 * p.T_curr - p.T_prev).toFixed(6)} / 3 = <strong>${answer.toFixed(6)}</strong>
-                        </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 4: Final answer</div>
+                    <div class="step-content">
+                        <strong>R(${p.k},${p.j}) = ${answer.toFixed(6)}</strong>
                     </div>
-                `;
-                
-                document.getElementById('worked-example-steps').innerHTML = stepsHtml;
-                katex.render(`R(k,1) = \\frac{4 T_{2n} - T_n}{3}`, document.getElementById('extrap-we-formula'), {displayMode: true});
-                katex.render(`R(k,1) = \\frac{4 \\times ${p.T_curr} - ${p.T_prev}}{3}`, document.getElementById('extrap-we-calc'), {displayMode: true});
-            } else {
-                stepsHtml = `
-                    <div class="worked-example-step">
-                        <div class="step-label">Step 1: Identify the values and column</div>
-                        <div class="step-content">
-                            We have ${p.label_prev} = ${p.R_prev} and ${p.label_curr} = ${p.R_curr}<br>
-                            We're computing column j = ${p.j}
-                        </div>
-                    </div>
-                    <div class="worked-example-step">
-                        <div class="step-label">Step 2: Calculate 4<sup>j</sup></div>
-                        <div class="step-content">
-                            4<sup>${p.j}</sup> = ${p.coef}, so denominator is ${p.coef} - 1 = ${p.denom}
-                        </div>
-                    </div>
-                    <div class="worked-example-step">
-                        <div class="step-label">Step 3: Apply the formula</div>
-                        <div class="step-content">
-                            <div class="step-math" id="extrap-we-formula2"></div>
-                        </div>
-                    </div>
-                    <div class="worked-example-step">
-                        <div class="step-label">Step 4: Result</div>
-                        <div class="step-content">
-                            <strong>${p.result_label} = ${answer.toFixed(6)}</strong>
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('worked-example-steps').innerHTML = stepsHtml;
-                katex.render(`R(k,${p.j}) = \\frac{${p.coef} \\times ${p.R_curr} - ${p.R_prev}}{${p.denom}}`, document.getElementById('extrap-we-formula2'), {displayMode: true});
-            }
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = stepsHtml;
+            katex.render(`R(k,j) = \\frac{4^j \\cdot R(k,j-1) - R(k-1,j-1)}{4^j - 1}`, document.getElementById('extrap-we-formula'), {displayMode: true});
         }
         
         function generateOrderProblem() {
-            const problems = [
-                {
-                    question: 'The trapezium rule has error O(h²). If you halve the step size, by what factor does the error decrease?',
+            // Larger pool of conceptual problems with some randomization
+            const problemGenerators = [
+                // Error reduction factor problems
+                () => {
+                    const order = [2, 4, 6][Math.floor(Math.random() * 3)];
+                    const factor = Math.pow(2, order);
+                    return {
+                        question: `A numerical method has error O(h<sup>${order}</sup>). If you halve the step size, by what factor does the error decrease?`,
+                        type: 'input',
+                        answer: String(factor),
+                        explanation: `Error ~ h<sup>${order}</sup>. If h → h/2, error ~ (h/2)<sup>${order}</sup> = h<sup>${order}</sup>/${factor}. So error decreases by factor <strong>${factor}</strong>.`
+                    };
+                },
+                // Column order problems
+                () => {
+                    const j = [0, 1, 2, 3][Math.floor(Math.random() * 4)];
+                    const order = 2 * (j + 1);
+                    const orderStr = ['O(h²)', 'O(h⁴)', 'O(h⁶)', 'O(h⁸)'][j];
+                    return {
+                        question: `In the Romberg table, what is the error order of column ${j}?`,
+                        type: 'select',
+                        options: ['O(h²)', 'O(h⁴)', 'O(h⁶)', 'O(h⁸)'],
+                        answer: orderStr,
+                        explanation: `Column j has error O(h<sup>2(j+1)</sup>). For j = ${j}, that's O(h<sup>${order}</sup>) = ${orderStr}.`
+                    };
+                },
+                // 4^j coefficient problems
+                () => {
+                    const j = [1, 2, 3, 4][Math.floor(Math.random() * 4)];
+                    const coef = Math.pow(4, j);
+                    return {
+                        question: `What is the coefficient 4<sup>j</sup> when extrapolating to column j = ${j}?`,
+                        type: 'input',
+                        answer: String(coef),
+                        explanation: `4<sup>${j}</sup> = ${coef}. The denominator in the formula would be ${coef} − 1 = ${coef - 1}.`
+                    };
+                },
+                // Simpson equivalence
+                () => ({
+                    question: `Simpson's rule is equivalent to which Romberg table column?`,
                     type: 'select',
-                    options: ['2', '4', '8', '16'],
-                    answer: '4',
-                    explanation: 'Error ~ h². If h → h/2, error ~ (h/2)² = h²/4. So error decreases by factor 4.'
+                    options: ['Column 0 (Trapezium)', 'Column 1', 'Column 2', 'Column 3'],
+                    answer: 'Column 1',
+                    explanation: `Simpson's rule is the first extrapolation of the trapezium rule, which is column 1 (j = 1). It achieves O(h⁴) accuracy.`
+                }),
+                // Denominator problems
+                () => {
+                    const j = [1, 2, 3][Math.floor(Math.random() * 3)];
+                    const denom = Math.pow(4, j) - 1;
+                    return {
+                        question: `In the Richardson extrapolation formula for column j = ${j}, what is the denominator (4<sup>j</sup> − 1)?`,
+                        type: 'input',
+                        answer: String(denom),
+                        explanation: `4<sup>${j}</sup> − 1 = ${Math.pow(4, j)} − 1 = <strong>${denom}</strong>.`
+                    };
                 },
-                {
-                    question: 'After one Richardson extrapolation (column 1), the error order becomes:',
+                // Which is more accurate
+                () => {
+                    const k = 3 + Math.floor(Math.random() * 3);
+                    return {
+                        question: `Which gives a more accurate estimate: R(${k},0) or R(${k-1},1)?`,
+                        type: 'select',
+                        options: [`R(${k},0) — uses more points`, `R(${k-1},1) — higher order`, 'They are equally accurate', 'Cannot determine'],
+                        answer: `R(${k-1},1) — higher order`,
+                        explanation: `R(${k-1},1) has O(h⁴) error while R(${k},0) has O(h²) error. Higher order wins despite fewer function evaluations!`
+                    };
+                },
+                // Order increase per column
+                () => ({
+                    question: `Each Richardson extrapolation step increases the error order by how much?`,
                     type: 'select',
-                    options: ['O(h²)', 'O(h³)', 'O(h⁴)', 'O(h⁶)'],
-                    answer: 'O(h⁴)',
-                    explanation: 'Each extrapolation increases the order by 2. Column 0 is O(h²), so column 1 is O(h⁴).'
-                },
-                {
-                    question: 'In the Romberg table, R(4,2) uses how many function evaluations in total?',
-                    type: 'input',
-                    answer: '17',
-                    explanation: 'R(4,2) requires T₁, T₂, T₄, T₈, T₁₆. That\'s 1+2+4+8+16 = 31 nodes, but endpoints are shared, so it\'s 2⁴ + 1 = 17 evaluations for the row k=4.'
-                },
-                {
-                    question: 'Simpson\'s rule is equivalent to which Romberg entry?',
+                    options: ['1', '2', '4', 'It doubles'],
+                    answer: '2',
+                    explanation: `Each extrapolation cancels the next even power of h in the error expansion: O(h²) → O(h⁴) → O(h⁶). The order increases by 2 each time.`
+                }),
+                // Diagonal significance
+                () => ({
+                    question: `In the Romberg table, the diagonal entries R(k,k) are special because:`,
                     type: 'select',
-                    options: ['R(k,0)', 'R(k,1)', 'R(k,2)', 'R(k,3)'],
-                    answer: 'R(k,1)',
-                    explanation: 'Simpson\'s rule is the first extrapolation of the trapezium rule, which is column 1 (j=1).'
-                },
-                {
-                    question: 'What is the coefficient 4ʲ when extrapolating to column j=3?',
-                    type: 'input',
-                    answer: '64',
-                    explanation: '4³ = 64. The denominator would be 64-1 = 63.'
-                }
+                    options: ['They require the fewest evaluations', 'They give the best accuracy for each level', 'They are always exact', 'They equal Simpson\'s rule'],
+                    answer: 'They give the best accuracy for each level',
+                    explanation: `The diagonal R(k,k) achieves the highest order of accuracy (O(h<sup>2k+2</sup>)) available at level k.`
+                }),
+                // When to stop
+                () => ({
+                    question: `If R(4,4) = 0.74682413 and R(5,5) = 0.74682413, what does this suggest?`,
+                    type: 'select',
+                    options: ['An error in the calculation', 'Machine precision has been reached', 'The function is linear', 'More extrapolation is needed'],
+                    answer: 'Machine precision has been reached',
+                    explanation: `When successive diagonal entries agree to all displayed digits, further extrapolation won't improve accuracy — we've hit the limits of floating-point precision.`
+                }),
             ];
             
-            const p = problems[Math.floor(Math.random() * problems.length)];
+            // Randomly select a problem generator and create the problem
+            const generator = problemGenerators[Math.floor(Math.random() * problemGenerators.length)];
+            const p = generator();
             
             challengeState.currentProblem = {
                 type: 'order',
@@ -1889,7 +2004,7 @@
                     </div>
                 </div>
                 <div class="worked-example-step">
-                    <div class="step-label">Step 2: Key concept</div>
+                    <div class="step-label">Step 2: Key reasoning</div>
                     <div class="step-content">
                         ${p.explanation}
                     </div>
