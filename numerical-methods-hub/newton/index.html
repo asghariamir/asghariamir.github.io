@@ -1,1 +1,2363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newton's Method | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Math.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.min.js"></script>
+    
+    <!-- Plotly -->
+    <script defer src="https://cdn.jsdelivr.net/npm/plotly.js@2.27.0/dist/plotly.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0d5d56;
+            --bg-light: #f7faf9;
+            --interactive-bg: #e6fffb;
+            --text-dark: #212121;
+            --text-muted: #4b5563;
+            --border-light: #d1d5db;
+            --accent-amber: #f59e0b;
+            --error-red: #c62828;
+            --success-green: #10b981;
+            --newton-blue: #3b82f6;
+            --tangent-orange: #f97316;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .tab-button:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section styling */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .section h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--interactive-bg) 0%, white 100%);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Concept Cards */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .concept-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .concept-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.1);
+        }
+        
+        .concept-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .concept-card .formula {
+            background: var(--bg-light);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+        
+        /* Preset Pills */
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preset-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Control Grid */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Function Preview */
+        .function-preview {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--interactive-bg);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            min-height: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .function-preview .preview-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .derivative-preview {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #fef3c7;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            min-height: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Buttons */
+        .primary-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .primary-button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .primary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .secondary-button {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .secondary-button:hover:not(:disabled) {
+            background: var(--interactive-bg);
+        }
+        
+        .secondary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Results Panel */
+        .results-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .result-box {
+            background: var(--interactive-bg);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .result-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .result-box .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Monaco', monospace;
+        }
+        
+        .result-box.highlight {
+            background: #fef3c7;
+            border-color: var(--accent-amber);
+        }
+        
+        .result-box.highlight .value {
+            color: var(--accent-amber);
+        }
+        
+        /* Step Table */
+        .step-table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .step-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .step-table th, .step-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+        
+        .step-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .step-table tbody tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+        
+        .step-table tbody tr:hover {
+            background: var(--interactive-bg);
+        }
+        
+        .step-table .highlight-row {
+            background: var(--interactive-bg) !important;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .step-table .quadratic-indicator {
+            color: var(--newton-blue);
+            font-weight: 600;
+        }
+        
+        /* Graph Container */
+        .graph-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            margin: 1rem 0;
+        }
+        
+        /* Step Controls */
+        .step-controls {
+            background: var(--interactive-bg);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .step-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .step-info span {
+            color: var(--text-dark);
+        }
+        
+        .step-position {
+            font-family: 'Monaco', monospace;
+            background: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .step-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .step-buttons button {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        /* Insights */
+        .dynamic-insights {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+        
+        .dynamic-insights h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dynamic-insights ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .dynamic-insights li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+        }
+        
+        .dynamic-insights li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+        
+        /* Key Formulas */
+        .key-formulas {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        
+        .key-formulas h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .formula-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+        
+        .formula-row:last-child {
+            border-bottom: none;
+        }
+        
+        .formula-label {
+            min-width: 140px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .formula-math {
+            flex: 1;
+        }
+        
+        /* Newton Formula Box */
+        .newton-formula-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #fef3c7 100%);
+            border: 2px solid var(--newton-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .newton-formula-box h3 {
+            color: var(--newton-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .newton-formula-box .big-formula {
+            font-size: 1.3rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        /* Perspectives */
+        .perspectives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .perspective-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .perspective-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .perspective-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Comparison Speed Box */
+        .speed-comparison {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .speed-box {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .speed-box.slow {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+        }
+        
+        .speed-box.medium {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+        }
+        
+        .speed-box.fast {
+            background: #dcfce7;
+            border: 2px solid #10b981;
+        }
+        
+        .speed-box h5 {
+            margin-bottom: 0.25rem;
+        }
+        
+        .speed-box .order {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        /* Challenge Tab Styles */
+        .challenge-type-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .challenge-type-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .challenge-type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.15);
+        }
+        
+        .challenge-type-card.active {
+            border-color: var(--primary);
+            background: var(--interactive-bg);
+        }
+        
+        .challenge-type-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .challenge-type-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .challenge-type-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        .challenge-prompt {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+        
+        .problem-area {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid var(--border-light);
+        }
+        
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .problem-type-badge {
+            background: var(--interactive-bg);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .problem-number {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .problem-question {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .problem-input-area {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .problem-input-area input, .problem-input-area select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+        
+        .problem-input-area input:focus, .problem-input-area select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .problem-feedback {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .problem-feedback.show {
+            display: block;
+        }
+        
+        .problem-feedback.correct {
+            background: #dcfce7;
+            border: 1px solid var(--success-green);
+            color: #166534;
+        }
+        
+        .problem-feedback.incorrect {
+            background: #fee2e2;
+            border: 1px solid var(--error-red);
+            color: #991b1b;
+        }
+        
+        /* Worked Example */
+        .worked-example-container {
+            margin: 1.5rem 0;
+        }
+        
+        .worked-example-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .worked-example-toggle:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+        
+        .worked-example-toggle.open {
+            border-color: var(--primary);
+            background: white;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .worked-example-toggle.open .toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        .worked-example-content {
+            background: white;
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1.5rem;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .worked-example-content.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .worked-example-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .worked-example-steps {
+            padding-left: 0.5rem;
+        }
+        
+        .worked-example-step {
+            margin-bottom: 1.25rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--interactive-bg);
+        }
+        
+        .worked-example-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .step-label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-content {
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .step-math {
+            background: var(--bg-light);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            text-align: center;
+        }
+        
+        .generate-new-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        /* Nav Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .nav-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-button:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .challenge-type-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .speed-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    
+        /* Week Navigation Bar */
+        .week-nav-bar {
+            background: white;
+            border-top: 2px solid var(--primary);
+            padding: 1rem;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .week-nav-bar a, .week-nav-bar span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .week-nav-bar .nav-prev,
+        .week-nav-bar .nav-next {
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            background: white;
+        }
+        
+        .week-nav-bar .nav-prev:hover,
+        .week-nav-bar .nav-next:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-hub {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .week-nav-bar .nav-hub:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-disabled {
+            color: var(--text-muted);
+            border: 2px solid var(--border-light);
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        @media (max-width: 600px) {
+            .week-nav-bar {
+                flex-direction: column;
+            }
+            .week-nav-bar a, .week-nav-bar span {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
 
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('intro')">Introduction</button>
+            <button class="tab-button" onclick="switchTab('explorer')">Explorer</button>
+            <button class="tab-button" onclick="switchTab('challenge')">Challenge</button>
+        </div>
+
+        <!-- ==================== INTRODUCTION TAB ==================== -->
+        <div id="intro-tab" class="tab-content active">
+            <div class="hero">
+                <h1>📐 Newton's Method</h1>
+                <p>Replace the curve with its tangent line. Where the tangent crosses the x-axis becomes your next guess — and convergence is dramatically fast.</p>
+            </div>
+
+            <div class="newton-formula-box">
+                <h3>The Newton Iteration</h3>
+                <div class="big-formula" id="newton-main-formula"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">
+                    "Walk down the tangent line until you hit the x-axis"
+                </p>
+            </div>
+
+            <div class="concept-cards">
+                <div class="concept-card">
+                    <div class="icon">📏</div>
+                    <h3>Tangent Line Idea</h3>
+                    <p>At each point xₙ, draw the tangent to y = f(x). The x-intercept of this line is your next approximation.</p>
+                    <div class="formula" id="tangent-idea"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">⚡</div>
+                    <h3>Quadratic Convergence</h3>
+                    <p>Near a simple root, errors roughly <em>square</em> each step. If eₙ = 0.01, then eₙ₊₁ ≈ 0.0001!</p>
+                    <div class="formula" id="quadratic-formula"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">⚠️</div>
+                    <h3>When It Fails</h3>
+                    <p>Newton can fail if f'(x) ≈ 0, or if you start too far from the root. It trades guarantees for speed.</p>
+                    <div class="formula" id="failure-formula"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Speed Comparison</h3>
+                <div class="speed-comparison">
+                    <div class="speed-box slow">
+                        <h5>🐢 Bisection</h5>
+                        <div class="order">Order 1 (linear)</div>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">~3.3 steps per digit</p>
+                    </div>
+                    <div class="speed-box medium">
+                        <h5>🚶 Fixed-Point</h5>
+                        <div class="order">Order 1 (linear)</div>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Depends on |g'(x*)|</p>
+                    </div>
+                    <div class="speed-box fast">
+                        <h5>🚀 Newton</h5>
+                        <div class="order">Order 2 (quadratic)</div>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Digits double each step!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Deriving the Formula</h3>
+                <div class="key-formulas">
+                    <div class="formula-row">
+                        <span class="formula-label">Tangent at xₙ:</span>
+                        <span class="formula-math" id="derivation-1"></span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Set y = 0:</span>
+                        <span class="formula-math" id="derivation-2"></span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Solve for x:</span>
+                        <span class="formula-math" id="derivation-3"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="perspectives">
+                <div class="perspective-card">
+                    <h4>🎯 Local Linear Model</h4>
+                    <p>Newton's method uses the best local linear approximation to f. Near a simple root, this approximation is excellent, which is why convergence is so fast.</p>
+                </div>
+                <div class="perspective-card">
+                    <h4>⚖️ Speed vs Safety</h4>
+                    <p>Bisection is slow but always works. Newton is fast but can fail. In practice, you might use bisection to get close, then switch to Newton.</p>
+                </div>
+            </div>
+
+            <div class="section" style="background: var(--interactive-bg);">
+                <h3>📚 Week 3 Connection</h3>
+                <p>This explorer covers Newton's method from Week 3. Watch the tangent lines converge to the root, and verify that the error roughly squares each iteration.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <div></div>
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    Try the Explorer →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== EXPLORER TAB ==================== -->
+        <div id="explorer-tab" class="tab-content">
+            <div class="section">
+                <h2>Preset Examples</h2>
+                <div id="preset-pills" class="preset-pills"></div>
+                
+                <div class="control-grid">
+                    <div class="control-group">
+                        <label>Function f(x):</label>
+                        <input type="text" id="f-input" placeholder="e.g., x^2 - 2">
+                        <div id="f-preview" class="function-preview"></div>
+                    </div>
+                    <div class="control-group">
+                        <label>Derivative f'(x):</label>
+                        <input type="text" id="fp-input" placeholder="e.g., 2*x">
+                        <div id="fp-preview" class="derivative-preview"></div>
+                    </div>
+                    <div class="control-group">
+                        <label>Starting value x₀:</label>
+                        <input type="number" id="x0-input" value="1.5" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Max iterations:</label>
+                        <input type="number" id="max-iter-input" value="10" min="1" max="30">
+                    </div>
+                    <div class="control-group">
+                        <label>Tolerance:</label>
+                        <input type="number" id="tol-input" value="1e-10" step="1e-10">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <button id="solve-btn" class="primary-button" onclick="runNewton()">
+                        ▶ Run Newton
+                    </button>
+                    <button id="step-btn" class="secondary-button" onclick="startStepMode()">
+                        👣 Step-by-Step
+                    </button>
+                    <button class="secondary-button" onclick="resetExplorer()">
+                        ↺ Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Results</h2>
+                
+                <div class="results-panel">
+                    <div class="result-box">
+                        <div class="label">Iterations</div>
+                        <div class="value" id="result-iterations">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Root</div>
+                        <div class="value" id="result-root">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">f(root)</div>
+                        <div class="value" id="result-froot">—</div>
+                    </div>
+                    <div class="result-box highlight" id="convergence-box">
+                        <div class="label">Convergence</div>
+                        <div class="value" id="result-convergence">—</div>
+                    </div>
+                </div>
+                
+                <!-- Step Controls -->
+                <div class="step-controls" id="step-controls" style="display: none;">
+                    <div class="step-info">
+                        <span>Iteration <strong id="current-iter">0</strong> of <span id="total-iter">?</span></span>
+                        <span class="step-position">x<sub id="iter-sub">0</sub> = <span id="current-x">?</span></span>
+                    </div>
+                    <div class="step-buttons">
+                        <button class="secondary-button" onclick="stepBackward()" id="step-back-btn" disabled>
+                            ← Previous
+                        </button>
+                        <button class="primary-button" onclick="stepForward()" id="step-forward-btn">
+                            Next Step →
+                        </button>
+                        <button class="secondary-button" onclick="jumpToEnd()">
+                            Skip to End ⏭
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="graph-container">
+                    <div id="newton-graph" style="width: 100%; height: 400px;"></div>
+                </div>
+                
+                <div class="step-table-container">
+                    <table class="step-table" id="step-table">
+                        <thead>
+                            <tr>
+                                <th>n</th>
+                                <th>xₙ</th>
+                                <th>f(xₙ)</th>
+                                <th>f'(xₙ)</th>
+                                <th>xₙ₊₁</th>
+                                <th>|eₙ₊₁|/|eₙ|²</th>
+                            </tr>
+                        </thead>
+                        <tbody id="step-table-body">
+                            <tr><td colspan="6" style="color: var(--text-muted); padding: 2rem;">Click "Run Newton" or "Step-by-Step" to begin</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="dynamic-insights" class="dynamic-insights" style="display: none;">
+                    <h4>💡 Insights</h4>
+                    <ul id="insights-list"></ul>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('intro')">
+                    ← Back to Introduction
+                </button>
+                <button class="nav-button" onclick="switchTab('challenge')">
+                    Try Challenges →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== CHALLENGE TAB ==================== -->
+        <div id="challenge-tab" class="tab-content">
+            <div class="section">
+                <h2>Challenge Types</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Select a challenge type to practice. Each generates unlimited problems.</p>
+                
+                <div class="challenge-type-cards">
+                    <div class="challenge-type-card" data-type="newton-step" onclick="selectChallengeType('newton-step')">
+                        <div class="challenge-type-icon">🔢</div>
+                        <h4>Newton Step</h4>
+                        <p>Compute one iteration</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="derive-iteration" onclick="selectChallengeType('derive-iteration')">
+                        <div class="challenge-type-icon">✏️</div>
+                        <h4>Derive Iteration</h4>
+                        <p>Write the Newton formula</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="quadratic-check" onclick="selectChallengeType('quadratic-check')">
+                        <div class="challenge-type-icon">📊</div>
+                        <h4>Verify Quadratic</h4>
+                        <p>Check convergence order</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem Area -->
+            <div id="problem-area" class="problem-area" style="display: none;">
+                <div class="problem-header">
+                    <span class="problem-type-badge" id="problem-type-label">Newton Step</span>
+                    <span class="problem-number" id="problem-number">Problem #1</span>
+                </div>
+                
+                <div class="problem-question" id="problem-question"></div>
+                
+                <div class="problem-input-area" id="problem-input-area"></div>
+                
+                <button class="primary-button" onclick="checkAnswer()">
+                    ✓ Check Answer
+                </button>
+                
+                <div id="problem-feedback" class="problem-feedback"></div>
+                
+                <!-- Worked Example -->
+                <div class="worked-example-container">
+                    <button class="worked-example-toggle" onclick="toggleWorkedExample()">
+                        <span class="toggle-icon">▶</span>
+                        <span>📖 See Worked Example</span>
+                    </button>
+                    
+                    <div id="worked-example-content" class="worked-example-content">
+                        <div class="worked-example-header">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                <line x1="8" y1="6" x2="16" y2="6"/>
+                                <line x1="8" y1="10" x2="14" y2="10"/>
+                            </svg>
+                            <div>
+                                <h4 style="margin: 0; color: var(--primary);">Worked Example</h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Step-by-step solution</p>
+                            </div>
+                        </div>
+                        <div id="worked-example-steps" class="worked-example-steps"></div>
+                    </div>
+                </div>
+                
+                <div class="generate-new-container">
+                    <button class="secondary-button" onclick="generateNewProblem()">
+                        🔄 Generate New Problem
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Initial prompt -->
+            <div id="challenge-prompt" class="challenge-prompt">
+                <p>👆 Select a challenge type above to begin practicing</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    ← Back to Explorer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    window.addEventListener('load', function() {
+        // ============ STATE ============
+        let state = {
+            compiledF: null,
+            compiledFp: null,
+            exactRoot: null,
+            stepMode: false,
+            currentStepIndex: 0,
+            allSteps: []
+        };
+        
+        // ============ DOM REFS ============
+        const DOM = {
+            presetPills: document.getElementById('preset-pills'),
+            fInput: document.getElementById('f-input'),
+            fpInput: document.getElementById('fp-input'),
+            fPreview: document.getElementById('f-preview'),
+            fpPreview: document.getElementById('fp-preview'),
+            x0Input: document.getElementById('x0-input'),
+            tolInput: document.getElementById('tol-input'),
+            maxIterInput: document.getElementById('max-iter-input'),
+            stepTableBody: document.getElementById('step-table-body'),
+            resultIterations: document.getElementById('result-iterations'),
+            resultRoot: document.getElementById('result-root'),
+            resultFroot: document.getElementById('result-froot'),
+            resultConvergence: document.getElementById('result-convergence'),
+            dynamicInsights: document.getElementById('dynamic-insights'),
+            insightsList: document.getElementById('insights-list')
+        };
+        
+        // ============ PRESETS ============
+        const PRESETS = {
+            "x² − 2": {
+                f: "x^2 - 2",
+                fp: "2*x",
+                fLabel: "x² − 2",
+                fpLabel: "2x",
+                x0: 1.5,
+                exact: Math.sqrt(2)
+            },
+            "x³ − x − 1": {
+                f: "x^3 - x - 1",
+                fp: "3*x^2 - 1",
+                fLabel: "x³ − x − 1",
+                fpLabel: "3x² − 1",
+                x0: 1.5,
+                exact: 1.3247179572
+            },
+            "cos(x) − x": {
+                f: "cos(x) - x",
+                fp: "-sin(x) - 1",
+                fLabel: "cos(x) − x",
+                fpLabel: "−sin(x) − 1",
+                x0: 0.5,
+                exact: 0.7390851332
+            },
+            "eˣ − 3": {
+                f: "exp(x) - 3",
+                fp: "exp(x)",
+                fLabel: "eˣ − 3",
+                fpLabel: "eˣ",
+                x0: 1,
+                exact: Math.log(3)
+            },
+            "x³ (slow)": {
+                f: "x^3",
+                fp: "3*x^2",
+                fLabel: "x³",
+                fpLabel: "3x²",
+                x0: 0.5,
+                exact: 0
+            },
+            "sin(x)": {
+                f: "sin(x)",
+                fp: "cos(x)",
+                fLabel: "sin(x)",
+                fpLabel: "cos(x)",
+                x0: 3,
+                exact: Math.PI
+            }
+        };
+        
+        // ============ INITIALIZATION ============
+        function initialize() {
+            // Build preset pills
+            Object.entries(PRESETS).forEach(([name, preset]) => {
+                const pill = document.createElement('button');
+                pill.className = 'preset-pill';
+                pill.innerHTML = preset.fLabel;
+                pill.dataset.name = name;
+                pill.onclick = () => loadPreset(name);
+                DOM.presetPills.appendChild(pill);
+            });
+            
+            // Event listeners
+            DOM.fInput.addEventListener('input', updateFPreview);
+            DOM.fpInput.addEventListener('input', updateFpPreview);
+            
+            // Render intro formulas
+            renderIntroFormulas();
+            
+            // Load default
+            loadPreset("x² − 2");
+        }
+        
+        function renderIntroFormulas() {
+            if (typeof katex === 'undefined') return;
+            
+            try {
+                katex.render("x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}", document.getElementById('newton-main-formula'), {displayMode: true});
+                katex.render("y - f(x_n) = f'(x_n)(x - x_n)", document.getElementById('tangent-idea'), {displayMode: false});
+                katex.render("e_{n+1} \\approx C \\cdot e_n^2", document.getElementById('quadratic-formula'), {displayMode: false});
+                katex.render("f'(x_n) \\neq 0", document.getElementById('failure-formula'), {displayMode: false});
+                
+                katex.render("y = f(x_n) + f'(x_n)(x - x_n)", document.getElementById('derivation-1'), {displayMode: false});
+                katex.render("0 = f(x_n) + f'(x_n)(x_{n+1} - x_n)", document.getElementById('derivation-2'), {displayMode: false});
+                katex.render("x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}", document.getElementById('derivation-3'), {displayMode: false});
+            } catch (e) {
+                console.error('KaTeX render error:', e);
+            }
+        }
+        
+        function loadPreset(name) {
+            const preset = PRESETS[name];
+            if (!preset) return;
+            
+            DOM.fInput.value = preset.f;
+            DOM.fpInput.value = preset.fp;
+            DOM.x0Input.value = preset.x0;
+            
+            state.exactRoot = preset.exact;
+            
+            document.querySelectorAll('.preset-pill').forEach(pill => {
+                pill.classList.toggle('active', pill.dataset.name === name);
+            });
+            
+            updateFPreview();
+            updateFpPreview();
+        }
+        
+        function updateFPreview() {
+            const fStr = DOM.fInput.value.trim();
+            
+            if (!fStr) {
+                DOM.fPreview.innerHTML = '<span class="preview-label">Enter f(x) above</span>';
+                return;
+            }
+            
+            const latex = mathToLatex(fStr);
+            DOM.fPreview.innerHTML = '<span class="preview-label">f(x) =</span> <span id="f-latex"></span>';
+            
+            if (typeof katex !== 'undefined') {
+                try {
+                    katex.render(latex, document.getElementById('f-latex'), { displayMode: false });
+                } catch (e) {
+                    DOM.fPreview.innerHTML = `<span class="preview-label">f(x) = ${fStr}</span>`;
+                }
+            }
+        }
+        
+        function updateFpPreview() {
+            const fpStr = DOM.fpInput.value.trim();
+            
+            if (!fpStr) {
+                DOM.fpPreview.innerHTML = '<span class="preview-label">Enter f\'(x) above</span>';
+                return;
+            }
+            
+            const latex = mathToLatex(fpStr);
+            DOM.fpPreview.innerHTML = '<span class="preview-label">f\'(x) =</span> <span id="fp-latex"></span>';
+            
+            if (typeof katex !== 'undefined') {
+                try {
+                    katex.render(latex, document.getElementById('fp-latex'), { displayMode: false });
+                } catch (e) {
+                    DOM.fpPreview.innerHTML = `<span class="preview-label">f'(x) = ${fpStr}</span>`;
+                }
+            }
+        }
+        
+        function mathToLatex(str) {
+            return str
+                .replace(/\*\*/g, '^')
+                .replace(/\*/g, ' \\cdot ')
+                .replace(/sqrt\(([^)]+)\)/g, '\\sqrt{$1}')
+                .replace(/exp\(([^)]+)\)/g, 'e^{$1}')
+                .replace(/sin\(([^)]+)\)/g, '\\sin($1)')
+                .replace(/cos\(([^)]+)\)/g, '\\cos($1)')
+                .replace(/tan\(([^)]+)\)/g, '\\tan($1)')
+                .replace(/log\(([^)]+)\)/g, '\\ln($1)')
+                .replace(/-sin/g, '-\\sin')
+                .replace(/pi/g, '\\pi')
+                .replace(/\^2/g, '^{2}')
+                .replace(/\^3/g, '^{3}');
+        }
+        
+        // ============ NEWTON'S METHOD ============
+        function newtonMethod(f, fp, x0, tol, maxIter) {
+            const steps = [];
+            let x = x0;
+            
+            for (let n = 0; n < maxIter; n++) {
+                let fx, fpx;
+                try {
+                    fx = f(x);
+                    fpx = fp(x);
+                } catch (e) {
+                    break;
+                }
+                
+                // Check for near-zero derivative
+                if (Math.abs(fpx) < 1e-14) {
+                    steps.push({
+                        n: n,
+                        x: x,
+                        fx: fx,
+                        fpx: fpx,
+                        xNext: null,
+                        error: null,
+                        failed: true
+                    });
+                    break;
+                }
+                
+                const xNext = x - fx / fpx;
+                const error = Math.abs(xNext - x);
+                
+                steps.push({
+                    n: n,
+                    x: x,
+                    fx: fx,
+                    fpx: fpx,
+                    xNext: xNext,
+                    error: error
+                });
+                
+                if (error < tol || Math.abs(fx) < tol) {
+                    // Add final step
+                    steps.push({
+                        n: n + 1,
+                        x: xNext,
+                        fx: f(xNext),
+                        fpx: fp(xNext),
+                        xNext: null,
+                        error: null,
+                        final: true
+                    });
+                    break;
+                }
+                
+                x = xNext;
+            }
+            
+            return steps;
+        }
+        
+        // ============ RUN NEWTON ============
+        window.runNewton = function() {
+            const fStr = DOM.fInput.value.trim();
+            const fpStr = DOM.fpInput.value.trim();
+            const x0 = parseFloat(DOM.x0Input.value);
+            const tol = parseFloat(DOM.tolInput.value);
+            const maxIter = parseInt(DOM.maxIterInput.value);
+            
+            if (!fStr || !fpStr) {
+                alert('Please enter both f(x) and f\'(x)');
+                return;
+            }
+            
+            if (typeof math === 'undefined') {
+                alert('Math library not loaded. Please refresh the page.');
+                return;
+            }
+            
+            try {
+                const compiledF = math.compile(fStr);
+                const compiledFp = math.compile(fpStr);
+                state.compiledF = compiledF;
+                state.compiledFp = compiledFp;
+                
+                const f = (x) => compiledF.evaluate({ x: x });
+                const fp = (x) => compiledFp.evaluate({ x: x });
+                
+                const steps = newtonMethod(f, fp, x0, tol, maxIter);
+                
+                state.allSteps = steps;
+                state.stepMode = false;
+                
+                displayResults(steps);
+                buildStepTable(steps);
+                plotNewton(f, steps, x0);
+                updateInsights(steps);
+                
+            } catch (e) {
+                alert('Error parsing function: ' + e.message);
+            }
+        };
+        
+        // ============ STEP MODE ============
+        window.startStepMode = function() {
+            const fStr = DOM.fInput.value.trim();
+            const fpStr = DOM.fpInput.value.trim();
+            const x0 = parseFloat(DOM.x0Input.value);
+            const tol = parseFloat(DOM.tolInput.value);
+            const maxIter = parseInt(DOM.maxIterInput.value);
+            
+            if (!fStr || !fpStr) {
+                alert('Please enter both f(x) and f\'(x)');
+                return;
+            }
+            
+            if (typeof math === 'undefined') {
+                alert('Math library not loaded. Please refresh the page.');
+                return;
+            }
+            
+            try {
+                const compiledF = math.compile(fStr);
+                const compiledFp = math.compile(fpStr);
+                state.compiledF = compiledF;
+                state.compiledFp = compiledFp;
+                
+                const f = (x) => compiledF.evaluate({ x: x });
+                const fp = (x) => compiledFp.evaluate({ x: x });
+                
+                const steps = newtonMethod(f, fp, x0, tol, maxIter);
+                
+                state.allSteps = steps;
+                state.stepMode = true;
+                state.currentStepIndex = 0;
+                
+                document.getElementById('step-controls').style.display = 'block';
+                document.getElementById('total-iter').textContent = steps.length - 1;
+                
+                DOM.stepTableBody.innerHTML = '';
+                
+                updateStepDisplay();
+                addStepToTable(steps[0], 0);
+                plotNewton(f, [steps[0]], x0);
+                
+            } catch (e) {
+                alert('Error parsing function: ' + e.message);
+            }
+        };
+        
+        window.stepForward = function() {
+            if (state.currentStepIndex < state.allSteps.length - 1) {
+                state.currentStepIndex++;
+                updateStepDisplay();
+                addStepToTable(state.allSteps[state.currentStepIndex], state.currentStepIndex);
+                
+                const f = (x) => state.compiledF.evaluate({ x: x });
+                const x0 = parseFloat(DOM.x0Input.value);
+                plotNewton(f, state.allSteps.slice(0, state.currentStepIndex + 1), x0);
+                highlightCurrentRow();
+            }
+        };
+        
+        window.stepBackward = function() {
+            if (state.currentStepIndex > 0) {
+                state.currentStepIndex--;
+                updateStepDisplay();
+                
+                const rows = DOM.stepTableBody.querySelectorAll('tr');
+                if (rows.length > state.currentStepIndex + 1) {
+                    rows[rows.length - 1].remove();
+                }
+                
+                const f = (x) => state.compiledF.evaluate({ x: x });
+                const x0 = parseFloat(DOM.x0Input.value);
+                plotNewton(f, state.allSteps.slice(0, state.currentStepIndex + 1), x0);
+                highlightCurrentRow();
+            }
+        };
+        
+        window.jumpToEnd = function() {
+            state.stepMode = false;
+            document.getElementById('step-controls').style.display = 'none';
+            
+            displayResults(state.allSteps);
+            buildStepTable(state.allSteps);
+            
+            const f = (x) => state.compiledF.evaluate({ x: x });
+            const x0 = parseFloat(DOM.x0Input.value);
+            plotNewton(f, state.allSteps, x0);
+            updateInsights(state.allSteps);
+        };
+        
+        function updateStepDisplay() {
+            const step = state.allSteps[state.currentStepIndex];
+            document.getElementById('current-iter').textContent = state.currentStepIndex;
+            document.getElementById('iter-sub').textContent = state.currentStepIndex;
+            document.getElementById('current-x').textContent = step.x.toFixed(8);
+            
+            document.getElementById('step-back-btn').disabled = state.currentStepIndex === 0;
+            document.getElementById('step-forward-btn').disabled = state.currentStepIndex >= state.allSteps.length - 1;
+        }
+        
+        function highlightCurrentRow() {
+            DOM.stepTableBody.querySelectorAll('tr').forEach((row, i) => {
+                row.classList.toggle('highlight-row', i === state.currentStepIndex);
+            });
+        }
+        
+        // ============ DISPLAY FUNCTIONS ============
+        function displayResults(steps) {
+            const lastStep = steps[steps.length - 1];
+            const converged = lastStep.final || (lastStep.error && lastStep.error < parseFloat(DOM.tolInput.value));
+            
+            DOM.resultIterations.textContent = steps.length - 1;
+            DOM.resultRoot.textContent = lastStep.x.toFixed(10);
+            DOM.resultFroot.textContent = lastStep.fx.toExponential(3);
+            
+            // Check for quadratic convergence
+            if (steps.length >= 3 && state.exactRoot) {
+                let isQuadratic = true;
+                for (let i = 1; i < steps.length - 1; i++) {
+                    const ePrev = Math.abs(steps[i-1].x - state.exactRoot);
+                    const eCurr = Math.abs(steps[i].x - state.exactRoot);
+                    if (ePrev > 1e-10) {
+                        const ratio = eCurr / (ePrev * ePrev);
+                        if (ratio > 100) isQuadratic = false;
+                    }
+                }
+                DOM.resultConvergence.textContent = isQuadratic ? 'Quadratic ⚡' : 'Linear';
+            } else {
+                DOM.resultConvergence.textContent = converged ? 'Converged' : 'Not conv.';
+            }
+        }
+        
+        function buildStepTable(steps) {
+            let html = '';
+            
+            steps.forEach((step, i) => {
+                const isLast = i === steps.length - 1;
+                
+                // Calculate ratio for quadratic check
+                let ratio = '—';
+                if (i >= 2 && state.exactRoot) {
+                    const e_prev = Math.abs(steps[i-1].x - state.exactRoot);
+                    const e_curr = Math.abs(step.x - state.exactRoot);
+                    if (e_prev > 1e-14 && e_curr > 1e-14) {
+                        ratio = (e_curr / (e_prev * e_prev)).toFixed(2);
+                    }
+                }
+                
+                html += `<tr class="${isLast ? 'highlight-row' : ''}">
+                    <td>${step.n}</td>
+                    <td>${step.x.toFixed(10)}</td>
+                    <td>${step.fx.toExponential(4)}</td>
+                    <td>${step.fpx.toFixed(6)}</td>
+                    <td>${step.xNext !== null ? step.xNext.toFixed(10) : '—'}</td>
+                    <td class="quadratic-indicator">${ratio}</td>
+                </tr>`;
+            });
+            
+            DOM.stepTableBody.innerHTML = html;
+        }
+        
+        function addStepToTable(step, index) {
+            let ratio = '—';
+            if (index >= 2 && state.exactRoot) {
+                const e_prev = Math.abs(state.allSteps[index-1].x - state.exactRoot);
+                const e_curr = Math.abs(step.x - state.exactRoot);
+                if (e_prev > 1e-14 && e_curr > 1e-14) {
+                    ratio = (e_curr / (e_prev * e_prev)).toFixed(2);
+                }
+            }
+            
+            const row = `<tr class="highlight-row">
+                <td>${step.n}</td>
+                <td>${step.x.toFixed(10)}</td>
+                <td>${step.fx.toExponential(4)}</td>
+                <td>${step.fpx.toFixed(6)}</td>
+                <td>${step.xNext !== null ? step.xNext.toFixed(10) : '—'}</td>
+                <td class="quadratic-indicator">${ratio}</td>
+            </tr>`;
+            
+            DOM.stepTableBody.querySelectorAll('tr').forEach(r => r.classList.remove('highlight-row'));
+            DOM.stepTableBody.insertAdjacentHTML('beforeend', row);
+        }
+        
+        function plotNewton(f, steps, x0) {
+            if (typeof Plotly === 'undefined') {
+                console.error('Plotly not loaded');
+                return;
+            }
+            
+            // Determine range
+            let xMin = x0, xMax = x0;
+            steps.forEach(s => {
+                if (isFinite(s.x)) {
+                    xMin = Math.min(xMin, s.x);
+                    xMax = Math.max(xMax, s.x);
+                }
+                if (s.xNext !== null && isFinite(s.xNext)) {
+                    xMin = Math.min(xMin, s.xNext);
+                    xMax = Math.max(xMax, s.xNext);
+                }
+            });
+            
+            const padding = Math.max((xMax - xMin) * 0.5, 0.5);
+            xMin -= padding;
+            xMax += padding;
+            
+            // Generate function curve
+            const xVals = [];
+            const yVals = [];
+            
+            for (let x = xMin; x <= xMax; x += (xMax - xMin) / 200) {
+                xVals.push(x);
+                try {
+                    const y = f(x);
+                    yVals.push(isFinite(y) && Math.abs(y) < 100 ? y : null);
+                } catch (e) {
+                    yVals.push(null);
+                }
+            }
+            
+            const traces = [
+                // Function curve
+                {
+                    x: xVals,
+                    y: yVals,
+                    mode: 'lines',
+                    name: 'f(x)',
+                    line: { color: '#6366f1', width: 2 }
+                },
+                // Zero line
+                {
+                    x: [xMin, xMax],
+                    y: [0, 0],
+                    mode: 'lines',
+                    name: 'y = 0',
+                    line: { color: '#94a3b8', width: 1, dash: 'dash' },
+                    showlegend: false
+                }
+            ];
+            
+            // Add tangent lines for each step
+            steps.forEach((step, i) => {
+                if (step.xNext === null) return;
+                
+                const x1 = step.x;
+                const y1 = step.fx;
+                const slope = step.fpx;
+                
+                // Tangent line from a bit before to x-intercept
+                const tangentX = [x1 - 0.3, step.xNext + 0.1];
+                const tangentY = tangentX.map(x => y1 + slope * (x - x1));
+                
+                traces.push({
+                    x: tangentX,
+                    y: tangentY,
+                    mode: 'lines',
+                    name: i === steps.length - 2 ? 'Tangent' : null,
+                    showlegend: i === steps.length - 2,
+                    line: { color: '#f97316', width: 2, dash: 'dot' }
+                });
+                
+                // Point on curve
+                traces.push({
+                    x: [x1],
+                    y: [y1],
+                    mode: 'markers',
+                    name: `x${i}`,
+                    showlegend: false,
+                    marker: { color: '#ef4444', size: 8 }
+                });
+                
+                // Vertical drop to x-axis
+                traces.push({
+                    x: [x1, x1],
+                    y: [0, y1],
+                    mode: 'lines',
+                    showlegend: false,
+                    line: { color: '#94a3b8', width: 1, dash: 'dot' }
+                });
+            });
+            
+            // Final point
+            const lastStep = steps[steps.length - 1];
+            traces.push({
+                x: [lastStep.x],
+                y: [0],
+                mode: 'markers',
+                name: 'Root approx',
+                marker: { color: '#10b981', size: 12, symbol: 'diamond' }
+            });
+            
+            // Calculate y range
+            const yFiltered = yVals.filter(y => y !== null);
+            let yMin = Math.min(...yFiltered, -1);
+            let yMax = Math.max(...yFiltered, 1);
+            const yPadding = (yMax - yMin) * 0.1;
+            yMin -= yPadding;
+            yMax += yPadding;
+            
+            const layout = {
+                title: 'Newton\'s Method',
+                xaxis: { title: 'x', range: [xMin, xMax] },
+                yaxis: { title: 'f(x)', range: [yMin, yMax] },
+                legend: { x: 0, y: 1, bgcolor: 'rgba(255,255,255,0.8)' },
+                margin: { t: 40, r: 20, b: 40, l: 50 }
+            };
+            
+            Plotly.newPlot('newton-graph', traces, layout, { responsive: true });
+        }
+        
+        function updateInsights(steps) {
+            DOM.dynamicInsights.style.display = 'block';
+            const insights = [];
+            
+            const lastStep = steps[steps.length - 1];
+            
+            insights.push(`Converged in ${steps.length - 1} iterations`);
+            
+            if (state.exactRoot) {
+                const finalError = Math.abs(lastStep.x - state.exactRoot);
+                insights.push(`Final error: ${finalError.toExponential(3)}`);
+                
+                // Check quadratic convergence
+                if (steps.length >= 3) {
+                    const ratios = [];
+                    for (let i = 2; i < steps.length; i++) {
+                        const e_prev = Math.abs(steps[i-1].x - state.exactRoot);
+                        const e_curr = Math.abs(steps[i].x - state.exactRoot);
+                        if (e_prev > 1e-12) {
+                            ratios.push(e_curr / (e_prev * e_prev));
+                        }
+                    }
+                    if (ratios.length > 0) {
+                        const avgRatio = ratios.reduce((a,b) => a+b, 0) / ratios.length;
+                        if (avgRatio < 10) {
+                            insights.push(`Quadratic convergence confirmed: eₙ₊₁/eₙ² ≈ ${avgRatio.toFixed(2)}`);
+                        }
+                    }
+                }
+            }
+            
+            // Compare with bisection
+            const bisectionSteps = Math.ceil(Math.log2(1 / parseFloat(DOM.tolInput.value)));
+            insights.push(`Bisection would need ~${bisectionSteps} steps for same accuracy`);
+            
+            DOM.insightsList.innerHTML = insights.map(i => `<li>${i}</li>`).join('');
+        }
+        
+        window.resetExplorer = function() {
+            DOM.stepTableBody.innerHTML = '<tr><td colspan="6" style="color: var(--text-muted); padding: 2rem;">Click "Run Newton" or "Step-by-Step" to begin</td></tr>';
+            DOM.resultIterations.textContent = '—';
+            DOM.resultRoot.textContent = '—';
+            DOM.resultFroot.textContent = '—';
+            DOM.resultConvergence.textContent = '—';
+            DOM.dynamicInsights.style.display = 'none';
+            document.getElementById('step-controls').style.display = 'none';
+            
+            state.stepMode = false;
+            state.currentStepIndex = 0;
+            state.allSteps = [];
+            
+            if (typeof Plotly !== 'undefined') {
+                Plotly.purge('newton-graph');
+            }
+        };
+        
+        // ============ TAB SWITCHING ============
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.tab-button').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        };
+        
+        // ============ CHALLENGE TAB ============
+        let challengeState = {
+            currentType: null,
+            currentProblem: null,
+            problemCount: { 'newton-step': 0, 'derive-iteration': 0, 'quadratic-check': 0 }
+        };
+        
+        window.selectChallengeType = function(type) {
+            challengeState.currentType = type;
+            
+            document.querySelectorAll('.challenge-type-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.type === type);
+            });
+            
+            document.getElementById('challenge-prompt').style.display = 'none';
+            document.getElementById('problem-area').style.display = 'block';
+            
+            const typeLabels = {
+                'newton-step': 'Newton Step',
+                'derive-iteration': 'Derive Iteration',
+                'quadratic-check': 'Verify Quadratic'
+            };
+            document.getElementById('problem-type-label').textContent = typeLabels[type];
+            
+            generateNewProblem();
+        };
+        
+        window.generateNewProblem = function() {
+            const type = challengeState.currentType;
+            if (!type) return;
+            
+            challengeState.problemCount[type]++;
+            document.getElementById('problem-number').textContent = `Problem #${challengeState.problemCount[type]}`;
+            
+            const feedback = document.getElementById('problem-feedback');
+            feedback.className = 'problem-feedback';
+            feedback.innerHTML = '';
+            
+            document.querySelector('.worked-example-toggle').classList.remove('open');
+            document.getElementById('worked-example-content').classList.remove('show');
+            
+            if (type === 'newton-step') {
+                generateNewtonStepProblem();
+            } else if (type === 'derive-iteration') {
+                generateDeriveIterationProblem();
+            } else if (type === 'quadratic-check') {
+                generateQuadraticCheckProblem();
+            }
+        };
+        
+        function generateNewtonStepProblem() {
+            const scenarios = [
+                { f: x => x*x - 2, fp: x => 2*x, fLabel: 'x² − 2', fpLabel: '2x' },
+                { f: x => x*x - 3, fp: x => 2*x, fLabel: 'x² − 3', fpLabel: '2x' },
+                { f: x => x*x*x - x - 1, fp: x => 3*x*x - 1, fLabel: 'x³ − x − 1', fpLabel: '3x² − 1' },
+                { f: x => Math.exp(x) - 3, fp: x => Math.exp(x), fLabel: 'eˣ − 3', fpLabel: 'eˣ' },
+                { f: x => x*x*x - 2, fp: x => 3*x*x, fLabel: 'x³ − 2', fpLabel: '3x²' },
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const x0Choices = [1, 1.5, 2, 2.5];
+            const x0 = x0Choices[Math.floor(Math.random() * x0Choices.length)];
+            
+            const fx0 = scenario.f(x0);
+            const fpx0 = scenario.fp(x0);
+            const x1 = x0 - fx0 / fpx0;
+            
+            challengeState.currentProblem = {
+                type: 'newton-step',
+                scenario: scenario,
+                x0: x0,
+                fx0: fx0,
+                fpx0: fpx0,
+                answer: x1
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>For <strong>f(x) = ${scenario.fLabel}</strong> with <strong>f'(x) = ${scenario.fpLabel}</strong>:</p>
+                <p>Starting from <strong>x₀ = ${x0}</strong>, compute <strong>x₁</strong> using Newton's method.</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Round to 4 decimal places.</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <span>x₁ = </span>
+                <input type="text" id="challenge-answer-input" placeholder="e.g., 1.4167">
+            `;
+            
+            generateNewtonStepWorkedExample(scenario, x0, fx0, fpx0, x1);
+        }
+        
+        function generateNewtonStepWorkedExample(scenario, x0, fx0, fpx0, x1) {
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Evaluate f(x₀)</div>
+                    <div class="step-content">
+                        f(${x0}) = ${scenario.fLabel.replace(/x/g, `(${x0})`)} = <strong>${fx0.toFixed(6)}</strong>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Evaluate f'(x₀)</div>
+                    <div class="step-content">
+                        f'(${x0}) = ${scenario.fpLabel.replace(/x/g, `(${x0})`)} = <strong>${fpx0.toFixed(6)}</strong>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Apply Newton's formula</div>
+                    <div class="step-content">
+                        x₁ = x₀ − f(x₀)/f'(x₀) = ${x0} − (${fx0.toFixed(4)})/(${fpx0.toFixed(4)})
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 4: Calculate</div>
+                    <div class="step-content">
+                        x₁ = ${x0} − ${(fx0/fpx0).toFixed(6)} = <strong>${x1.toFixed(6)}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generateDeriveIterationProblem() {
+            const problems = [
+                {
+                    fLabel: 'x² − a (for finding √a)',
+                    fpLabel: '2x',
+                    iterationLabel: 'x_{n+1} = ½(xₙ + a/xₙ)',
+                    explanation: 'This is the famous Babylonian method for square roots!'
+                },
+                {
+                    fLabel: 'x³ − a (for finding ∛a)',
+                    fpLabel: '3x²',
+                    iterationLabel: 'x_{n+1} = ⅓(2xₙ + a/xₙ²)',
+                    explanation: 'The cube root iteration from Newton\'s method.'
+                },
+                {
+                    fLabel: '1/x − a (for finding 1/a)',
+                    fpLabel: '−1/x²',
+                    iterationLabel: 'x_{n+1} = xₙ(2 − axₙ)',
+                    explanation: 'Division without dividing! Used in early computers.'
+                },
+                {
+                    fLabel: 'x² − 2',
+                    fpLabel: '2x',
+                    iterationLabel: 'x_{n+1} = ½(xₙ + 2/xₙ)',
+                    explanation: 'The Babylonian method specialized for √2.'
+                }
+            ];
+            
+            const problem = problems[Math.floor(Math.random() * problems.length)];
+            
+            challengeState.currentProblem = {
+                type: 'derive-iteration',
+                problem: problem,
+                answer: problem.iterationLabel
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>For <strong>f(x) = ${problem.fLabel}</strong>:</p>
+                <p>What is the Newton iteration formula?</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Select the correct simplified form.</p>
+            `;
+            
+            // Generate wrong answers
+            const options = [problem.iterationLabel];
+            const wrongOptions = [
+                'x_{n+1} = xₙ − f(xₙ)',
+                'x_{n+1} = xₙ/2',
+                'x_{n+1} = xₙ − 1/f\'(xₙ)',
+                'x_{n+1} = f(xₙ)/f\'(xₙ)'
+            ];
+            while (options.length < 4) {
+                const wrong = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+                if (!options.includes(wrong)) options.push(wrong);
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <select id="challenge-answer-input">
+                    <option value="">Select the iteration formula...</option>
+                    ${options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                </select>
+            `;
+            
+            generateDeriveIterationWorkedExample(problem);
+        }
+        
+        function generateDeriveIterationWorkedExample(problem) {
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Newton's formula</div>
+                    <div class="step-content">
+                        x_{n+1} = xₙ − f(xₙ)/f'(xₙ)
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">For this function</div>
+                    <div class="step-content">
+                        f(x) = ${problem.fLabel}, f'(x) = ${problem.fpLabel}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Simplified iteration</div>
+                    <div class="step-content">
+                        <strong>${problem.iterationLabel}</strong>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Note</div>
+                    <div class="step-content">
+                        ${problem.explanation}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generateQuadraticCheckProblem() {
+            // Generate realistic Newton iteration data
+            const root = Math.sqrt(2);
+            const x0 = 2;
+            let x = x0;
+            const iterates = [x];
+            
+            for (let i = 0; i < 4; i++) {
+                x = 0.5 * (x + 2/x);
+                iterates.push(x);
+            }
+            
+            const errors = iterates.map(xi => Math.abs(xi - root));
+            
+            // Ask about ratio
+            const n = Math.floor(Math.random() * 2) + 2; // Ask about step 2 or 3
+            const ratio = errors[n] / (errors[n-1] * errors[n-1]);
+            
+            challengeState.currentProblem = {
+                type: 'quadratic-check',
+                iterates: iterates,
+                errors: errors,
+                n: n,
+                answer: ratio < 5 ? 'quadratic' : 'linear'
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>For Newton's method finding √2 (exact value ≈ 1.41421356):</p>
+                <table class="step-table" style="margin: 1rem 0;">
+                    <tr><th>n</th><th>xₙ</th><th>|eₙ| = |xₙ − √2|</th></tr>
+                    ${iterates.slice(0, 4).map((xi, i) => `<tr><td>${i}</td><td>${xi.toFixed(8)}</td><td>${errors[i].toExponential(4)}</td></tr>`).join('')}
+                </table>
+                <p>Is the convergence <strong>quadratic</strong> or <strong>linear</strong>?</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <select id="challenge-answer-input">
+                    <option value="">Select convergence type...</option>
+                    <option value="quadratic">Quadratic (eₙ₊₁ ≈ C·eₙ²)</option>
+                    <option value="linear">Linear (eₙ₊₁ ≈ C·eₙ)</option>
+                </select>
+            `;
+            
+            generateQuadraticCheckWorkedExample(iterates, errors);
+        }
+        
+        function generateQuadraticCheckWorkedExample(iterates, errors) {
+            const ratios = [];
+            for (let i = 1; i < Math.min(4, errors.length); i++) {
+                if (errors[i-1] > 1e-12) {
+                    ratios.push({
+                        n: i,
+                        quadRatio: errors[i] / (errors[i-1] * errors[i-1]),
+                        linRatio: errors[i] / errors[i-1]
+                    });
+                }
+            }
+            
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Check the ratio eₙ₊₁/eₙ² (for quadratic)</div>
+                    <div class="step-content">
+                        ${ratios.map(r => `n=${r.n}: e${r.n}/e${r.n-1}² = ${r.quadRatio.toFixed(2)}`).join('<br>')}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Interpretation</div>
+                    <div class="step-content">
+                        The ratio eₙ₊₁/eₙ² is approximately constant (≈ ${ratios[0]?.quadRatio.toFixed(2) || '?'}), confirming <strong>quadratic convergence</strong>.
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">What this means</div>
+                    <div class="step-content">
+                        If eₙ = 10⁻², then eₙ₊₁ ≈ 10⁻⁴. Correct digits roughly double each step!
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        window.checkAnswer = function() {
+            const problem = challengeState.currentProblem;
+            const feedback = document.getElementById('problem-feedback');
+            const input = document.getElementById('challenge-answer-input');
+            const userAnswer = input.value.trim();
+            
+            let isCorrect = false;
+            
+            if (problem.type === 'newton-step') {
+                const userNum = parseFloat(userAnswer);
+                isCorrect = Math.abs(userNum - problem.answer) < 0.01;
+            } else {
+                isCorrect = userAnswer === problem.answer;
+            }
+            
+            feedback.classList.add('show');
+            
+            if (isCorrect) {
+                feedback.className = 'problem-feedback show correct';
+                feedback.innerHTML = '✓ Correct! Well done.';
+            } else {
+                feedback.className = 'problem-feedback show incorrect';
+                if (problem.type === 'newton-step') {
+                    feedback.innerHTML = `✗ Not quite. x₁ = ${problem.answer.toFixed(4)}. See the worked example.`;
+                } else {
+                    feedback.innerHTML = `✗ Not quite. The answer is "${problem.answer}". See the worked example.`;
+                }
+            }
+        };
+        
+        window.toggleWorkedExample = function() {
+            const toggle = document.querySelector('.worked-example-toggle');
+            const content = document.getElementById('worked-example-content');
+            
+            toggle.classList.toggle('open');
+            content.classList.toggle('show');
+        };
+        
+        // Initialize
+        initialize();
+    });
+    </script>
+
+    <!-- Week Navigation -->
+    <div class="week-nav-bar">
+        <a href="../fixed-point/" class="nav-prev">← Week 2: Fixed-Point</a>
+        <a href="../" class="nav-hub">🏠 All Weeks</a>
+        <a href="../secant/" class="nav-next">Week 4: Secant →</a>
+    </div>
+    
+</body>
+</html>
