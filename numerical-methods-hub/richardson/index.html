@@ -1,1 +1,1982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Richardson Extrapolation | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Math.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.min.js"></script>
+    
+    <!-- Plotly -->
+    <script defer src="https://cdn.jsdelivr.net/npm/plotly.js@2.27.0/dist/plotly.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0d5d56;
+            --bg-light: #f7faf9;
+            --interactive-bg: #e6fffb;
+            --text-dark: #212121;
+            --text-muted: #4b5563;
+            --border-light: #d1d5db;
+            --accent-amber: #f59e0b;
+            --error-red: #c62828;
+            --success-green: #10b981;
+            --extrapolate-purple: #8b5cf6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .tab-button:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section styling */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .section h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--interactive-bg) 0%, white 100%);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Concept Cards */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .concept-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .concept-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.1);
+        }
+        
+        .concept-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .concept-card .formula {
+            background: var(--bg-light);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+        
+        /* Richardson Formula Box */
+        .richardson-formula-box {
+            background: linear-gradient(135deg, #ede9fe 0%, #e0f2fe 100%);
+            border: 2px solid var(--extrapolate-purple);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .richardson-formula-box h3 {
+            color: var(--extrapolate-purple);
+            margin-bottom: 1rem;
+        }
+        
+        .richardson-formula-box .big-formula {
+            font-size: 1.2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        /* Preset Pills */
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preset-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Control Grid */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Function Preview */
+        .function-preview {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--interactive-bg);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            min-height: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .function-preview .preview-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        /* Buttons */
+        .primary-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .primary-button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .primary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .secondary-button {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .secondary-button:hover:not(:disabled) {
+            background: var(--interactive-bg);
+        }
+        
+        .secondary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Results Panel */
+        .results-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .result-box {
+            background: var(--interactive-bg);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .result-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .result-box .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Monaco', monospace;
+        }
+        
+        .result-box.extrapolated {
+            background: #ede9fe;
+            border-color: var(--extrapolate-purple);
+        }
+        
+        .result-box.extrapolated .value {
+            color: var(--extrapolate-purple);
+        }
+        
+        /* Romberg Table */
+        .romberg-table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .romberg-table {
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin: 0 auto;
+        }
+        
+        .romberg-table th, .romberg-table td {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-light);
+            text-align: center;
+            min-width: 100px;
+        }
+        
+        .romberg-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .romberg-table .level-0 {
+            background: var(--bg-light);
+        }
+        
+        .romberg-table .level-1 {
+            background: #dbeafe;
+        }
+        
+        .romberg-table .level-2 {
+            background: #ede9fe;
+        }
+        
+        .romberg-table .level-3 {
+            background: #fce7f3;
+        }
+        
+        .romberg-table .highlight {
+            font-weight: 600;
+            border: 2px solid var(--extrapolate-purple);
+        }
+        
+        /* Step Table */
+        .step-table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .step-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .step-table th, .step-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+        
+        .step-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .step-table tbody tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+        
+        .step-table tbody tr:hover {
+            background: var(--interactive-bg);
+        }
+        
+        /* Graph Container */
+        .graph-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            margin: 1rem 0;
+        }
+        
+        /* Insights */
+        .dynamic-insights {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+        
+        .dynamic-insights h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dynamic-insights ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .dynamic-insights li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+        }
+        
+        .dynamic-insights li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+        
+        /* Key Formulas */
+        .key-formulas {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        
+        .key-formulas h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .formula-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+        
+        .formula-row:last-child {
+            border-bottom: none;
+        }
+        
+        .formula-label {
+            min-width: 160px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .formula-math {
+            flex: 1;
+        }
+        
+        /* Order Diagnostic */
+        .order-diagnostic {
+            background: #fef3c7;
+            border: 2px solid var(--accent-amber);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .order-diagnostic h4 {
+            color: var(--accent-amber);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Perspectives */
+        .perspectives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .perspective-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .perspective-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .perspective-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Challenge Tab Styles */
+        .challenge-type-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .challenge-type-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .challenge-type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.15);
+        }
+        
+        .challenge-type-card.active {
+            border-color: var(--primary);
+            background: var(--interactive-bg);
+        }
+        
+        .challenge-type-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .challenge-type-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .challenge-type-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        .challenge-prompt {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+        
+        .problem-area {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid var(--border-light);
+        }
+        
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .problem-type-badge {
+            background: var(--interactive-bg);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .problem-number {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .problem-question {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .problem-input-area {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .problem-input-area input, .problem-input-area select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+        
+        .problem-input-area input:focus, .problem-input-area select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .problem-feedback {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .problem-feedback.show {
+            display: block;
+        }
+        
+        .problem-feedback.correct {
+            background: #dcfce7;
+            border: 1px solid var(--success-green);
+            color: #166534;
+        }
+        
+        .problem-feedback.incorrect {
+            background: #fee2e2;
+            border: 1px solid var(--error-red);
+            color: #991b1b;
+        }
+        
+        /* Worked Example */
+        .worked-example-container {
+            margin: 1.5rem 0;
+        }
+        
+        .worked-example-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .worked-example-toggle:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+        
+        .worked-example-toggle.open {
+            border-color: var(--primary);
+            background: white;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .worked-example-toggle.open .toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        .worked-example-content {
+            background: white;
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1.5rem;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .worked-example-content.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .worked-example-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .worked-example-steps {
+            padding-left: 0.5rem;
+        }
+        
+        .worked-example-step {
+            margin-bottom: 1.25rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--interactive-bg);
+        }
+        
+        .worked-example-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .step-label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-content {
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .generate-new-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        /* Nav Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .nav-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-button:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .challenge-type-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    
+        /* Week Navigation Bar */
+        .week-nav-bar {
+            background: white;
+            border-top: 2px solid var(--primary);
+            padding: 1rem;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .week-nav-bar a, .week-nav-bar span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .week-nav-bar .nav-prev,
+        .week-nav-bar .nav-next {
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            background: white;
+        }
+        
+        .week-nav-bar .nav-prev:hover,
+        .week-nav-bar .nav-next:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-hub {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .week-nav-bar .nav-hub:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-disabled {
+            color: var(--text-muted);
+            border: 2px solid var(--border-light);
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        @media (max-width: 600px) {
+            .week-nav-bar {
+                flex-direction: column;
+            }
+            .week-nav-bar a, .week-nav-bar span {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
 
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('intro')">Introduction</button>
+            <button class="tab-button" onclick="switchTab('explorer')">Explorer</button>
+            <button class="tab-button" onclick="switchTab('romberg')">Romberg Table</button>
+            <button class="tab-button" onclick="switchTab('challenge')">Challenge</button>
+        </div>
+
+        <!-- ==================== INTRODUCTION TAB ==================== -->
+        <div id="intro-tab" class="tab-content active">
+            <div class="hero">
+                <h1>🔬 Richardson Extrapolation</h1>
+                <p>Turn two rough answers into one better answer. Use error structure to cancel leading terms and boost accuracy — the engine behind Simpson's rule and Romberg integration.</p>
+            </div>
+
+            <div class="richardson-formula-box">
+                <h3>The Richardson Formula</h3>
+                <div class="big-formula" id="richardson-main-formula"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">
+                    "Combine A(h) and A(h/2) to cancel the leading error term"
+                </p>
+            </div>
+
+            <div class="concept-cards">
+                <div class="concept-card">
+                    <div class="icon">📐</div>
+                    <h3>Taylor Error Structure</h3>
+                    <p>Numerical methods have predictable errors: A(h) = A + Ch^p + O(h^{p+1}). Knowing p lets us cancel the Ch^p term.</p>
+                    <div class="formula" id="taylor-structure"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">📊</div>
+                    <h3>Order of Accuracy</h3>
+                    <p>If halving h reduces error by ~2^p, the method has order p. This is the "step-halving diagnostic."</p>
+                    <div class="formula" id="order-diagnostic"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">⚡</div>
+                    <h3>Extrapolation Boost</h3>
+                    <p>Richardson extrapolation increases order from p to p+1 (or more). Simpson = Trapezium + extrapolation!</p>
+                    <div class="formula" id="boost-formula"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>The Key Idea</h3>
+                <div class="key-formulas">
+                    <div class="formula-row">
+                        <span class="formula-label">Method at step h:</span>
+                        <span class="formula-math" id="key-formula-1"></span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Method at step h/2:</span>
+                        <span class="formula-math" id="key-formula-2"></span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Cancel Ch^p:</span>
+                        <span class="formula-math" id="key-formula-3"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-diagnostic">
+                <h4>🔍 Step-Halving Diagnostic</h4>
+                <p>Compute A(h) and A(h/2). If the error ratio is approximately:</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                    <li><strong>2</strong> → Order 1 method</li>
+                    <li><strong>4</strong> → Order 2 method</li>
+                    <li><strong>8</strong> → Order 3 method</li>
+                    <li><strong>16</strong> → Order 4 method</li>
+                </ul>
+                <p style="margin-top: 0.5rem;">General pattern: error ratio ≈ 2^p for order p</p>
+            </div>
+
+            <div class="perspectives">
+                <div class="perspective-card">
+                    <h4>🧮 Simpson = Trapezium + Extrapolation</h4>
+                    <p>The trapezium rule has order 2. Richardson extrapolation with p=2 gives (4T_{h/2} - T_h)/3 — which is exactly Simpson's rule!</p>
+                </div>
+                <div class="perspective-card">
+                    <h4>📈 Romberg = Repeated Extrapolation</h4>
+                    <p>Apply Richardson extrapolation repeatedly: T → Simpson → Boole → ... Each level cancels another error term.</p>
+                </div>
+            </div>
+
+            <div class="section" style="background: var(--interactive-bg);">
+                <h3>📚 Week 5 Connection</h3>
+                <p>This explorer covers Richardson extrapolation from Week 5 — the theoretical foundation connecting root-finding (error analysis) to numerical integration (Simpson, Romberg) and ODEs (method order).</p>
+            </div>
+
+            <div class="nav-buttons">
+                <div></div>
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    Try the Explorer →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== EXPLORER TAB ==================== -->
+        <div id="explorer-tab" class="tab-content">
+            <div class="section">
+                <h2>Richardson Extrapolation Explorer</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">See how extrapolation improves numerical differentiation and integration.</p>
+                
+                <div class="control-grid">
+                    <div class="control-group">
+                        <label>Example Type:</label>
+                        <select id="example-type" onchange="updateExample()">
+                            <option value="derivative">Numerical Derivative f'(x)</option>
+                            <option value="integral">Numerical Integration ∫f(x)dx</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Function f(x):</label>
+                        <select id="function-select" onchange="updateFunction()">
+                            <option value="exp">eˣ at x=0</option>
+                            <option value="sin">sin(x) at x=0</option>
+                            <option value="x2">x² on [0,1]</option>
+                            <option value="x3">x³ on [0,1]</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Initial step h:</label>
+                        <input type="number" id="h-input" value="0.5" step="0.1" min="0.01">
+                    </div>
+                    <div class="control-group">
+                        <label>Method order p:</label>
+                        <select id="order-select">
+                            <option value="1">1 (Forward difference)</option>
+                            <option value="2" selected>2 (Central diff / Trapezium)</option>
+                            <option value="4">4 (Simpson-type)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="primary-button" onclick="runExtrapolation()">
+                        ▶ Run Extrapolation
+                    </button>
+                    <button class="secondary-button" onclick="resetExplorer()">
+                        ↺ Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Results</h2>
+                
+                <div class="results-panel" id="results-panel">
+                    <div class="result-box">
+                        <div class="label">A(h)</div>
+                        <div class="value" id="result-ah">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">A(h/2)</div>
+                        <div class="value" id="result-ah2">—</div>
+                    </div>
+                    <div class="result-box extrapolated">
+                        <div class="label">A_rich (extrapolated)</div>
+                        <div class="value" id="result-arich">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Exact Value</div>
+                        <div class="value" id="result-exact">—</div>
+                    </div>
+                </div>
+                
+                <div class="step-table-container">
+                    <table class="step-table" id="error-table">
+                        <thead>
+                            <tr>
+                                <th>Approximation</th>
+                                <th>Value</th>
+                                <th>Error</th>
+                                <th>Error Ratio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="error-table-body">
+                            <tr><td colspan="4" style="color: var(--text-muted); padding: 2rem;">Click "Run Extrapolation" to begin</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="graph-container">
+                    <div id="error-graph" style="width: 100%; height: 350px;"></div>
+                </div>
+                
+                <div id="dynamic-insights" class="dynamic-insights" style="display: none;">
+                    <h4>💡 Insights</h4>
+                    <ul id="insights-list"></ul>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('intro')">
+                    ← Back to Introduction
+                </button>
+                <button class="nav-button" onclick="switchTab('romberg')">
+                    Romberg Table →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== ROMBERG TAB ==================== -->
+        <div id="romberg-tab" class="tab-content">
+            <div class="section">
+                <h2>Romberg Integration Table</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Build a triangular table of repeated extrapolations. Each diagonal increases the order of accuracy.</p>
+                
+                <div class="control-grid">
+                    <div class="control-group">
+                        <label>Integrand f(x):</label>
+                        <select id="romberg-function" onchange="updateRombergFunction()">
+                            <option value="exp-x2">e^(-x²) on [0,1]</option>
+                            <option value="sin">sin(x) on [0,π]</option>
+                            <option value="1/x">1/(1+x) on [0,1]</option>
+                            <option value="sqrt">√x on [0,1]</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Levels (rows):</label>
+                        <select id="romberg-levels">
+                            <option value="3">3</option>
+                            <option value="4" selected>4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="primary-button" onclick="buildRombergTable()">
+                    ▶ Build Romberg Table
+                </button>
+            </div>
+            
+            <div class="section" id="romberg-results" style="display: none;">
+                <h2>Romberg Table</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    <span style="display: inline-block; width: 15px; height: 15px; background: var(--bg-light); border: 1px solid var(--border-light); vertical-align: middle;"></span> Order 2 (Trapezium) &nbsp;
+                    <span style="display: inline-block; width: 15px; height: 15px; background: #dbeafe; border: 1px solid var(--border-light); vertical-align: middle;"></span> Order 4 (Simpson) &nbsp;
+                    <span style="display: inline-block; width: 15px; height: 15px; background: #ede9fe; border: 1px solid var(--border-light); vertical-align: middle;"></span> Order 6 &nbsp;
+                    <span style="display: inline-block; width: 15px; height: 15px; background: #fce7f3; border: 1px solid var(--border-light); vertical-align: middle;"></span> Order 8
+                </p>
+                
+                <div class="romberg-table-container" id="romberg-table-container"></div>
+                
+                <div class="results-panel">
+                    <div class="result-box">
+                        <div class="label">Best Approximation</div>
+                        <div class="value" id="romberg-best">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Exact Value</div>
+                        <div class="value" id="romberg-exact">—</div>
+                    </div>
+                    <div class="result-box extrapolated">
+                        <div class="label">Final Error</div>
+                        <div class="value" id="romberg-error">—</div>
+                    </div>
+                </div>
+                
+                <div id="romberg-insights" class="dynamic-insights">
+                    <h4>💡 Romberg Insights</h4>
+                    <ul id="romberg-insights-list"></ul>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    ← Back to Explorer
+                </button>
+                <button class="nav-button" onclick="switchTab('challenge')">
+                    Try Challenges →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== CHALLENGE TAB ==================== -->
+        <div id="challenge-tab" class="tab-content">
+            <div class="section">
+                <h2>Challenge Types</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Test your understanding of error analysis and extrapolation.</p>
+                
+                <div class="challenge-type-cards">
+                    <div class="challenge-type-card" data-type="extrapolate" onclick="selectChallengeType('extrapolate')">
+                        <div class="challenge-type-icon">🔢</div>
+                        <h4>Extrapolate</h4>
+                        <p>Compute Richardson value</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="identify-order" onclick="selectChallengeType('identify-order')">
+                        <div class="challenge-type-icon">📊</div>
+                        <h4>Identify Order</h4>
+                        <p>From error ratios</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="romberg-entry" onclick="selectChallengeType('romberg-entry')">
+                        <div class="challenge-type-icon">📐</div>
+                        <h4>Romberg Entry</h4>
+                        <p>Fill in the table</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem Area -->
+            <div id="problem-area" class="problem-area" style="display: none;">
+                <div class="problem-header">
+                    <span class="problem-type-badge" id="problem-type-label">Extrapolate</span>
+                    <span class="problem-number" id="problem-number">Problem #1</span>
+                </div>
+                
+                <div class="problem-question" id="problem-question"></div>
+                
+                <div class="problem-input-area" id="problem-input-area"></div>
+                
+                <button class="primary-button" onclick="checkAnswer()">
+                    ✓ Check Answer
+                </button>
+                
+                <div id="problem-feedback" class="problem-feedback"></div>
+                
+                <!-- Worked Example -->
+                <div class="worked-example-container">
+                    <button class="worked-example-toggle" onclick="toggleWorkedExample()">
+                        <span class="toggle-icon">▶</span>
+                        <span>📖 See Worked Example</span>
+                    </button>
+                    
+                    <div id="worked-example-content" class="worked-example-content">
+                        <div class="worked-example-header">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                <line x1="8" y1="6" x2="16" y2="6"/>
+                                <line x1="8" y1="10" x2="14" y2="10"/>
+                            </svg>
+                            <div>
+                                <h4 style="margin: 0; color: var(--primary);">Worked Example</h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Step-by-step solution</p>
+                            </div>
+                        </div>
+                        <div id="worked-example-steps" class="worked-example-steps"></div>
+                    </div>
+                </div>
+                
+                <div class="generate-new-container">
+                    <button class="secondary-button" onclick="generateNewProblem()">
+                        🔄 Generate New Problem
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Initial prompt -->
+            <div id="challenge-prompt" class="challenge-prompt">
+                <p>👆 Select a challenge type above to begin practicing</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('romberg')">
+                    ← Back to Romberg
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    window.addEventListener('load', function() {
+        // ============ INITIALIZATION ============
+        function initialize() {
+            renderIntroFormulas();
+        }
+        
+        function renderIntroFormulas() {
+            if (typeof katex === 'undefined') return;
+            
+            try {
+                katex.render("A_{\\text{rich}} = \\frac{2^p A(h/2) - A(h)}{2^p - 1}", document.getElementById('richardson-main-formula'), {displayMode: true});
+                katex.render("A(h) = A + Ch^p + O(h^{p+1})", document.getElementById('taylor-structure'), {displayMode: false});
+                katex.render("\\frac{\\text{Error}(h)}{\\text{Error}(h/2)} \\approx 2^p", document.getElementById('order-diagnostic'), {displayMode: false});
+                katex.render("p \\to p+1 \\text{ (or more)}", document.getElementById('boost-formula'), {displayMode: false});
+                
+                katex.render("A(h) = A + Ch^p + O(h^{p+1})", document.getElementById('key-formula-1'), {displayMode: false});
+                katex.render("A(h/2) = A + C(h/2)^p + O(h^{p+1})", document.getElementById('key-formula-2'), {displayMode: false});
+                katex.render("A_{\\text{rich}} = \\frac{2^p A(h/2) - A(h)}{2^p - 1}", document.getElementById('key-formula-3'), {displayMode: false});
+            } catch (e) {
+                console.error('KaTeX render error:', e);
+            }
+        }
+        
+        // ============ EXTRAPOLATION EXPLORER ============
+        window.updateExample = function() {
+            const type = document.getElementById('example-type').value;
+            const funcSelect = document.getElementById('function-select');
+            
+            funcSelect.innerHTML = '';
+            
+            if (type === 'derivative') {
+                funcSelect.innerHTML = `
+                    <option value="exp">eˣ at x=0 (f'=1)</option>
+                    <option value="sin">sin(x) at x=0 (f'=1)</option>
+                    <option value="cos">cos(x) at x=0 (f'=0)</option>
+                    <option value="x3">x³ at x=1 (f'=3)</option>
+                `;
+            } else {
+                funcSelect.innerHTML = `
+                    <option value="exp-int">∫₀¹ eˣ dx (=e-1)</option>
+                    <option value="x2-int">∫₀¹ x² dx (=1/3)</option>
+                    <option value="sin-int">∫₀^π sin(x) dx (=2)</option>
+                    <option value="exp-x2">∫₀¹ e^(-x²) dx (≈0.7468)</option>
+                `;
+            }
+        };
+        
+        window.runExtrapolation = function() {
+            const type = document.getElementById('example-type').value;
+            const func = document.getElementById('function-select').value;
+            const h = parseFloat(document.getElementById('h-input').value);
+            const p = parseInt(document.getElementById('order-select').value);
+            
+            let exact, Ah, Ah2, Ah4;
+            
+            if (type === 'derivative') {
+                // Numerical differentiation examples
+                if (func === 'exp') {
+                    exact = 1; // f'(0) for e^x
+                    if (p === 1) {
+                        // Forward difference
+                        Ah = (Math.exp(h) - Math.exp(0)) / h;
+                        Ah2 = (Math.exp(h/2) - Math.exp(0)) / (h/2);
+                        Ah4 = (Math.exp(h/4) - Math.exp(0)) / (h/4);
+                    } else {
+                        // Central difference
+                        Ah = (Math.exp(h) - Math.exp(-h)) / (2*h);
+                        Ah2 = (Math.exp(h/2) - Math.exp(-h/2)) / (2*h/2);
+                        Ah4 = (Math.exp(h/4) - Math.exp(-h/4)) / (2*h/4);
+                    }
+                } else if (func === 'sin') {
+                    exact = 1; // cos(0)
+                    if (p === 1) {
+                        Ah = (Math.sin(h) - Math.sin(0)) / h;
+                        Ah2 = (Math.sin(h/2) - Math.sin(0)) / (h/2);
+                        Ah4 = (Math.sin(h/4) - Math.sin(0)) / (h/4);
+                    } else {
+                        Ah = (Math.sin(h) - Math.sin(-h)) / (2*h);
+                        Ah2 = (Math.sin(h/2) - Math.sin(-h/2)) / h;
+                        Ah4 = (Math.sin(h/4) - Math.sin(-h/4)) / (h/2);
+                    }
+                } else if (func === 'cos') {
+                    exact = 0; // -sin(0)
+                    Ah = (Math.cos(h) - Math.cos(-h)) / (2*h);
+                    Ah2 = (Math.cos(h/2) - Math.cos(-h/2)) / h;
+                    Ah4 = (Math.cos(h/4) - Math.cos(-h/4)) / (h/2);
+                } else {
+                    exact = 3; // 3x² at x=1
+                    Ah = (Math.pow(1+h, 3) - Math.pow(1-h, 3)) / (2*h);
+                    Ah2 = (Math.pow(1+h/2, 3) - Math.pow(1-h/2, 3)) / h;
+                    Ah4 = (Math.pow(1+h/4, 3) - Math.pow(1-h/4, 3)) / (h/2);
+                }
+            } else {
+                // Numerical integration (trapezium rule)
+                if (func === 'exp-int') {
+                    exact = Math.E - 1;
+                    Ah = trapezium(x => Math.exp(x), 0, 1, Math.round(1/h));
+                    Ah2 = trapezium(x => Math.exp(x), 0, 1, Math.round(2/h));
+                    Ah4 = trapezium(x => Math.exp(x), 0, 1, Math.round(4/h));
+                } else if (func === 'x2-int') {
+                    exact = 1/3;
+                    Ah = trapezium(x => x*x, 0, 1, Math.round(1/h));
+                    Ah2 = trapezium(x => x*x, 0, 1, Math.round(2/h));
+                    Ah4 = trapezium(x => x*x, 0, 1, Math.round(4/h));
+                } else if (func === 'sin-int') {
+                    exact = 2;
+                    Ah = trapezium(x => Math.sin(x), 0, Math.PI, Math.round(Math.PI/h));
+                    Ah2 = trapezium(x => Math.sin(x), 0, Math.PI, Math.round(2*Math.PI/h));
+                    Ah4 = trapezium(x => Math.sin(x), 0, Math.PI, Math.round(4*Math.PI/h));
+                } else {
+                    exact = 0.7468241328;
+                    Ah = trapezium(x => Math.exp(-x*x), 0, 1, Math.round(1/h));
+                    Ah2 = trapezium(x => Math.exp(-x*x), 0, 1, Math.round(2/h));
+                    Ah4 = trapezium(x => Math.exp(-x*x), 0, 1, Math.round(4/h));
+                }
+            }
+            
+            // Richardson extrapolation
+            const Arich = (Math.pow(2, p) * Ah2 - Ah) / (Math.pow(2, p) - 1);
+            const Arich2 = (Math.pow(2, p) * Ah4 - Ah2) / (Math.pow(2, p) - 1);
+            
+            // Display results
+            document.getElementById('result-ah').textContent = Ah.toFixed(8);
+            document.getElementById('result-ah2').textContent = Ah2.toFixed(8);
+            document.getElementById('result-arich').textContent = Arich.toFixed(8);
+            document.getElementById('result-exact').textContent = exact.toFixed(8);
+            
+            // Build error table
+            const errAh = Math.abs(Ah - exact);
+            const errAh2 = Math.abs(Ah2 - exact);
+            const errAh4 = Math.abs(Ah4 - exact);
+            const errArich = Math.abs(Arich - exact);
+            const errArich2 = Math.abs(Arich2 - exact);
+            
+            const tableBody = document.getElementById('error-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td>A(h)</td>
+                    <td>${Ah.toFixed(8)}</td>
+                    <td>${errAh.toExponential(3)}</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>A(h/2)</td>
+                    <td>${Ah2.toFixed(8)}</td>
+                    <td>${errAh2.toExponential(3)}</td>
+                    <td>${(errAh/errAh2).toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td>A(h/4)</td>
+                    <td>${Ah4.toFixed(8)}</td>
+                    <td>${errAh4.toExponential(3)}</td>
+                    <td>${(errAh2/errAh4).toFixed(2)}</td>
+                </tr>
+                <tr style="background: #ede9fe;">
+                    <td><strong>A_rich (from h, h/2)</strong></td>
+                    <td><strong>${Arich.toFixed(8)}</strong></td>
+                    <td><strong>${errArich.toExponential(3)}</strong></td>
+                    <td>—</td>
+                </tr>
+                <tr style="background: #ede9fe;">
+                    <td><strong>A_rich (from h/2, h/4)</strong></td>
+                    <td><strong>${Arich2.toFixed(8)}</strong></td>
+                    <td><strong>${errArich2.toExponential(3)}</strong></td>
+                    <td>${(errArich/errArich2).toFixed(2)}</td>
+                </tr>
+            `;
+            
+            // Plot error graph
+            plotErrors([errAh, errAh2, errAh4], [errArich, errArich2], p);
+            
+            // Update insights
+            updateExplorerInsights(errAh, errAh2, errArich, p, exact);
+        };
+        
+        function trapezium(f, a, b, n) {
+            const h = (b - a) / n;
+            let sum = (f(a) + f(b)) / 2;
+            for (let i = 1; i < n; i++) {
+                sum += f(a + i * h);
+            }
+            return sum * h;
+        }
+        
+        function plotErrors(baseErrors, richErrors, p) {
+            if (typeof Plotly === 'undefined') return;
+            
+            const traces = [
+                {
+                    x: ['h', 'h/2', 'h/4'],
+                    y: baseErrors,
+                    type: 'bar',
+                    name: 'Before extrapolation',
+                    marker: { color: '#6366f1' }
+                },
+                {
+                    x: ['Rich(h,h/2)', 'Rich(h/2,h/4)'],
+                    y: richErrors,
+                    type: 'bar',
+                    name: 'After extrapolation',
+                    marker: { color: '#8b5cf6' }
+                }
+            ];
+            
+            const layout = {
+                title: 'Error Comparison',
+                yaxis: { title: 'Error', type: 'log' },
+                barmode: 'group',
+                margin: { t: 40, r: 20, b: 40, l: 60 }
+            };
+            
+            Plotly.newPlot('error-graph', traces, layout, { responsive: true });
+        }
+        
+        function updateExplorerInsights(errAh, errAh2, errArich, p, exact) {
+            document.getElementById('dynamic-insights').style.display = 'block';
+            const insights = [];
+            
+            const ratio = errAh / errAh2;
+            insights.push(`Error ratio A(h)/A(h/2) ≈ ${ratio.toFixed(2)} (expected ~${Math.pow(2, p)} for order ${p})`);
+            
+            const improvement = errAh2 / errArich;
+            insights.push(`Extrapolation improved accuracy by factor of ${improvement.toFixed(1)}`);
+            
+            if (errArich < 1e-10) {
+                insights.push(`Extrapolated value matches exact to machine precision!`);
+            }
+            
+            insights.push(`New order after extrapolation: ${p + 2}`);
+            
+            document.getElementById('insights-list').innerHTML = insights.map(i => `<li>${i}</li>`).join('');
+        }
+        
+        window.resetExplorer = function() {
+            document.getElementById('error-table-body').innerHTML = '<tr><td colspan="4" style="color: var(--text-muted); padding: 2rem;">Click "Run Extrapolation" to begin</td></tr>';
+            document.getElementById('result-ah').textContent = '—';
+            document.getElementById('result-ah2').textContent = '—';
+            document.getElementById('result-arich').textContent = '—';
+            document.getElementById('result-exact').textContent = '—';
+            document.getElementById('dynamic-insights').style.display = 'none';
+            
+            if (typeof Plotly !== 'undefined') {
+                Plotly.purge('error-graph');
+            }
+        };
+        
+        // ============ ROMBERG TABLE ============
+        window.buildRombergTable = function() {
+            const funcName = document.getElementById('romberg-function').value;
+            const levels = parseInt(document.getElementById('romberg-levels').value);
+            
+            let f, a, b, exact;
+            
+            if (funcName === 'exp-x2') {
+                f = x => Math.exp(-x*x);
+                a = 0; b = 1;
+                exact = 0.7468241328;
+            } else if (funcName === 'sin') {
+                f = x => Math.sin(x);
+                a = 0; b = Math.PI;
+                exact = 2;
+            } else if (funcName === '1/x') {
+                f = x => 1 / (1 + x);
+                a = 0; b = 1;
+                exact = Math.log(2);
+            } else {
+                f = x => Math.sqrt(x);
+                a = 0; b = 1;
+                exact = 2/3;
+            }
+            
+            // Build Romberg table
+            const R = [];
+            for (let i = 0; i < levels; i++) {
+                R[i] = [];
+                const n = Math.pow(2, i);
+                R[i][0] = trapezium(f, a, b, n);
+            }
+            
+            // Extrapolate
+            for (let j = 1; j < levels; j++) {
+                for (let i = j; i < levels; i++) {
+                    const factor = Math.pow(4, j);
+                    R[i][j] = (factor * R[i][j-1] - R[i-1][j-1]) / (factor - 1);
+                }
+            }
+            
+            // Build HTML table
+            let html = '<table class="romberg-table"><thead><tr><th>n</th>';
+            for (let j = 0; j < levels; j++) {
+                html += `<th>R[i,${j}]</th>`;
+            }
+            html += '</tr></thead><tbody>';
+            
+            for (let i = 0; i < levels; i++) {
+                html += `<tr><td>${Math.pow(2, i)}</td>`;
+                for (let j = 0; j <= i; j++) {
+                    const levelClass = ['level-0', 'level-1', 'level-2', 'level-3'][Math.min(j, 3)];
+                    const isHighlight = (i === levels - 1 && j === i);
+                    html += `<td class="${levelClass} ${isHighlight ? 'highlight' : ''}">${R[i][j].toFixed(10)}</td>`;
+                }
+                for (let j = i + 1; j < levels; j++) {
+                    html += '<td>—</td>';
+                }
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            
+            document.getElementById('romberg-table-container').innerHTML = html;
+            
+            // Display results
+            const best = R[levels-1][levels-1];
+            document.getElementById('romberg-best').textContent = best.toFixed(12);
+            document.getElementById('romberg-exact').textContent = exact.toFixed(12);
+            document.getElementById('romberg-error').textContent = Math.abs(best - exact).toExponential(3);
+            
+            // Insights
+            const insights = [];
+            insights.push(`Column 0: Trapezium rule (order 2)`);
+            insights.push(`Column 1: Simpson's rule (order 4)`);
+            insights.push(`Column 2: Boole's rule (order 6)`);
+            insights.push(`Best value from ${levels} levels: ${best.toFixed(10)}`);
+            insights.push(`Improvement from T₁ to best: ${(Math.abs(R[0][0] - exact) / Math.abs(best - exact)).toFixed(0)}×`);
+            
+            document.getElementById('romberg-insights-list').innerHTML = insights.map(i => `<li>${i}</li>`).join('');
+            document.getElementById('romberg-results').style.display = 'block';
+        };
+        
+        // ============ TAB SWITCHING ============
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.tab-button').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        };
+        
+        // ============ CHALLENGE TAB ============
+        let challengeState = {
+            currentType: null,
+            currentProblem: null,
+            problemCount: { 'extrapolate': 0, 'identify-order': 0, 'romberg-entry': 0 }
+        };
+        
+        window.selectChallengeType = function(type) {
+            challengeState.currentType = type;
+            
+            document.querySelectorAll('.challenge-type-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.type === type);
+            });
+            
+            document.getElementById('challenge-prompt').style.display = 'none';
+            document.getElementById('problem-area').style.display = 'block';
+            
+            const typeLabels = {
+                'extrapolate': 'Extrapolate',
+                'identify-order': 'Identify Order',
+                'romberg-entry': 'Romberg Entry'
+            };
+            document.getElementById('problem-type-label').textContent = typeLabels[type];
+            
+            generateNewProblem();
+        };
+        
+        window.generateNewProblem = function() {
+            const type = challengeState.currentType;
+            if (!type) return;
+            
+            challengeState.problemCount[type]++;
+            document.getElementById('problem-number').textContent = `Problem #${challengeState.problemCount[type]}`;
+            
+            const feedback = document.getElementById('problem-feedback');
+            feedback.className = 'problem-feedback';
+            feedback.innerHTML = '';
+            
+            document.querySelector('.worked-example-toggle').classList.remove('open');
+            document.getElementById('worked-example-content').classList.remove('show');
+            
+            if (type === 'extrapolate') {
+                generateExtrapolateProblem();
+            } else if (type === 'identify-order') {
+                generateIdentifyOrderProblem();
+            } else if (type === 'romberg-entry') {
+                generateRombergEntryProblem();
+            }
+        };
+        
+        function generateExtrapolateProblem() {
+            const scenarios = [
+                { Ah: 1.234, Ah2: 1.245, p: 2, name: 'Order 2' },
+                { Ah: 0.9, Ah2: 0.95, p: 1, name: 'Order 1' },
+                { Ah: 0.742984, Ah2: 0.745866, p: 2, name: 'Trapezium' },
+                { Ah: 2.8, Ah2: 2.9, p: 2, name: 'Order 2' }
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const answer = (Math.pow(2, scenario.p) * scenario.Ah2 - scenario.Ah) / (Math.pow(2, scenario.p) - 1);
+            
+            challengeState.currentProblem = {
+                type: 'extrapolate',
+                scenario: scenario,
+                answer: answer
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>Given approximations from an <strong>order ${scenario.p}</strong> method:</p>
+                <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                    <li>A(h) = ${scenario.Ah}</li>
+                    <li>A(h/2) = ${scenario.Ah2}</li>
+                </ul>
+                <p>Compute the <strong>Richardson extrapolated value</strong> A_rich.</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Round to 4 decimal places.</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <span>A_rich = </span>
+                <input type="text" id="challenge-answer-input" placeholder="e.g., 1.2487">
+            `;
+            
+            generateExtrapolateWorkedExample(scenario, answer);
+        }
+        
+        function generateExtrapolateWorkedExample(scenario, answer) {
+            const twoP = Math.pow(2, scenario.p);
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Identify the formula</div>
+                    <div class="step-content">
+                        A_rich = (2^p · A(h/2) − A(h)) / (2^p − 1)
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Substitute p = ${scenario.p}</div>
+                    <div class="step-content">
+                        2^${scenario.p} = ${twoP}, so: A_rich = (${twoP} · A(h/2) − A(h)) / (${twoP} − 1)
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Plug in values</div>
+                    <div class="step-content">
+                        A_rich = (${twoP} × ${scenario.Ah2} − ${scenario.Ah}) / ${twoP - 1}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 4: Calculate</div>
+                    <div class="step-content">
+                        A_rich = (${(twoP * scenario.Ah2).toFixed(4)} − ${scenario.Ah}) / ${twoP - 1} = <strong>${answer.toFixed(6)}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generateIdentifyOrderProblem() {
+            const scenarios = [
+                { errors: [0.1, 0.05, 0.025], order: 1, ratio: 2 },
+                { errors: [0.04, 0.01, 0.0025], order: 2, ratio: 4 },
+                { errors: [0.008, 0.001, 0.000125], order: 3, ratio: 8 },
+                { errors: [0.0016, 0.0001, 0.00000625], order: 4, ratio: 16 }
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            
+            challengeState.currentProblem = {
+                type: 'identify-order',
+                scenario: scenario,
+                answer: scenario.order
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>A numerical method produces these errors for step sizes h, h/2, h/4:</p>
+                <table class="step-table" style="margin: 1rem 0; max-width: 300px;">
+                    <tr><th>Step</th><th>Error</th></tr>
+                    <tr><td>h</td><td>${scenario.errors[0].toExponential(2)}</td></tr>
+                    <tr><td>h/2</td><td>${scenario.errors[1].toExponential(2)}</td></tr>
+                    <tr><td>h/4</td><td>${scenario.errors[2].toExponential(2)}</td></tr>
+                </table>
+                <p>What is the <strong>order of the method</strong>?</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <select id="challenge-answer-input">
+                    <option value="">Select order...</option>
+                    <option value="1">Order 1</option>
+                    <option value="2">Order 2</option>
+                    <option value="3">Order 3</option>
+                    <option value="4">Order 4</option>
+                </select>
+            `;
+            
+            generateIdentifyOrderWorkedExample(scenario);
+        }
+        
+        function generateIdentifyOrderWorkedExample(scenario) {
+            const ratio1 = scenario.errors[0] / scenario.errors[1];
+            const ratio2 = scenario.errors[1] / scenario.errors[2];
+            
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Compute error ratios</div>
+                    <div class="step-content">
+                        Error(h)/Error(h/2) = ${scenario.errors[0].toExponential(2)} / ${scenario.errors[1].toExponential(2)} = ${ratio1.toFixed(1)}<br>
+                        Error(h/2)/Error(h/4) = ${scenario.errors[1].toExponential(2)} / ${scenario.errors[2].toExponential(2)} = ${ratio2.toFixed(1)}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Match to 2^p</div>
+                    <div class="step-content">
+                        Ratio ≈ ${scenario.ratio} = 2^${scenario.order}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Conclusion</div>
+                    <div class="step-content">
+                        The method has <strong>order ${scenario.order}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generateRombergEntryProblem() {
+            // Generate simple Romberg table values
+            const T = [0.75, 0.8125, 0.828125]; // T_1, T_2, T_4 for some integral
+            const S = (4 * T[1] - T[0]) / 3;
+            const S2 = (4 * T[2] - T[1]) / 3;
+            const B = (16 * S2 - S) / 15;
+            
+            const askTypes = [
+                { ask: 'S (Simpson from T₁, T₂)', answer: S, formula: '(4T₂ - T₁)/3' },
+                { ask: 'S₂ (Simpson from T₂, T₄)', answer: S2, formula: '(4T₄ - T₂)/3' }
+            ];
+            
+            const askType = askTypes[Math.floor(Math.random() * askTypes.length)];
+            
+            challengeState.currentProblem = {
+                type: 'romberg-entry',
+                T: T,
+                askType: askType,
+                answer: askType.answer
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>Given trapezium rule values:</p>
+                <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                    <li>T₁ = ${T[0]}</li>
+                    <li>T₂ = ${T[1]}</li>
+                    <li>T₄ = ${T[2]}</li>
+                </ul>
+                <p>Compute <strong>${askType.ask}</strong></p>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Formula: ${askType.formula}</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <span>${askType.ask.split(' ')[0]} = </span>
+                <input type="text" id="challenge-answer-input" placeholder="e.g., 0.8333">
+            `;
+            
+            generateRombergEntryWorkedExample(T, askType);
+        }
+        
+        function generateRombergEntryWorkedExample(T, askType) {
+            let html;
+            
+            if (askType.ask.includes('T₁, T₂')) {
+                html = `
+                    <div class="worked-example-step">
+                        <div class="step-label">Simpson formula</div>
+                        <div class="step-content">S = (4T₂ - T₁) / 3</div>
+                    </div>
+                    <div class="worked-example-step">
+                        <div class="step-label">Substitute</div>
+                        <div class="step-content">S = (4 × ${T[1]} - ${T[0]}) / 3 = (${4*T[1]} - ${T[0]}) / 3</div>
+                    </div>
+                    <div class="worked-example-step">
+                        <div class="step-label">Calculate</div>
+                        <div class="step-content">S = ${(4*T[1] - T[0]).toFixed(4)} / 3 = <strong>${askType.answer.toFixed(6)}</strong></div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="worked-example-step">
+                        <div class="step-label">Simpson formula</div>
+                        <div class="step-content">S₂ = (4T₄ - T₂) / 3</div>
+                    </div>
+                    <div class="worked-example-step">
+                        <div class="step-label">Substitute</div>
+                        <div class="step-content">S₂ = (4 × ${T[2]} - ${T[1]}) / 3 = (${4*T[2]} - ${T[1]}) / 3</div>
+                    </div>
+                    <div class="worked-example-step">
+                        <div class="step-label">Calculate</div>
+                        <div class="step-content">S₂ = ${(4*T[2] - T[1]).toFixed(4)} / 3 = <strong>${askType.answer.toFixed(6)}</strong></div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        window.checkAnswer = function() {
+            const problem = challengeState.currentProblem;
+            const feedback = document.getElementById('problem-feedback');
+            const input = document.getElementById('challenge-answer-input');
+            const userAnswer = input.value.trim();
+            
+            let isCorrect = false;
+            
+            if (problem.type === 'extrapolate' || problem.type === 'romberg-entry') {
+                const userNum = parseFloat(userAnswer);
+                isCorrect = Math.abs(userNum - problem.answer) < 0.01;
+            } else {
+                isCorrect = parseInt(userAnswer) === problem.answer;
+            }
+            
+            feedback.classList.add('show');
+            
+            if (isCorrect) {
+                feedback.className = 'problem-feedback show correct';
+                feedback.innerHTML = '✓ Correct! Well done.';
+            } else {
+                feedback.className = 'problem-feedback show incorrect';
+                if (problem.type === 'identify-order') {
+                    feedback.innerHTML = `✗ Not quite. The order is ${problem.answer}. See the worked example.`;
+                } else {
+                    feedback.innerHTML = `✗ Not quite. The answer is ${problem.answer.toFixed(4)}. See the worked example.`;
+                }
+            }
+        };
+        
+        window.toggleWorkedExample = function() {
+            const toggle = document.querySelector('.worked-example-toggle');
+            const content = document.getElementById('worked-example-content');
+            
+            toggle.classList.toggle('open');
+            content.classList.toggle('show');
+        };
+        
+        // Initialize
+        initialize();
+    });
+    </script>
+
+    <!-- Week Navigation -->
+    <div class="week-nav-bar">
+        <a href="../secant/" class="nav-prev">← Week 4: Secant</a>
+        <a href="../" class="nav-hub">🏠 All Weeks</a>
+        <a href="../romberg/" class="nav-next">Week 6: Romberg →</a>
+    </div>
+    
+</body>
+</html>
