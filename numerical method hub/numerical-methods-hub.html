@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numerical Methods | 5103MATHS | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0d5d56;
+            --bg-light: #f7faf9;
+            --interactive-bg: #e6fffb;
+            --text-dark: #212121;
+            --text-muted: #4b5563;
+            --border-light: #d1d5db;
+            --accent-amber: #f59e0b;
+            --success-green: #10b981;
+            
+            /* Week colors */
+            --week1-color: #6366f1;
+            --week2-color: #8b5cf6;
+            --week3-color: #f97316;
+            --week4-color: #06b6d4;
+            --week5-color: #ec4899;
+            --week6-color: #10b981;
+            --week7-color: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--interactive-bg) 0%, white 100%);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(15, 118, 110, 0.1);
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero .subtitle {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero .author {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Big Idea Box */
+        .big-idea {
+            background: white;
+            border: 3px solid var(--primary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .big-idea h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .big-idea .quote {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--text-dark);
+            max-width: 700px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.8;
+        }
+        
+        .big-idea .formula-box {
+            display: inline-block;
+            background: var(--interactive-bg);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+        }
+        
+        /* Three Themes */
+        .themes-section {
+            margin-bottom: 2rem;
+        }
+        
+        .themes-section h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .themes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .theme-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--primary);
+        }
+        
+        .theme-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .theme-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .theme-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .theme-card .weeks {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        /* Weekly Cards */
+        .weeks-section {
+            margin-bottom: 2rem;
+        }
+        
+        .weeks-section h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .week-card {
+            display: flex;
+            align-items: stretch;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .week-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.15);
+        }
+        
+        .week-number {
+            width: 80px;
+            min-width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .week-number .num {
+            font-size: 2rem;
+            line-height: 1;
+        }
+        
+        .week-number .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .week-card:nth-child(1) .week-number { background: var(--week1-color); }
+        .week-card:nth-child(2) .week-number { background: var(--week2-color); }
+        .week-card:nth-child(3) .week-number { background: var(--week3-color); }
+        .week-card:nth-child(4) .week-number { background: var(--week4-color); }
+        .week-card:nth-child(5) .week-number { background: var(--week5-color); }
+        .week-card:nth-child(6) .week-number { background: var(--week6-color); }
+        .week-card:nth-child(7) .week-number { background: var(--week7-color); }
+        
+        .week-content {
+            flex: 1;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .week-content h3 {
+            color: var(--text-dark);
+            font-size: 1.15rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .week-content .description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .week-content .topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .topic-tag {
+            background: var(--bg-light);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .week-arrow {
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.5rem;
+            background: var(--bg-light);
+        }
+        
+        /* Roadmap */
+        .roadmap-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .roadmap-section h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .roadmap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .roadmap-stage {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .roadmap-stage .stage-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--interactive-bg);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.5rem;
+        }
+        
+        .roadmap-stage h4 {
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .roadmap-stage p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        
+        .roadmap-arrow {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .roadmap {
+                flex-direction: column;
+            }
+            .roadmap-arrow {
+                transform: rotate(90deg);
+            }
+        }
+        
+        /* Diagnostic Box */
+        .diagnostic-box {
+            background: #fef3c7;
+            border: 2px solid var(--accent-amber);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .diagnostic-box h3 {
+            color: var(--accent-amber);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .diagnostic-box p {
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .diagnostic-box .formula {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Quick Start */
+        .quick-start {
+            background: var(--interactive-bg);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .quick-start h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        
+        .quick-start p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .quick-start-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .quick-start-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .quick-start-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .quick-start-btn.primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .quick-start-btn.secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .quick-start-btn.secondary:hover {
+            background: var(--bg-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
+
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <span class="hero-badge">5103MATHS · Level 5 · BSc Mathematics</span>
+            <h1>Numerical Methods</h1>
+            <p class="subtitle">Interactive Explorations for Weeks 1–7</p>
+            <p class="author">Dr Amir Asghari</p>
+        </div>
+
+        <!-- Quick Start -->
+        <div class="quick-start">
+            <h3>🚀 Quick Start</h3>
+            <p>New to the module? Start with Week 1. Revising? Jump to any week.</p>
+            <div class="quick-start-buttons">
+                <a href="root-finding-basics.html" class="quick-start-btn primary">
+                    Start Week 1 →
+                </a>
+                <a href="#weeks" class="quick-start-btn secondary">
+                    Browse All Weeks
+                </a>
+            </div>
+        </div>
+
+        <!-- Big Idea -->
+        <div class="big-idea">
+            <h2>💡 The One Big Idea</h2>
+            <p class="quote">
+                "Replace a complicated object by a simpler one that we can compute, and then justify what we did."
+            </p>
+            <div class="formula-box" id="big-idea-formula"></div>
+        </div>
+
+        <!-- Three Themes -->
+        <div class="themes-section">
+            <h2>Three Problem Types, One Story</h2>
+            <div class="themes-grid">
+                <div class="theme-card">
+                    <div class="icon">🎯</div>
+                    <h3>Root Finding</h3>
+                    <p>Solve f(x) = 0 by local linearisation or guaranteed bracketing</p>
+                    <div class="weeks">Weeks 1–4</div>
+                </div>
+                <div class="theme-card">
+                    <div class="icon">📐</div>
+                    <h3>Integration</h3>
+                    <p>Replace curves by shapes; extrapolate to cancel error</p>
+                    <div class="weeks">Weeks 5–6</div>
+                </div>
+                <div class="theme-card">
+                    <div class="icon">📈</div>
+                    <h3>ODEs</h3>
+                    <p>Replace the curve by local slope steps; combine slopes</p>
+                    <div class="weeks">Week 7</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roadmap -->
+        <div class="roadmap-section">
+            <h2>The Numerical Methods Journey</h2>
+            <div class="roadmap">
+                <div class="roadmap-stage">
+                    <div class="stage-icon">📏</div>
+                    <h4>Taylor Expansion</h4>
+                    <p>Local approximation</p>
+                </div>
+                <div class="roadmap-arrow">→</div>
+                <div class="roadmap-stage">
+                    <div class="stage-icon">✂️</div>
+                    <h4>Truncation</h4>
+                    <p>Keep finite terms</p>
+                </div>
+                <div class="roadmap-arrow">→</div>
+                <div class="roadmap-stage">
+                    <div class="stage-icon">📊</div>
+                    <h4>Order</h4>
+                    <p>Error behaviour</p>
+                </div>
+                <div class="roadmap-arrow">→</div>
+                <div class="roadmap-stage">
+                    <div class="stage-icon">🔬</div>
+                    <h4>Extrapolation</h4>
+                    <p>Cancel leading error</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Cards -->
+        <div class="weeks-section" id="weeks">
+            <h2>Weekly Explorations</h2>
+            
+            <a href="root-finding-basics.html" class="week-card">
+                <div class="week-number">
+                    <span class="num">1</span>
+                    <span class="label">Week</span>
+                </div>
+                <div class="week-content">
+                    <h3>Bisection Method</h3>
+                    <p class="description">Guaranteed root finding through interval halving. Slow but safe.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Bracketing</span>
+                        <span class="topic-tag">Error bounds</span>
+                        <span class="topic-tag">Linear convergence</span>
+                    </div>
+                </div>
+                <div class="week-arrow">→</div>
+            </a>
+            
+            <a href="fixed-point-iteration.html" class="week-card">
+                <div class="week-number">
+                    <span class="num">2</span>
+                    <span class="label">Week</span>
+                </div>
+                <div class="week-content">
+                    <h3>Fixed-Point Iteration</h3>
+                    <p class="description">Transform f(x)=0 into x=g(x). Convergence depends on |g'(x*)|.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Cobweb diagrams</span>
+                        <span class="topic-tag">Convergence criteria</span>
+                        <span class="topic-tag">Rearrangements</span>
+                    </div>
+                </div>
+                <div class="week-arrow">→</div>
+            </a>
+            
+            <a href="newtons-method.html" class="week-card">
+                <div class="week-number">
+                    <span class="num">3</span>
+                    <span class="label">Week</span>
+                </div>
+                <div class="week-content">
+                    <h3>Newton's Method</h3>
+                    <p class="description">Follow the tangent line. Quadratic convergence — digits double each step!</p>
+                    <div class="topics">
+                        <span class="topic-tag">Tangent lines</span>
+                        <span class="topic-tag">Quadratic convergence</span>
+                        <span class="topic-tag">Failure modes</span>
+                    </div>
+                </div>
+                <div class="week-arrow">→</div>
+            </a>
+            
+            <a href="secant-method.html" class="week-card">
+                <div class="week-number">
+                    <span class="num">4</span>
+                    <span class="label">Week</span>
+                </div>
+                <div class="week-content">
+                    <h3>Secant Method & Comparison</h3>
+                    <p class="description">Newton without derivatives. Compare all four methods side by side.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Finite differences</span>
+                        <span class="topic-tag">Order ≈ 1.618</span>
+                        <span class="topic-tag">Method comparison</span>
+                    </div>
+                </div>
+                <div class="week-arrow">→</div>
+            </a>
+            
+            <a href="richardson-extrapolation.html" class="week-card">
+                <div class="week-number">
+                    <span class="num">5</span>
+                    <span class="label">Week</span>
+                </div>
+                <div class="week-content">
+                    <h3>Richardson Extrapolation</h3>
+                    <p class="description">Combine two rough answers into one better answer. The engine behind Simpson and Romberg.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Taylor error</span>
+                        <span class="topic-tag">Order detection</span>
+                        <span class="topic-tag">Extrapolation formula</span>
+                    </div>
+                </div>
+                <div class="week-arrow">→</div>
+            </a>
+            
+            <a href="romberg-modern.html" class="week-card">
+                <div class="week-number">
+                    <span class="num">6</span>
+                    <span class="label">Week</span>
+                </div>
+                <div class="week-content">
+                    <h3>Numerical Integration</h3>
+                    <p class="description">Midpoint, trapezium, Simpson, and Romberg. Repeated extrapolation in action.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Quadrature rules</span>
+                        <span class="topic-tag">Simpson's rule</span>
+                        <span class="topic-tag">Romberg table</span>
+                    </div>
+                </div>
+                <div class="week-arrow">→</div>
+            </a>
+            
+            <a href="ode-methods.html" class="week-card">
+                <div class="week-number">
+                    <span class="num">7</span>
+                    <span class="label">Week</span>
+                </div>
+                <div class="week-content">
+                    <h3>ODE Methods</h3>
+                    <p class="description">Euler, Modified Euler, and RK4. Quadrature rules applied to differential equations.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Initial value problems</span>
+                        <span class="topic-tag">Runge-Kutta</span>
+                        <span class="topic-tag">Local vs global error</span>
+                    </div>
+                </div>
+                <div class="week-arrow">→</div>
+            </a>
+        </div>
+
+        <!-- Universal Diagnostic -->
+        <div class="diagnostic-box">
+            <h3>🔍 Universal Diagnostic: Step Halving</h3>
+            <p>If a method has global order p, halving h reduces the dominant error by about 2<sup>p</sup>.</p>
+            <p>This works for root finding, integration, AND ODEs!</p>
+            <div class="formula" id="diagnostic-formula"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Part of the <a href="/">Mathswell</a> interactive mathematics platform</p>
+            <p style="margin-top: 0.5rem;">5103MATHS Numerical Methods · Level 5 BSc Mathematics</p>
+        </div>
+    </div>
+
+    <script>
+    window.addEventListener('load', function() {
+        if (typeof katex !== 'undefined') {
+            try {
+                katex.render("\\text{Exact} \\approx \\text{Simple} + \\text{Error}(h^p)", document.getElementById('big-idea-formula'), {displayMode: false});
+                katex.render("\\frac{\\text{Error}(h)}{\\text{Error}(h/2)} \\approx 2^p", document.getElementById('diagnostic-formula'), {displayMode: false});
+            } catch (e) {
+                console.error('KaTeX error:', e);
+            }
+        }
+    });
+    </script>
+</body>
+</html>
