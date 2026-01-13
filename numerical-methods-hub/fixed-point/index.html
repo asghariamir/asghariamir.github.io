@@ -1,1 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed-Point Iteration | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Math.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.min.js"></script>
+    
+    <!-- Plotly -->
+    <script defer src="https://cdn.jsdelivr.net/npm/plotly.js@2.27.0/dist/plotly.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0d5d56;
+            --bg-light: #f7faf9;
+            --interactive-bg: #e6fffb;
+            --text-dark: #212121;
+            --text-muted: #4b5563;
+            --border-light: #d1d5db;
+            --accent-amber: #f59e0b;
+            --error-red: #c62828;
+            --success-green: #10b981;
+            --diverge-red: #ef4444;
+            --converge-green: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .tab-button:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section styling */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .section h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--interactive-bg) 0%, white 100%);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Concept Cards */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .concept-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .concept-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.1);
+        }
+        
+        .concept-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .concept-card .formula {
+            background: var(--bg-light);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+        
+        /* Preset Pills */
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preset-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .preset-pill.converges {
+            border-color: var(--converge-green);
+            color: var(--converge-green);
+        }
+        
+        .preset-pill.converges.active {
+            background: var(--converge-green);
+            color: white;
+        }
+        
+        .preset-pill.diverges {
+            border-color: var(--diverge-red);
+            color: var(--diverge-red);
+        }
+        
+        .preset-pill.diverges.active {
+            background: var(--diverge-red);
+            color: white;
+        }
+        
+        /* Control Grid */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Function Preview */
+        .function-preview {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--interactive-bg);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            min-height: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .function-preview .preview-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        /* Buttons */
+        .primary-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .primary-button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .primary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .secondary-button {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .secondary-button:hover:not(:disabled) {
+            background: var(--interactive-bg);
+        }
+        
+        .secondary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Results Panel */
+        .results-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .result-box {
+            background: var(--interactive-bg);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .result-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .result-box .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Monaco', monospace;
+        }
+        
+        .result-box.converged {
+            border-color: var(--converge-green);
+        }
+        
+        .result-box.converged .value {
+            color: var(--converge-green);
+        }
+        
+        .result-box.diverged {
+            border-color: var(--diverge-red);
+        }
+        
+        .result-box.diverged .value {
+            color: var(--diverge-red);
+        }
+        
+        /* Step Table */
+        .step-table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .step-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .step-table th, .step-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+        
+        .step-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .step-table tbody tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+        
+        .step-table tbody tr:hover {
+            background: var(--interactive-bg);
+        }
+        
+        .step-table .highlight-row {
+            background: var(--interactive-bg) !important;
+            border-left: 3px solid var(--primary);
+        }
+        
+        /* Graph Container */
+        .graph-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            margin: 1rem 0;
+        }
+        
+        .graphs-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        @media (max-width: 900px) {
+            .graphs-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Step Controls */
+        .step-controls {
+            background: var(--interactive-bg);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .step-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .step-info span {
+            color: var(--text-dark);
+        }
+        
+        .step-position {
+            font-family: 'Monaco', monospace;
+            background: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .step-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .step-buttons button {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        /* Insights */
+        .dynamic-insights {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+        
+        .dynamic-insights h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dynamic-insights ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .dynamic-insights li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+        }
+        
+        .dynamic-insights li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+        
+        /* Key Formulas */
+        .key-formulas {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        
+        .key-formulas h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .formula-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+        
+        .formula-row:last-child {
+            border-bottom: none;
+        }
+        
+        .formula-label {
+            min-width: 140px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .formula-math {
+            flex: 1;
+        }
+        
+        /* Perspectives */
+        .perspectives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .perspective-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .perspective-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .perspective-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Comparison Box */
+        .comparison-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .comparison-side {
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .comparison-side.converges {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--converge-green);
+        }
+        
+        .comparison-side.diverges {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--diverge-red);
+        }
+        
+        .comparison-side h4 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .comparison-side.converges h4 {
+            color: var(--converge-green);
+        }
+        
+        .comparison-side.diverges h4 {
+            color: var(--diverge-red);
+        }
+        
+        /* Challenge Tab Styles */
+        .challenge-type-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .challenge-type-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .challenge-type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.15);
+        }
+        
+        .challenge-type-card.active {
+            border-color: var(--primary);
+            background: var(--interactive-bg);
+        }
+        
+        .challenge-type-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .challenge-type-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .challenge-type-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        .challenge-prompt {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+        
+        .problem-area {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid var(--border-light);
+        }
+        
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .problem-type-badge {
+            background: var(--interactive-bg);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .problem-number {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .problem-question {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .problem-input-area {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .problem-input-area input, .problem-input-area select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+        
+        .problem-input-area input:focus, .problem-input-area select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .problem-feedback {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .problem-feedback.show {
+            display: block;
+        }
+        
+        .problem-feedback.correct {
+            background: #dcfce7;
+            border: 1px solid var(--success-green);
+            color: #166534;
+        }
+        
+        .problem-feedback.incorrect {
+            background: #fee2e2;
+            border: 1px solid var(--error-red);
+            color: #991b1b;
+        }
+        
+        /* Worked Example */
+        .worked-example-container {
+            margin: 1.5rem 0;
+        }
+        
+        .worked-example-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .worked-example-toggle:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+        
+        .worked-example-toggle.open {
+            border-color: var(--primary);
+            background: white;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .worked-example-toggle.open .toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        .worked-example-content {
+            background: white;
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1.5rem;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .worked-example-content.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .worked-example-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .worked-example-steps {
+            padding-left: 0.5rem;
+        }
+        
+        .worked-example-step {
+            margin-bottom: 1.25rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--interactive-bg);
+        }
+        
+        .worked-example-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .step-label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-content {
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .step-math {
+            background: var(--bg-light);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            text-align: center;
+        }
+        
+        .generate-new-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        /* Nav Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .nav-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-button:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .challenge-type-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .comparison-box {
+                grid-template-columns: 1fr;
+            }
+        }
+    
+        /* Week Navigation Bar */
+        .week-nav-bar {
+            background: white;
+            border-top: 2px solid var(--primary);
+            padding: 1rem;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .week-nav-bar a, .week-nav-bar span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .week-nav-bar .nav-prev,
+        .week-nav-bar .nav-next {
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            background: white;
+        }
+        
+        .week-nav-bar .nav-prev:hover,
+        .week-nav-bar .nav-next:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-hub {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .week-nav-bar .nav-hub:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-disabled {
+            color: var(--text-muted);
+            border: 2px solid var(--border-light);
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        @media (max-width: 600px) {
+            .week-nav-bar {
+                flex-direction: column;
+            }
+            .week-nav-bar a, .week-nav-bar span {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
 
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('intro')">Introduction</button>
+            <button class="tab-button" onclick="switchTab('explorer')">Explorer</button>
+            <button class="tab-button" onclick="switchTab('challenge')">Challenge</button>
+        </div>
+
+        <!-- ==================== INTRODUCTION TAB ==================== -->
+        <div id="intro-tab" class="tab-content active">
+            <div class="hero">
+                <h1>🔄 Fixed-Point Iteration</h1>
+                <p>Transform root-finding into repeated substitution. Discover why the same equation can converge or diverge depending on how you rewrite it.</p>
+            </div>
+
+            <div class="section">
+                <h2>From Roots to Fixed Points</h2>
+                <p>Instead of solving f(x) = 0 directly, we rewrite the equation as <strong>x = g(x)</strong> and look for a <em>fixed point</em> — a value that maps to itself.</p>
+                
+                <div class="key-formulas" style="margin-top: 1rem;">
+                    <div class="formula-row">
+                        <span class="formula-label">Root Problem:</span>
+                        <span class="formula-math">Find x such that f(x) = 0</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Fixed Point:</span>
+                        <span class="formula-math">Find x* such that x* = g(x*)</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Iteration:</span>
+                        <span class="formula-math" id="iteration-formula"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-cards">
+                <div class="concept-card">
+                    <div class="icon">🎯</div>
+                    <h3>Fixed Point</h3>
+                    <p>A number x* where x* = g(x*). On the graph, it's where y = g(x) intersects y = x.</p>
+                    <div class="formula" id="fixed-point-def"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">🔁</div>
+                    <h3>Iteration</h3>
+                    <p>Start with a guess x₀, then repeatedly compute xₙ₊₁ = g(xₙ). If it converges, you've found the fixed point!</p>
+                    <div class="formula" id="iteration-def"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">⚖️</div>
+                    <h3>Convergence</h3>
+                    <p>Iteration converges when |g'(x*)| < 1 near the fixed point. The slope determines if errors shrink or grow.</p>
+                    <div class="formula" id="convergence-def"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>The Same Equation, Different Behaviors</h3>
+                <p>The equation <strong>x³ − x − 1 = 0</strong> can be rewritten many ways:</p>
+                
+                <div class="comparison-box">
+                    <div class="comparison-side converges">
+                        <h4>✓ Converges</h4>
+                        <p><strong>g(x) = ∛(x + 1)</strong></p>
+                        <p>Starting from x₀ = 1:</p>
+                        <p style="font-family: monospace; font-size: 0.9rem;">
+                            x₁ = 1.26, x₂ = 1.31, x₃ = 1.32...
+                        </p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">|g'(x*)| ≈ 0.19 < 1</p>
+                    </div>
+                    <div class="comparison-side diverges">
+                        <h4>✗ Diverges</h4>
+                        <p><strong>g(x) = x³ − 1</strong></p>
+                        <p>Starting from x₀ = 1:</p>
+                        <p style="font-family: monospace; font-size: 0.9rem;">
+                            x₁ = 0, x₂ = −1, x₃ = −2...
+                        </p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">|g'(x*)| ≈ 5.26 > 1</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="perspectives">
+                <div class="perspective-card">
+                    <h4>🕸️ The Cobweb Picture</h4>
+                    <p>Draw y = g(x) and y = x. Start at x₀ on the x-axis, go up to g(x₀), then across to y = x, then up again. The path either spirals in (converges) or out (diverges).</p>
+                </div>
+                <div class="perspective-card">
+                    <h4>📐 The Slope Test</h4>
+                    <p>If the curve y = g(x) is "flatter" than y = x at the fixed point (|g'(x*)| < 1), errors get smaller. If it's "steeper," errors grow.</p>
+                </div>
+            </div>
+
+            <div class="section" style="background: var(--interactive-bg);">
+                <h3>📚 Week 2 Connection</h3>
+                <p>This explorer covers fixed-point iteration from Week 2. Use the cobweb diagrams to visualize convergence and divergence, and experiment with different rearrangements of the same equation.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <div></div>
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    Try the Explorer →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== EXPLORER TAB ==================== -->
+        <div id="explorer-tab" class="tab-content">
+            <div class="section">
+                <h2>Preset Examples</h2>
+                <p style="color: var(--text-muted); margin-bottom: 0.75rem;">
+                    <span style="color: var(--converge-green);">●</span> Converges &nbsp;
+                    <span style="color: var(--diverge-red);">●</span> Diverges
+                </p>
+                <div id="preset-pills" class="preset-pills"></div>
+                
+                <div class="control-grid">
+                    <div class="control-group full-width">
+                        <label>Iteration function g(x):</label>
+                        <input type="text" id="g-input" placeholder="e.g., cos(x) or (x+1)^(1/3)">
+                        <div id="g-preview" class="function-preview"></div>
+                    </div>
+                    <div class="control-group">
+                        <label>Starting value x₀:</label>
+                        <input type="number" id="x0-input" value="0.5" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Max iterations:</label>
+                        <input type="number" id="max-iter-input" value="20" min="1" max="50">
+                    </div>
+                    <div class="control-group">
+                        <label>Tolerance:</label>
+                        <input type="number" id="tol-input" value="0.0001" step="0.0001">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <button id="iterate-btn" class="primary-button" onclick="runIteration()">
+                        ▶ Run Iteration
+                    </button>
+                    <button id="step-btn" class="secondary-button" onclick="startStepMode()">
+                        👣 Step-by-Step
+                    </button>
+                    <button class="secondary-button" onclick="resetExplorer()">
+                        ↺ Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Results</h2>
+                
+                <div class="results-panel">
+                    <div class="result-box" id="status-box">
+                        <div class="label">Status</div>
+                        <div class="value" id="result-status">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Iterations</div>
+                        <div class="value" id="result-iterations">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Fixed Point</div>
+                        <div class="value" id="result-fixed-point">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">|g'(x*)| estimate</div>
+                        <div class="value" id="result-derivative">—</div>
+                    </div>
+                </div>
+                
+                <!-- Step Controls -->
+                <div class="step-controls" id="step-controls" style="display: none;">
+                    <div class="step-info">
+                        <span>Iteration <strong id="current-iter">0</strong> of <span id="total-iter">?</span></span>
+                        <span class="step-position">x<sub id="iter-sub">0</sub> = <span id="current-x">?</span></span>
+                    </div>
+                    <div class="step-buttons">
+                        <button class="secondary-button" onclick="stepBackward()" id="step-back-btn" disabled>
+                            ← Previous
+                        </button>
+                        <button class="primary-button" onclick="stepForward()" id="step-forward-btn">
+                            Next Step →
+                        </button>
+                        <button class="secondary-button" onclick="jumpToEnd()">
+                            Skip to End ⏭
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="graphs-row">
+                    <div class="graph-container">
+                        <div id="cobweb-graph" style="width: 100%; height: 350px;"></div>
+                    </div>
+                    <div class="graph-container">
+                        <div id="sequence-graph" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
+                
+                <div class="step-table-container">
+                    <table class="step-table" id="step-table">
+                        <thead>
+                            <tr>
+                                <th>n</th>
+                                <th>xₙ</th>
+                                <th>g(xₙ) = xₙ₊₁</th>
+                                <th>|xₙ₊₁ − xₙ|</th>
+                            </tr>
+                        </thead>
+                        <tbody id="step-table-body">
+                            <tr><td colspan="4" style="color: var(--text-muted); padding: 2rem;">Click "Run Iteration" or "Step-by-Step" to begin</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="dynamic-insights" class="dynamic-insights" style="display: none;">
+                    <h4>💡 Insights</h4>
+                    <ul id="insights-list"></ul>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('intro')">
+                    ← Back to Introduction
+                </button>
+                <button class="nav-button" onclick="switchTab('challenge')">
+                    Try Challenges →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== CHALLENGE TAB ==================== -->
+        <div id="challenge-tab" class="tab-content">
+            <div class="section">
+                <h2>Challenge Types</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Select a challenge type to practice. Each generates unlimited problems.</p>
+                
+                <div class="challenge-type-cards">
+                    <div class="challenge-type-card" data-type="compute-iterations" onclick="selectChallengeType('compute-iterations')">
+                        <div class="challenge-type-icon">🔢</div>
+                        <h4>Compute Iterations</h4>
+                        <p>Calculate x₁, x₂, x₃ from x₀</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="predict-behavior" onclick="selectChallengeType('predict-behavior')">
+                        <div class="challenge-type-icon">🔮</div>
+                        <h4>Predict Behavior</h4>
+                        <p>Will it converge or diverge?</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="choose-rearrangement" onclick="selectChallengeType('choose-rearrangement')">
+                        <div class="challenge-type-icon">🎯</div>
+                        <h4>Choose Rearrangement</h4>
+                        <p>Which g(x) will converge?</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem Area -->
+            <div id="problem-area" class="problem-area" style="display: none;">
+                <div class="problem-header">
+                    <span class="problem-type-badge" id="problem-type-label">Compute Iterations</span>
+                    <span class="problem-number" id="problem-number">Problem #1</span>
+                </div>
+                
+                <div class="problem-question" id="problem-question"></div>
+                
+                <div class="problem-input-area" id="problem-input-area"></div>
+                
+                <button class="primary-button" onclick="checkAnswer()">
+                    ✓ Check Answer
+                </button>
+                
+                <div id="problem-feedback" class="problem-feedback"></div>
+                
+                <!-- Worked Example -->
+                <div class="worked-example-container">
+                    <button class="worked-example-toggle" onclick="toggleWorkedExample()">
+                        <span class="toggle-icon">▶</span>
+                        <span>📖 See Worked Example</span>
+                    </button>
+                    
+                    <div id="worked-example-content" class="worked-example-content">
+                        <div class="worked-example-header">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                <line x1="8" y1="6" x2="16" y2="6"/>
+                                <line x1="8" y1="10" x2="14" y2="10"/>
+                            </svg>
+                            <div>
+                                <h4 style="margin: 0; color: var(--primary);">Worked Example</h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Step-by-step solution</p>
+                            </div>
+                        </div>
+                        <div id="worked-example-steps" class="worked-example-steps"></div>
+                    </div>
+                </div>
+                
+                <div class="generate-new-container">
+                    <button class="secondary-button" onclick="generateNewProblem()">
+                        🔄 Generate New Problem
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Initial prompt -->
+            <div id="challenge-prompt" class="challenge-prompt">
+                <p>👆 Select a challenge type above to begin practicing</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    ← Back to Explorer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    window.addEventListener('load', function() {
+        // ============ STATE ============
+        let state = {
+            compiledG: null,
+            stepMode: false,
+            currentStepIndex: 0,
+            allSteps: [],
+            converged: null,
+            fixedPoint: null
+        };
+        
+        // ============ DOM REFS ============
+        const DOM = {
+            presetPills: document.getElementById('preset-pills'),
+            gInput: document.getElementById('g-input'),
+            gPreview: document.getElementById('g-preview'),
+            x0Input: document.getElementById('x0-input'),
+            tolInput: document.getElementById('tol-input'),
+            maxIterInput: document.getElementById('max-iter-input'),
+            stepTableBody: document.getElementById('step-table-body'),
+            resultStatus: document.getElementById('result-status'),
+            resultIterations: document.getElementById('result-iterations'),
+            resultFixedPoint: document.getElementById('result-fixed-point'),
+            resultDerivative: document.getElementById('result-derivative'),
+            statusBox: document.getElementById('status-box'),
+            dynamicInsights: document.getElementById('dynamic-insights'),
+            insightsList: document.getElementById('insights-list')
+        };
+        
+        // ============ PRESETS ============
+        const PRESETS = {
+            "cos(x)": {
+                g: "cos(x)",
+                gLabel: "cos(x)",
+                x0: 0.5,
+                converges: true,
+                fixedPoint: 0.7390851332
+            },
+            "∛(x+1) ✓": {
+                g: "(x+1)^(1/3)",
+                gLabel: "∛(x+1)",
+                x0: 1,
+                converges: true,
+                fixedPoint: 1.3247179572
+            },
+            "x³−1 ✗": {
+                g: "x^3 - 1",
+                gLabel: "x³ − 1",
+                x0: 1,
+                converges: false,
+                fixedPoint: 1.3247179572
+            },
+            "√(x+2)": {
+                g: "sqrt(x+2)",
+                gLabel: "√(x+2)",
+                x0: 1,
+                converges: true,
+                fixedPoint: 2
+            },
+            "(x+2)/x": {
+                g: "(x+2)/x",
+                gLabel: "(x+2)/x",
+                x0: 1,
+                converges: false,
+                fixedPoint: 2
+            },
+            "2cos(x)": {
+                g: "2*cos(x)",
+                gLabel: "2cos(x)",
+                x0: 1,
+                converges: false,
+                fixedPoint: null
+            },
+            "exp(-x)": {
+                g: "exp(-x)",
+                gLabel: "e⁻ˣ",
+                x0: 0.5,
+                converges: true,
+                fixedPoint: 0.5671432904
+            },
+            "½(x+2/x)": {
+                g: "0.5*(x + 2/x)",
+                gLabel: "½(x + 2/x)",
+                x0: 1,
+                converges: true,
+                fixedPoint: Math.sqrt(2)
+            }
+        };
+        
+        // ============ INITIALIZATION ============
+        function initialize() {
+            // Build preset pills
+            Object.entries(PRESETS).forEach(([name, preset]) => {
+                const pill = document.createElement('button');
+                pill.className = 'preset-pill';
+                if (preset.converges === true) pill.classList.add('converges');
+                else if (preset.converges === false) pill.classList.add('diverges');
+                pill.innerHTML = preset.gLabel;
+                pill.dataset.name = name;
+                pill.onclick = () => loadPreset(name);
+                DOM.presetPills.appendChild(pill);
+            });
+            
+            // Event listeners
+            DOM.gInput.addEventListener('input', updateGPreview);
+            
+            // Render intro formulas
+            renderIntroFormulas();
+            
+            // Load default
+            loadPreset("cos(x)");
+        }
+        
+        function renderIntroFormulas() {
+            if (typeof katex === 'undefined') return;
+            
+            try {
+                katex.render("x_{n+1} = g(x_n)", document.getElementById('iteration-formula'), {displayMode: false});
+                katex.render("x^* = g(x^*)", document.getElementById('fixed-point-def'), {displayMode: false});
+                katex.render("x_0 \\to x_1 \\to x_2 \\to \\cdots", document.getElementById('iteration-def'), {displayMode: false});
+                katex.render("|g'(x^*)| < 1", document.getElementById('convergence-def'), {displayMode: false});
+            } catch (e) {
+                console.error('KaTeX render error:', e);
+            }
+        }
+        
+        function loadPreset(name) {
+            const preset = PRESETS[name];
+            if (!preset) return;
+            
+            DOM.gInput.value = preset.g;
+            DOM.x0Input.value = preset.x0;
+            
+            state.fixedPoint = preset.fixedPoint;
+            
+            // Update pill styling
+            document.querySelectorAll('.preset-pill').forEach(pill => {
+                pill.classList.toggle('active', pill.dataset.name === name);
+            });
+            
+            updateGPreview();
+        }
+        
+        function updateGPreview() {
+            const gStr = DOM.gInput.value.trim();
+            
+            if (!gStr) {
+                DOM.gPreview.innerHTML = '<span class="preview-label">Enter g(x) above</span>';
+                return;
+            }
+            
+            const latex = mathToLatex(gStr);
+            DOM.gPreview.innerHTML = '<span class="preview-label">g(x) =</span> <span id="g-latex"></span>';
+            
+            if (typeof katex !== 'undefined') {
+                try {
+                    katex.render(latex, document.getElementById('g-latex'), { displayMode: false });
+                } catch (e) {
+                    DOM.gPreview.innerHTML = `<span class="preview-label">g(x) = ${gStr}</span>`;
+                }
+            } else {
+                DOM.gPreview.innerHTML = `<span class="preview-label">g(x) = ${gStr}</span>`;
+            }
+        }
+        
+        function mathToLatex(str) {
+            return str
+                .replace(/\*\*/g, '^')
+                .replace(/\*/g, ' \\cdot ')
+                .replace(/sqrt\(([^)]+)\)/g, '\\sqrt{$1}')
+                .replace(/\(([^)]+)\)\^\(1\/3\)/g, '\\sqrt[3]{$1}')
+                .replace(/exp\(([^)]+)\)/g, 'e^{$1}')
+                .replace(/sin\(([^)]+)\)/g, '\\sin($1)')
+                .replace(/cos\(([^)]+)\)/g, '\\cos($1)')
+                .replace(/tan\(([^)]+)\)/g, '\\tan($1)')
+                .replace(/log\(([^)]+)\)/g, '\\ln($1)')
+                .replace(/pi/g, '\\pi')
+                .replace(/\^2/g, '^{2}')
+                .replace(/\^3/g, '^{3}');
+        }
+        
+        // ============ FIXED-POINT ITERATION ============
+        function fixedPointIteration(g, x0, tol, maxIter) {
+            const steps = [];
+            let x = x0;
+            let converged = false;
+            
+            for (let n = 0; n < maxIter; n++) {
+                let gx;
+                try {
+                    gx = g(x);
+                } catch (e) {
+                    break;
+                }
+                
+                // Check for divergence
+                if (!isFinite(gx) || Math.abs(gx) > 1e10) {
+                    steps.push({
+                        n: n,
+                        x: x,
+                        gx: gx,
+                        diff: Math.abs(gx - x)
+                    });
+                    break;
+                }
+                
+                const diff = Math.abs(gx - x);
+                
+                steps.push({
+                    n: n,
+                    x: x,
+                    gx: gx,
+                    diff: diff
+                });
+                
+                if (diff < tol) {
+                    converged = true;
+                    // Add final step
+                    steps.push({
+                        n: n + 1,
+                        x: gx,
+                        gx: g(gx),
+                        diff: Math.abs(g(gx) - gx)
+                    });
+                    break;
+                }
+                
+                x = gx;
+            }
+            
+            return { steps: steps, converged: converged };
+        }
+        
+        // ============ RUN ITERATION ============
+        window.runIteration = function() {
+            const gStr = DOM.gInput.value.trim();
+            const x0 = parseFloat(DOM.x0Input.value);
+            const tol = parseFloat(DOM.tolInput.value);
+            const maxIter = parseInt(DOM.maxIterInput.value);
+            
+            if (!gStr) {
+                alert('Please enter a function g(x)');
+                return;
+            }
+            
+            if (typeof math === 'undefined') {
+                alert('Math library not loaded. Please refresh the page.');
+                return;
+            }
+            
+            try {
+                const compiled = math.compile(gStr);
+                state.compiledG = compiled;
+                const g = (x) => compiled.evaluate({ x: x });
+                
+                const result = fixedPointIteration(g, x0, tol, maxIter);
+                
+                state.allSteps = result.steps;
+                state.converged = result.converged;
+                state.stepMode = false;
+                
+                displayResults(result);
+                buildStepTable(result.steps);
+                plotCobweb(g, result.steps, x0);
+                plotSequence(result.steps);
+                updateInsights(result);
+                
+            } catch (e) {
+                alert('Error parsing function: ' + e.message);
+            }
+        };
+        
+        // ============ STEP MODE ============
+        window.startStepMode = function() {
+            const gStr = DOM.gInput.value.trim();
+            const x0 = parseFloat(DOM.x0Input.value);
+            const tol = parseFloat(DOM.tolInput.value);
+            const maxIter = parseInt(DOM.maxIterInput.value);
+            
+            if (!gStr) {
+                alert('Please enter a function g(x)');
+                return;
+            }
+            
+            if (typeof math === 'undefined') {
+                alert('Math library not loaded. Please refresh the page.');
+                return;
+            }
+            
+            try {
+                const compiled = math.compile(gStr);
+                state.compiledG = compiled;
+                const g = (x) => compiled.evaluate({ x: x });
+                
+                const result = fixedPointIteration(g, x0, tol, maxIter);
+                
+                state.allSteps = result.steps;
+                state.converged = result.converged;
+                state.stepMode = true;
+                state.currentStepIndex = 0;
+                
+                // Show step controls
+                document.getElementById('step-controls').style.display = 'block';
+                document.getElementById('total-iter').textContent = result.steps.length - 1;
+                
+                // Clear table
+                DOM.stepTableBody.innerHTML = '';
+                
+                // Show first step
+                updateStepDisplay();
+                addStepToTable(result.steps[0]);
+                plotCobweb(g, [result.steps[0]], x0);
+                plotSequence(result.steps.slice(0, 1));
+                
+            } catch (e) {
+                alert('Error parsing function: ' + e.message);
+            }
+        };
+        
+        window.stepForward = function() {
+            if (state.currentStepIndex < state.allSteps.length - 1) {
+                state.currentStepIndex++;
+                updateStepDisplay();
+                addStepToTable(state.allSteps[state.currentStepIndex]);
+                
+                const g = (x) => state.compiledG.evaluate({ x: x });
+                const x0 = parseFloat(DOM.x0Input.value);
+                plotCobweb(g, state.allSteps.slice(0, state.currentStepIndex + 1), x0);
+                plotSequence(state.allSteps.slice(0, state.currentStepIndex + 1));
+                highlightCurrentRow();
+            }
+        };
+        
+        window.stepBackward = function() {
+            if (state.currentStepIndex > 0) {
+                state.currentStepIndex--;
+                updateStepDisplay();
+                
+                // Remove last row
+                const rows = DOM.stepTableBody.querySelectorAll('tr');
+                if (rows.length > state.currentStepIndex + 1) {
+                    rows[rows.length - 1].remove();
+                }
+                
+                const g = (x) => state.compiledG.evaluate({ x: x });
+                const x0 = parseFloat(DOM.x0Input.value);
+                plotCobweb(g, state.allSteps.slice(0, state.currentStepIndex + 1), x0);
+                plotSequence(state.allSteps.slice(0, state.currentStepIndex + 1));
+                highlightCurrentRow();
+            }
+        };
+        
+        window.jumpToEnd = function() {
+            state.stepMode = false;
+            document.getElementById('step-controls').style.display = 'none';
+            
+            const result = { steps: state.allSteps, converged: state.converged };
+            displayResults(result);
+            buildStepTable(state.allSteps);
+            
+            const g = (x) => state.compiledG.evaluate({ x: x });
+            const x0 = parseFloat(DOM.x0Input.value);
+            plotCobweb(g, state.allSteps, x0);
+            plotSequence(state.allSteps);
+            updateInsights(result);
+        };
+        
+        function updateStepDisplay() {
+            const step = state.allSteps[state.currentStepIndex];
+            document.getElementById('current-iter').textContent = state.currentStepIndex;
+            document.getElementById('iter-sub').textContent = state.currentStepIndex;
+            document.getElementById('current-x').textContent = step.x.toFixed(6);
+            
+            document.getElementById('step-back-btn').disabled = state.currentStepIndex === 0;
+            document.getElementById('step-forward-btn').disabled = state.currentStepIndex >= state.allSteps.length - 1;
+        }
+        
+        function highlightCurrentRow() {
+            DOM.stepTableBody.querySelectorAll('tr').forEach((row, i) => {
+                row.classList.toggle('highlight-row', i === state.currentStepIndex);
+            });
+        }
+        
+        // ============ DISPLAY FUNCTIONS ============
+        function displayResults(result) {
+            const lastStep = result.steps[result.steps.length - 1];
+            
+            DOM.resultIterations.textContent = result.steps.length - 1;
+            
+            if (result.converged) {
+                DOM.resultStatus.textContent = '✓ Converged';
+                DOM.statusBox.classList.remove('diverged');
+                DOM.statusBox.classList.add('converged');
+                DOM.resultFixedPoint.textContent = lastStep.x.toFixed(8);
+                
+                // Estimate derivative using finite differences
+                if (result.steps.length >= 3) {
+                    const n = result.steps.length - 1;
+                    const ratio = Math.abs(result.steps[n].diff / result.steps[n-1].diff);
+                    DOM.resultDerivative.textContent = '≈ ' + ratio.toFixed(3);
+                } else {
+                    DOM.resultDerivative.textContent = '—';
+                }
+            } else {
+                DOM.resultStatus.textContent = '✗ Diverged';
+                DOM.statusBox.classList.remove('converged');
+                DOM.statusBox.classList.add('diverged');
+                DOM.resultFixedPoint.textContent = 'N/A';
+                DOM.resultDerivative.textContent = '> 1';
+            }
+        }
+        
+        function buildStepTable(steps) {
+            let html = '';
+            
+            steps.forEach((step, i) => {
+                const isLast = i === steps.length - 1;
+                html += `<tr class="${isLast ? 'highlight-row' : ''}">
+                    <td>${step.n}</td>
+                    <td>${step.x.toFixed(8)}</td>
+                    <td>${isFinite(step.gx) ? step.gx.toFixed(8) : 'undefined'}</td>
+                    <td>${isFinite(step.diff) ? step.diff.toExponential(3) : '—'}</td>
+                </tr>`;
+            });
+            
+            DOM.stepTableBody.innerHTML = html;
+        }
+        
+        function addStepToTable(step) {
+            const row = `<tr class="highlight-row">
+                <td>${step.n}</td>
+                <td>${step.x.toFixed(8)}</td>
+                <td>${isFinite(step.gx) ? step.gx.toFixed(8) : 'undefined'}</td>
+                <td>${isFinite(step.diff) ? step.diff.toExponential(3) : '—'}</td>
+            </tr>`;
+            
+            DOM.stepTableBody.querySelectorAll('tr').forEach(r => r.classList.remove('highlight-row'));
+            DOM.stepTableBody.insertAdjacentHTML('beforeend', row);
+        }
+        
+        function plotCobweb(g, steps, x0) {
+            if (typeof Plotly === 'undefined') {
+                console.error('Plotly not loaded');
+                return;
+            }
+            
+            // Determine range
+            let xMin = x0, xMax = x0;
+            steps.forEach(s => {
+                if (isFinite(s.x)) {
+                    xMin = Math.min(xMin, s.x);
+                    xMax = Math.max(xMax, s.x);
+                }
+                if (isFinite(s.gx)) {
+                    xMin = Math.min(xMin, s.gx);
+                    xMax = Math.max(xMax, s.gx);
+                }
+            });
+            
+            const padding = Math.max((xMax - xMin) * 0.3, 0.5);
+            xMin -= padding;
+            xMax += padding;
+            
+            // Generate curves
+            const xVals = [];
+            const gVals = [];
+            const yxVals = [];
+            
+            for (let x = xMin; x <= xMax; x += (xMax - xMin) / 200) {
+                xVals.push(x);
+                yxVals.push(x);
+                try {
+                    const gx = g(x);
+                    gVals.push(isFinite(gx) && Math.abs(gx) < 1e10 ? gx : null);
+                } catch (e) {
+                    gVals.push(null);
+                }
+            }
+            
+            // Build cobweb path
+            const cobwebX = [x0];
+            const cobwebY = [0];
+            
+            for (let i = 0; i < steps.length - 1; i++) {
+                const s = steps[i];
+                if (!isFinite(s.x) || !isFinite(s.gx)) break;
+                
+                // Up to g(x)
+                cobwebX.push(s.x);
+                cobwebY.push(s.gx);
+                
+                // Across to y = x
+                cobwebX.push(s.gx);
+                cobwebY.push(s.gx);
+            }
+            
+            const traces = [
+                // y = g(x)
+                {
+                    x: xVals,
+                    y: gVals,
+                    mode: 'lines',
+                    name: 'y = g(x)',
+                    line: { color: '#6366f1', width: 2 }
+                },
+                // y = x
+                {
+                    x: xVals,
+                    y: yxVals,
+                    mode: 'lines',
+                    name: 'y = x',
+                    line: { color: '#94a3b8', width: 2, dash: 'dash' }
+                },
+                // Cobweb
+                {
+                    x: cobwebX,
+                    y: cobwebY,
+                    mode: 'lines',
+                    name: 'Cobweb',
+                    line: { color: state.converged ? '#10b981' : '#ef4444', width: 2 }
+                },
+                // Starting point
+                {
+                    x: [x0],
+                    y: [0],
+                    mode: 'markers',
+                    name: 'x₀',
+                    marker: { color: '#f59e0b', size: 10 }
+                }
+            ];
+            
+            // Current point marker
+            if (steps.length > 0) {
+                const last = steps[steps.length - 1];
+                if (isFinite(last.x)) {
+                    traces.push({
+                        x: [last.x],
+                        y: [last.x],
+                        mode: 'markers',
+                        name: 'Current',
+                        marker: { color: state.converged ? '#10b981' : '#ef4444', size: 12, symbol: 'diamond' }
+                    });
+                }
+            }
+            
+            const layout = {
+                title: 'Cobweb Diagram',
+                xaxis: { title: 'x', range: [xMin, xMax] },
+                yaxis: { title: 'y', range: [xMin, xMax] },
+                legend: { x: 0, y: 1, bgcolor: 'rgba(255,255,255,0.8)' },
+                margin: { t: 40, r: 20, b: 40, l: 50 },
+                aspectratio: { x: 1, y: 1 }
+            };
+            
+            Plotly.newPlot('cobweb-graph', traces, layout, { responsive: true });
+        }
+        
+        function plotSequence(steps) {
+            if (typeof Plotly === 'undefined') return;
+            
+            const nVals = steps.map(s => s.n);
+            const xVals = steps.map(s => isFinite(s.x) ? s.x : null);
+            
+            const traces = [
+                {
+                    x: nVals,
+                    y: xVals,
+                    mode: 'lines+markers',
+                    name: 'xₙ',
+                    line: { color: state.converged ? '#10b981' : '#ef4444', width: 2 },
+                    marker: { size: 8 }
+                }
+            ];
+            
+            // Add fixed point line if known
+            if (state.fixedPoint && state.converged) {
+                traces.push({
+                    x: [0, Math.max(...nVals)],
+                    y: [state.fixedPoint, state.fixedPoint],
+                    mode: 'lines',
+                    name: 'x* (exact)',
+                    line: { color: '#6366f1', width: 1, dash: 'dash' }
+                });
+            }
+            
+            const layout = {
+                title: 'Sequence xₙ',
+                xaxis: { title: 'n', dtick: 1 },
+                yaxis: { title: 'xₙ' },
+                legend: { x: 1, y: 1, xanchor: 'right', bgcolor: 'rgba(255,255,255,0.8)' },
+                margin: { t: 40, r: 20, b: 40, l: 50 }
+            };
+            
+            Plotly.newPlot('sequence-graph', traces, layout, { responsive: true });
+        }
+        
+        function updateInsights(result) {
+            DOM.dynamicInsights.style.display = 'block';
+            const insights = [];
+            
+            if (result.converged) {
+                const lastStep = result.steps[result.steps.length - 1];
+                insights.push(`Converged to x* ≈ ${lastStep.x.toFixed(6)} in ${result.steps.length - 1} iterations`);
+                
+                if (result.steps.length >= 3) {
+                    const n = result.steps.length - 1;
+                    const ratio = Math.abs(result.steps[n].diff / result.steps[n-1].diff);
+                    insights.push(`Error ratio ≈ ${ratio.toFixed(3)} suggests |g'(x*)| ≈ ${ratio.toFixed(3)}`);
+                    insights.push(`Since ${ratio.toFixed(3)} < 1, the iteration is linearly convergent`);
+                }
+                
+                if (state.fixedPoint) {
+                    const error = Math.abs(lastStep.x - state.fixedPoint);
+                    insights.push(`Actual error: ${error.toExponential(3)}`);
+                }
+            } else {
+                insights.push('The iteration diverged — |g\'(x*)| > 1 near the fixed point');
+                insights.push('Try a different rearrangement of the same equation');
+                insights.push('The cobweb spirals outward, showing errors growing');
+            }
+            
+            DOM.insightsList.innerHTML = insights.map(i => `<li>${i}</li>`).join('');
+        }
+        
+        window.resetExplorer = function() {
+            DOM.stepTableBody.innerHTML = '<tr><td colspan="4" style="color: var(--text-muted); padding: 2rem;">Click "Run Iteration" or "Step-by-Step" to begin</td></tr>';
+            DOM.resultStatus.textContent = '—';
+            DOM.resultIterations.textContent = '—';
+            DOM.resultFixedPoint.textContent = '—';
+            DOM.resultDerivative.textContent = '—';
+            DOM.statusBox.classList.remove('converged', 'diverged');
+            DOM.dynamicInsights.style.display = 'none';
+            document.getElementById('step-controls').style.display = 'none';
+            
+            state.stepMode = false;
+            state.currentStepIndex = 0;
+            state.allSteps = [];
+            state.converged = null;
+            
+            if (typeof Plotly !== 'undefined') {
+                Plotly.purge('cobweb-graph');
+                Plotly.purge('sequence-graph');
+            }
+        };
+        
+        // ============ TAB SWITCHING ============
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.tab-button').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        };
+        
+        // ============ CHALLENGE TAB ============
+        let challengeState = {
+            currentType: null,
+            currentProblem: null,
+            problemCount: { 'compute-iterations': 0, 'predict-behavior': 0, 'choose-rearrangement': 0 }
+        };
+        
+        window.selectChallengeType = function(type) {
+            challengeState.currentType = type;
+            
+            document.querySelectorAll('.challenge-type-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.type === type);
+            });
+            
+            document.getElementById('challenge-prompt').style.display = 'none';
+            document.getElementById('problem-area').style.display = 'block';
+            
+            const typeLabels = {
+                'compute-iterations': 'Compute Iterations',
+                'predict-behavior': 'Predict Behavior',
+                'choose-rearrangement': 'Choose Rearrangement'
+            };
+            document.getElementById('problem-type-label').textContent = typeLabels[type];
+            
+            generateNewProblem();
+        };
+        
+        window.generateNewProblem = function() {
+            const type = challengeState.currentType;
+            if (!type) return;
+            
+            challengeState.problemCount[type]++;
+            document.getElementById('problem-number').textContent = `Problem #${challengeState.problemCount[type]}`;
+            
+            // Reset feedback
+            const feedback = document.getElementById('problem-feedback');
+            feedback.className = 'problem-feedback';
+            feedback.innerHTML = '';
+            
+            // Close worked example
+            document.querySelector('.worked-example-toggle').classList.remove('open');
+            document.getElementById('worked-example-content').classList.remove('show');
+            
+            if (type === 'compute-iterations') {
+                generateComputeIterationsProblem();
+            } else if (type === 'predict-behavior') {
+                generatePredictBehaviorProblem();
+            } else if (type === 'choose-rearrangement') {
+                generateChooseRearrangementProblem();
+            }
+        };
+        
+        function generateComputeIterationsProblem() {
+            const scenarios = [
+                { g: x => Math.cos(x), gLabel: 'cos(x)', x0: 0.5 },
+                { g: x => Math.exp(-x), gLabel: 'e⁻ˣ', x0: 0.5 },
+                { g: x => Math.sqrt(x + 2), gLabel: '√(x+2)', x0: 1 },
+                { g: x => Math.pow(x + 1, 1/3), gLabel: '∛(x+1)', x0: 1 },
+                { g: x => 0.5 * (x + 2/x), gLabel: '½(x + 2/x)', x0: 1 },
+                { g: x => (x + 3) / 4, gLabel: '(x+3)/4', x0: 0 },
+                { g: x => 2 - x*x/4, gLabel: '2 − x²/4', x0: 1 }
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const x0 = scenario.x0;
+            const x1 = scenario.g(x0);
+            const x2 = scenario.g(x1);
+            const x3 = scenario.g(x2);
+            
+            // Randomly ask for x1, x2, or x3
+            const askFor = Math.random() < 0.5 ? 1 : (Math.random() < 0.5 ? 2 : 3);
+            const answers = [x1, x2, x3];
+            
+            challengeState.currentProblem = {
+                type: 'compute-iterations',
+                scenario: scenario,
+                x0: x0,
+                askFor: askFor,
+                answer: answers[askFor - 1],
+                x1: x1, x2: x2, x3: x3
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>For the iteration <strong>g(x) = ${scenario.gLabel}</strong> with <strong>x₀ = ${x0}</strong>:</p>
+                <p>Compute <strong>x${askFor}</strong> (round to 4 decimal places)</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <span>x<sub>${askFor}</sub> = </span>
+                <input type="text" id="challenge-answer-input" placeholder="e.g., 0.8776">
+            `;
+            
+            generateComputeIterationsWorkedExample(scenario, x0, x1, x2, x3);
+        }
+        
+        function generateComputeIterationsWorkedExample(scenario, x0, x1, x2, x3) {
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: x₁ = g(x₀)</div>
+                    <div class="step-content">
+                        x₁ = ${scenario.gLabel.replace('x', `(${x0})`)} = <strong>${x1.toFixed(6)}</strong>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: x₂ = g(x₁)</div>
+                    <div class="step-content">
+                        x₂ = ${scenario.gLabel.replace('x', `(${x1.toFixed(4)})`)} = <strong>${x2.toFixed(6)}</strong>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: x₃ = g(x₂)</div>
+                    <div class="step-content">
+                        x₃ = ${scenario.gLabel.replace('x', `(${x2.toFixed(4)})`)} = <strong>${x3.toFixed(6)}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generatePredictBehaviorProblem() {
+            const scenarios = [
+                { gLabel: 'cos(x)', x0: 0.5, converges: true, reason: '|g\'(x*)| ≈ 0.67 < 1' },
+                { gLabel: '2cos(x)', x0: 1, converges: false, reason: '|g\'(x*)| > 1 (slope too steep)' },
+                { gLabel: '∛(x+1)', x0: 1, converges: true, reason: '|g\'(x*)| ≈ 0.19 < 1' },
+                { gLabel: 'x³ − 1', x0: 1, converges: false, reason: '|g\'(x*)| ≈ 5.26 > 1' },
+                { gLabel: 'e⁻ˣ', x0: 0.5, converges: true, reason: '|g\'(x*)| ≈ 0.57 < 1' },
+                { gLabel: '(x+2)/x', x0: 1, converges: false, reason: 'Oscillates — |g\'(x*)| = 1' },
+                { gLabel: '√(x+2)', x0: 1, converges: true, reason: '|g\'(x*)| = 0.25 < 1' },
+                { gLabel: '½(x + 2/x)', x0: 1, converges: true, reason: 'Newton\'s method for √2' }
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            
+            challengeState.currentProblem = {
+                type: 'predict-behavior',
+                scenario: scenario,
+                answer: scenario.converges ? 'converge' : 'diverge'
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>For <strong>g(x) = ${scenario.gLabel}</strong> starting from <strong>x₀ = ${scenario.x0}</strong>:</p>
+                <p>Will the iteration <strong>converge</strong> or <strong>diverge</strong>?</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <select id="challenge-answer-input">
+                    <option value="">Select...</option>
+                    <option value="converge">Converge</option>
+                    <option value="diverge">Diverge</option>
+                </select>
+            `;
+            
+            generatePredictBehaviorWorkedExample(scenario);
+        }
+        
+        function generatePredictBehaviorWorkedExample(scenario) {
+            const result = scenario.converges ? 'converges' : 'diverges';
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">The iteration function</div>
+                    <div class="step-content">g(x) = ${scenario.gLabel}</div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Analysis</div>
+                    <div class="step-content">${scenario.reason}</div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Conclusion</div>
+                    <div class="step-content">
+                        The iteration <strong>${result}</strong>. 
+                        ${scenario.converges 
+                            ? 'The cobweb spirals inward toward the fixed point.' 
+                            : 'The cobweb spirals outward — errors grow each step.'}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generateChooseRearrangementProblem() {
+            const problems = [
+                {
+                    equation: 'x³ − x − 1 = 0',
+                    options: ['x = ∛(x+1)', 'x = x³ − 1', 'x = (x+1)/x²'],
+                    correctIndex: 0,
+                    explanation: '∛(x+1) has |g\'(x*)| ≈ 0.19 < 1, while x³−1 has |g\'(x*)| ≈ 5.26 > 1'
+                },
+                {
+                    equation: 'x² − 2 = 0 (finding √2)',
+                    options: ['x = 2/x', 'x = ½(x + 2/x)', 'x = x² − 2 + x'],
+                    correctIndex: 1,
+                    explanation: '½(x + 2/x) is the Babylonian method with quadratic convergence!'
+                },
+                {
+                    equation: 'x = cos(x)',
+                    options: ['x = cos(x)', 'x = arccos(x)', 'x = x − cos(x)'],
+                    correctIndex: 0,
+                    explanation: 'cos(x) has |g\'(x*)| ≈ 0.67 < 1, so direct iteration works'
+                },
+                {
+                    equation: 'eˣ = 2',
+                    options: ['x = ln(2)', 'x = eˣ − 2 + x', 'x = 2e⁻ˣ'],
+                    correctIndex: 0,
+                    explanation: 'x = ln(2) gives the answer directly! Sometimes the best "iteration" is solving algebraically.'
+                }
+            ];
+            
+            const problem = problems[Math.floor(Math.random() * problems.length)];
+            
+            challengeState.currentProblem = {
+                type: 'choose-rearrangement',
+                problem: problem,
+                answer: problem.options[problem.correctIndex]
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>For the equation <strong>${problem.equation}</strong>:</p>
+                <p>Which rearrangement will <strong>converge</strong>?</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <select id="challenge-answer-input">
+                    <option value="">Select g(x)...</option>
+                    ${problem.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                </select>
+            `;
+            
+            generateChooseRearrangementWorkedExample(problem);
+        }
+        
+        function generateChooseRearrangementWorkedExample(problem) {
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">The equation</div>
+                    <div class="step-content">${problem.equation}</div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Best choice</div>
+                    <div class="step-content"><strong>g(x) = ${problem.options[problem.correctIndex]}</strong></div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Why?</div>
+                    <div class="step-content">${problem.explanation}</div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        window.checkAnswer = function() {
+            const problem = challengeState.currentProblem;
+            const feedback = document.getElementById('problem-feedback');
+            const input = document.getElementById('challenge-answer-input');
+            const userAnswer = input.value.trim();
+            
+            let isCorrect = false;
+            
+            if (problem.type === 'compute-iterations') {
+                const userNum = parseFloat(userAnswer);
+                isCorrect = Math.abs(userNum - problem.answer) < 0.01;
+            } else {
+                isCorrect = userAnswer === problem.answer;
+            }
+            
+            feedback.classList.add('show');
+            
+            if (isCorrect) {
+                feedback.className = 'problem-feedback show correct';
+                feedback.innerHTML = '✓ Correct! Well done.';
+            } else {
+                feedback.className = 'problem-feedback show incorrect';
+                if (problem.type === 'compute-iterations') {
+                    feedback.innerHTML = `✗ Not quite. x${problem.askFor} = ${problem.answer.toFixed(4)}. See the worked example.`;
+                } else {
+                    feedback.innerHTML = `✗ Not quite. The answer is "${problem.answer}". See the worked example.`;
+                }
+            }
+        };
+        
+        window.toggleWorkedExample = function() {
+            const toggle = document.querySelector('.worked-example-toggle');
+            const content = document.getElementById('worked-example-content');
+            
+            toggle.classList.toggle('open');
+            content.classList.toggle('show');
+        };
+        
+        // Initialize
+        initialize();
+    });
+    </script>
+
+    <!-- Week Navigation -->
+    <div class="week-nav-bar">
+        <a href="../bisection/" class="nav-prev">← Week 1: Bisection</a>
+        <a href="../" class="nav-hub">🏠 All Weeks</a>
+        <a href="../newton/" class="nav-next">Week 3: Newton →</a>
+    </div>
+    
+</body>
+</html>
