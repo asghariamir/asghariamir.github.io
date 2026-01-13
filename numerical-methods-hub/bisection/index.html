@@ -1,1 +1,2284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Root Finding Basics | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Math.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.min.js"></script>
+    
+    <!-- Plotly -->
+    <script defer src="https://cdn.jsdelivr.net/npm/plotly.js@2.27.0/dist/plotly.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0d5d56;
+            --bg-light: #f7faf9;
+            --interactive-bg: #e6fffb;
+            --text-dark: #212121;
+            --text-muted: #4b5563;
+            --border-light: #d1d5db;
+            --accent-amber: #f59e0b;
+            --error-red: #c62828;
+            --success-green: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .tab-button:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section styling */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .section h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--interactive-bg) 0%, white 100%);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Concept Cards */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .concept-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .concept-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.1);
+        }
+        
+        .concept-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .concept-card .formula {
+            background: var(--bg-light);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+        
+        /* Preset Pills */
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preset-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Control Grid */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Function Preview */
+        .function-preview {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--interactive-bg);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            min-height: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .function-preview .preview-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        /* Buttons */
+        .primary-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .primary-button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .primary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .secondary-button {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .secondary-button:hover:not(:disabled) {
+            background: var(--interactive-bg);
+        }
+        
+        .secondary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Results Panel */
+        .results-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .result-box {
+            background: var(--interactive-bg);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .result-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .result-box .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Monaco', monospace;
+        }
+        
+        /* Interval Visualization */
+        .interval-viz {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .interval-bar-container {
+            position: relative;
+            height: 50px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .interval-bar {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary));
+            border-radius: 8px;
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .interval-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        .interval-labels .current {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Step Table */
+        .step-table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .step-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .step-table th, .step-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+        
+        .step-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .step-table tbody tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+        
+        .step-table tbody tr:hover {
+            background: var(--interactive-bg);
+        }
+        
+        .step-table .highlight-row {
+            background: var(--interactive-bg) !important;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .step-table .positive {
+            color: var(--success-green);
+        }
+        
+        .step-table .negative {
+            color: var(--error-red);
+        }
+        
+        /* Graph Container */
+        .graph-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            margin: 1rem 0;
+        }
+        
+        /* Step Controls */
+        .step-controls {
+            background: var(--interactive-bg);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .step-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .step-info span {
+            color: var(--text-dark);
+        }
+        
+        .step-position {
+            font-family: 'Monaco', monospace;
+            background: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .step-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .step-buttons button {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        /* Insights */
+        .dynamic-insights {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+        
+        .dynamic-insights h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dynamic-insights ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .dynamic-insights li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+        }
+        
+        .dynamic-insights li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+        
+        /* Key Formulas */
+        .key-formulas {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        
+        .key-formulas h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .formula-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+        
+        .formula-row:last-child {
+            border-bottom: none;
+        }
+        
+        .formula-label {
+            min-width: 140px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .formula-math {
+            flex: 1;
+        }
+        
+        /* Perspectives */
+        .perspectives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .perspective-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .perspective-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .perspective-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Challenge Tab Styles */
+        .challenge-type-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .challenge-type-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .challenge-type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.15);
+        }
+        
+        .challenge-type-card.active {
+            border-color: var(--primary);
+            background: var(--interactive-bg);
+        }
+        
+        .challenge-type-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .challenge-type-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .challenge-type-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        .challenge-prompt {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+        
+        .problem-area {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid var(--border-light);
+        }
+        
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .problem-type-badge {
+            background: var(--interactive-bg);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .problem-number {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .problem-question {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .problem-input-area {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .problem-input-area input, .problem-input-area select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 200px;
+            max-width: 300px;
+        }
+        
+        .problem-input-area input:focus, .problem-input-area select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .problem-feedback {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .problem-feedback.show {
+            display: block;
+        }
+        
+        .problem-feedback.correct {
+            background: #dcfce7;
+            border: 1px solid var(--success-green);
+            color: #166534;
+        }
+        
+        .problem-feedback.incorrect {
+            background: #fee2e2;
+            border: 1px solid var(--error-red);
+            color: #991b1b;
+        }
+        
+        /* Worked Example */
+        .worked-example-container {
+            margin: 1.5rem 0;
+        }
+        
+        .worked-example-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .worked-example-toggle:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+        
+        .worked-example-toggle.open {
+            border-color: var(--primary);
+            background: white;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .worked-example-toggle.open .toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        .worked-example-content {
+            background: white;
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1.5rem;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .worked-example-content.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .worked-example-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .worked-example-steps {
+            padding-left: 0.5rem;
+        }
+        
+        .worked-example-step {
+            margin-bottom: 1.25rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--interactive-bg);
+        }
+        
+        .worked-example-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .step-label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-content {
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .step-math {
+            background: var(--bg-light);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            text-align: center;
+        }
+        
+        .generate-new-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        /* Nav Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .nav-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-button:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .challenge-type-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    
+        /* Week Navigation Bar */
+        .week-nav-bar {
+            background: white;
+            border-top: 2px solid var(--primary);
+            padding: 1rem;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .week-nav-bar a, .week-nav-bar span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .week-nav-bar .nav-prev,
+        .week-nav-bar .nav-next {
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            background: white;
+        }
+        
+        .week-nav-bar .nav-prev:hover,
+        .week-nav-bar .nav-next:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-hub {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .week-nav-bar .nav-hub:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-disabled {
+            color: var(--text-muted);
+            border: 2px solid var(--border-light);
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        @media (max-width: 600px) {
+            .week-nav-bar {
+                flex-direction: column;
+            }
+            .week-nav-bar a, .week-nav-bar span {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
 
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('intro')">Introduction</button>
+            <button class="tab-button" onclick="switchTab('explorer')">Explorer</button>
+            <button class="tab-button" onclick="switchTab('challenge')">Challenge</button>
+        </div>
+
+        <!-- ==================== INTRODUCTION TAB ==================== -->
+        <div id="intro-tab" class="tab-content active">
+            <div class="hero">
+                <h1>🎯 Root Finding Basics</h1>
+                <p>Learn the foundations of numerical methods: what is an approximation, how do we measure error, and how does the bisection method guarantee finding a root?</p>
+            </div>
+
+            <div class="section">
+                <h2>Why Numerical Methods?</h2>
+                <p>Many equations cannot be solved exactly using algebra or calculus. For example, <em>x = cos(x)</em> has no closed-form solution. Numerical methods give us <strong>controlled approximations</strong> — answers that are "close enough" with known accuracy.</p>
+                
+                <div class="key-formulas" style="margin-top: 1rem;">
+                    <div class="formula-row">
+                        <span class="formula-label">The Problem:</span>
+                        <span class="formula-math">Find <em>x</em> such that <em>f(x) = 0</em></span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">The Challenge:</span>
+                        <span class="formula-math">Exact solutions often don't exist in terms of familiar functions</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-cards">
+                <div class="concept-card">
+                    <div class="icon">📏</div>
+                    <h3>Absolute Error</h3>
+                    <p>The difference between your approximation and the true value. Measures "how far off" you are.</p>
+                    <div class="formula" id="abs-error-formula"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">📊</div>
+                    <h3>Relative Error</h3>
+                    <p>The absolute error as a fraction of the true value. Better for comparing across different scales.</p>
+                    <div class="formula" id="rel-error-formula"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">✂️</div>
+                    <h3>Bisection Method</h3>
+                    <p>If f(a) and f(b) have opposite signs, there's a root between them. Cut the interval in half and repeat!</p>
+                    <div class="formula" id="bisection-formula"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>The Bisection Method</h3>
+                <div class="key-formulas">
+                    <div class="formula-row">
+                        <span class="formula-label">Key Idea:</span>
+                        <span class="formula-math">If f is continuous and f(a)·f(b) < 0, there's at least one root in [a, b]</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Algorithm:</span>
+                        <span class="formula-math">1. Compute midpoint m = (a+b)/2<br>2. Check sign of f(m)<br>3. Replace a or b to keep the sign change<br>4. Repeat</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Error Bound:</span>
+                        <span class="formula-math" id="error-bound-formula"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="perspectives">
+                <div class="perspective-card">
+                    <h4>🔒 Guaranteed Convergence</h4>
+                    <p>Bisection <em>always</em> works for continuous functions with a sign change. The interval shrinks by half each step — you can predict exactly how many steps you need.</p>
+                </div>
+                <div class="perspective-card">
+                    <h4>🐢 Slow but Safe</h4>
+                    <p>Bisection is the "tortoise" of root-finding: reliable but not fast. Each step gains about 0.3 decimal digits of accuracy. Later methods will be faster!</p>
+                </div>
+            </div>
+
+            <div class="section" style="background: var(--interactive-bg);">
+                <h3>📚 Week 1 Connection</h3>
+                <p>This explorer covers the core concepts from Week 1: approximation, error, and the bisection method. Use it to visualize how the interval shrinks and to verify your hand calculations.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <div></div>
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    Try the Explorer →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== EXPLORER TAB ==================== -->
+        <div id="explorer-tab" class="tab-content">
+            <div class="section">
+                <h2>Preset Examples</h2>
+                <div id="preset-pills" class="preset-pills"></div>
+                
+                <div class="control-grid">
+                    <div class="control-group full-width">
+                        <label>Function f(x):</label>
+                        <input type="text" id="func-input" placeholder="e.g., x^2 - 2 or cos(x) - x">
+                        <div id="func-preview" class="function-preview"></div>
+                    </div>
+                    <div class="control-group">
+                        <label>Left endpoint a:</label>
+                        <input type="number" id="a-input" value="1" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Right endpoint b:</label>
+                        <input type="number" id="b-input" value="2" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Tolerance (optional):</label>
+                        <input type="number" id="tol-input" value="0.001" step="0.0001">
+                    </div>
+                    <div class="control-group">
+                        <label>Max iterations:</label>
+                        <input type="number" id="max-iter-input" value="20" min="1" max="50">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <button id="solve-btn" class="primary-button" onclick="runBisection()">
+                        ▶ Run Bisection
+                    </button>
+                    <button id="step-btn" class="secondary-button" onclick="startStepMode()">
+                        👣 Step-by-Step
+                    </button>
+                    <button class="secondary-button" onclick="resetExplorer()">
+                        ↺ Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Results</h2>
+                
+                <div class="results-panel">
+                    <div class="result-box">
+                        <div class="label">Iterations</div>
+                        <div class="value" id="result-iterations">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Root Approximation</div>
+                        <div class="value" id="result-root">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">f(root)</div>
+                        <div class="value" id="result-froot">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Error Bound</div>
+                        <div class="value" id="result-error">—</div>
+                    </div>
+                </div>
+                
+                <!-- Interval Visualization -->
+                <div class="interval-viz" id="interval-viz" style="display: none;">
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">📐 Interval Shrinking</h4>
+                    <div class="interval-bar-container" id="interval-bar-container">
+                        <div class="interval-bar" id="interval-bar">Root is here</div>
+                    </div>
+                    <div class="interval-labels">
+                        <span>[<span id="viz-a">1</span></span>
+                        <span class="current">Current interval: <span id="viz-width">1</span></span>
+                        <span><span id="viz-b">2</span>]</span>
+                    </div>
+                </div>
+                
+                <!-- Step Controls -->
+                <div class="step-controls" id="step-controls" style="display: none;">
+                    <div class="step-info">
+                        <span>Iteration <strong id="current-iter">0</strong> of <span id="total-iter">?</span></span>
+                        <span class="step-position">Interval: [<span id="step-a">?</span>, <span id="step-b">?</span>]</span>
+                    </div>
+                    <div class="step-buttons">
+                        <button class="secondary-button" onclick="stepBackward()" id="step-back-btn" disabled>
+                            ← Previous
+                        </button>
+                        <button class="primary-button" onclick="stepForward()" id="step-forward-btn">
+                            Next Step →
+                        </button>
+                        <button class="secondary-button" onclick="jumpToEnd()">
+                            Skip to End ⏭
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="graph-container">
+                    <div id="bisection-graph" style="width: 100%; height: 350px;"></div>
+                </div>
+                
+                <div class="step-table-container">
+                    <table class="step-table" id="step-table">
+                        <thead>
+                            <tr>
+                                <th>n</th>
+                                <th>a</th>
+                                <th>b</th>
+                                <th>m = (a+b)/2</th>
+                                <th>f(m)</th>
+                                <th>New interval</th>
+                                <th>Width</th>
+                            </tr>
+                        </thead>
+                        <tbody id="step-table-body">
+                            <tr><td colspan="7" style="color: var(--text-muted); padding: 2rem;">Click "Run Bisection" or "Step-by-Step" to begin</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="dynamic-insights" class="dynamic-insights" style="display: none;">
+                    <h4>💡 Insights</h4>
+                    <ul id="insights-list"></ul>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('intro')">
+                    ← Back to Introduction
+                </button>
+                <button class="nav-button" onclick="switchTab('challenge')">
+                    Try Challenges →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== CHALLENGE TAB ==================== -->
+        <div id="challenge-tab" class="tab-content">
+            <div class="section">
+                <h2>Challenge Types</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Select a challenge type to practice. Each generates unlimited problems.</p>
+                
+                <div class="challenge-type-cards">
+                    <div class="challenge-type-card" data-type="bisection-step" onclick="selectChallengeType('bisection-step')">
+                        <div class="challenge-type-icon">✂️</div>
+                        <h4>Bisection Steps</h4>
+                        <p>Compute one bisection iteration</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="error-prediction" onclick="selectChallengeType('error-prediction')">
+                        <div class="challenge-type-icon">🎯</div>
+                        <h4>Error Prediction</h4>
+                        <p>How many steps for a given tolerance?</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="conceptual" onclick="selectChallengeType('conceptual')">
+                        <div class="challenge-type-icon">💭</div>
+                        <h4>Conceptual</h4>
+                        <p>Understanding error and convergence</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem Area -->
+            <div id="problem-area" class="problem-area" style="display: none;">
+                <div class="problem-header">
+                    <span class="problem-type-badge" id="problem-type-label">Bisection Steps</span>
+                    <span class="problem-number" id="problem-number">Problem #1</span>
+                </div>
+                
+                <div class="problem-question" id="problem-question"></div>
+                
+                <div class="problem-input-area" id="problem-input-area"></div>
+                
+                <button class="primary-button" onclick="checkAnswer()">
+                    ✓ Check Answer
+                </button>
+                
+                <div id="problem-feedback" class="problem-feedback"></div>
+                
+                <!-- Worked Example -->
+                <div class="worked-example-container">
+                    <button class="worked-example-toggle" onclick="toggleWorkedExample()">
+                        <span class="toggle-icon">▶</span>
+                        <span>📖 See Worked Example</span>
+                    </button>
+                    
+                    <div id="worked-example-content" class="worked-example-content">
+                        <div class="worked-example-header">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                <line x1="8" y1="6" x2="16" y2="6"/>
+                                <line x1="8" y1="10" x2="14" y2="10"/>
+                            </svg>
+                            <div>
+                                <h4 style="margin: 0; color: var(--primary);">Worked Example</h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Step-by-step solution</p>
+                            </div>
+                        </div>
+                        <div id="worked-example-steps" class="worked-example-steps"></div>
+                    </div>
+                </div>
+                
+                <div class="generate-new-container">
+                    <button class="secondary-button" onclick="generateNewProblem()">
+                        🔄 Generate New Problem
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Initial prompt -->
+            <div id="challenge-prompt" class="challenge-prompt">
+                <p>👆 Select a challenge type above to begin practicing</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    ← Back to Explorer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    window.addEventListener('load', function() {
+        // ============ STATE ============
+        let state = {
+            compiledF: null,
+            exactRoot: null,
+            stepMode: false,
+            currentStepIndex: 0,
+            allSteps: [],
+            originalA: null,
+            originalB: null
+        };
+        
+        // ============ DOM REFS ============
+        const DOM = {
+            presetPills: document.getElementById('preset-pills'),
+            funcInput: document.getElementById('func-input'),
+            funcPreview: document.getElementById('func-preview'),
+            aInput: document.getElementById('a-input'),
+            bInput: document.getElementById('b-input'),
+            tolInput: document.getElementById('tol-input'),
+            maxIterInput: document.getElementById('max-iter-input'),
+            stepTableBody: document.getElementById('step-table-body'),
+            resultIterations: document.getElementById('result-iterations'),
+            resultRoot: document.getElementById('result-root'),
+            resultFroot: document.getElementById('result-froot'),
+            resultError: document.getElementById('result-error'),
+            dynamicInsights: document.getElementById('dynamic-insights'),
+            insightsList: document.getElementById('insights-list'),
+            intervalViz: document.getElementById('interval-viz'),
+            intervalBar: document.getElementById('interval-bar')
+        };
+        
+        // ============ PRESETS ============
+        const PRESETS = {
+            "x² − 2": { 
+                f: "x^2 - 2", 
+                a: 1, b: 2,
+                label: "x² − 2 = 0",
+                exact: Math.sqrt(2)
+            },
+            "x³ − x − 1": { 
+                f: "x^3 - x - 1", 
+                a: 1, b: 2,
+                label: "x³ − x − 1 = 0",
+                exact: 1.3247179572
+            },
+            "cos(x) − x": { 
+                f: "cos(x) - x", 
+                a: 0, b: 1,
+                label: "cos(x) − x = 0",
+                exact: 0.7390851332
+            },
+            "eˣ − 3": { 
+                f: "exp(x) - 3", 
+                a: 1, b: 2,
+                label: "eˣ − 3 = 0",
+                exact: Math.log(3)
+            },
+            "x³ − 0.01": { 
+                f: "x^3 - 0.01", 
+                a: 0, b: 1,
+                label: "x³ − 0.01 = 0",
+                exact: Math.pow(0.01, 1/3)
+            },
+            "sin(x) − 0.5": { 
+                f: "sin(x) - 0.5", 
+                a: 0, b: 1,
+                label: "sin(x) − 0.5 = 0",
+                exact: Math.asin(0.5)
+            }
+        };
+        
+        // ============ INITIALIZATION ============
+        function initialize() {
+            // Build preset pills
+            Object.entries(PRESETS).forEach(([name, preset]) => {
+                const pill = document.createElement('button');
+                pill.className = 'preset-pill';
+                pill.innerHTML = preset.label;
+                pill.dataset.name = name;
+                pill.onclick = () => loadPreset(name);
+                DOM.presetPills.appendChild(pill);
+            });
+            
+            // Event listeners
+            DOM.funcInput.addEventListener('input', updateFuncPreview);
+            
+            // Render intro formulas
+            renderIntroFormulas();
+            
+            // Load default
+            loadPreset("x² − 2");
+        }
+        
+        function renderIntroFormulas() {
+            if (typeof katex === 'undefined') {
+                console.error('KaTeX not loaded');
+                return;
+            }
+            try {
+                katex.render("|x - x^*|", document.getElementById('abs-error-formula'), {displayMode: false});
+                katex.render("\\frac{|x - x^*|}{|x^*|}", document.getElementById('rel-error-formula'), {displayMode: false});
+                katex.render("m = \\frac{a + b}{2}", document.getElementById('bisection-formula'), {displayMode: false});
+                katex.render("\\text{After } n \\text{ steps: error} \\leq \\frac{b-a}{2^n}", document.getElementById('error-bound-formula'), {displayMode: false});
+            } catch (e) {
+                console.error('KaTeX render error:', e);
+            }
+        }
+        
+        function loadPreset(name) {
+            const preset = PRESETS[name];
+            if (!preset) return;
+            
+            DOM.funcInput.value = preset.f;
+            DOM.aInput.value = preset.a;
+            DOM.bInput.value = preset.b;
+            
+            state.exactRoot = preset.exact;
+            
+            // Update pill styling
+            document.querySelectorAll('.preset-pill').forEach(pill => {
+                pill.classList.toggle('active', pill.dataset.name === name);
+            });
+            
+            updateFuncPreview();
+        }
+        
+        function updateFuncPreview() {
+            const funcStr = DOM.funcInput.value.trim();
+            
+            if (!funcStr) {
+                DOM.funcPreview.innerHTML = '<span class="preview-label">Enter a function above</span>';
+                return;
+            }
+            
+            const latex = mathToLatex(funcStr);
+            DOM.funcPreview.innerHTML = '<span class="preview-label">f(x) =</span> <span id="func-latex"></span>';
+            
+            if (typeof katex !== 'undefined') {
+                try {
+                    katex.render(latex, document.getElementById('func-latex'), { displayMode: false });
+                } catch (e) {
+                    DOM.funcPreview.innerHTML = `<span class="preview-label">f(x) = ${funcStr}</span>`;
+                }
+            } else {
+                DOM.funcPreview.innerHTML = `<span class="preview-label">f(x) = ${funcStr}</span>`;
+            }
+        }
+        
+        function mathToLatex(str) {
+            return str
+                .replace(/\*\*/g, '^')
+                .replace(/\*/g, ' \\cdot ')
+                .replace(/sqrt\(([^)]+)\)/g, '\\sqrt{$1}')
+                .replace(/exp\(([^)]+)\)/g, 'e^{$1}')
+                .replace(/sin\(([^)]+)\)/g, '\\sin($1)')
+                .replace(/cos\(([^)]+)\)/g, '\\cos($1)')
+                .replace(/tan\(([^)]+)\)/g, '\\tan($1)')
+                .replace(/log\(([^)]+)\)/g, '\\ln($1)')
+                .replace(/pi/g, '\\pi')
+                .replace(/\^2/g, '^{2}')
+                .replace(/\^3/g, '^{3}');
+        }
+        
+        // ============ BISECTION SOLVER ============
+        function bisection(f, a, b, tol, maxIter) {
+            const steps = [];
+            let fa = f(a);
+            let fb = f(b);
+            
+            if (fa * fb > 0) {
+                return { error: "f(a) and f(b) must have opposite signs", steps: [] };
+            }
+            
+            for (let n = 0; n < maxIter; n++) {
+                const m = (a + b) / 2;
+                const fm = f(m);
+                const width = b - a;
+                
+                let newInterval;
+                if (fa * fm < 0) {
+                    newInterval = `[${a.toFixed(4)}, ${m.toFixed(4)}]`;
+                } else {
+                    newInterval = `[${m.toFixed(4)}, ${b.toFixed(4)}]`;
+                }
+                
+                steps.push({
+                    n: n + 1,
+                    a: a,
+                    b: b,
+                    m: m,
+                    fm: fm,
+                    fa: fa,
+                    fb: fb,
+                    newInterval: newInterval,
+                    width: width
+                });
+                
+                if (Math.abs(fm) < 1e-15 || width / 2 < tol) {
+                    break;
+                }
+                
+                if (fa * fm < 0) {
+                    b = m;
+                    fb = fm;
+                } else {
+                    a = m;
+                    fa = fm;
+                }
+            }
+            
+            return { steps: steps, finalRoot: steps[steps.length - 1].m };
+        }
+        
+        // ============ RUN BISECTION ============
+        window.runBisection = function() {
+            const funcStr = DOM.funcInput.value.trim();
+            const a = parseFloat(DOM.aInput.value);
+            const b = parseFloat(DOM.bInput.value);
+            const tol = parseFloat(DOM.tolInput.value);
+            const maxIter = parseInt(DOM.maxIterInput.value);
+            
+            if (!funcStr) {
+                alert('Please enter a function');
+                return;
+            }
+            
+            if (typeof math === 'undefined') {
+                alert('Math library not loaded. Please refresh the page.');
+                return;
+            }
+            
+            try {
+                const compiled = math.compile(funcStr);
+                state.compiledF = compiled;
+                const f = (x) => compiled.evaluate({ x: x });
+                
+                state.originalA = a;
+                state.originalB = b;
+                
+                const result = bisection(f, a, b, tol, maxIter);
+                
+                if (result.error) {
+                    alert(result.error);
+                    return;
+                }
+                
+                state.allSteps = result.steps;
+                state.stepMode = false;
+                
+                displayResults(result);
+                buildStepTable(result.steps);
+                plotFunction(f, a, b, result.steps);
+                updateIntervalVisualization(result.steps[result.steps.length - 1], a, b);
+                updateInsights(result);
+                
+            } catch (e) {
+                alert('Error parsing function: ' + e.message);
+            }
+        };
+        
+        // ============ STEP MODE ============
+        window.startStepMode = function() {
+            const funcStr = DOM.funcInput.value.trim();
+            const a = parseFloat(DOM.aInput.value);
+            const b = parseFloat(DOM.bInput.value);
+            const tol = parseFloat(DOM.tolInput.value);
+            const maxIter = parseInt(DOM.maxIterInput.value);
+            
+            if (!funcStr) {
+                alert('Please enter a function');
+                return;
+            }
+            
+            if (typeof math === 'undefined') {
+                alert('Math library not loaded. Please refresh the page.');
+                return;
+            }
+            
+            try {
+                const compiled = math.compile(funcStr);
+                state.compiledF = compiled;
+                const f = (x) => compiled.evaluate({ x: x });
+                
+                state.originalA = a;
+                state.originalB = b;
+                
+                const result = bisection(f, a, b, tol, maxIter);
+                
+                if (result.error) {
+                    alert(result.error);
+                    return;
+                }
+                
+                state.allSteps = result.steps;
+                state.stepMode = true;
+                state.currentStepIndex = 0;
+                
+                // Show step controls
+                document.getElementById('step-controls').style.display = 'block';
+                document.getElementById('total-iter').textContent = result.steps.length;
+                
+                // Clear table
+                DOM.stepTableBody.innerHTML = '';
+                
+                // Show first step
+                updateStepDisplay();
+                addStepToTable(result.steps[0]);
+                plotFunction(f, a, b, [result.steps[0]]);
+                updateIntervalVisualization(result.steps[0], a, b);
+                
+            } catch (e) {
+                alert('Error parsing function: ' + e.message);
+            }
+        };
+        
+        window.stepForward = function() {
+            if (state.currentStepIndex < state.allSteps.length - 1) {
+                state.currentStepIndex++;
+                updateStepDisplay();
+                addStepToTable(state.allSteps[state.currentStepIndex]);
+                
+                const f = (x) => state.compiledF.evaluate({ x: x });
+                plotFunction(f, state.originalA, state.originalB, state.allSteps.slice(0, state.currentStepIndex + 1));
+                updateIntervalVisualization(state.allSteps[state.currentStepIndex], state.originalA, state.originalB);
+                highlightCurrentRow();
+            }
+        };
+        
+        window.stepBackward = function() {
+            if (state.currentStepIndex > 0) {
+                state.currentStepIndex--;
+                updateStepDisplay();
+                
+                // Remove last row
+                const rows = DOM.stepTableBody.querySelectorAll('tr');
+                if (rows.length > state.currentStepIndex + 1) {
+                    rows[rows.length - 1].remove();
+                }
+                
+                const f = (x) => state.compiledF.evaluate({ x: x });
+                plotFunction(f, state.originalA, state.originalB, state.allSteps.slice(0, state.currentStepIndex + 1));
+                updateIntervalVisualization(state.allSteps[state.currentStepIndex], state.originalA, state.originalB);
+                highlightCurrentRow();
+            }
+        };
+        
+        window.jumpToEnd = function() {
+            state.stepMode = false;
+            document.getElementById('step-controls').style.display = 'none';
+            
+            const result = { steps: state.allSteps, finalRoot: state.allSteps[state.allSteps.length - 1].m };
+            displayResults(result);
+            buildStepTable(state.allSteps);
+            
+            const f = (x) => state.compiledF.evaluate({ x: x });
+            plotFunction(f, state.originalA, state.originalB, state.allSteps);
+            updateIntervalVisualization(state.allSteps[state.allSteps.length - 1], state.originalA, state.originalB);
+            updateInsights(result);
+        };
+        
+        function updateStepDisplay() {
+            const step = state.allSteps[state.currentStepIndex];
+            document.getElementById('current-iter').textContent = state.currentStepIndex + 1;
+            document.getElementById('step-a').textContent = step.a.toFixed(6);
+            document.getElementById('step-b').textContent = step.b.toFixed(6);
+            
+            document.getElementById('step-back-btn').disabled = state.currentStepIndex === 0;
+            document.getElementById('step-forward-btn').disabled = state.currentStepIndex >= state.allSteps.length - 1;
+            
+            // Update results panel
+            DOM.resultIterations.textContent = state.currentStepIndex + 1;
+            DOM.resultRoot.textContent = step.m.toFixed(8);
+            DOM.resultFroot.textContent = step.fm.toExponential(3);
+            DOM.resultError.textContent = `≤ ${(step.width / 2).toExponential(3)}`;
+        }
+        
+        function highlightCurrentRow() {
+            DOM.stepTableBody.querySelectorAll('tr').forEach((row, i) => {
+                row.classList.toggle('highlight-row', i === state.currentStepIndex);
+            });
+        }
+        
+        // ============ DISPLAY FUNCTIONS ============
+        function displayResults(result) {
+            const lastStep = result.steps[result.steps.length - 1];
+            
+            DOM.resultIterations.textContent = result.steps.length;
+            DOM.resultRoot.textContent = lastStep.m.toFixed(8);
+            DOM.resultFroot.textContent = lastStep.fm.toExponential(3);
+            DOM.resultError.textContent = `≤ ${(lastStep.width / 2).toExponential(3)}`;
+        }
+        
+        function buildStepTable(steps) {
+            let html = '';
+            
+            steps.forEach((step, i) => {
+                const fmClass = step.fm > 0 ? 'positive' : 'negative';
+                html += `<tr class="${i === steps.length - 1 ? 'highlight-row' : ''}">
+                    <td>${step.n}</td>
+                    <td>${step.a.toFixed(6)}</td>
+                    <td>${step.b.toFixed(6)}</td>
+                    <td>${step.m.toFixed(6)}</td>
+                    <td class="${fmClass}">${step.fm.toFixed(6)}</td>
+                    <td>${step.newInterval}</td>
+                    <td>${step.width.toFixed(6)}</td>
+                </tr>`;
+            });
+            
+            DOM.stepTableBody.innerHTML = html;
+        }
+        
+        function addStepToTable(step) {
+            const fmClass = step.fm > 0 ? 'positive' : 'negative';
+            const row = `<tr class="highlight-row">
+                <td>${step.n}</td>
+                <td>${step.a.toFixed(6)}</td>
+                <td>${step.b.toFixed(6)}</td>
+                <td>${step.m.toFixed(6)}</td>
+                <td class="${fmClass}">${step.fm.toFixed(6)}</td>
+                <td>${step.newInterval}</td>
+                <td>${step.width.toFixed(6)}</td>
+            </tr>`;
+            
+            // Remove highlight from previous rows
+            DOM.stepTableBody.querySelectorAll('tr').forEach(r => r.classList.remove('highlight-row'));
+            DOM.stepTableBody.insertAdjacentHTML('beforeend', row);
+        }
+        
+        function updateIntervalVisualization(step, origA, origB) {
+            DOM.intervalViz.style.display = 'block';
+            
+            const origWidth = origB - origA;
+            const currentA = step.a;
+            const currentB = step.b;
+            
+            // Calculate bar position and width as percentage
+            const leftPercent = ((currentA - origA) / origWidth) * 100;
+            const widthPercent = ((currentB - currentA) / origWidth) * 100;
+            
+            DOM.intervalBar.style.left = leftPercent + '%';
+            DOM.intervalBar.style.width = Math.max(widthPercent, 2) + '%';
+            DOM.intervalBar.textContent = widthPercent > 10 ? 'Root is here' : '';
+            
+            document.getElementById('viz-a').textContent = currentA.toFixed(4);
+            document.getElementById('viz-b').textContent = currentB.toFixed(4);
+            document.getElementById('viz-width').textContent = (currentB - currentA).toFixed(6);
+        }
+        
+        function plotFunction(f, origA, origB, steps) {
+            // Check if Plotly is loaded
+            if (typeof Plotly === 'undefined') {
+                console.error('Plotly not loaded');
+                document.getElementById('bisection-graph').innerHTML = '<p style="color: var(--error-red); padding: 2rem; text-align: center;">Graph library loading... Please refresh if this persists.</p>';
+                return;
+            }
+            
+            // Generate function curve
+            const padding = (origB - origA) * 0.2;
+            const xMin = origA - padding;
+            const xMax = origB + padding;
+            
+            const xVals = [];
+            const yVals = [];
+            for (let x = xMin; x <= xMax; x += (xMax - xMin) / 200) {
+                xVals.push(x);
+                try {
+                    yVals.push(f(x));
+                } catch (e) {
+                    yVals.push(null);
+                }
+            }
+            
+            const traces = [
+                // Function curve
+                {
+                    x: xVals,
+                    y: yVals,
+                    mode: 'lines',
+                    name: 'f(x)',
+                    line: { color: '#6366f1', width: 2 }
+                },
+                // Zero line
+                {
+                    x: [xMin, xMax],
+                    y: [0, 0],
+                    mode: 'lines',
+                    name: 'y = 0',
+                    line: { color: '#94a3b8', width: 1, dash: 'dash' },
+                    showlegend: false
+                }
+            ];
+            
+            // Add current interval markers
+            if (steps && steps.length > 0) {
+                const lastStep = steps[steps.length - 1];
+                
+                // Interval shading
+                traces.push({
+                    x: [lastStep.a, lastStep.a, lastStep.b, lastStep.b],
+                    y: [-1000, 1000, 1000, -1000],
+                    fill: 'toself',
+                    fillcolor: 'rgba(16, 185, 129, 0.1)',
+                    line: { color: 'transparent' },
+                    name: 'Current interval',
+                    showlegend: false
+                });
+                
+                // Midpoint marker
+                traces.push({
+                    x: [lastStep.m],
+                    y: [lastStep.fm],
+                    mode: 'markers',
+                    name: 'Midpoint',
+                    marker: { color: '#ef4444', size: 12, symbol: 'circle' }
+                });
+                
+                // Root approximation on x-axis
+                traces.push({
+                    x: [lastStep.m],
+                    y: [0],
+                    mode: 'markers',
+                    name: 'Root approx',
+                    marker: { color: '#10b981', size: 10, symbol: 'diamond' }
+                });
+            }
+            
+            // Calculate y range
+            const yFiltered = yVals.filter(y => y !== null && Math.abs(y) < 100);
+            const yMin = Math.min(...yFiltered) * 1.2;
+            const yMax = Math.max(...yFiltered) * 1.2;
+            
+            const layout = {
+                title: 'Function and Bisection Progress',
+                xaxis: { title: 'x', range: [xMin, xMax] },
+                yaxis: { title: 'f(x)', range: [Math.min(yMin, -1), Math.max(yMax, 1)] },
+                legend: { x: 0, y: 1, bgcolor: 'rgba(255,255,255,0.8)' },
+                margin: { t: 40, r: 20, b: 40, l: 50 }
+            };
+            
+            Plotly.newPlot('bisection-graph', traces, layout, { responsive: true });
+        }
+        
+        function updateInsights(result) {
+            DOM.dynamicInsights.style.display = 'block';
+            const insights = [];
+            const lastStep = result.steps[result.steps.length - 1];
+            
+            insights.push(`After ${result.steps.length} iterations, the interval width is ${lastStep.width.toExponential(3)}`);
+            insights.push(`Error bound: the root is within ${(lastStep.width / 2).toExponential(3)} of ${lastStep.m.toFixed(6)}`);
+            
+            if (state.exactRoot) {
+                const actualError = Math.abs(lastStep.m - state.exactRoot);
+                insights.push(`Actual error: ${actualError.toExponential(3)} (exact root ≈ ${state.exactRoot.toFixed(8)})`);
+            }
+            
+            const stepsFor6Digits = Math.ceil(Math.log2((state.originalB - state.originalA) / 1e-6));
+            insights.push(`To get 6 decimal places accuracy, you'd need ~${stepsFor6Digits} steps`);
+            
+            DOM.insightsList.innerHTML = insights.map(i => `<li>${i}</li>`).join('');
+        }
+        
+        window.resetExplorer = function() {
+            DOM.stepTableBody.innerHTML = '<tr><td colspan="7" style="color: var(--text-muted); padding: 2rem;">Click "Run Bisection" or "Step-by-Step" to begin</td></tr>';
+            DOM.resultIterations.textContent = '—';
+            DOM.resultRoot.textContent = '—';
+            DOM.resultFroot.textContent = '—';
+            DOM.resultError.textContent = '—';
+            DOM.dynamicInsights.style.display = 'none';
+            DOM.intervalViz.style.display = 'none';
+            document.getElementById('step-controls').style.display = 'none';
+            
+            state.stepMode = false;
+            state.currentStepIndex = 0;
+            state.allSteps = [];
+            
+            if (typeof Plotly !== 'undefined') Plotly.purge('bisection-graph');
+        };
+        
+        // ============ TAB SWITCHING ============
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.tab-button').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        };
+        
+        // ============ CHALLENGE TAB ============
+        let challengeState = {
+            currentType: null,
+            currentProblem: null,
+            problemCount: { 'bisection-step': 0, 'error-prediction': 0, 'conceptual': 0 }
+        };
+        
+        window.selectChallengeType = function(type) {
+            challengeState.currentType = type;
+            
+            document.querySelectorAll('.challenge-type-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.type === type);
+            });
+            
+            document.getElementById('challenge-prompt').style.display = 'none';
+            document.getElementById('problem-area').style.display = 'block';
+            
+            const typeLabels = {
+                'bisection-step': 'Bisection Steps',
+                'error-prediction': 'Error Prediction',
+                'conceptual': 'Conceptual'
+            };
+            document.getElementById('problem-type-label').textContent = typeLabels[type];
+            
+            generateNewProblem();
+        };
+        
+        window.generateNewProblem = function() {
+            const type = challengeState.currentType;
+            if (!type) return;
+            
+            challengeState.problemCount[type]++;
+            document.getElementById('problem-number').textContent = `Problem #${challengeState.problemCount[type]}`;
+            
+            // Reset feedback
+            const feedback = document.getElementById('problem-feedback');
+            feedback.className = 'problem-feedback';
+            feedback.innerHTML = '';
+            
+            // Close worked example
+            document.querySelector('.worked-example-toggle').classList.remove('open');
+            document.getElementById('worked-example-content').classList.remove('show');
+            
+            if (type === 'bisection-step') {
+                generateBisectionStepProblem();
+            } else if (type === 'error-prediction') {
+                generateErrorPredictionProblem();
+            } else if (type === 'conceptual') {
+                generateConceptualProblem();
+            }
+        };
+        
+        function generateBisectionStepProblem() {
+            // Random function and interval
+            const scenarios = [
+                { f: 'x^2 - 2', fLabel: 'x² − 2', fFunc: x => x*x - 2, a: 1, b: 2 },
+                { f: 'x^3 - x - 1', fLabel: 'x³ − x − 1', fFunc: x => x*x*x - x - 1, a: 1, b: 2 },
+                { f: 'x^2 - 3', fLabel: 'x² − 3', fFunc: x => x*x - 3, a: 1, b: 2 },
+                { f: 'x^3 - 2', fLabel: 'x³ − 2', fFunc: x => x*x*x - 2, a: 1, b: 2 },
+                { f: 'x^2 - 5', fLabel: 'x² − 5', fFunc: x => x*x - 5, a: 2, b: 3 },
+                { f: 'x^3 + x - 1', fLabel: 'x³ + x − 1', fFunc: x => x*x*x + x - 1, a: 0, b: 1 },
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const a = scenario.a;
+            const b = scenario.b;
+            const m = (a + b) / 2;
+            const fm = scenario.fFunc(m);
+            const fa = scenario.fFunc(a);
+            
+            // Determine new interval
+            let newA, newB;
+            if (fa * fm < 0) {
+                newA = a;
+                newB = m;
+            } else {
+                newA = m;
+                newB = b;
+            }
+            
+            // Ask for midpoint or new interval
+            const askType = Math.random() < 0.5 ? 'midpoint' : 'interval';
+            
+            challengeState.currentProblem = {
+                type: 'bisection-step',
+                askType: askType,
+                scenario: scenario,
+                a: a, b: b, m: m, fm: fm, fa: fa,
+                newA: newA, newB: newB,
+                answer: askType === 'midpoint' ? m : `${newA},${newB}`
+            };
+            
+            if (askType === 'midpoint') {
+                document.getElementById('problem-question').innerHTML = `
+                    <p>For f(x) = <strong>${scenario.fLabel}</strong> on the interval <strong>[${a}, ${b}]</strong>:</p>
+                    <p>What is the <strong>midpoint</strong> m?</p>
+                `;
+                document.getElementById('problem-input-area').innerHTML = `
+                    <input type="text" id="challenge-answer-input" placeholder="Enter the midpoint">
+                `;
+            } else {
+                document.getElementById('problem-question').innerHTML = `
+                    <p>For f(x) = <strong>${scenario.fLabel}</strong> on <strong>[${a}, ${b}]</strong>:</p>
+                    <p>After one bisection step, what is the <strong>new interval</strong>?</p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Hint: f(${a}) = ${fa.toFixed(4)}, f(${m}) = ${fm.toFixed(4)}</p>
+                `;
+                document.getElementById('problem-input-area').innerHTML = `
+                    <span>New interval: [</span>
+                    <input type="text" id="answer-a" placeholder="a" style="width: 80px;">
+                    <span>,</span>
+                    <input type="text" id="answer-b" placeholder="b" style="width: 80px;">
+                    <span>]</span>
+                `;
+            }
+            
+            generateBisectionStepWorkedExample(scenario, a, b, m, fm, fa, newA, newB);
+        }
+        
+        function generateBisectionStepWorkedExample(scenario, a, b, m, fm, fa, newA, newB) {
+            const signFa = fa > 0 ? '+' : '−';
+            const signFm = fm > 0 ? '+' : '−';
+            
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Find the midpoint</div>
+                    <div class="step-content">
+                        m = (a + b) / 2 = (${a} + ${b}) / 2 = <strong>${m}</strong>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Evaluate f(m)</div>
+                    <div class="step-content">
+                        f(${m}) = ${scenario.fLabel.replace('x', `(${m})`)} = <strong>${fm.toFixed(6)}</strong>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Check signs</div>
+                    <div class="step-content">
+                        f(${a}) = ${fa.toFixed(4)} (${signFa})<br>
+                        f(${m}) = ${fm.toFixed(4)} (${signFm})<br>
+                        ${fa * fm < 0 ? `Signs differ on [${a}, ${m}]` : `Signs differ on [${m}, ${b}]`} → root is there
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 4: New interval</div>
+                    <div class="step-content">
+                        <strong>[${newA}, ${newB}]</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generateErrorPredictionProblem() {
+            const intervals = [
+                { a: 0, b: 1, width: 1 },
+                { a: 1, b: 2, width: 1 },
+                { a: 0, b: 2, width: 2 },
+                { a: 1, b: 3, width: 2 },
+                { a: 0, b: 4, width: 4 }
+            ];
+            
+            const tolerances = [0.1, 0.01, 0.001, 0.0001, 1e-5, 1e-6];
+            
+            const interval = intervals[Math.floor(Math.random() * intervals.length)];
+            const tol = tolerances[Math.floor(Math.random() * tolerances.length)];
+            
+            // Calculate required steps: width / 2^n < tol => n > log2(width/tol)
+            const requiredSteps = Math.ceil(Math.log2(interval.width / tol));
+            
+            challengeState.currentProblem = {
+                type: 'error-prediction',
+                interval: interval,
+                tolerance: tol,
+                answer: requiredSteps
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>Starting with interval <strong>[${interval.a}, ${interval.b}]</strong> (width = ${interval.width}):</p>
+                <p>How many bisection steps are needed to guarantee an error less than <strong>${tol}</strong>?</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <input type="number" id="challenge-answer-input" placeholder="Number of steps" min="1">
+            `;
+            
+            generateErrorPredictionWorkedExample(interval, tol, requiredSteps);
+        }
+        
+        function generateErrorPredictionWorkedExample(interval, tol, requiredSteps) {
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Recall the error bound formula</div>
+                    <div class="step-content">
+                        <div class="step-math">After n steps, error ≤ (b − a) / 2ⁿ</div>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Set up the inequality</div>
+                    <div class="step-content">
+                        We need: ${interval.width} / 2ⁿ < ${tol}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Solve for n</div>
+                    <div class="step-content">
+                        2ⁿ > ${interval.width} / ${tol} = ${interval.width / tol}<br>
+                        n > log₂(${interval.width / tol}) = ${Math.log2(interval.width / tol).toFixed(2)}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 4: Round up</div>
+                    <div class="step-content">
+                        n must be an integer, so n ≥ <strong>${requiredSteps}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generateConceptualProblem() {
+            const problems = [
+                {
+                    question: 'Why does bisection always converge for a continuous function with f(a)·f(b) < 0?',
+                    type: 'select',
+                    options: [
+                        'Because computers are fast',
+                        'By the Intermediate Value Theorem, a root must exist in the interval',
+                        'Because the function is always decreasing',
+                        'Because we use the midpoint formula'
+                    ],
+                    answer: 'By the Intermediate Value Theorem, a root must exist in the interval',
+                    explanation: 'The Intermediate Value Theorem guarantees that if f is continuous and f(a) and f(b) have opposite signs, then f must equal zero somewhere between a and b.'
+                },
+                {
+                    question: 'After each bisection step, by what factor does the interval width decrease?',
+                    type: 'select',
+                    options: ['1/4', '1/3', '1/2', '2/3'],
+                    answer: '1/2',
+                    explanation: 'The interval is cut exactly in half each step. After n steps, the width is (original width)/2ⁿ.'
+                },
+                {
+                    question: 'What does bisection give you that faster methods might not?',
+                    type: 'select',
+                    options: [
+                        'Faster convergence',
+                        'Guaranteed convergence with a known error bound',
+                        'The exact root',
+                        'Multiple roots at once'
+                    ],
+                    answer: 'Guaranteed convergence with a known error bound',
+                    explanation: 'Bisection always converges (for continuous functions with a sign change) and gives a precise error bound at each step. Faster methods like Newton\'s may fail to converge.'
+                },
+                {
+                    question: 'If the true root is x* = 1.414... and your approximation is x = 1.4, what is the absolute error?',
+                    type: 'input',
+                    answer: '0.014',
+                    tolerance: 0.001,
+                    explanation: 'Absolute error = |x - x*| = |1.4 - 1.414...| ≈ 0.014'
+                },
+                {
+                    question: 'Approximately how many bisection steps are needed to gain one decimal digit of accuracy?',
+                    type: 'select',
+                    options: ['1 step', '2-3 steps', '3-4 steps', '10 steps'],
+                    answer: '3-4 steps',
+                    explanation: 'Each step halves the error. To reduce error by 10x (one digit), we need 2ⁿ ≥ 10, so n ≥ log₂(10) ≈ 3.32 steps.'
+                },
+                {
+                    question: 'If f(1) = -2 and f(2) = 5, and m = 1.5 gives f(1.5) = 0.8, what is the new interval?',
+                    type: 'select',
+                    options: ['[1, 1.5]', '[1.5, 2]', '[1, 2]', 'Cannot determine'],
+                    answer: '[1, 1.5]',
+                    explanation: 'f(1) = -2 (negative) and f(1.5) = 0.8 (positive). Sign change is in [1, 1.5].'
+                },
+                {
+                    question: 'What happens if you try bisection when f(a) and f(b) have the same sign?',
+                    type: 'select',
+                    options: [
+                        'It still works but slower',
+                        'The method cannot guarantee a root exists in the interval',
+                        'It finds the root faster',
+                        'It finds all roots'
+                    ],
+                    answer: 'The method cannot guarantee a root exists in the interval',
+                    explanation: 'Without a sign change, we have no guarantee that a root exists between a and b. There might be zero, one, or multiple roots.'
+                }
+            ];
+            
+            const problem = problems[Math.floor(Math.random() * problems.length)];
+            
+            challengeState.currentProblem = {
+                type: 'conceptual',
+                ...problem
+            };
+            
+            document.getElementById('problem-question').innerHTML = `<p>${problem.question}</p>`;
+            
+            if (problem.type === 'select') {
+                document.getElementById('problem-input-area').innerHTML = `
+                    <select id="challenge-answer-input">
+                        <option value="">Select an answer...</option>
+                        ${problem.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                    </select>
+                `;
+            } else {
+                document.getElementById('problem-input-area').innerHTML = `
+                    <input type="text" id="challenge-answer-input" placeholder="Enter your answer">
+                `;
+            }
+            
+            generateConceptualWorkedExample(problem);
+        }
+        
+        function generateConceptualWorkedExample(problem) {
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Question</div>
+                    <div class="step-content">${problem.question}</div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Answer</div>
+                    <div class="step-content"><strong>${problem.answer}</strong></div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Explanation</div>
+                    <div class="step-content">${problem.explanation}</div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        window.checkAnswer = function() {
+            const problem = challengeState.currentProblem;
+            const feedback = document.getElementById('problem-feedback');
+            let isCorrect = false;
+            let userAnswer;
+            
+            if (problem.type === 'bisection-step' && problem.askType === 'interval') {
+                const ansA = parseFloat(document.getElementById('answer-a').value);
+                const ansB = parseFloat(document.getElementById('answer-b').value);
+                userAnswer = `${ansA},${ansB}`;
+                isCorrect = Math.abs(ansA - problem.newA) < 0.01 && Math.abs(ansB - problem.newB) < 0.01;
+            } else {
+                const input = document.getElementById('challenge-answer-input');
+                userAnswer = input.value.trim();
+                
+                if (problem.type === 'conceptual' && problem.type === 'select') {
+                    isCorrect = userAnswer === problem.answer;
+                } else if (problem.tolerance) {
+                    const userNum = parseFloat(userAnswer);
+                    const correctNum = parseFloat(problem.answer);
+                    isCorrect = Math.abs(userNum - correctNum) <= problem.tolerance;
+                } else if (typeof problem.answer === 'number') {
+                    const userNum = parseFloat(userAnswer);
+                    isCorrect = Math.abs(userNum - problem.answer) < 0.01;
+                } else {
+                    isCorrect = userAnswer === problem.answer;
+                }
+            }
+            
+            feedback.classList.add('show');
+            
+            if (isCorrect) {
+                feedback.className = 'problem-feedback show correct';
+                feedback.innerHTML = '✓ Correct! Well done.';
+            } else {
+                feedback.className = 'problem-feedback show incorrect';
+                if (problem.type === 'bisection-step' && problem.askType === 'interval') {
+                    feedback.innerHTML = `✗ Not quite. The new interval is [${problem.newA}, ${problem.newB}]. See the worked example.`;
+                } else {
+                    feedback.innerHTML = `✗ Not quite. The answer is ${problem.answer}. See the worked example.`;
+                }
+            }
+        };
+        
+        window.toggleWorkedExample = function() {
+            const toggle = document.querySelector('.worked-example-toggle');
+            const content = document.getElementById('worked-example-content');
+            
+            toggle.classList.toggle('open');
+            content.classList.toggle('show');
+        };
+        
+        // Initialize
+        initialize();
+    });
+    </script>
+
+    <!-- Week Navigation -->
+    <div class="week-nav-bar">
+        <span class="nav-disabled">← No Previous</span>
+        <a href="../" class="nav-hub">🏠 All Weeks</a>
+        <a href="../fixed-point/" class="nav-next">Week 2: Fixed-Point →</a>
+    </div>
+    
+</body>
+</html>
