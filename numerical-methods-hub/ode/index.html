@@ -1,1 +1,2701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ODE Methods Explorer | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Math.js for parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.min.js"></script>
+    
+    <!-- Plotly for graphs -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0d5d56;
+            --bg-light: #f7faf9;
+            --interactive-bg: #e6fffb;
+            --text-dark: #212121;
+            --text-muted: #4b5563;
+            --border-light: #d1d5db;
+            --accent-amber: #f59e0b;
+            --error-red: #c62828;
+            --success-green: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tab-button:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section styling */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .section h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--interactive-bg) 0%, white 100%);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Concept Cards */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .concept-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .concept-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.1);
+        }
+        
+        .concept-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .concept-card .formula {
+            background: var(--bg-light);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+        
+        /* Method Order Badge */
+        .order-badge {
+            display: inline-block;
+            background: var(--interactive-bg);
+            color: var(--primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        /* Preset Pills */
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preset-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Control Grid */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Function Preview */
+        .function-preview {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--interactive-bg);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            min-height: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .function-preview .preview-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        /* Method Selector */
+        .method-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .method-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .method-btn:hover {
+            border-color: var(--primary);
+        }
+        
+        .method-btn.active {
+            border-color: var(--primary);
+            background: var(--interactive-bg);
+        }
+        
+        .method-btn .method-order {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* Buttons */
+        .primary-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .primary-button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .primary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .secondary-button {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .secondary-button:hover {
+            background: var(--interactive-bg);
+        }
+        
+        /* Step Table */
+        .step-table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .step-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .step-table th, .step-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+        
+        .step-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .step-table tbody tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+        
+        .step-table tbody tr:hover {
+            background: var(--interactive-bg);
+        }
+        
+        .step-table .error-cell {
+            color: var(--error-red);
+            font-weight: 500;
+        }
+        
+        .step-table .highlight-row {
+            background: var(--interactive-bg) !important;
+            border-left: 3px solid var(--primary);
+        }
+        
+        /* Graph Container */
+        .graph-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            margin: 1rem 0;
+        }
+        
+        /* Results Panel */
+        .results-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .result-box {
+            background: var(--interactive-bg);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .result-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .result-box .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Monaco', monospace;
+        }
+        
+        /* Insights */
+        .dynamic-insights {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+        
+        .dynamic-insights h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dynamic-insights ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .dynamic-insights li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+        }
+        
+        .dynamic-insights li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+        
+        /* Key Formulas */
+        .key-formulas {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        
+        .key-formulas h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .formula-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .formula-row:last-child {
+            border-bottom: none;
+        }
+        
+        .formula-label {
+            min-width: 120px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .formula-math {
+            flex: 1;
+        }
+        
+        /* Perspectives */
+        .perspectives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .perspective-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .perspective-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .perspective-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Challenge Tab Styles */
+        .challenge-type-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .challenge-type-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .challenge-type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.15);
+        }
+        
+        .challenge-type-card.active {
+            border-color: var(--primary);
+            background: var(--interactive-bg);
+        }
+        
+        .challenge-type-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .challenge-type-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .challenge-type-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        .challenge-prompt {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+        
+        .problem-area {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid var(--border-light);
+        }
+        
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .problem-type-badge {
+            background: var(--interactive-bg);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .problem-number {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .problem-question {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .problem-input-area {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .problem-input-area input, .problem-input-area select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 200px;
+            max-width: 300px;
+        }
+        
+        .problem-input-area input:focus, .problem-input-area select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .problem-feedback {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .problem-feedback.correct {
+            background: #dcfce7;
+            border: 1px solid var(--success-green);
+            color: #166534;
+        }
+        
+        .problem-feedback.incorrect {
+            background: #fee2e2;
+            border: 1px solid var(--error-red);
+            color: #991b1b;
+        }
+        
+        /* Worked Example */
+        .worked-example-container {
+            margin: 1.5rem 0;
+        }
+        
+        .worked-example-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .worked-example-toggle:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+        
+        .worked-example-toggle.open {
+            border-color: var(--primary);
+            background: white;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .worked-example-toggle.open .toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        .worked-example-content {
+            background: white;
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1.5rem;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .worked-example-content .worked-example-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .worked-example-steps {
+            padding-left: 0.5rem;
+        }
+        
+        .worked-example-step {
+            margin-bottom: 1.25rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--interactive-bg);
+        }
+        
+        .worked-example-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .step-label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-content {
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .step-math {
+            background: var(--bg-light);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            text-align: center;
+        }
+        
+        .generate-new-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        /* Nav Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        /* Step Controls */
+        .step-controls {
+            background: var(--interactive-bg);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .step-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .step-info span {
+            color: var(--text-dark);
+        }
+        
+        .step-position {
+            font-family: 'Monaco', monospace;
+            background: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .step-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .step-buttons button {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        /* Slope Legend */
+        .slope-legend {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .slope-legend h4 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .legend-line {
+            width: 24px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        
+        .legend-line.legend-dashed {
+            background: repeating-linear-gradient(
+                90deg,
+                #6366f1 0px,
+                #6366f1 4px,
+                transparent 4px,
+                transparent 8px
+            ) !important;
+        }
+        
+        /* K-value markers */
+        .k-marker {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .nav-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-button:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .challenge-type-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .method-selector {
+                flex-direction: column;
+            }
+            
+            .method-btn {
+                width: 100%;
+            }
+        }
+    
+        /* Week Navigation Bar */
+        .week-nav-bar {
+            background: white;
+            border-top: 2px solid var(--primary);
+            padding: 1rem;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .week-nav-bar a, .week-nav-bar span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .week-nav-bar .nav-prev,
+        .week-nav-bar .nav-next {
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            background: white;
+        }
+        
+        .week-nav-bar .nav-prev:hover,
+        .week-nav-bar .nav-next:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-hub {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .week-nav-bar .nav-hub:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-disabled {
+            color: var(--text-muted);
+            border: 2px solid var(--border-light);
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        @media (max-width: 600px) {
+            .week-nav-bar {
+                flex-direction: column;
+            }
+            .week-nav-bar a, .week-nav-bar span {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
 
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('intro')">Introduction</button>
+            <button class="tab-button" onclick="switchTab('explorer')">Explorer</button>
+            <button class="tab-button" onclick="switchTab('challenge')">
+                Challenge
+            </button>
+        </div>
+
+        <!-- ==================== INTRODUCTION TAB ==================== -->
+        <div id="intro-tab" class="tab-content active">
+            <div class="hero">
+                <h1>🔄 ODE Methods Explorer</h1>
+                <p>Master numerical methods for solving ordinary differential equations: Euler, Modified Euler (Heun), and Runge-Kutta. See how "walking along tangents" approximates solution curves.</p>
+            </div>
+
+            <div class="section">
+                <h2>What is an Initial Value Problem (IVP)?</h2>
+                <p>Given a differential equation and a starting point, we want to trace out the solution curve step by step. Since most ODEs can't be solved exactly, we use numerical methods to approximate the solution at discrete time points.</p>
+                
+                <div class="key-formulas" style="margin-top: 1rem;">
+                    <div class="formula-row">
+                        <span class="formula-label">The Problem:</span>
+                        <span class="formula-math" id="ivp-formula"></span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">The Idea:</span>
+                        <span class="formula-math">Use the slope <em>f(t, y)</em> to step forward from each point</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-cards">
+                <div class="concept-card">
+                    <div class="icon">📐</div>
+                    <h3>Euler's Method</h3>
+                    <p>The simplest approach: follow the tangent line at each point for one step. Fast but accumulates error quickly.</p>
+                    <div class="formula" id="euler-formula"></div>
+                    <span class="order-badge">Global Order 1</span>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">⚖️</div>
+                    <h3>Modified Euler (Heun)</h3>
+                    <p>Predict with Euler, then correct using the average of slopes at start and end. Captures curvature better.</p>
+                    <div class="formula" id="heun-formula"></div>
+                    <span class="order-badge">Global Order 2</span>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">🎯</div>
+                    <h3>Runge-Kutta 4 (RK4)</h3>
+                    <p>The workhorse of ODE solving: four slope evaluations combined with clever weights. Remarkably accurate.</p>
+                    <div class="formula" id="rk4-formula"></div>
+                    <span class="order-badge">Global Order 4</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Key Formulas</h3>
+                <div class="key-formulas">
+                    <div class="formula-row">
+                        <span class="formula-label">Euler:</span>
+                        <span class="formula-math" id="euler-full"></span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Modified Euler:</span>
+                        <span class="formula-math" id="heun-full"></span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">RK4 Update:</span>
+                        <span class="formula-math" id="rk4-full"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="perspectives">
+                <div class="perspective-card">
+                    <h4>🔗 Connection to Integration</h4>
+                    <p>ODE solvers are quadrature rules in time! The solution satisfies y(t) = y(0) + ∫f(s,y(s))ds. Euler uses a left-rectangle rule; RK4 uses Simpson-like weights.</p>
+                </div>
+                <div class="perspective-card">
+                    <h4>📊 Order = Error Reduction</h4>
+                    <p>A method with global order p means: halving h reduces error by ~2^p. Euler (p=1) halves error; RK4 (p=4) reduces it by factor of 16!</p>
+                </div>
+            </div>
+
+            <div class="section" style="background: var(--interactive-bg);">
+                <h3>📚 Week 7 Connection</h3>
+                <p>This explorer covers the three main methods from your Week 7 booklet. Practice computing steps by hand, then verify with the Explorer. The Challenge tab tests your understanding of both calculations and concepts.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <div></div>
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    Try the Explorer →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== EXPLORER TAB ==================== -->
+        <div id="explorer-tab" class="tab-content">
+            <div class="section">
+                <h2>Preset Examples</h2>
+                <div id="preset-pills" class="preset-pills"></div>
+                
+                <div class="control-grid">
+                    <div class="control-group full-width">
+                        <label>Differential Equation: y' = f(t, y)</label>
+                        <input type="text" id="ode-input" placeholder="e.g., y or y^2 - t">
+                        <div id="ode-preview" class="function-preview"></div>
+                    </div>
+                    <div class="control-group">
+                        <label>Initial t₀:</label>
+                        <input type="number" id="t0-input" value="0" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Initial y₀:</label>
+                        <input type="number" id="y0-input" value="1" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Final t:</label>
+                        <input type="number" id="tf-input" value="1" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Step size h:</label>
+                        <input type="number" id="h-input" value="0.25" step="0.05" min="0.01">
+                    </div>
+                </div>
+                
+                <h3>Select Method</h3>
+                <div class="method-selector">
+                    <button class="method-btn active" data-method="euler" onclick="selectMethod('euler')">
+                        <span>Euler</span>
+                        <span class="method-order">Order 1</span>
+                    </button>
+                    <button class="method-btn" data-method="heun" onclick="selectMethod('heun')">
+                        <span>Modified Euler</span>
+                        <span class="method-order">Order 2</span>
+                    </button>
+                    <button class="method-btn" data-method="rk4" onclick="selectMethod('rk4')">
+                        <span>RK4</span>
+                        <span class="method-order">Order 4</span>
+                    </button>
+                    <button class="method-btn" data-method="compare" onclick="selectMethod('compare')">
+                        <span>Compare All</span>
+                        <span class="method-order">Side by side</span>
+                    </button>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <button id="solve-btn" class="primary-button" onclick="solveProblem()">
+                        ▶ Solve All Steps
+                    </button>
+                    <button id="step-btn" class="secondary-button" onclick="startStepMode()">
+                        👣 Step-by-Step
+                    </button>
+                    <button class="secondary-button" onclick="resetExplorer()">
+                        ↺ Reset
+                    </button>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto; cursor: pointer;">
+                        <input type="checkbox" id="show-slope-field" checked onchange="toggleSlopeField()">
+                        <span style="font-size: 0.9rem; color: var(--text-muted);">Show slope field</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Solution</h2>
+                
+                <div class="results-panel">
+                    <div class="result-box">
+                        <div class="label">Method</div>
+                        <div class="value" id="method-name">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Final y(t<sub>f</sub>)</div>
+                        <div class="value" id="final-y">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Exact (if known)</div>
+                        <div class="value" id="exact-y">—</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="label">Error</div>
+                        <div class="value" id="error-val">—</div>
+                    </div>
+                </div>
+                
+                <div class="step-table-container">
+                    <table class="step-table" id="step-table">
+                        <thead>
+                            <tr>
+                                <th>n</th>
+                                <th>t<sub>n</sub></th>
+                                <th>y<sub>n</sub></th>
+                                <th>f(t<sub>n</sub>, y<sub>n</sub>)</th>
+                                <th>y<sub>n+1</sub></th>
+                            </tr>
+                        </thead>
+                        <tbody id="step-table-body">
+                            <tr><td colspan="5" style="color: var(--text-muted); padding: 2rem;">Click "Solve" to generate the step table</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="graph-container">
+                    <div id="solution-graph" style="width: 100%; height: 400px;"></div>
+                </div>
+                
+                <!-- Step-by-step controls -->
+                <div class="step-controls" id="step-controls" style="display: none;">
+                    <div class="step-info">
+                        <span>Step <strong id="current-step-num">0</strong> of <span id="total-steps">?</span></span>
+                        <span class="step-position">t = <span id="current-t">0</span>, y = <span id="current-y">1</span></span>
+                    </div>
+                    <div class="step-buttons">
+                        <button class="secondary-button" onclick="stepBackward()" id="step-back-btn" disabled>
+                            ← Previous
+                        </button>
+                        <button class="primary-button" onclick="stepForward()" id="step-forward-btn">
+                            Next Step →
+                        </button>
+                        <button class="secondary-button" onclick="jumpToEnd()">
+                            Skip to End ⏭
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Slope visualization legend -->
+                <div class="slope-legend" id="slope-legend" style="display: none;">
+                    <h4>🔍 What You're Seeing</h4>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <span class="legend-line" style="background: #94a3b8;"></span>
+                            <span>Slope field: shows f(t,y) at each point</span>
+                        </div>
+                        <div class="legend-item" id="legend-euler" style="display: none;">
+                            <span class="legend-line" style="background: #ef4444;"></span>
+                            <span>Euler: follows tangent for full step</span>
+                        </div>
+                        <div class="legend-item" id="legend-heun" style="display: none;">
+                            <span class="legend-line" style="background: #f59e0b;"></span>
+                            <span>Modified Euler: averages start & end slopes</span>
+                        </div>
+                        <div class="legend-item" id="legend-rk4" style="display: none;">
+                            <span class="legend-line" style="background: #10b981;"></span>
+                            <span>RK4: weighted average of 4 slopes</span>
+                        </div>
+                        <div class="legend-item" id="legend-exact" style="display: none;">
+                            <span class="legend-line legend-dashed" style="background: #6366f1;"></span>
+                            <span>Exact solution</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="dynamic-insights" class="dynamic-insights" style="display: none;">
+                    <h4>💡 Insights</h4>
+                    <ul id="insights-list"></ul>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('intro')">
+                    ← Back to Introduction
+                </button>
+                <button class="nav-button" onclick="switchTab('challenge')">
+                    Try Challenges →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== CHALLENGE TAB ==================== -->
+        <div id="challenge-tab" class="tab-content">
+            <div class="section">
+                <h2>Challenge Types</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Select a challenge type to practice. Each type generates unlimited problems for you to master.</p>
+                
+                <div class="challenge-type-cards">
+                    <div class="challenge-type-card" data-type="euler" onclick="selectChallengeType('euler')">
+                        <div class="challenge-type-icon">📐</div>
+                        <h4>Euler Steps</h4>
+                        <p>Can you compute one Euler step?</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="higher" onclick="selectChallengeType('higher')">
+                        <div class="challenge-type-icon">⚖️</div>
+                        <h4>Higher-Order Methods</h4>
+                        <p>Modified Euler and RK4 calculations</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="order" onclick="selectChallengeType('order')">
+                        <div class="challenge-type-icon">📈</div>
+                        <h4>Order & Accuracy</h4>
+                        <p>Why do methods differ in accuracy?</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem Area -->
+            <div id="problem-area" class="problem-area" style="display: none;">
+                <div class="problem-header">
+                    <span class="problem-type-badge" id="problem-type-label">Euler Steps</span>
+                    <span class="problem-number" id="problem-number">Problem #1</span>
+                </div>
+                
+                <div class="problem-question" id="problem-question">
+                    <!-- Problem text populated by JS -->
+                </div>
+                
+                <div class="problem-input-area" id="problem-input-area">
+                    <!-- Input populated by JS -->
+                </div>
+                
+                <button class="primary-button" onclick="checkAnswer()">
+                    ✓ Check Answer
+                </button>
+                
+                <div id="problem-feedback" class="problem-feedback"></div>
+                
+                <!-- Worked Example Toggle -->
+                <div class="worked-example-container">
+                    <button class="worked-example-toggle" onclick="toggleWorkedExample()">
+                        <span class="toggle-icon">▶</span>
+                        <span>📖 See Worked Example</span>
+                    </button>
+                    
+                    <div id="worked-example-content" class="worked-example-content" style="display: none;">
+                        <div class="worked-example-header">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                <line x1="8" y1="6" x2="16" y2="6"/>
+                                <line x1="8" y1="10" x2="14" y2="10"/>
+                            </svg>
+                            <div>
+                                <h4 style="margin: 0; color: var(--primary);">Worked Example</h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Step-by-step solution</p>
+                            </div>
+                        </div>
+                        <div id="worked-example-steps" class="worked-example-steps">
+                            <!-- Steps populated by JS -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="generate-new-container">
+                    <button class="secondary-button" onclick="generateNewProblem()">
+                        🔄 Generate New Problem
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Initial prompt -->
+            <div id="challenge-prompt" class="challenge-prompt">
+                <p>👆 Select a challenge type above to begin practicing</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    ← Back to Explorer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ============ STATE ============
+        let state = {
+            method: 'euler',
+            activePreset: null,
+            compiledF: null,
+            exactSolution: null,
+            showSlopeField: true,
+            // Step mode state
+            stepMode: false,
+            currentStepIndex: 0,
+            allSteps: [],
+            stepModeData: null,
+            compareResults: null
+        };
+        
+        // ============ DOM REFS ============
+        const DOM = {
+            presetPills: document.getElementById('preset-pills'),
+            odeInput: document.getElementById('ode-input'),
+            odePreview: document.getElementById('ode-preview'),
+            t0Input: document.getElementById('t0-input'),
+            y0Input: document.getElementById('y0-input'),
+            tfInput: document.getElementById('tf-input'),
+            hInput: document.getElementById('h-input'),
+            stepTableBody: document.getElementById('step-table-body'),
+            methodName: document.getElementById('method-name'),
+            finalY: document.getElementById('final-y'),
+            exactY: document.getElementById('exact-y'),
+            errorVal: document.getElementById('error-val'),
+            dynamicInsights: document.getElementById('dynamic-insights'),
+            insightsList: document.getElementById('insights-list')
+        };
+        
+        // ============ PRESETS ============
+        const PRESETS = {
+            "y' = y": { 
+                f: "y", 
+                t0: 0, y0: 1, tf: 1, h: 0.5,
+                label: "y' = y",
+                exact: (t, y0) => y0 * Math.exp(t),
+                exactLabel: "y = e^t"
+            },
+            "y' = -y": { 
+                f: "-y", 
+                t0: 0, y0: 1, tf: 1, h: 0.25,
+                label: "y' = −y",
+                exact: (t, y0) => y0 * Math.exp(-t),
+                exactLabel: "y = e^{-t}"
+            },
+            "y' = y²−t": { 
+                f: "y^2 - t", 
+                t0: 0, y0: 1, tf: 1, h: 0.2,
+                label: "y' = y² − t",
+                exact: null,
+                exactLabel: "No closed form"
+            },
+            "y' = cos(t)": { 
+                f: "cos(t)", 
+                t0: 0, y0: 0, tf: 2*Math.PI, h: 0.5,
+                label: "y' = cos(t)",
+                exact: (t, y0) => Math.sin(t) + y0,
+                exactLabel: "y = sin(t)"
+            },
+            "y' = y(1−y)": { 
+                f: "y*(1-y)", 
+                t0: 0, y0: 0.1, tf: 5, h: 0.5,
+                label: "y' = y(1−y)",
+                exact: (t, y0) => y0 * Math.exp(t) / (1 - y0 + y0 * Math.exp(t)),
+                exactLabel: "Logistic"
+            },
+            "y' = −10y": { 
+                f: "-10*y", 
+                t0: 0, y0: 1, tf: 1, h: 0.1,
+                label: "y' = −10y",
+                exact: (t, y0) => y0 * Math.exp(-10*t),
+                exactLabel: "y = e^{-10t}"
+            }
+        };
+        
+        // ============ INITIALIZATION ============
+        function initialize() {
+            // Build preset pills
+            Object.entries(PRESETS).forEach(([name, preset]) => {
+                const pill = document.createElement('button');
+                pill.className = 'preset-pill';
+                pill.innerHTML = preset.label;
+                pill.dataset.name = name;
+                pill.onclick = () => loadPreset(name);
+                DOM.presetPills.appendChild(pill);
+            });
+            
+            // Event listeners
+            DOM.odeInput.addEventListener('input', updateODEPreview);
+            
+            // Render intro formulas
+            renderIntroFormulas();
+            
+            // Load default
+            loadPreset("y' = y");
+        }
+        
+        function renderIntroFormulas() {
+            katex.render("y'(t) = f(t, y), \\quad y(t_0) = y_0", document.getElementById('ivp-formula'), {displayMode: false});
+            katex.render("y_{n+1} = y_n + h \\cdot f(t_n, y_n)", document.getElementById('euler-formula'), {displayMode: false});
+            katex.render("y_{n+1} = y_n + \\frac{h}{2}[f_n + f(t_{n+1}, y^*)]", document.getElementById('heun-formula'), {displayMode: false});
+            katex.render("y_{n+1} = y_n + \\frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4)", document.getElementById('rk4-formula'), {displayMode: false});
+            
+            katex.render("y_{n+1} = y_n + h \\cdot f(t_n, y_n)", document.getElementById('euler-full'), {displayMode: false});
+            katex.render("y^* = y_n + h f_n, \\quad y_{n+1} = y_n + \\frac{h}{2}[f_n + f(t_{n+1}, y^*)]", document.getElementById('heun-full'), {displayMode: false});
+            katex.render("y_{n+1} = y_n + \\frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4)", document.getElementById('rk4-full'), {displayMode: false});
+        }
+        
+        function loadPreset(name) {
+            const preset = PRESETS[name];
+            if (!preset) return;
+            
+            DOM.odeInput.value = preset.f;
+            DOM.t0Input.value = preset.t0;
+            DOM.y0Input.value = preset.y0;
+            DOM.tfInput.value = preset.tf;
+            DOM.hInput.value = preset.h;
+            
+            state.activePreset = name;
+            state.exactSolution = preset.exact;
+            
+            // Update pill styling
+            document.querySelectorAll('.preset-pill').forEach(pill => {
+                pill.classList.toggle('active', pill.dataset.name === name);
+            });
+            
+            updateODEPreview();
+        }
+        
+        function updateODEPreview() {
+            const funcStr = DOM.odeInput.value.trim();
+            
+            if (!funcStr) {
+                DOM.odePreview.innerHTML = '<span class="preview-label">Enter an ODE above</span>';
+                return;
+            }
+            
+            const latex = mathToLatex(funcStr);
+            DOM.odePreview.innerHTML = '<span class="preview-label">y\' =</span> <span id="ode-latex"></span>';
+            
+            try {
+                katex.render(latex, document.getElementById('ode-latex'), { displayMode: false });
+            } catch (e) {
+                DOM.odePreview.innerHTML = `<span class="preview-label">y' = ${funcStr}</span>`;
+            }
+        }
+        
+        function mathToLatex(str) {
+            return str
+                .replace(/\*\*/g, '^')
+                .replace(/\*/g, ' \\cdot ')
+                .replace(/sqrt\(([^)]+)\)/g, '\\sqrt{$1}')
+                .replace(/exp\(([^)]+)\)/g, 'e^{$1}')
+                .replace(/sin\(([^)]+)\)/g, '\\sin($1)')
+                .replace(/cos\(([^)]+)\)/g, '\\cos($1)')
+                .replace(/tan\(([^)]+)\)/g, '\\tan($1)')
+                .replace(/log\(([^)]+)\)/g, '\\ln($1)')
+                .replace(/pi/g, '\\pi')
+                .replace(/\^2/g, '^{2}')
+                .replace(/\^3/g, '^{3}');
+        }
+        
+        // ============ METHOD SELECTION ============
+        window.selectMethod = function(method) {
+            state.method = method;
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.method === method);
+            });
+        };
+        
+        // ============ SOLVER ============
+        window.solveProblem = function() {
+            const odeStr = DOM.odeInput.value.trim();
+            const t0 = parseFloat(DOM.t0Input.value);
+            const y0 = parseFloat(DOM.y0Input.value);
+            const tf = parseFloat(DOM.tfInput.value);
+            const h = parseFloat(DOM.hInput.value);
+            
+            if (!odeStr) {
+                alert('Please enter a differential equation');
+                return;
+            }
+            
+            // Reset step mode
+            state.stepMode = false;
+            document.getElementById('step-controls').style.display = 'none';
+            
+            try {
+                const compiledF = math.compile(odeStr);
+                state.compiledF = compiledF;
+                
+                const f = (t, y) => compiledF.evaluate({ t: t, y: y });
+                
+                if (state.method === 'compare') {
+                    solveAndCompare(f, t0, y0, tf, h);
+                } else {
+                    const result = solveWithMethod(f, t0, y0, tf, h, state.method);
+                    state.stepModeData = result; // Store for slope field toggle
+                    displayResults(result, state.method);
+                    plotSolution([result]);
+                }
+                
+                updateInsights();
+                
+            } catch (e) {
+                alert('Error parsing equation: ' + e.message);
+            }
+        };
+        
+        function solveWithMethod(f, t0, y0, tf, h, method) {
+            const steps = [];
+            let t = t0;
+            let y = y0;
+            
+            steps.push({ n: 0, t: t, y: y, f_val: f(t, y), y_next: null, details: {} });
+            
+            let n = 0;
+            while (t < tf - 1e-10) {
+                const actualH = Math.min(h, tf - t);
+                let y_next, details = {};
+                
+                if (method === 'euler') {
+                    const slope = f(t, y);
+                    y_next = y + actualH * slope;
+                    details = { slope: slope };
+                } else if (method === 'heun') {
+                    const k1 = f(t, y);
+                    const y_star = y + actualH * k1;
+                    const k2 = f(t + actualH, y_star);
+                    y_next = y + (actualH / 2) * (k1 + k2);
+                    details = { k1: k1, y_star: y_star, k2: k2 };
+                } else if (method === 'rk4') {
+                    const k1 = f(t, y);
+                    const k2 = f(t + actualH/2, y + actualH/2 * k1);
+                    const k3 = f(t + actualH/2, y + actualH/2 * k2);
+                    const k4 = f(t + actualH, y + actualH * k3);
+                    y_next = y + (actualH / 6) * (k1 + 2*k2 + 2*k3 + k4);
+                    details = { k1: k1, k2: k2, k3: k3, k4: k4 };
+                }
+                
+                steps[steps.length - 1].y_next = y_next;
+                steps[steps.length - 1].details = details;
+                
+                t = t + actualH;
+                y = y_next;
+                n++;
+                
+                if (t < tf - 1e-10) {
+                    steps.push({ n: n, t: t, y: y, f_val: f(t, y), y_next: null, details: {} });
+                }
+            }
+            
+            // Add final point
+            steps.push({ n: n, t: t, y: y, f_val: f(t, y), y_next: null, details: {}, isFinal: true });
+            
+            return { steps: steps, method: method, finalY: y, finalT: t };
+        }
+        
+        function solveAndCompare(f, t0, y0, tf, h) {
+            const eulerResult = solveWithMethod(f, t0, y0, tf, h, 'euler');
+            const heunResult = solveWithMethod(f, t0, y0, tf, h, 'heun');
+            const rk4Result = solveWithMethod(f, t0, y0, tf, h, 'rk4');
+            
+            // Store for slope field toggle
+            state.compareResults = [eulerResult, heunResult, rk4Result];
+            state.stepModeData = eulerResult; // Use euler for range calculation
+            
+            displayComparisonResults(eulerResult, heunResult, rk4Result);
+            plotSolution([eulerResult, heunResult, rk4Result]);
+        }
+        
+        function displayResults(result, method) {
+            const methodNames = { euler: 'Euler', heun: 'Modified Euler', rk4: 'RK4' };
+            DOM.methodName.textContent = methodNames[method];
+            DOM.finalY.textContent = result.finalY.toFixed(6);
+            
+            // Calculate exact if available
+            if (state.exactSolution) {
+                const y0 = parseFloat(DOM.y0Input.value);
+                const exact = state.exactSolution(result.finalT, y0);
+                DOM.exactY.textContent = exact.toFixed(6);
+                const error = Math.abs(exact - result.finalY);
+                DOM.errorVal.textContent = error.toExponential(3);
+            } else {
+                DOM.exactY.textContent = 'Unknown';
+                DOM.errorVal.textContent = '—';
+            }
+            
+            // Build step table
+            buildStepTable(result, method);
+        }
+        
+        function displayComparisonResults(euler, heun, rk4) {
+            DOM.methodName.textContent = 'Comparison';
+            DOM.finalY.innerHTML = `E: ${euler.finalY.toFixed(4)}<br>H: ${heun.finalY.toFixed(4)}<br>RK4: ${rk4.finalY.toFixed(4)}`;
+            
+            if (state.exactSolution) {
+                const y0 = parseFloat(DOM.y0Input.value);
+                const exact = state.exactSolution(euler.finalT, y0);
+                DOM.exactY.textContent = exact.toFixed(6);
+                
+                const errE = Math.abs(exact - euler.finalY);
+                const errH = Math.abs(exact - heun.finalY);
+                const errR = Math.abs(exact - rk4.finalY);
+                DOM.errorVal.innerHTML = `E: ${errE.toExponential(2)}<br>H: ${errH.toExponential(2)}<br>RK4: ${errR.toExponential(2)}`;
+            } else {
+                DOM.exactY.textContent = 'Unknown';
+                DOM.errorVal.textContent = '—';
+            }
+            
+            // Build comparison table
+            buildComparisonTable(euler, heun, rk4);
+        }
+        
+        function buildStepTable(result, method) {
+            let html = '';
+            const headers = ['n', 't<sub>n</sub>', 'y<sub>n</sub>', 'f(t<sub>n</sub>, y<sub>n</sub>)', 'y<sub>n+1</sub>'];
+            
+            if (method === 'heun') {
+                document.getElementById('step-table').querySelector('thead tr').innerHTML = 
+                    '<th>n</th><th>t<sub>n</sub></th><th>y<sub>n</sub></th><th>k₁</th><th>y*</th><th>k₂</th><th>y<sub>n+1</sub></th>';
+            } else if (method === 'rk4') {
+                document.getElementById('step-table').querySelector('thead tr').innerHTML = 
+                    '<th>n</th><th>t<sub>n</sub></th><th>y<sub>n</sub></th><th>k₁</th><th>k₂</th><th>k₃</th><th>k₄</th><th>y<sub>n+1</sub></th>';
+            } else {
+                document.getElementById('step-table').querySelector('thead tr').innerHTML = 
+                    '<th>n</th><th>t<sub>n</sub></th><th>y<sub>n</sub></th><th>f(t<sub>n</sub>, y<sub>n</sub>)</th><th>y<sub>n+1</sub></th>';
+            }
+            
+            result.steps.forEach((step, i) => {
+                const isLast = step.isFinal;
+                let rowClass = isLast ? 'highlight-row' : '';
+                
+                if (method === 'euler') {
+                    html += `<tr class="${rowClass}">
+                        <td>${step.n}</td>
+                        <td>${step.t.toFixed(4)}</td>
+                        <td>${step.y.toFixed(6)}</td>
+                        <td>${step.f_val.toFixed(6)}</td>
+                        <td>${step.y_next !== null ? step.y_next.toFixed(6) : '—'}</td>
+                    </tr>`;
+                } else if (method === 'heun') {
+                    html += `<tr class="${rowClass}">
+                        <td>${step.n}</td>
+                        <td>${step.t.toFixed(4)}</td>
+                        <td>${step.y.toFixed(6)}</td>
+                        <td>${step.details.k1 !== undefined ? step.details.k1.toFixed(4) : '—'}</td>
+                        <td>${step.details.y_star !== undefined ? step.details.y_star.toFixed(4) : '—'}</td>
+                        <td>${step.details.k2 !== undefined ? step.details.k2.toFixed(4) : '—'}</td>
+                        <td>${step.y_next !== null ? step.y_next.toFixed(6) : '—'}</td>
+                    </tr>`;
+                } else if (method === 'rk4') {
+                    html += `<tr class="${rowClass}">
+                        <td>${step.n}</td>
+                        <td>${step.t.toFixed(4)}</td>
+                        <td>${step.y.toFixed(6)}</td>
+                        <td>${step.details.k1 !== undefined ? step.details.k1.toFixed(4) : '—'}</td>
+                        <td>${step.details.k2 !== undefined ? step.details.k2.toFixed(4) : '—'}</td>
+                        <td>${step.details.k3 !== undefined ? step.details.k3.toFixed(4) : '—'}</td>
+                        <td>${step.details.k4 !== undefined ? step.details.k4.toFixed(4) : '—'}</td>
+                        <td>${step.y_next !== null ? step.y_next.toFixed(6) : '—'}</td>
+                    </tr>`;
+                }
+            });
+            
+            DOM.stepTableBody.innerHTML = html;
+        }
+        
+        function buildComparisonTable(euler, heun, rk4) {
+            document.getElementById('step-table').querySelector('thead tr').innerHTML = 
+                '<th>n</th><th>t<sub>n</sub></th><th>Euler</th><th>Mod. Euler</th><th>RK4</th><th>Exact</th>';
+            
+            let html = '';
+            const n = euler.steps.length;
+            
+            for (let i = 0; i < n; i++) {
+                const t = euler.steps[i].t;
+                const yE = euler.steps[i].y;
+                const yH = heun.steps[i] ? heun.steps[i].y : '—';
+                const yR = rk4.steps[i] ? rk4.steps[i].y : '—';
+                
+                let exact = '—';
+                if (state.exactSolution) {
+                    const y0 = parseFloat(DOM.y0Input.value);
+                    exact = state.exactSolution(t, y0).toFixed(6);
+                }
+                
+                html += `<tr>
+                    <td>${i}</td>
+                    <td>${t.toFixed(4)}</td>
+                    <td>${typeof yE === 'number' ? yE.toFixed(6) : yE}</td>
+                    <td>${typeof yH === 'number' ? yH.toFixed(6) : yH}</td>
+                    <td>${typeof yR === 'number' ? yR.toFixed(6) : yR}</td>
+                    <td>${exact}</td>
+                </tr>`;
+            }
+            
+            DOM.stepTableBody.innerHTML = html;
+        }
+        
+        function plotSolution(results, upToStep = null) {
+            const traces = [];
+            const colors = { euler: '#ef4444', heun: '#f59e0b', rk4: '#10b981' };
+            const names = { euler: 'Euler', heun: 'Modified Euler', rk4: 'RK4' };
+            
+            const t0 = parseFloat(DOM.t0Input.value);
+            const tf = parseFloat(DOM.tfInput.value);
+            const y0 = parseFloat(DOM.y0Input.value);
+            
+            // Determine y range for slope field
+            let yMin = y0, yMax = y0;
+            results.forEach(result => {
+                result.steps.forEach(s => {
+                    if (s.y < yMin) yMin = s.y;
+                    if (s.y > yMax) yMax = s.y;
+                });
+            });
+            
+            // Add exact solution values to range calculation
+            if (state.exactSolution) {
+                for (let t = t0; t <= tf; t += (tf - t0) / 50) {
+                    const yExact = state.exactSolution(t, y0);
+                    if (yExact < yMin) yMin = yExact;
+                    if (yExact > yMax) yMax = yExact;
+                }
+            }
+            
+            // Expand range slightly
+            const yPadding = (yMax - yMin) * 0.15 || 0.5;
+            yMin -= yPadding;
+            yMax += yPadding;
+            
+            // Add slope field if enabled
+            if (state.showSlopeField && state.compiledF) {
+                const slopeTrace = generateSlopeField(t0, tf, yMin, yMax);
+                traces.push(slopeTrace);
+            }
+            
+            // Add exact solution if available (draw first so it's behind)
+            if (state.exactSolution && results.length > 0) {
+                const t_exact = [];
+                const y_exact = [];
+                for (let t = t0; t <= tf; t += (tf - t0) / 100) {
+                    t_exact.push(t);
+                    y_exact.push(state.exactSolution(t, y0));
+                }
+                
+                traces.push({
+                    x: t_exact,
+                    y: y_exact,
+                    mode: 'lines',
+                    name: 'Exact',
+                    line: { color: '#6366f1', width: 2, dash: 'dash' }
+                });
+            }
+            
+            // Add solution curves
+            results.forEach(result => {
+                let stepsToPlot = result.steps;
+                
+                // In step mode, only show up to current step
+                if (upToStep !== null && result.method === state.method) {
+                    stepsToPlot = result.steps.slice(0, upToStep + 1);
+                }
+                
+                const t_vals = stepsToPlot.map(s => s.t);
+                const y_vals = stepsToPlot.map(s => s.y);
+                
+                traces.push({
+                    x: t_vals,
+                    y: y_vals,
+                    mode: 'lines+markers',
+                    name: names[result.method],
+                    line: { color: colors[result.method], width: 3 },
+                    marker: { size: 8 }
+                });
+                
+                // In step mode, add tangent/slope visualization for current step
+                if (upToStep !== null && result.method === state.method && upToStep < result.steps.length - 1) {
+                    const currentStep = result.steps[upToStep];
+                    const nextStep = result.steps[upToStep + 1];
+                    
+                    // Add slope visualization based on method
+                    const slopeVis = generateSlopeVisualization(currentStep, nextStep, result.method, colors[result.method]);
+                    traces.push(...slopeVis);
+                }
+            });
+            
+            const layout = {
+                title: state.stepMode ? 'Step-by-Step Solution' : 'Solution Curve',
+                xaxis: { title: 't', range: [t0 - (tf-t0)*0.05, tf + (tf-t0)*0.05] },
+                yaxis: { title: 'y', range: [yMin, yMax] },
+                legend: { x: 0, y: 1, bgcolor: 'rgba(255,255,255,0.8)' },
+                margin: { t: 40, r: 20, b: 40, l: 50 },
+                hovermode: 'closest'
+            };
+            
+            Plotly.newPlot('solution-graph', traces, layout, { responsive: true });
+            
+            // Update legend visibility
+            updateLegend(results);
+        }
+        
+        function generateSlopeField(t0, tf, yMin, yMax) {
+            const f = (t, y) => state.compiledF.evaluate({ t: t, y: y });
+            
+            const nT = 15; // Number of points in t direction
+            const nY = 12; // Number of points in y direction
+            
+            const dt = (tf - t0) / (nT - 1);
+            const dy = (yMax - yMin) / (nY - 1);
+            const segLen = Math.min(dt, dy) * 0.35; // Length of slope segments
+            
+            const x = [];
+            const y = [];
+            
+            for (let i = 0; i < nT; i++) {
+                for (let j = 0; j < nY; j++) {
+                    const tVal = t0 + i * dt;
+                    const yVal = yMin + j * dy;
+                    
+                    try {
+                        const slope = f(tVal, yVal);
+                        
+                        // Clamp slope for visualization
+                        const clampedSlope = Math.max(-10, Math.min(10, slope));
+                        
+                        // Calculate segment endpoints
+                        const angle = Math.atan(clampedSlope);
+                        const dxSeg = segLen * Math.cos(angle) * 0.5;
+                        const dySeg = segLen * Math.sin(angle) * 0.5;
+                        
+                        // Add line segment (with null to break between segments)
+                        x.push(tVal - dxSeg, tVal + dxSeg, null);
+                        y.push(yVal - dySeg, yVal + dySeg, null);
+                    } catch (e) {
+                        // Skip points where f is undefined
+                    }
+                }
+            }
+            
+            return {
+                x: x,
+                y: y,
+                mode: 'lines',
+                name: 'Slope field',
+                line: { color: '#94a3b8', width: 1 },
+                hoverinfo: 'skip',
+                showlegend: false
+            };
+        }
+        
+        function generateSlopeVisualization(currentStep, nextStep, method, color) {
+            const traces = [];
+            const t = currentStep.t;
+            const y = currentStep.y;
+            const h = nextStep.t - currentStep.t;
+            const details = currentStep.details;
+            
+            if (method === 'euler') {
+                // Show tangent line extended
+                const slope = details.slope || currentStep.f_val;
+                const tEnd = t + h * 1.2;
+                const yEnd = y + slope * h * 1.2;
+                
+                traces.push({
+                    x: [t, tEnd],
+                    y: [y, yEnd],
+                    mode: 'lines',
+                    name: 'Tangent',
+                    line: { color: color, width: 2, dash: 'dot' },
+                    showlegend: false
+                });
+                
+                // Arrow annotation would go here if Plotly supported it better
+                
+            } else if (method === 'heun') {
+                // Show predictor (Euler step)
+                if (details.k1 !== undefined && details.y_star !== undefined) {
+                    traces.push({
+                        x: [t, t + h],
+                        y: [y, details.y_star],
+                        mode: 'lines+markers',
+                        name: 'Predictor (y*)',
+                        line: { color: color, width: 2, dash: 'dot' },
+                        marker: { size: 6, symbol: 'circle-open' },
+                        showlegend: false
+                    });
+                    
+                    // Show k1 and k2 as small arrows/text
+                    traces.push({
+                        x: [t, t + h],
+                        y: [y, details.y_star],
+                        mode: 'text',
+                        text: ['k₁', 'k₂'],
+                        textposition: 'top center',
+                        textfont: { size: 10, color: color },
+                        showlegend: false
+                    });
+                }
+                
+            } else if (method === 'rk4') {
+                // Show k1, k2, k3, k4 evaluation points
+                if (details.k1 !== undefined) {
+                    const k1 = details.k1;
+                    const k2 = details.k2;
+                    const k3 = details.k3;
+                    const k4 = details.k4;
+                    
+                    // Points where k values are evaluated
+                    const points = [
+                        { t: t, y: y, label: 'k₁' },
+                        { t: t + h/2, y: y + h/2 * k1, label: 'k₂' },
+                        { t: t + h/2, y: y + h/2 * k2, label: 'k₃' },
+                        { t: t + h, y: y + h * k3, label: 'k₄' }
+                    ];
+                    
+                    traces.push({
+                        x: points.map(p => p.t),
+                        y: points.map(p => p.y),
+                        mode: 'markers+text',
+                        text: points.map(p => p.label),
+                        textposition: 'top center',
+                        textfont: { size: 10, color: '#10b981' },
+                        marker: { size: 8, color: '#10b981', symbol: 'diamond' },
+                        name: 'RK4 evaluations',
+                        showlegend: false
+                    });
+                }
+            }
+            
+            return traces;
+        }
+        
+        function updateLegend(results) {
+            const legend = document.getElementById('slope-legend');
+            legend.style.display = 'block';
+            
+            document.getElementById('legend-euler').style.display = 
+                results.some(r => r.method === 'euler') || state.method === 'euler' ? 'flex' : 'none';
+            document.getElementById('legend-heun').style.display = 
+                results.some(r => r.method === 'heun') || state.method === 'heun' ? 'flex' : 'none';
+            document.getElementById('legend-rk4').style.display = 
+                results.some(r => r.method === 'rk4') || state.method === 'rk4' ? 'flex' : 'none';
+            document.getElementById('legend-exact').style.display = 
+                state.exactSolution ? 'flex' : 'none';
+        }
+        
+        // ============ STEP MODE FUNCTIONS ============
+        window.startStepMode = function() {
+            const odeStr = DOM.odeInput.value.trim();
+            const t0 = parseFloat(DOM.t0Input.value);
+            const y0 = parseFloat(DOM.y0Input.value);
+            const tf = parseFloat(DOM.tfInput.value);
+            const h = parseFloat(DOM.hInput.value);
+            
+            if (!odeStr) {
+                alert('Please enter a differential equation');
+                return;
+            }
+            
+            if (state.method === 'compare') {
+                alert('Step-by-step mode works with individual methods. Please select Euler, Modified Euler, or RK4.');
+                return;
+            }
+            
+            try {
+                const compiledF = math.compile(odeStr);
+                state.compiledF = compiledF;
+                
+                const f = (t, y) => compiledF.evaluate({ t: t, y: y });
+                const result = solveWithMethod(f, t0, y0, tf, h, state.method);
+                
+                state.stepMode = true;
+                state.currentStepIndex = 0;
+                state.allSteps = result.steps;
+                state.stepModeData = result;
+                
+                // Show step controls
+                document.getElementById('step-controls').style.display = 'block';
+                document.getElementById('total-steps').textContent = result.steps.length - 1;
+                
+                // Update display
+                updateStepDisplay();
+                plotSolution([result], 0);
+                
+                // Clear table initially
+                DOM.stepTableBody.innerHTML = '';
+                addStepToTable(result.steps[0], state.method, 0);
+                
+            } catch (e) {
+                alert('Error parsing equation: ' + e.message);
+            }
+        };
+        
+        window.stepForward = function() {
+            if (state.currentStepIndex < state.allSteps.length - 1) {
+                state.currentStepIndex++;
+                updateStepDisplay();
+                plotSolution([state.stepModeData], state.currentStepIndex);
+                
+                // Add row to table
+                addStepToTable(state.allSteps[state.currentStepIndex], state.method, state.currentStepIndex);
+                
+                // Highlight current row
+                highlightCurrentRow();
+            }
+        };
+        
+        window.stepBackward = function() {
+            if (state.currentStepIndex > 0) {
+                state.currentStepIndex--;
+                updateStepDisplay();
+                plotSolution([state.stepModeData], state.currentStepIndex);
+                
+                // Remove last row from table
+                const rows = DOM.stepTableBody.querySelectorAll('tr');
+                if (rows.length > state.currentStepIndex + 1) {
+                    rows[rows.length - 1].remove();
+                }
+                
+                highlightCurrentRow();
+            }
+        };
+        
+        window.jumpToEnd = function() {
+            state.currentStepIndex = state.allSteps.length - 1;
+            state.stepMode = false;
+            
+            document.getElementById('step-controls').style.display = 'none';
+            
+            // Display full results
+            displayResults(state.stepModeData, state.method);
+            plotSolution([state.stepModeData]);
+            updateInsights();
+        };
+        
+        function updateStepDisplay() {
+            const step = state.allSteps[state.currentStepIndex];
+            document.getElementById('current-step-num').textContent = state.currentStepIndex;
+            document.getElementById('current-t').textContent = step.t.toFixed(4);
+            document.getElementById('current-y').textContent = step.y.toFixed(6);
+            
+            // Update button states
+            document.getElementById('step-back-btn').disabled = state.currentStepIndex === 0;
+            document.getElementById('step-forward-btn').disabled = state.currentStepIndex >= state.allSteps.length - 1;
+        }
+        
+        function addStepToTable(step, method, index) {
+            const row = document.createElement('tr');
+            
+            if (method === 'euler') {
+                row.innerHTML = `
+                    <td>${step.n}</td>
+                    <td>${step.t.toFixed(4)}</td>
+                    <td>${step.y.toFixed(6)}</td>
+                    <td>${step.f_val.toFixed(6)}</td>
+                    <td>${step.y_next !== null ? step.y_next.toFixed(6) : '—'}</td>
+                `;
+            } else if (method === 'heun') {
+                // Update header if needed
+                if (index === 0) {
+                    document.getElementById('step-table').querySelector('thead tr').innerHTML = 
+                        '<th>n</th><th>t<sub>n</sub></th><th>y<sub>n</sub></th><th>k₁</th><th>y*</th><th>k₂</th><th>y<sub>n+1</sub></th>';
+                }
+                row.innerHTML = `
+                    <td>${step.n}</td>
+                    <td>${step.t.toFixed(4)}</td>
+                    <td>${step.y.toFixed(6)}</td>
+                    <td>${step.details.k1 !== undefined ? step.details.k1.toFixed(4) : '—'}</td>
+                    <td>${step.details.y_star !== undefined ? step.details.y_star.toFixed(4) : '—'}</td>
+                    <td>${step.details.k2 !== undefined ? step.details.k2.toFixed(4) : '—'}</td>
+                    <td>${step.y_next !== null ? step.y_next.toFixed(6) : '—'}</td>
+                `;
+            } else if (method === 'rk4') {
+                if (index === 0) {
+                    document.getElementById('step-table').querySelector('thead tr').innerHTML = 
+                        '<th>n</th><th>t<sub>n</sub></th><th>y<sub>n</sub></th><th>k₁</th><th>k₂</th><th>k₃</th><th>k₄</th><th>y<sub>n+1</sub></th>';
+                }
+                row.innerHTML = `
+                    <td>${step.n}</td>
+                    <td>${step.t.toFixed(4)}</td>
+                    <td>${step.y.toFixed(6)}</td>
+                    <td>${step.details.k1 !== undefined ? step.details.k1.toFixed(4) : '—'}</td>
+                    <td>${step.details.k2 !== undefined ? step.details.k2.toFixed(4) : '—'}</td>
+                    <td>${step.details.k3 !== undefined ? step.details.k3.toFixed(4) : '—'}</td>
+                    <td>${step.details.k4 !== undefined ? step.details.k4.toFixed(4) : '—'}</td>
+                    <td>${step.y_next !== null ? step.y_next.toFixed(6) : '—'}</td>
+                `;
+            }
+            
+            DOM.stepTableBody.appendChild(row);
+        }
+        
+        function highlightCurrentRow() {
+            DOM.stepTableBody.querySelectorAll('tr').forEach((row, i) => {
+                row.classList.toggle('highlight-row', i === state.currentStepIndex);
+            });
+        }
+        
+        window.toggleSlopeField = function() {
+            state.showSlopeField = document.getElementById('show-slope-field').checked;
+            
+            // Re-plot if we have data
+            if (state.method === 'compare' && state.compareResults) {
+                plotSolution(state.compareResults);
+            } else if (state.stepModeData) {
+                plotSolution([state.stepModeData], state.stepMode ? state.currentStepIndex : null);
+            }
+        };
+        
+        function updateInsights() {
+            DOM.dynamicInsights.style.display = 'block';
+            const insights = [];
+            const method = state.method;
+            
+            if (method === 'euler') {
+                insights.push('Euler uses only the slope at the start of each interval');
+                insights.push('Error is O(h) — halving h roughly halves the error');
+                insights.push('Simple but can be inaccurate for stiff equations');
+            } else if (method === 'heun') {
+                insights.push('Modified Euler averages slopes at start and (predicted) end');
+                insights.push('Error is O(h²) — halving h reduces error by ~4');
+                insights.push('Also known as Heun\'s method or the trapezoidal rule');
+            } else if (method === 'rk4') {
+                insights.push('RK4 uses 4 slope evaluations with Simpson-like weights');
+                insights.push('Error is O(h⁴) — halving h reduces error by ~16');
+                insights.push('The standard choice for most ODE problems');
+            } else if (method === 'compare') {
+                insights.push('Higher-order methods converge faster to the exact solution');
+                insights.push('The gap between methods grows as h increases');
+                insights.push('For smooth problems, RK4 often gives machine precision quickly');
+            }
+            
+            DOM.insightsList.innerHTML = insights.map(i => `<li>${i}</li>`).join('');
+        }
+        
+        window.resetExplorer = function() {
+            DOM.stepTableBody.innerHTML = '<tr><td colspan="5" style="color: var(--text-muted); padding: 2rem;">Click "Solve" or "Step-by-Step" to begin</td></tr>';
+            DOM.methodName.textContent = '—';
+            DOM.finalY.textContent = '—';
+            DOM.exactY.textContent = '—';
+            DOM.errorVal.textContent = '—';
+            DOM.dynamicInsights.style.display = 'none';
+            
+            // Reset step mode
+            state.stepMode = false;
+            state.currentStepIndex = 0;
+            state.allSteps = [];
+            state.stepModeData = null;
+            document.getElementById('step-controls').style.display = 'none';
+            document.getElementById('slope-legend').style.display = 'none';
+            
+            // Reset table header
+            document.getElementById('step-table').querySelector('thead tr').innerHTML = 
+                '<th>n</th><th>t<sub>n</sub></th><th>y<sub>n</sub></th><th>f(t<sub>n</sub>, y<sub>n</sub>)</th><th>y<sub>n+1</sub></th>';
+            
+            Plotly.purge('solution-graph');
+        };
+        
+        // ============ TAB SWITCHING ============
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.tab-button').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        };
+        
+        // ============ CHALLENGE TAB ============
+        let challengeState = {
+            currentType: null,
+            currentProblem: null,
+            problemCount: { euler: 0, higher: 0, order: 0 }
+        };
+        
+        window.selectChallengeType = function(type) {
+            challengeState.currentType = type;
+            
+            document.querySelectorAll('.challenge-type-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.type === type);
+            });
+            
+            document.getElementById('challenge-prompt').style.display = 'none';
+            document.getElementById('problem-area').style.display = 'block';
+            
+            const typeLabels = {
+                euler: 'Euler Steps',
+                higher: 'Higher-Order Methods',
+                order: 'Order & Accuracy'
+            };
+            document.getElementById('problem-type-label').textContent = typeLabels[type];
+            
+            generateNewProblem();
+        };
+        
+        window.generateNewProblem = function() {
+            const type = challengeState.currentType;
+            if (!type) return;
+            
+            challengeState.problemCount[type]++;
+            document.getElementById('problem-number').textContent = `Problem #${challengeState.problemCount[type]}`;
+            
+            document.getElementById('problem-feedback').innerHTML = '';
+            document.getElementById('problem-feedback').className = 'problem-feedback';
+            
+            const toggle = document.querySelector('.worked-example-toggle');
+            const content = document.getElementById('worked-example-content');
+            toggle.classList.remove('open');
+            content.style.display = 'none';
+            
+            if (type === 'euler') {
+                generateEulerProblem();
+            } else if (type === 'higher') {
+                generateHigherProblem();
+            } else if (type === 'order') {
+                generateOrderProblem();
+            }
+        };
+        
+        function generateEulerProblem() {
+            const scenarios = [
+                { f: 'y', fLabel: 'y', fFunc: (t, y) => y },
+                { f: '-y', fLabel: '-y', fFunc: (t, y) => -y },
+                { f: '2*y', fLabel: '2y', fFunc: (t, y) => 2*y },
+                { f: 't + y', fLabel: 't + y', fFunc: (t, y) => t + y },
+                { f: 't*y', fLabel: 'ty', fFunc: (t, y) => t*y },
+                { f: 'y - t', fLabel: 'y - t', fFunc: (t, y) => y - t },
+                { f: '1 + y', fLabel: '1 + y', fFunc: (t, y) => 1 + y },
+            ];
+            
+            const t0_vals = [0, 0, 0, 1];
+            const y0_vals = [1, 2, 0.5, 1];
+            const h_vals = [0.1, 0.2, 0.25, 0.5];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const t0 = t0_vals[Math.floor(Math.random() * t0_vals.length)];
+            const y0 = y0_vals[Math.floor(Math.random() * y0_vals.length)];
+            const h = h_vals[Math.floor(Math.random() * h_vals.length)];
+            
+            const f_val = scenario.fFunc(t0, y0);
+            const y1 = y0 + h * f_val;
+            
+            challengeState.currentProblem = {
+                type: 'euler',
+                answer: y1,
+                data: { scenario, t0, y0, h, f_val }
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>Consider the IVP: <strong>y' = ${scenario.fLabel}</strong>, <strong>y(${t0}) = ${y0}</strong></p>
+                <p>Using Euler's method with step size <strong>h = ${h}</strong>, compute <strong>y<sub>1</sub></strong> (the value after one step).</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <input type="text" id="challenge-answer-input" placeholder="Enter y₁ (e.g., 1.5)">
+            `;
+            
+            generateEulerWorkedExample(scenario, t0, y0, h, f_val, y1);
+        }
+        
+        function generateEulerWorkedExample(scenario, t0, y0, h, f_val, y1) {
+            const stepsHtml = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Write the formula</div>
+                    <div class="step-content">
+                        <div class="step-math" id="euler-we-formula"></div>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Evaluate f(t₀, y₀)</div>
+                    <div class="step-content">
+                        f(${t0}, ${y0}) = ${scenario.fLabel.replace('y', `(${y0})`).replace('t', `(${t0})`)} = ${f_val}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Apply the formula</div>
+                    <div class="step-content">
+                        y₁ = y₀ + h · f(t₀, y₀)<br>
+                        y₁ = ${y0} + ${h} × ${f_val}<br>
+                        y₁ = ${y0} + ${h * f_val}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 4: Final answer</div>
+                    <div class="step-content">
+                        <strong>y₁ = ${y1}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = stepsHtml;
+            katex.render('y_{n+1} = y_n + h \\cdot f(t_n, y_n)', document.getElementById('euler-we-formula'), {displayMode: true});
+        }
+        
+        function generateHigherProblem() {
+            const subtypes = ['heun', 'heun', 'rk4'];
+            const subtype = subtypes[Math.floor(Math.random() * subtypes.length)];
+            
+            if (subtype === 'heun') {
+                // Modified Euler problem
+                const scenarios = [
+                    { f: 'y', fLabel: 'y', fFunc: (t, y) => y },
+                    { f: '-y', fLabel: '-y', fFunc: (t, y) => -y },
+                    { f: 't + y', fLabel: 't + y', fFunc: (t, y) => t + y },
+                ];
+                
+                const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+                const t0 = 0;
+                const y0 = 1;
+                const h = [0.5, 0.25, 0.2][Math.floor(Math.random() * 3)];
+                
+                const k1 = scenario.fFunc(t0, y0);
+                const y_star = y0 + h * k1;
+                const k2 = scenario.fFunc(t0 + h, y_star);
+                const y1 = y0 + (h / 2) * (k1 + k2);
+                
+                challengeState.currentProblem = {
+                    type: 'higher',
+                    subtype: 'heun',
+                    answer: y1,
+                    data: { scenario, t0, y0, h, k1, y_star, k2 }
+                };
+                
+                document.getElementById('problem-question').innerHTML = `
+                    <p>Consider: <strong>y' = ${scenario.fLabel}</strong>, <strong>y(${t0}) = ${y0}</strong>, <strong>h = ${h}</strong></p>
+                    <p>Using <strong>Modified Euler (Heun's method)</strong>, compute <strong>y₁</strong>.</p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Formula: y* = y₀ + h·k₁, then y₁ = y₀ + (h/2)(k₁ + k₂) where k₂ = f(t₁, y*)</p>
+                `;
+                
+                generateHeunWorkedExample(scenario, t0, y0, h, k1, y_star, k2, y1);
+            } else {
+                // RK4 k-value problem
+                const y0 = 1;
+                const h = 0.5;
+                const k1 = 1; // For y' = y
+                
+                const askFor = ['k2', 'k3', 'k4'][Math.floor(Math.random() * 3)];
+                let answer, question;
+                
+                if (askFor === 'k2') {
+                    answer = 1 + (h/2) * k1; // k2 = f(t + h/2, y + h/2*k1) = y + h/2*k1 for y'=y
+                    question = `Given y' = y, y(0) = 1, h = 0.5, k₁ = 1, compute <strong>k₂</strong>.`;
+                } else if (askFor === 'k3') {
+                    const k2 = 1.25;
+                    answer = 1 + (h/2) * k2;
+                    question = `Given y' = y, y(0) = 1, h = 0.5, k₂ = 1.25, compute <strong>k₃</strong>.`;
+                } else {
+                    const k3 = 1.3125;
+                    answer = 1 + h * k3;
+                    question = `Given y' = y, y(0) = 1, h = 0.5, k₃ = 1.3125, compute <strong>k₄</strong>.`;
+                }
+                
+                challengeState.currentProblem = {
+                    type: 'higher',
+                    subtype: 'rk4',
+                    answer: answer,
+                    data: { askFor, h, y0 }
+                };
+                
+                document.getElementById('problem-question').innerHTML = `<p>${question}</p>`;
+                
+                generateRK4WorkedExample(askFor, answer);
+            }
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <input type="text" id="challenge-answer-input" placeholder="Enter your answer">
+            `;
+        }
+        
+        function generateHeunWorkedExample(scenario, t0, y0, h, k1, y_star, k2, y1) {
+            const stepsHtml = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Compute k₁ = f(t₀, y₀)</div>
+                    <div class="step-content">
+                        k₁ = f(${t0}, ${y0}) = ${k1}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Predict y* using Euler</div>
+                    <div class="step-content">
+                        y* = y₀ + h · k₁ = ${y0} + ${h} × ${k1} = ${y_star}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Compute k₂ = f(t₁, y*)</div>
+                    <div class="step-content">
+                        k₂ = f(${t0 + h}, ${y_star}) = ${k2}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 4: Correct using average slope</div>
+                    <div class="step-content">
+                        y₁ = y₀ + (h/2)(k₁ + k₂)<br>
+                        y₁ = ${y0} + (${h}/2)(${k1} + ${k2})<br>
+                        y₁ = ${y0} + ${h/2} × ${k1 + k2}<br>
+                        <strong>y₁ = ${y1}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = stepsHtml;
+        }
+        
+        function generateRK4WorkedExample(askFor, answer) {
+            let explanation;
+            if (askFor === 'k2') {
+                explanation = `k₂ = f(t₀ + h/2, y₀ + (h/2)k₁) = y₀ + (h/2)k₁ = 1 + 0.25×1 = 1.25`;
+            } else if (askFor === 'k3') {
+                explanation = `k₃ = f(t₀ + h/2, y₀ + (h/2)k₂) = y₀ + (h/2)k₂ = 1 + 0.25×1.25 = 1.3125`;
+            } else {
+                explanation = `k₄ = f(t₀ + h, y₀ + h·k₃) = y₀ + h·k₃ = 1 + 0.5×1.3125 = 1.65625`;
+            }
+            
+            const stepsHtml = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Recall the RK4 formulas</div>
+                    <div class="step-content">
+                        <div class="step-math" id="rk4-we-formula"></div>
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: For y' = y, f(t,y) = y</div>
+                    <div class="step-content">
+                        ${explanation}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Answer</div>
+                    <div class="step-content">
+                        <strong>${askFor} = ${answer}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = stepsHtml;
+            katex.render('k_2 = f(t_n + \\tfrac{h}{2}, y_n + \\tfrac{h}{2}k_1)', document.getElementById('rk4-we-formula'), {displayMode: true});
+        }
+        
+        function generateOrderProblem() {
+            const problemGenerators = [
+                () => {
+                    const method = ['Euler', 'Modified Euler', 'RK4'][Math.floor(Math.random() * 3)];
+                    const order = { 'Euler': 1, 'Modified Euler': 2, 'RK4': 4 }[method];
+                    const factor = Math.pow(2, order);
+                    return {
+                        question: `${method} has global order ${order}. If you halve the step size h, by approximately what factor does the error decrease?`,
+                        type: 'input',
+                        answer: String(factor),
+                        explanation: `Order p means error ~ hᵖ. Halving h gives error ~ (h/2)ᵖ = hᵖ/2ᵖ. For p=${order}, error decreases by 2${order > 1 ? '^'+order+' = '+factor : ''}.`
+                    };
+                },
+                () => ({
+                    question: `Which method requires the most function evaluations per step?`,
+                    type: 'select',
+                    options: ['Euler (1 evaluation)', 'Modified Euler (2 evaluations)', 'RK4 (4 evaluations)'],
+                    answer: 'RK4 (4 evaluations)',
+                    explanation: `RK4 evaluates f four times per step (k₁, k₂, k₃, k₄). This extra work pays off with 4th-order accuracy.`
+                }),
+                () => ({
+                    question: `What does "global order 2" mean for Modified Euler?`,
+                    type: 'select',
+                    options: ['Error halves when h halves', 'Error quarters when h halves', 'Error reduces by factor 8', 'Method uses 2 function evaluations'],
+                    answer: 'Error quarters when h halves',
+                    explanation: `Global order p means the accumulated error is O(hᵖ). For p=2, halving h reduces error by 2² = 4.`
+                }),
+                () => ({
+                    question: `Euler's method can be interpreted as which quadrature rule applied to the integral form of the ODE?`,
+                    type: 'select',
+                    options: ['Left rectangle rule', 'Trapezium rule', 'Simpson\'s rule', 'Midpoint rule'],
+                    answer: 'Left rectangle rule',
+                    explanation: `The ODE y'=f(t,y) means y(t) = y(0) + ∫f(s,y(s))ds. Euler approximates this integral using only the left endpoint — a left rectangle.`
+                }),
+                () => ({
+                    question: `For stiff equations like y' = -100y, which is the main concern with Euler's method?`,
+                    type: 'select',
+                    options: ['Accuracy', 'Stability', 'Speed', 'Memory'],
+                    answer: 'Stability',
+                    explanation: `For stiff equations, the step size must be very small not for accuracy but for stability — to prevent oscillations or blowup.`
+                }),
+                () => {
+                    const methods = ['Euler', 'Modified Euler', 'RK4'];
+                    const m1 = methods[Math.floor(Math.random() * 3)];
+                    let m2;
+                    do { m2 = methods[Math.floor(Math.random() * 3)]; } while (m2 === m1);
+                    
+                    const orders = { 'Euler': 1, 'Modified Euler': 2, 'RK4': 4 };
+                    const better = orders[m1] > orders[m2] ? m1 : m2;
+                    
+                    return {
+                        question: `For a smooth problem with the same step size h, which method typically gives smaller error: ${m1} or ${m2}?`,
+                        type: 'select',
+                        options: [m1, m2, 'They\'re equal', 'Cannot determine'],
+                        answer: better,
+                        explanation: `${better} has higher order (${orders[better]} vs ${orders[better === m1 ? m2 : m1]}), so for smooth problems it typically gives smaller error with the same h.`
+                    };
+                },
+                () => ({
+                    question: `Why does Modified Euler (Heun) capture curvature better than basic Euler?`,
+                    type: 'select',
+                    options: ['Uses smaller step size', 'Averages slopes at start and end', 'Uses more precision', 'Runs faster'],
+                    answer: 'Averages slopes at start and end',
+                    explanation: `Heun predicts y* using Euler, then averages the slope at start and end. This captures how the slope changes — i.e., the curvature.`
+                }),
+            ];
+            
+            const generator = problemGenerators[Math.floor(Math.random() * problemGenerators.length)];
+            const p = generator();
+            
+            challengeState.currentProblem = {
+                type: 'order',
+                answer: p.answer,
+                data: p
+            };
+            
+            document.getElementById('problem-question').innerHTML = `<p>${p.question}</p>`;
+            
+            if (p.type === 'select') {
+                document.getElementById('problem-input-area').innerHTML = `
+                    <select id="challenge-answer-input">
+                        <option value="">Select an answer...</option>
+                        ${p.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                    </select>
+                `;
+            } else {
+                document.getElementById('problem-input-area').innerHTML = `
+                    <input type="text" id="challenge-answer-input" placeholder="Enter your answer">
+                `;
+            }
+            
+            generateOrderWorkedExample(p);
+        }
+        
+        function generateOrderWorkedExample(p) {
+            const stepsHtml = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Understand the question</div>
+                    <div class="step-content">${p.question}</div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Key reasoning</div>
+                    <div class="step-content">${p.explanation}</div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Answer</div>
+                    <div class="step-content"><strong>${p.answer}</strong></div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = stepsHtml;
+        }
+        
+        window.checkAnswer = function() {
+            const input = document.getElementById('challenge-answer-input');
+            const userAnswer = input.value.trim();
+            const feedback = document.getElementById('problem-feedback');
+            
+            if (!userAnswer) {
+                feedback.innerHTML = 'Please enter an answer';
+                feedback.className = 'problem-feedback incorrect';
+                return;
+            }
+            
+            const problem = challengeState.currentProblem;
+            let isCorrect = false;
+            
+            if (problem.type === 'order' && problem.data.type === 'select') {
+                isCorrect = userAnswer === problem.answer;
+            } else {
+                const userNum = parseFloat(userAnswer);
+                const correctNum = parseFloat(problem.answer);
+                const tolerance = Math.abs(correctNum) * 0.02 + 0.001;
+                isCorrect = Math.abs(userNum - correctNum) <= tolerance;
+            }
+            
+            if (isCorrect) {
+                feedback.innerHTML = '✓ Correct! Well done.';
+                feedback.className = 'problem-feedback correct';
+            } else {
+                feedback.innerHTML = `✗ Not quite. The answer is ${problem.answer}. See the worked example below.`;
+                feedback.className = 'problem-feedback incorrect';
+            }
+        };
+        
+        window.toggleWorkedExample = function() {
+            const toggle = document.querySelector('.worked-example-toggle');
+            const content = document.getElementById('worked-example-content');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.classList.add('open');
+            } else {
+                content.style.display = 'none';
+                toggle.classList.remove('open');
+            }
+        };
+        
+        // Initialize
+        initialize();
+    });
+    </script>
+
+    <!-- Week Navigation -->
+    <div class="week-nav-bar">
+        <a href="../romberg/" class="nav-prev">← Week 6: Romberg</a>
+        <a href="../" class="nav-hub">🏠 All Weeks</a>
+        <span class="nav-disabled">No Next →</span>
+    </div>
+    
+</body>
+</html>
