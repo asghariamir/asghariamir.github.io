@@ -1,1 +1,2419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secant Method & Comparison | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Math.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.min.js"></script>
+    
+    <!-- Plotly -->
+    <script defer src="https://cdn.jsdelivr.net/npm/plotly.js@2.27.0/dist/plotly.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0d5d56;
+            --bg-light: #f7faf9;
+            --interactive-bg: #e6fffb;
+            --text-dark: #212121;
+            --text-muted: #4b5563;
+            --border-light: #d1d5db;
+            --accent-amber: #f59e0b;
+            --error-red: #c62828;
+            --success-green: #10b981;
+            
+            /* Method colors */
+            --bisection-color: #6366f1;
+            --fixedpoint-color: #8b5cf6;
+            --newton-color: #f97316;
+            --secant-color: #06b6d4;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .tab-button:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section styling */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .section h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--interactive-bg) 0%, white 100%);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Concept Cards */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .concept-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .concept-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.1);
+        }
+        
+        .concept-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .concept-card .formula {
+            background: var(--bg-light);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+        
+        /* Preset Pills */
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preset-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Control Grid */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Function Preview */
+        .function-preview {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--interactive-bg);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            min-height: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .function-preview .preview-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        /* Buttons */
+        .primary-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .primary-button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .primary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .secondary-button {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .secondary-button:hover:not(:disabled) {
+            background: var(--interactive-bg);
+        }
+        
+        .secondary-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Method Checkboxes */
+        .method-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .method-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .method-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .method-checkbox.bisection {
+            background: rgba(99, 102, 241, 0.1);
+            border: 2px solid var(--bisection-color);
+        }
+        
+        .method-checkbox.fixedpoint {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid var(--fixedpoint-color);
+        }
+        
+        .method-checkbox.newton {
+            background: rgba(249, 115, 22, 0.1);
+            border: 2px solid var(--newton-color);
+        }
+        
+        .method-checkbox.secant {
+            background: rgba(6, 182, 212, 0.1);
+            border: 2px solid var(--secant-color);
+        }
+        
+        .method-checkbox span {
+            font-weight: 500;
+        }
+        
+        .method-checkbox.bisection span { color: var(--bisection-color); }
+        .method-checkbox.fixedpoint span { color: var(--fixedpoint-color); }
+        .method-checkbox.newton span { color: var(--newton-color); }
+        .method-checkbox.secant span { color: var(--secant-color); }
+        
+        /* Results Panel */
+        .results-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .result-box {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .result-box .method-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-box.bisection { border-left: 4px solid var(--bisection-color); }
+        .result-box.bisection .method-name { color: var(--bisection-color); }
+        
+        .result-box.fixedpoint { border-left: 4px solid var(--fixedpoint-color); }
+        .result-box.fixedpoint .method-name { color: var(--fixedpoint-color); }
+        
+        .result-box.newton { border-left: 4px solid var(--newton-color); }
+        .result-box.newton .method-name { color: var(--newton-color); }
+        
+        .result-box.secant { border-left: 4px solid var(--secant-color); }
+        .result-box.secant .method-name { color: var(--secant-color); }
+        
+        .result-box .result-value {
+            font-size: 1.1rem;
+            font-family: monospace;
+            margin-bottom: 0.25rem;
+        }
+        
+        .result-box .result-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        /* Step Table */
+        .step-table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .step-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        
+        .step-table th, .step-table td {
+            padding: 0.6rem;
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+        
+        .step-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .step-table tbody tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+        
+        .step-table tbody tr:hover {
+            background: var(--interactive-bg);
+        }
+        
+        /* Graph Container */
+        .graph-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            margin: 1rem 0;
+        }
+        
+        .graphs-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        @media (max-width: 900px) {
+            .graphs-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Insights */
+        .dynamic-insights {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+        
+        .dynamic-insights h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dynamic-insights ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .dynamic-insights li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+        }
+        
+        .dynamic-insights li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+        
+        /* Secant Formula Box */
+        .secant-formula-box {
+            background: linear-gradient(135deg, #cffafe 0%, #e0f2fe 100%);
+            border: 2px solid var(--secant-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .secant-formula-box h3 {
+            color: var(--secant-color);
+            margin-bottom: 1rem;
+        }
+        
+        .secant-formula-box .big-formula {
+            font-size: 1.2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        /* Method Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+        
+        .comparison-table th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+        
+        .comparison-table th:first-child {
+            text-align: left;
+        }
+        
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .comparison-table .bisection-col { color: var(--bisection-color); }
+        .comparison-table .fixedpoint-col { color: var(--fixedpoint-color); }
+        .comparison-table .newton-col { color: var(--newton-color); }
+        .comparison-table .secant-col { color: var(--secant-color); }
+        
+        /* Perspectives */
+        .perspectives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .perspective-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .perspective-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .perspective-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Challenge Tab Styles */
+        .challenge-type-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .challenge-type-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .challenge-type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.15);
+        }
+        
+        .challenge-type-card.active {
+            border-color: var(--primary);
+            background: var(--interactive-bg);
+        }
+        
+        .challenge-type-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .challenge-type-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .challenge-type-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        .challenge-prompt {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+        
+        .problem-area {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid var(--border-light);
+        }
+        
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .problem-type-badge {
+            background: var(--interactive-bg);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .problem-number {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .problem-question {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .problem-input-area {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .problem-input-area input, .problem-input-area select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+        
+        .problem-input-area input:focus, .problem-input-area select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .problem-feedback {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .problem-feedback.show {
+            display: block;
+        }
+        
+        .problem-feedback.correct {
+            background: #dcfce7;
+            border: 1px solid var(--success-green);
+            color: #166534;
+        }
+        
+        .problem-feedback.incorrect {
+            background: #fee2e2;
+            border: 1px solid var(--error-red);
+            color: #991b1b;
+        }
+        
+        /* Worked Example */
+        .worked-example-container {
+            margin: 1.5rem 0;
+        }
+        
+        .worked-example-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .worked-example-toggle:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+        
+        .worked-example-toggle.open {
+            border-color: var(--primary);
+            background: white;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .worked-example-toggle.open .toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        .worked-example-content {
+            background: white;
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1.5rem;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .worked-example-content.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .worked-example-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .worked-example-steps {
+            padding-left: 0.5rem;
+        }
+        
+        .worked-example-step {
+            margin-bottom: 1.25rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--interactive-bg);
+        }
+        
+        .worked-example-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .step-label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-content {
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .generate-new-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        /* Nav Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .nav-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-button:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .challenge-type-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    
+        /* Week Navigation Bar */
+        .week-nav-bar {
+            background: white;
+            border-top: 2px solid var(--primary);
+            padding: 1rem;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .week-nav-bar a, .week-nav-bar span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .week-nav-bar .nav-prev,
+        .week-nav-bar .nav-next {
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            background: white;
+        }
+        
+        .week-nav-bar .nav-prev:hover,
+        .week-nav-bar .nav-next:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-hub {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .week-nav-bar .nav-hub:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .week-nav-bar .nav-disabled {
+            color: var(--text-muted);
+            border: 2px solid var(--border-light);
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        @media (max-width: 600px) {
+            .week-nav-bar {
+                flex-direction: column;
+            }
+            .week-nav-bar a, .week-nav-bar span {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
 
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('intro')">Introduction</button>
+            <button class="tab-button" onclick="switchTab('explorer')">Explorer</button>
+            <button class="tab-button" onclick="switchTab('comparison')">Comparison</button>
+            <button class="tab-button" onclick="switchTab('challenge')">Challenge</button>
+        </div>
+
+        <!-- ==================== INTRODUCTION TAB ==================== -->
+        <div id="intro-tab" class="tab-content active">
+            <div class="hero">
+                <h1>📐 Secant Method & Comparison</h1>
+                <p>Newton without derivatives. Use two points to approximate the tangent slope, then compare all four root-finding methods side by side.</p>
+            </div>
+
+            <div class="secant-formula-box">
+                <h3>The Secant Iteration</h3>
+                <div class="big-formula" id="secant-main-formula"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">
+                    "Replace the derivative with a finite difference"
+                </p>
+            </div>
+
+            <div class="concept-cards">
+                <div class="concept-card">
+                    <div class="icon">📐</div>
+                    <h3>From Newton to Secant</h3>
+                    <p>Newton uses f'(xₙ). If we don't have the derivative, approximate it using two recent points.</p>
+                    <div class="formula" id="derivative-approx"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">🎯</div>
+                    <h3>Superlinear Convergence</h3>
+                    <p>The secant method has order ≈ 1.618 (the golden ratio). Faster than linear, slower than quadratic.</p>
+                    <div class="formula" id="golden-order"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">⚖️</div>
+                    <h3>Trade-offs</h3>
+                    <p>No derivative needed, but requires two starting points. Still faster than bisection or fixed-point.</p>
+                    <div class="formula" id="tradeoff-formula"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Method Comparison at a Glance</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Property</th>
+                        <th class="bisection-col">Bisection</th>
+                        <th class="fixedpoint-col">Fixed-Point</th>
+                        <th class="newton-col">Newton</th>
+                        <th class="secant-col">Secant</th>
+                    </tr>
+                    <tr>
+                        <td>Order of convergence</td>
+                        <td>1 (linear)</td>
+                        <td>1 (linear)</td>
+                        <td>2 (quadratic)</td>
+                        <td>≈1.618</td>
+                    </tr>
+                    <tr>
+                        <td>Requires derivative?</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Starting values</td>
+                        <td>Interval [a,b]</td>
+                        <td>One point</td>
+                        <td>One point</td>
+                        <td>Two points</td>
+                    </tr>
+                    <tr>
+                        <td>Guaranteed to converge?</td>
+                        <td>Yes (if bracket)</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Function evals/step</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>2 (f, f')</td>
+                        <td>1</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="perspectives">
+                <div class="perspective-card">
+                    <h4>🔗 Memory vs Computation</h4>
+                    <p>Secant trades derivative computation for memory — it stores two previous points. This is often a good trade when derivatives are expensive.</p>
+                </div>
+                <div class="perspective-card">
+                    <h4>🏆 When to Use What</h4>
+                    <p>Start with bisection to bracket the root safely, then switch to Newton (if derivatives available) or secant for speed.</p>
+                </div>
+            </div>
+
+            <div class="section" style="background: var(--interactive-bg);">
+                <h3>📚 Week 4 Connection</h3>
+                <p>This explorer covers the secant method from Week 4 and provides a comprehensive comparison of all root-finding methods. Use the Comparison tab to see how methods perform on the same problem.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <div></div>
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    Try the Explorer →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== EXPLORER TAB ==================== -->
+        <div id="explorer-tab" class="tab-content">
+            <div class="section">
+                <h2>Secant Method Explorer</h2>
+                <div class="preset-pills" id="preset-pills"></div>
+                
+                <div class="control-grid">
+                    <div class="control-group">
+                        <label>Function f(x):</label>
+                        <input type="text" id="f-input" placeholder="e.g., x^2 - 2">
+                        <div id="f-preview" class="function-preview"></div>
+                    </div>
+                    <div class="control-group">
+                        <label>First starting value x₀:</label>
+                        <input type="number" id="x0-input" value="1" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Second starting value x₁:</label>
+                        <input type="number" id="x1-input" value="2" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Max iterations:</label>
+                        <input type="number" id="max-iter-input" value="15" min="1" max="30">
+                    </div>
+                    <div class="control-group">
+                        <label>Tolerance:</label>
+                        <input type="number" id="tol-input" value="1e-10" step="1e-10">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="primary-button" onclick="runSecant()">
+                        ▶ Run Secant Method
+                    </button>
+                    <button class="secondary-button" onclick="resetExplorer()">
+                        ↺ Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Results</h2>
+                
+                <div class="results-panel">
+                    <div class="result-box secant">
+                        <div class="method-name">Iterations</div>
+                        <div class="result-value" id="result-iterations">—</div>
+                    </div>
+                    <div class="result-box secant">
+                        <div class="method-name">Root</div>
+                        <div class="result-value" id="result-root">—</div>
+                    </div>
+                    <div class="result-box secant">
+                        <div class="method-name">f(root)</div>
+                        <div class="result-value" id="result-froot">—</div>
+                    </div>
+                    <div class="result-box secant">
+                        <div class="method-name">Est. Order</div>
+                        <div class="result-value" id="result-order">—</div>
+                    </div>
+                </div>
+                
+                <div class="graph-container">
+                    <div id="secant-graph" style="width: 100%; height: 400px;"></div>
+                </div>
+                
+                <div class="step-table-container">
+                    <table class="step-table" id="step-table">
+                        <thead>
+                            <tr>
+                                <th>n</th>
+                                <th>xₙ₋₁</th>
+                                <th>xₙ</th>
+                                <th>f(xₙ)</th>
+                                <th>xₙ₊₁</th>
+                                <th>|xₙ₊₁ − xₙ|</th>
+                            </tr>
+                        </thead>
+                        <tbody id="step-table-body">
+                            <tr><td colspan="6" style="color: var(--text-muted); padding: 2rem;">Click "Run Secant Method" to begin</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="dynamic-insights" class="dynamic-insights" style="display: none;">
+                    <h4>💡 Insights</h4>
+                    <ul id="insights-list"></ul>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('intro')">
+                    ← Back to Introduction
+                </button>
+                <button class="nav-button" onclick="switchTab('comparison')">
+                    Compare Methods →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== COMPARISON TAB ==================== -->
+        <div id="comparison-tab" class="tab-content">
+            <div class="section">
+                <h2>Method Comparison</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Run multiple methods on the same problem to compare their performance.</p>
+                
+                <div class="preset-pills" id="comparison-presets"></div>
+                
+                <div class="control-grid">
+                    <div class="control-group">
+                        <label>Function f(x):</label>
+                        <input type="text" id="comp-f-input" placeholder="e.g., x^2 - 2">
+                    </div>
+                    <div class="control-group">
+                        <label>f'(x) for Newton:</label>
+                        <input type="text" id="comp-fp-input" placeholder="e.g., 2*x">
+                    </div>
+                    <div class="control-group">
+                        <label>g(x) for Fixed-Point:</label>
+                        <input type="text" id="comp-g-input" placeholder="e.g., sqrt(2+x)">
+                    </div>
+                    <div class="control-group">
+                        <label>Interval [a, b]:</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="number" id="comp-a-input" value="1" step="0.1" style="width: 50%;">
+                            <input type="number" id="comp-b-input" value="2" step="0.1" style="width: 50%;">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Starting point x₀:</label>
+                        <input type="number" id="comp-x0-input" value="1.5" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Tolerance:</label>
+                        <input type="number" id="comp-tol-input" value="1e-8" step="1e-8">
+                    </div>
+                </div>
+                
+                <div class="method-checkboxes">
+                    <label class="method-checkbox bisection">
+                        <input type="checkbox" id="use-bisection" checked>
+                        <span>Bisection</span>
+                    </label>
+                    <label class="method-checkbox fixedpoint">
+                        <input type="checkbox" id="use-fixedpoint" checked>
+                        <span>Fixed-Point</span>
+                    </label>
+                    <label class="method-checkbox newton">
+                        <input type="checkbox" id="use-newton" checked>
+                        <span>Newton</span>
+                    </label>
+                    <label class="method-checkbox secant">
+                        <input type="checkbox" id="use-secant" checked>
+                        <span>Secant</span>
+                    </label>
+                </div>
+                
+                <button class="primary-button" onclick="runComparison()">
+                    ▶ Compare All Methods
+                </button>
+            </div>
+            
+            <div class="section" id="comparison-results" style="display: none;">
+                <h2>Comparison Results</h2>
+                
+                <div id="comparison-boxes" class="results-panel"></div>
+                
+                <div class="graphs-row">
+                    <div class="graph-container">
+                        <div id="convergence-graph" style="width: 100%; height: 350px;"></div>
+                    </div>
+                    <div class="graph-container">
+                        <div id="error-graph" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
+                
+                <div id="comparison-insights" class="dynamic-insights">
+                    <h4>💡 Comparison Insights</h4>
+                    <ul id="comparison-insights-list"></ul>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('explorer')">
+                    ← Back to Explorer
+                </button>
+                <button class="nav-button" onclick="switchTab('challenge')">
+                    Try Challenges →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== CHALLENGE TAB ==================== -->
+        <div id="challenge-tab" class="tab-content">
+            <div class="section">
+                <h2>Challenge Types</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Test your understanding of root-finding methods.</p>
+                
+                <div class="challenge-type-cards">
+                    <div class="challenge-type-card" data-type="secant-step" onclick="selectChallengeType('secant-step')">
+                        <div class="challenge-type-icon">🔢</div>
+                        <h4>Secant Step</h4>
+                        <p>Compute one iteration</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="estimate-order" onclick="selectChallengeType('estimate-order')">
+                        <div class="challenge-type-icon">📊</div>
+                        <h4>Estimate Order</h4>
+                        <p>From iteration data</p>
+                    </div>
+                    <div class="challenge-type-card" data-type="choose-method" onclick="selectChallengeType('choose-method')">
+                        <div class="challenge-type-icon">🎯</div>
+                        <h4>Choose Method</h4>
+                        <p>Which method is best?</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem Area -->
+            <div id="problem-area" class="problem-area" style="display: none;">
+                <div class="problem-header">
+                    <span class="problem-type-badge" id="problem-type-label">Secant Step</span>
+                    <span class="problem-number" id="problem-number">Problem #1</span>
+                </div>
+                
+                <div class="problem-question" id="problem-question"></div>
+                
+                <div class="problem-input-area" id="problem-input-area"></div>
+                
+                <button class="primary-button" onclick="checkAnswer()">
+                    ✓ Check Answer
+                </button>
+                
+                <div id="problem-feedback" class="problem-feedback"></div>
+                
+                <!-- Worked Example -->
+                <div class="worked-example-container">
+                    <button class="worked-example-toggle" onclick="toggleWorkedExample()">
+                        <span class="toggle-icon">▶</span>
+                        <span>📖 See Worked Example</span>
+                    </button>
+                    
+                    <div id="worked-example-content" class="worked-example-content">
+                        <div class="worked-example-header">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                <line x1="8" y1="6" x2="16" y2="6"/>
+                                <line x1="8" y1="10" x2="14" y2="10"/>
+                            </svg>
+                            <div>
+                                <h4 style="margin: 0; color: var(--primary);">Worked Example</h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Step-by-step solution</p>
+                            </div>
+                        </div>
+                        <div id="worked-example-steps" class="worked-example-steps"></div>
+                    </div>
+                </div>
+                
+                <div class="generate-new-container">
+                    <button class="secondary-button" onclick="generateNewProblem()">
+                        🔄 Generate New Problem
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Initial prompt -->
+            <div id="challenge-prompt" class="challenge-prompt">
+                <p>👆 Select a challenge type above to begin practicing</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="switchTab('comparison')">
+                    ← Back to Comparison
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    window.addEventListener('load', function() {
+        // ============ STATE ============
+        let state = {
+            compiledF: null,
+            exactRoot: null,
+            allSteps: []
+        };
+        
+        // ============ PRESETS ============
+        const PRESETS = {
+            "x² − 2": {
+                f: "x^2 - 2",
+                fp: "2*x",
+                g: "sqrt(x + 2)",
+                fLabel: "x² − 2",
+                x0: 1,
+                x1: 2,
+                a: 1,
+                b: 2,
+                exact: Math.sqrt(2)
+            },
+            "x³ − x − 1": {
+                f: "x^3 - x - 1",
+                fp: "3*x^2 - 1",
+                g: "(x + 1)^(1/3)",
+                fLabel: "x³ − x − 1",
+                x0: 1,
+                x1: 1.5,
+                a: 1,
+                b: 2,
+                exact: 1.3247179572
+            },
+            "cos(x) − x": {
+                f: "cos(x) - x",
+                fp: "-sin(x) - 1",
+                g: "cos(x)",
+                fLabel: "cos(x) − x",
+                x0: 0.5,
+                x1: 1,
+                a: 0,
+                b: 1,
+                exact: 0.7390851332
+            },
+            "eˣ − 3": {
+                f: "exp(x) - 3",
+                fp: "exp(x)",
+                g: "log(3)",
+                fLabel: "eˣ − 3",
+                x0: 1,
+                x1: 1.5,
+                a: 0,
+                b: 2,
+                exact: Math.log(3)
+            }
+        };
+        
+        // ============ INITIALIZATION ============
+        function initialize() {
+            // Build preset pills
+            Object.entries(PRESETS).forEach(([name, preset]) => {
+                const pill = document.createElement('button');
+                pill.className = 'preset-pill';
+                pill.innerHTML = preset.fLabel;
+                pill.dataset.name = name;
+                pill.onclick = () => loadPreset(name);
+                document.getElementById('preset-pills').appendChild(pill);
+                
+                const pill2 = pill.cloneNode(true);
+                pill2.onclick = () => loadComparisonPreset(name);
+                document.getElementById('comparison-presets').appendChild(pill2);
+            });
+            
+            // Event listeners
+            document.getElementById('f-input').addEventListener('input', updateFPreview);
+            
+            // Render intro formulas
+            renderIntroFormulas();
+            
+            // Load default
+            loadPreset("x² − 2");
+            loadComparisonPreset("x² − 2");
+        }
+        
+        function renderIntroFormulas() {
+            if (typeof katex === 'undefined') return;
+            
+            try {
+                katex.render("x_{n+1} = x_n - f(x_n) \\cdot \\frac{x_n - x_{n-1}}{f(x_n) - f(x_{n-1})}", document.getElementById('secant-main-formula'), {displayMode: true});
+                katex.render("f'(x_n) \\approx \\frac{f(x_n) - f(x_{n-1})}{x_n - x_{n-1}}", document.getElementById('derivative-approx'), {displayMode: false});
+                katex.render("p = \\frac{1 + \\sqrt{5}}{2} \\approx 1.618", document.getElementById('golden-order'), {displayMode: false});
+                katex.render("\\text{No } f' \\text{ needed}", document.getElementById('tradeoff-formula'), {displayMode: false});
+            } catch (e) {
+                console.error('KaTeX render error:', e);
+            }
+        }
+        
+        function loadPreset(name) {
+            const preset = PRESETS[name];
+            if (!preset) return;
+            
+            document.getElementById('f-input').value = preset.f;
+            document.getElementById('x0-input').value = preset.x0;
+            document.getElementById('x1-input').value = preset.x1;
+            
+            state.exactRoot = preset.exact;
+            
+            document.querySelectorAll('#preset-pills .preset-pill').forEach(pill => {
+                pill.classList.toggle('active', pill.dataset.name === name);
+            });
+            
+            updateFPreview();
+        }
+        
+        function loadComparisonPreset(name) {
+            const preset = PRESETS[name];
+            if (!preset) return;
+            
+            document.getElementById('comp-f-input').value = preset.f;
+            document.getElementById('comp-fp-input').value = preset.fp;
+            document.getElementById('comp-g-input').value = preset.g;
+            document.getElementById('comp-a-input').value = preset.a;
+            document.getElementById('comp-b-input').value = preset.b;
+            document.getElementById('comp-x0-input').value = (preset.x0 + preset.x1) / 2;
+            
+            state.exactRoot = preset.exact;
+            
+            document.querySelectorAll('#comparison-presets .preset-pill').forEach(pill => {
+                pill.classList.toggle('active', pill.dataset.name === name);
+            });
+        }
+        
+        function updateFPreview() {
+            const fStr = document.getElementById('f-input').value.trim();
+            const preview = document.getElementById('f-preview');
+            
+            if (!fStr) {
+                preview.innerHTML = '<span class="preview-label">Enter f(x) above</span>';
+                return;
+            }
+            
+            const latex = mathToLatex(fStr);
+            preview.innerHTML = '<span class="preview-label">f(x) =</span> <span id="f-latex"></span>';
+            
+            if (typeof katex !== 'undefined') {
+                try {
+                    katex.render(latex, document.getElementById('f-latex'), { displayMode: false });
+                } catch (e) {
+                    preview.innerHTML = `<span class="preview-label">f(x) = ${fStr}</span>`;
+                }
+            }
+        }
+        
+        function mathToLatex(str) {
+            return str
+                .replace(/\*\*/g, '^')
+                .replace(/\*/g, ' \\cdot ')
+                .replace(/sqrt\(([^)]+)\)/g, '\\sqrt{$1}')
+                .replace(/exp\(([^)]+)\)/g, 'e^{$1}')
+                .replace(/sin\(([^)]+)\)/g, '\\sin($1)')
+                .replace(/cos\(([^)]+)\)/g, '\\cos($1)')
+                .replace(/log\(([^)]+)\)/g, '\\ln($1)')
+                .replace(/pi/g, '\\pi')
+                .replace(/\^2/g, '^{2}')
+                .replace(/\^3/g, '^{3}');
+        }
+        
+        // ============ SECANT METHOD ============
+        function secantMethod(f, x0, x1, tol, maxIter) {
+            const steps = [];
+            let xPrev = x0;
+            let xCurr = x1;
+            
+            for (let n = 0; n < maxIter; n++) {
+                let fPrev, fCurr;
+                try {
+                    fPrev = f(xPrev);
+                    fCurr = f(xCurr);
+                } catch (e) {
+                    break;
+                }
+                
+                if (Math.abs(fCurr - fPrev) < 1e-14) {
+                    break;
+                }
+                
+                const xNext = xCurr - fCurr * (xCurr - xPrev) / (fCurr - fPrev);
+                const diff = Math.abs(xNext - xCurr);
+                
+                steps.push({
+                    n: n,
+                    xPrev: xPrev,
+                    xCurr: xCurr,
+                    fCurr: fCurr,
+                    xNext: xNext,
+                    diff: diff
+                });
+                
+                if (diff < tol || Math.abs(fCurr) < tol) {
+                    break;
+                }
+                
+                xPrev = xCurr;
+                xCurr = xNext;
+            }
+            
+            return steps;
+        }
+        
+        function bisectionMethod(f, a, b, tol, maxIter) {
+            const steps = [];
+            
+            for (let n = 0; n < maxIter; n++) {
+                const m = (a + b) / 2;
+                const fm = f(m);
+                
+                steps.push({
+                    n: n,
+                    a: a,
+                    b: b,
+                    m: m,
+                    fm: fm
+                });
+                
+                if (Math.abs(fm) < tol || (b - a) / 2 < tol) {
+                    break;
+                }
+                
+                if (f(a) * fm < 0) {
+                    b = m;
+                } else {
+                    a = m;
+                }
+            }
+            
+            return steps;
+        }
+        
+        function fixedPointMethod(g, x0, tol, maxIter) {
+            const steps = [];
+            let x = x0;
+            
+            for (let n = 0; n < maxIter; n++) {
+                let gx;
+                try {
+                    gx = g(x);
+                } catch (e) {
+                    break;
+                }
+                
+                if (!isFinite(gx) || Math.abs(gx) > 1e10) {
+                    break;
+                }
+                
+                const diff = Math.abs(gx - x);
+                
+                steps.push({
+                    n: n,
+                    x: x,
+                    gx: gx,
+                    diff: diff
+                });
+                
+                if (diff < tol) {
+                    break;
+                }
+                
+                x = gx;
+            }
+            
+            return steps;
+        }
+        
+        function newtonMethod(f, fp, x0, tol, maxIter) {
+            const steps = [];
+            let x = x0;
+            
+            for (let n = 0; n < maxIter; n++) {
+                let fx, fpx;
+                try {
+                    fx = f(x);
+                    fpx = fp(x);
+                } catch (e) {
+                    break;
+                }
+                
+                if (Math.abs(fpx) < 1e-14) {
+                    break;
+                }
+                
+                const xNext = x - fx / fpx;
+                const diff = Math.abs(xNext - x);
+                
+                steps.push({
+                    n: n,
+                    x: x,
+                    fx: fx,
+                    fpx: fpx,
+                    xNext: xNext,
+                    diff: diff
+                });
+                
+                if (diff < tol || Math.abs(fx) < tol) {
+                    break;
+                }
+                
+                x = xNext;
+            }
+            
+            return steps;
+        }
+        
+        // ============ RUN SECANT ============
+        window.runSecant = function() {
+            const fStr = document.getElementById('f-input').value.trim();
+            const x0 = parseFloat(document.getElementById('x0-input').value);
+            const x1 = parseFloat(document.getElementById('x1-input').value);
+            const tol = parseFloat(document.getElementById('tol-input').value);
+            const maxIter = parseInt(document.getElementById('max-iter-input').value);
+            
+            if (!fStr) {
+                alert('Please enter a function f(x)');
+                return;
+            }
+            
+            if (typeof math === 'undefined') {
+                alert('Math library not loaded. Please refresh the page.');
+                return;
+            }
+            
+            try {
+                const compiledF = math.compile(fStr);
+                state.compiledF = compiledF;
+                const f = (x) => compiledF.evaluate({ x: x });
+                
+                const steps = secantMethod(f, x0, x1, tol, maxIter);
+                state.allSteps = steps;
+                
+                displaySecantResults(steps);
+                buildSecantTable(steps);
+                plotSecant(f, steps, x0, x1);
+                updateSecantInsights(steps);
+                
+            } catch (e) {
+                alert('Error parsing function: ' + e.message);
+            }
+        };
+        
+        function displaySecantResults(steps) {
+            const lastStep = steps[steps.length - 1];
+            
+            document.getElementById('result-iterations').textContent = steps.length;
+            document.getElementById('result-root').textContent = lastStep.xNext.toFixed(10);
+            document.getElementById('result-froot').textContent = state.compiledF.evaluate({ x: lastStep.xNext }).toExponential(3);
+            
+            // Estimate order
+            if (steps.length >= 3 && state.exactRoot) {
+                let orders = [];
+                for (let i = 2; i < steps.length; i++) {
+                    const e_prev2 = Math.abs(steps[i-2].xCurr - state.exactRoot);
+                    const e_prev = Math.abs(steps[i-1].xCurr - state.exactRoot);
+                    const e_curr = Math.abs(steps[i].xCurr - state.exactRoot);
+                    
+                    if (e_prev2 > 1e-14 && e_prev > 1e-14 && e_curr > 1e-14) {
+                        const p = Math.log(e_curr / e_prev) / Math.log(e_prev / e_prev2);
+                        if (isFinite(p) && p > 0 && p < 3) {
+                            orders.push(p);
+                        }
+                    }
+                }
+                
+                if (orders.length > 0) {
+                    const avgOrder = orders.reduce((a,b) => a+b, 0) / orders.length;
+                    document.getElementById('result-order').textContent = '≈ ' + avgOrder.toFixed(2);
+                } else {
+                    document.getElementById('result-order').textContent = '≈ 1.6';
+                }
+            } else {
+                document.getElementById('result-order').textContent = '—';
+            }
+        }
+        
+        function buildSecantTable(steps) {
+            let html = '';
+            
+            steps.forEach((step, i) => {
+                const isLast = i === steps.length - 1;
+                
+                html += `<tr class="${isLast ? 'highlight-row' : ''}">
+                    <td>${step.n}</td>
+                    <td>${step.xPrev.toFixed(8)}</td>
+                    <td>${step.xCurr.toFixed(8)}</td>
+                    <td>${step.fCurr.toExponential(4)}</td>
+                    <td>${step.xNext.toFixed(8)}</td>
+                    <td>${step.diff.toExponential(3)}</td>
+                </tr>`;
+            });
+            
+            document.getElementById('step-table-body').innerHTML = html;
+        }
+        
+        function plotSecant(f, steps, x0, x1) {
+            if (typeof Plotly === 'undefined') return;
+            
+            let xMin = Math.min(x0, x1);
+            let xMax = Math.max(x0, x1);
+            
+            steps.forEach(s => {
+                xMin = Math.min(xMin, s.xCurr, s.xNext);
+                xMax = Math.max(xMax, s.xCurr, s.xNext);
+            });
+            
+            const padding = (xMax - xMin) * 0.3;
+            xMin -= padding;
+            xMax += padding;
+            
+            const xVals = [];
+            const yVals = [];
+            
+            for (let x = xMin; x <= xMax; x += (xMax - xMin) / 200) {
+                xVals.push(x);
+                try {
+                    const y = f(x);
+                    yVals.push(isFinite(y) && Math.abs(y) < 100 ? y : null);
+                } catch (e) {
+                    yVals.push(null);
+                }
+            }
+            
+            const traces = [
+                {
+                    x: xVals,
+                    y: yVals,
+                    mode: 'lines',
+                    name: 'f(x)',
+                    line: { color: '#6366f1', width: 2 }
+                },
+                {
+                    x: [xMin, xMax],
+                    y: [0, 0],
+                    mode: 'lines',
+                    name: 'y = 0',
+                    line: { color: '#94a3b8', width: 1, dash: 'dash' },
+                    showlegend: false
+                }
+            ];
+            
+            // Add secant lines
+            steps.forEach((step, i) => {
+                const x1 = step.xPrev;
+                const x2 = step.xCurr;
+                const f1 = f(x1);
+                const f2 = f(x2);
+                
+                traces.push({
+                    x: [x1, x2, step.xNext],
+                    y: [f1, f2, 0],
+                    mode: 'lines+markers',
+                    name: i === steps.length - 1 ? 'Secant lines' : null,
+                    showlegend: i === steps.length - 1,
+                    line: { color: '#06b6d4', width: 2, dash: 'dot' },
+                    marker: { size: 6 }
+                });
+            });
+            
+            // Final point
+            const lastStep = steps[steps.length - 1];
+            traces.push({
+                x: [lastStep.xNext],
+                y: [0],
+                mode: 'markers',
+                name: 'Root',
+                marker: { color: '#10b981', size: 12, symbol: 'diamond' }
+            });
+            
+            const layout = {
+                title: 'Secant Method',
+                xaxis: { title: 'x' },
+                yaxis: { title: 'f(x)' },
+                legend: { x: 0, y: 1, bgcolor: 'rgba(255,255,255,0.8)' },
+                margin: { t: 40, r: 20, b: 40, l: 50 }
+            };
+            
+            Plotly.newPlot('secant-graph', traces, layout, { responsive: true });
+        }
+        
+        function updateSecantInsights(steps) {
+            document.getElementById('dynamic-insights').style.display = 'block';
+            const insights = [];
+            
+            const lastStep = steps[steps.length - 1];
+            insights.push(`Converged in ${steps.length} iterations`);
+            
+            if (state.exactRoot) {
+                const finalError = Math.abs(lastStep.xNext - state.exactRoot);
+                insights.push(`Final error: ${finalError.toExponential(3)}`);
+            }
+            
+            // Compare with other methods
+            const bisectionSteps = Math.ceil(Math.log2(1 / parseFloat(document.getElementById('tol-input').value)));
+            insights.push(`Bisection would need ~${bisectionSteps} steps for same accuracy`);
+            insights.push(`Secant requires no derivative computation`);
+            
+            document.getElementById('insights-list').innerHTML = insights.map(i => `<li>${i}</li>`).join('');
+        }
+        
+        window.resetExplorer = function() {
+            document.getElementById('step-table-body').innerHTML = '<tr><td colspan="6" style="color: var(--text-muted); padding: 2rem;">Click "Run Secant Method" to begin</td></tr>';
+            document.getElementById('result-iterations').textContent = '—';
+            document.getElementById('result-root').textContent = '—';
+            document.getElementById('result-froot').textContent = '—';
+            document.getElementById('result-order').textContent = '—';
+            document.getElementById('dynamic-insights').style.display = 'none';
+            
+            if (typeof Plotly !== 'undefined') {
+                Plotly.purge('secant-graph');
+            }
+        };
+        
+        // ============ COMPARISON ============
+        window.runComparison = function() {
+            const fStr = document.getElementById('comp-f-input').value.trim();
+            const fpStr = document.getElementById('comp-fp-input').value.trim();
+            const gStr = document.getElementById('comp-g-input').value.trim();
+            const a = parseFloat(document.getElementById('comp-a-input').value);
+            const b = parseFloat(document.getElementById('comp-b-input').value);
+            const x0 = parseFloat(document.getElementById('comp-x0-input').value);
+            const tol = parseFloat(document.getElementById('comp-tol-input').value);
+            
+            if (!fStr) {
+                alert('Please enter a function f(x)');
+                return;
+            }
+            
+            if (typeof math === 'undefined') {
+                alert('Math library not loaded. Please refresh the page.');
+                return;
+            }
+            
+            try {
+                const f = (x) => math.evaluate(fStr, { x: x });
+                const fp = fpStr ? (x) => math.evaluate(fpStr, { x: x }) : null;
+                const g = gStr ? (x) => math.evaluate(gStr, { x: x }) : null;
+                
+                const results = {};
+                const maxIter = 50;
+                
+                if (document.getElementById('use-bisection').checked) {
+                    results.bisection = bisectionMethod(f, a, b, tol, maxIter);
+                }
+                
+                if (document.getElementById('use-fixedpoint').checked && g) {
+                    results.fixedpoint = fixedPointMethod(g, x0, tol, maxIter);
+                }
+                
+                if (document.getElementById('use-newton').checked && fp) {
+                    results.newton = newtonMethod(f, fp, x0, tol, maxIter);
+                }
+                
+                if (document.getElementById('use-secant').checked) {
+                    results.secant = secantMethod(f, a, x0, tol, maxIter);
+                }
+                
+                displayComparisonResults(results);
+                plotComparison(results);
+                updateComparisonInsights(results);
+                
+                document.getElementById('comparison-results').style.display = 'block';
+                
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        };
+        
+        function displayComparisonResults(results) {
+            let html = '';
+            
+            const methodNames = {
+                bisection: 'Bisection',
+                fixedpoint: 'Fixed-Point',
+                newton: 'Newton',
+                secant: 'Secant'
+            };
+            
+            Object.entries(results).forEach(([method, steps]) => {
+                if (!steps || steps.length === 0) return;
+                
+                let root;
+                if (method === 'bisection') {
+                    root = steps[steps.length - 1].m;
+                } else if (method === 'fixedpoint') {
+                    root = steps[steps.length - 1].gx;
+                } else if (method === 'newton') {
+                    root = steps[steps.length - 1].xNext;
+                } else {
+                    root = steps[steps.length - 1].xNext;
+                }
+                
+                html += `
+                    <div class="result-box ${method}">
+                        <div class="method-name">${methodNames[method]}</div>
+                        <div class="result-value">${steps.length} iterations</div>
+                        <div class="result-label">Root: ${root?.toFixed(8) || 'N/A'}</div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('comparison-boxes').innerHTML = html;
+        }
+        
+        function plotComparison(results) {
+            if (typeof Plotly === 'undefined') return;
+            
+            const colors = {
+                bisection: '#6366f1',
+                fixedpoint: '#8b5cf6',
+                newton: '#f97316',
+                secant: '#06b6d4'
+            };
+            
+            // Convergence plot
+            const convTraces = [];
+            Object.entries(results).forEach(([method, steps]) => {
+                if (!steps || steps.length === 0) return;
+                
+                const xVals = [];
+                Object.entries(results).forEach(([m, s]) => {
+                    if (s) for (let i = 0; i < s.length; i++) xVals.push(i);
+                });
+                
+                const nVals = steps.map((_, i) => i);
+                let rootVals;
+                
+                if (method === 'bisection') {
+                    rootVals = steps.map(s => s.m);
+                } else if (method === 'fixedpoint') {
+                    rootVals = steps.map(s => s.gx);
+                } else if (method === 'newton') {
+                    rootVals = steps.map(s => s.xNext);
+                } else {
+                    rootVals = steps.map(s => s.xNext);
+                }
+                
+                convTraces.push({
+                    x: nVals,
+                    y: rootVals,
+                    mode: 'lines+markers',
+                    name: method.charAt(0).toUpperCase() + method.slice(1),
+                    line: { color: colors[method], width: 2 },
+                    marker: { size: 6 }
+                });
+            });
+            
+            // Error plot
+            const errorTraces = [];
+            if (state.exactRoot) {
+                Object.entries(results).forEach(([method, steps]) => {
+                    if (!steps || steps.length === 0) return;
+                    
+                    const nVals = steps.map((_, i) => i);
+                    let errors;
+                    
+                    if (method === 'bisection') {
+                        errors = steps.map(s => Math.abs(s.m - state.exactRoot));
+                    } else if (method === 'fixedpoint') {
+                        errors = steps.map(s => Math.abs(s.gx - state.exactRoot));
+                    } else if (method === 'newton') {
+                        errors = steps.map(s => Math.abs(s.xNext - state.exactRoot));
+                    } else {
+                        errors = steps.map(s => Math.abs(s.xNext - state.exactRoot));
+                    }
+                    
+                    errorTraces.push({
+                        x: nVals,
+                        y: errors,
+                        mode: 'lines+markers',
+                        name: method.charAt(0).toUpperCase() + method.slice(1),
+                        line: { color: colors[method], width: 2 },
+                        marker: { size: 6 }
+                    });
+                });
+            }
+            
+            Plotly.newPlot('convergence-graph', convTraces, {
+                title: 'Convergence to Root',
+                xaxis: { title: 'Iteration' },
+                yaxis: { title: 'Approximation' },
+                margin: { t: 40, r: 20, b: 40, l: 50 }
+            }, { responsive: true });
+            
+            if (errorTraces.length > 0) {
+                Plotly.newPlot('error-graph', errorTraces, {
+                    title: 'Error vs Iteration',
+                    xaxis: { title: 'Iteration' },
+                    yaxis: { title: 'Error', type: 'log' },
+                    margin: { t: 40, r: 20, b: 40, l: 50 }
+                }, { responsive: true });
+            }
+        }
+        
+        function updateComparisonInsights(results) {
+            const insights = [];
+            
+            const counts = {};
+            Object.entries(results).forEach(([method, steps]) => {
+                if (steps) counts[method] = steps.length;
+            });
+            
+            const sorted = Object.entries(counts).sort((a, b) => a[1] - b[1]);
+            
+            if (sorted.length > 0) {
+                insights.push(`Fastest: ${sorted[0][0]} (${sorted[0][1]} iterations)`);
+                if (sorted.length > 1) {
+                    insights.push(`Slowest: ${sorted[sorted.length-1][0]} (${sorted[sorted.length-1][1]} iterations)`);
+                }
+            }
+            
+            if (counts.newton && counts.bisection) {
+                const speedup = counts.bisection / counts.newton;
+                insights.push(`Newton was ${speedup.toFixed(1)}× faster than bisection`);
+            }
+            
+            if (counts.secant && counts.newton) {
+                insights.push(`Secant used ${counts.secant} iterations vs Newton's ${counts.newton} (no derivative needed)`);
+            }
+            
+            document.getElementById('comparison-insights-list').innerHTML = insights.map(i => `<li>${i}</li>`).join('');
+        }
+        
+        // ============ TAB SWITCHING ============
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.tab-button').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        };
+        
+        // ============ CHALLENGE TAB ============
+        let challengeState = {
+            currentType: null,
+            currentProblem: null,
+            problemCount: { 'secant-step': 0, 'estimate-order': 0, 'choose-method': 0 }
+        };
+        
+        window.selectChallengeType = function(type) {
+            challengeState.currentType = type;
+            
+            document.querySelectorAll('.challenge-type-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.type === type);
+            });
+            
+            document.getElementById('challenge-prompt').style.display = 'none';
+            document.getElementById('problem-area').style.display = 'block';
+            
+            const typeLabels = {
+                'secant-step': 'Secant Step',
+                'estimate-order': 'Estimate Order',
+                'choose-method': 'Choose Method'
+            };
+            document.getElementById('problem-type-label').textContent = typeLabels[type];
+            
+            generateNewProblem();
+        };
+        
+        window.generateNewProblem = function() {
+            const type = challengeState.currentType;
+            if (!type) return;
+            
+            challengeState.problemCount[type]++;
+            document.getElementById('problem-number').textContent = `Problem #${challengeState.problemCount[type]}`;
+            
+            const feedback = document.getElementById('problem-feedback');
+            feedback.className = 'problem-feedback';
+            feedback.innerHTML = '';
+            
+            document.querySelector('.worked-example-toggle').classList.remove('open');
+            document.getElementById('worked-example-content').classList.remove('show');
+            
+            if (type === 'secant-step') {
+                generateSecantStepProblem();
+            } else if (type === 'estimate-order') {
+                generateEstimateOrderProblem();
+            } else if (type === 'choose-method') {
+                generateChooseMethodProblem();
+            }
+        };
+        
+        function generateSecantStepProblem() {
+            const scenarios = [
+                { f: x => x*x - 2, fLabel: 'x² − 2' },
+                { f: x => x*x - 3, fLabel: 'x² − 3' },
+                { f: x => x*x*x - x - 1, fLabel: 'x³ − x − 1' }
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const x0 = 1;
+            const x1 = 2;
+            
+            const f0 = scenario.f(x0);
+            const f1 = scenario.f(x1);
+            const x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
+            
+            challengeState.currentProblem = {
+                type: 'secant-step',
+                scenario: scenario,
+                x0: x0,
+                x1: x1,
+                f0: f0,
+                f1: f1,
+                answer: x2
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>For <strong>f(x) = ${scenario.fLabel}</strong>:</p>
+                <p>Starting with x₀ = ${x0} and x₁ = ${x1}, compute <strong>x₂</strong> using the secant method.</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Round to 4 decimal places.</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <span>x₂ = </span>
+                <input type="text" id="challenge-answer-input" placeholder="e.g., 1.3333">
+            `;
+            
+            generateSecantStepWorkedExample(scenario, x0, x1, f0, f1, x2);
+        }
+        
+        function generateSecantStepWorkedExample(scenario, x0, x1, f0, f1, x2) {
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Step 1: Evaluate f(x₀) and f(x₁)</div>
+                    <div class="step-content">
+                        f(${x0}) = ${f0}, f(${x1}) = ${f1}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 2: Apply secant formula</div>
+                    <div class="step-content">
+                        x₂ = x₁ − f(x₁) · (x₁ − x₀)/(f(x₁) − f(x₀))
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 3: Substitute</div>
+                    <div class="step-content">
+                        x₂ = ${x1} − ${f1} · (${x1} − ${x0})/(${f1} − ${f0})
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Step 4: Calculate</div>
+                    <div class="step-content">
+                        x₂ = ${x1} − ${f1} · ${x1 - x0}/${f1 - f0} = <strong>${x2.toFixed(6)}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generateEstimateOrderProblem() {
+            const methods = [
+                { name: 'Bisection', order: 1, data: [1, 0.5, 0.25, 0.125, 0.0625] },
+                { name: 'Fixed-Point', order: 1, data: [0.1, 0.05, 0.025, 0.0125, 0.00625] },
+                { name: 'Newton', order: 2, data: [0.1, 0.01, 0.0001, 0.00000001] },
+                { name: 'Secant', order: 1.618, data: [0.1, 0.04, 0.01, 0.002, 0.0003] }
+            ];
+            
+            const method = methods[Math.floor(Math.random() * methods.length)];
+            
+            challengeState.currentProblem = {
+                type: 'estimate-order',
+                method: method,
+                answer: method.order
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p>Given these error values from a root-finding method:</p>
+                <table class="step-table" style="margin: 1rem 0; max-width: 300px;">
+                    <tr><th>n</th><th>|eₙ|</th></tr>
+                    ${method.data.map((e, i) => `<tr><td>${i}</td><td>${e.toExponential(2)}</td></tr>`).join('')}
+                </table>
+                <p>What is the <strong>order of convergence</strong>?</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <select id="challenge-answer-input">
+                    <option value="">Select order...</option>
+                    <option value="1">1 (Linear)</option>
+                    <option value="1.618">≈1.618 (Superlinear)</option>
+                    <option value="2">2 (Quadratic)</option>
+                </select>
+            `;
+            
+            generateEstimateOrderWorkedExample(method);
+        }
+        
+        function generateEstimateOrderWorkedExample(method) {
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Check error reduction pattern</div>
+                    <div class="step-content">
+                        Linear: error halves each step (ratio ≈ 0.5)<br>
+                        Quadratic: error squares each step (ratio changes)<br>
+                        Superlinear: between the two
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Analyze this data</div>
+                    <div class="step-content">
+                        ${method.order === 1 ? 'Error roughly halves each step → Linear (order 1)' : ''}
+                        ${method.order === 2 ? 'Error squares each step (10⁻² → 10⁻⁴ → 10⁻⁸) → Quadratic (order 2)' : ''}
+                        ${method.order === 1.618 ? 'Error decreases faster than linear but not quite squaring → Superlinear (order ≈ 1.618)' : ''}
+                    </div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Answer</div>
+                    <div class="step-content">
+                        This is <strong>${method.name}</strong> with order <strong>${method.order}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        function generateChooseMethodProblem() {
+            const scenarios = [
+                {
+                    situation: 'You need guaranteed convergence and have a bracketing interval.',
+                    answer: 'bisection',
+                    explanation: 'Bisection is the only method that guarantees convergence when you have a valid bracket.'
+                },
+                {
+                    situation: 'The derivative f\'(x) is expensive to compute analytically.',
+                    answer: 'secant',
+                    explanation: 'Secant avoids derivatives while being faster than bisection and fixed-point.'
+                },
+                {
+                    situation: 'You have f\'(x) readily available and want fastest possible convergence.',
+                    answer: 'newton',
+                    explanation: 'Newton has quadratic convergence — the fastest among standard methods.'
+                },
+                {
+                    situation: 'You can easily rewrite f(x)=0 as x=g(x) with |g\'(x*)|<1.',
+                    answer: 'fixedpoint',
+                    explanation: 'Fixed-point iteration is simple and requires only function evaluations.'
+                }
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            
+            challengeState.currentProblem = {
+                type: 'choose-method',
+                scenario: scenario,
+                answer: scenario.answer
+            };
+            
+            document.getElementById('problem-question').innerHTML = `
+                <p><strong>Situation:</strong> ${scenario.situation}</p>
+                <p>Which method should you choose?</p>
+            `;
+            
+            document.getElementById('problem-input-area').innerHTML = `
+                <select id="challenge-answer-input">
+                    <option value="">Select method...</option>
+                    <option value="bisection">Bisection</option>
+                    <option value="fixedpoint">Fixed-Point Iteration</option>
+                    <option value="newton">Newton's Method</option>
+                    <option value="secant">Secant Method</option>
+                </select>
+            `;
+            
+            generateChooseMethodWorkedExample(scenario);
+        }
+        
+        function generateChooseMethodWorkedExample(scenario) {
+            const html = `
+                <div class="worked-example-step">
+                    <div class="step-label">Situation</div>
+                    <div class="step-content">${scenario.situation}</div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Best choice</div>
+                    <div class="step-content"><strong>${scenario.answer.charAt(0).toUpperCase() + scenario.answer.slice(1)}</strong></div>
+                </div>
+                <div class="worked-example-step">
+                    <div class="step-label">Why?</div>
+                    <div class="step-content">${scenario.explanation}</div>
+                </div>
+            `;
+            
+            document.getElementById('worked-example-steps').innerHTML = html;
+        }
+        
+        window.checkAnswer = function() {
+            const problem = challengeState.currentProblem;
+            const feedback = document.getElementById('problem-feedback');
+            const input = document.getElementById('challenge-answer-input');
+            const userAnswer = input.value.trim();
+            
+            let isCorrect = false;
+            
+            if (problem.type === 'secant-step') {
+                const userNum = parseFloat(userAnswer);
+                isCorrect = Math.abs(userNum - problem.answer) < 0.01;
+            } else if (problem.type === 'estimate-order') {
+                isCorrect = parseFloat(userAnswer) === problem.answer;
+            } else {
+                isCorrect = userAnswer === problem.answer;
+            }
+            
+            feedback.classList.add('show');
+            
+            if (isCorrect) {
+                feedback.className = 'problem-feedback show correct';
+                feedback.innerHTML = '✓ Correct! Well done.';
+            } else {
+                feedback.className = 'problem-feedback show incorrect';
+                if (problem.type === 'secant-step') {
+                    feedback.innerHTML = `✗ Not quite. x₂ = ${problem.answer.toFixed(4)}. See the worked example.`;
+                } else {
+                    feedback.innerHTML = `✗ Not quite. See the worked example.`;
+                }
+            }
+        };
+        
+        window.toggleWorkedExample = function() {
+            const toggle = document.querySelector('.worked-example-toggle');
+            const content = document.getElementById('worked-example-content');
+            
+            toggle.classList.toggle('open');
+            content.classList.toggle('show');
+        };
+        
+        // Initialize
+        initialize();
+    });
+    </script>
+
+    <!-- Week Navigation -->
+    <div class="week-nav-bar">
+        <a href="../newton/" class="nav-prev">← Week 3: Newton</a>
+        <a href="../" class="nav-hub">🏠 All Weeks</a>
+        <a href="../richardson/" class="nav-next">Week 5: Richardson →</a>
+    </div>
+    
+</body>
+</html>
