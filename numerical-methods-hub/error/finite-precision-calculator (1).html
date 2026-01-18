@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finite Precision Calculator | Mathswell</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #065f56;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #dc2626;
+            --success: #10b981;
+            --card-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .mw-logo {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: var(--interactive);
+            color: var(--primary);
+        }
+
+        /* Tab content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Introduction Tab */
+        .hero {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .concept-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .concept-card h3 {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .concept-card .formula {
+            background: var(--interactive);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            font-family: 'Georgia', serif;
+            text-align: center;
+        }
+
+        .key-idea {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .key-idea h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .key-idea p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cta-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Explorer Tab */
+        .controls-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1rem;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: var(--background);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .mode-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .preset-pill {
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .preset-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Calculator workspace */
+        .calculator-workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .calculator {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .calc-header {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .calc-4digit .calc-header {
+            background: var(--accent-amber);
+            color: white;
+        }
+
+        .calc-full .calc-header {
+            background: var(--primary);
+            color: white;
+        }
+
+        .calc-badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        .calc-display {
+            padding: 1rem;
+            background: #1a1a2e;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .calc-expression {
+            color: #888;
+            font-size: 0.9rem;
+            min-height: 1.5rem;
+            word-break: break-all;
+        }
+
+        .calc-result {
+            color: #00ff88;
+            font-size: 1.8rem;
+            font-weight: bold;
+            min-height: 2.5rem;
+            word-break: break-all;
+        }
+
+        .calc-4digit .calc-result {
+            color: #ffd700;
+        }
+
+        .calc-body {
+            padding: 1rem;
+        }
+
+        /* Input area */
+        .input-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-section label {
+            display: block;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .expression-input {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1.1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            transition: border-color 0.2s ease;
+        }
+
+        .expression-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .input-help {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .input-help code {
+            background: var(--interactive);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* Error analysis panel */
+        .error-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .error-panel h3 {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .error-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .error-item {
+            background: var(--background);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .error-item.warning {
+            border-left-color: var(--accent-amber);
+            background: #fffbeb;
+        }
+
+        .error-item.danger {
+            border-left-color: var(--accent-red);
+            background: #fef2f2;
+        }
+
+        .error-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .error-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        /* Keypad */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .key {
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: var(--background);
+            color: var(--text-primary);
+        }
+
+        .key:hover {
+            background: var(--interactive);
+            transform: scale(1.05);
+        }
+
+        .key:active {
+            transform: scale(0.95);
+        }
+
+        .key.operator {
+            background: var(--primary);
+            color: white;
+        }
+
+        .key.operator:hover {
+            background: var(--primary-dark);
+        }
+
+        .key.clear {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .key.equals {
+            background: var(--success);
+            color: white;
+            grid-column: span 2;
+        }
+
+        /* Step-by-step display */
+        .steps-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .steps-panel h3 {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            background: var(--background);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .step-num {
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-arrow {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .step-result {
+            color: var(--accent-amber);
+            font-weight: bold;
+        }
+
+        /* Insight box */
+        .insight-box {
+            background: var(--interactive);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .insight-box h4 {
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .insight-box p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer-note {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            padding-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="mathswell-nav">
+        <a href="#" class="mw-link">
+            <div class="mw-logo">M</div>
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="intro">📖 Introduction</button>
+            <button class="tab-btn" data-tab="explorer">🔢 Explorer</button>
+        </div>
+
+        <!-- Introduction Tab -->
+        <div id="intro" class="tab-content active">
+            <div class="hero">
+                <h1>Finite Precision Arithmetic</h1>
+                <p>In mathematics, arithmetic is exact. In computation, it is not. Explore how limiting digits affects calculations — and why it matters.</p>
+            </div>
+
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>📐 Two Calculators</h3>
+                    <p>Compare a <strong>4-digit calculator</strong> (limited precision) with a <strong>full-precision calculator</strong> (the "truth"). See errors unfold in real time.</p>
+                </div>
+                <div class="concept-card">
+                    <h3>✂️ Rounding vs Truncation</h3>
+                    <p><strong>Truncation:</strong> chop off extra digits.<br>
+                    <strong>Rounding:</strong> adjust based on the next digit.</p>
+                    <div class="formula">3.14159 → 3.141 (trunc) or 3.142 (round)</div>
+                </div>
+                <div class="concept-card">
+                    <h3>📊 Measuring Error</h3>
+                    <p><strong>Absolute error:</strong> |true − approx|<br>
+                    <strong>Relative error:</strong> |true − approx| / |true|</p>
+                    <div class="formula">Relative error reveals significance</div>
+                </div>
+                <div class="concept-card">
+                    <h3>⚠️ Catastrophic Cancellation</h3>
+                    <p>Subtracting nearly equal numbers can destroy significant digits. This is the most dangerous operation in finite precision.</p>
+                </div>
+            </div>
+
+            <div class="key-idea">
+                <h3>💡 Key Idea</h3>
+                <p>Significant digits are not about decimal places — they are about which digits we can defend with evidence.</p>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="cta-btn" onclick="switchTab('explorer')">
+                    Try the Explorer →
+                </button>
+            </div>
+        </div>
+
+        <!-- Explorer Tab -->
+        <div id="explorer" class="tab-content">
+            <!-- Controls -->
+            <div class="controls-bar">
+                <div class="mode-toggle">
+                    <button class="mode-btn active" data-mode="round">Rounding</button>
+                    <button class="mode-btn" data-mode="trunc">Truncation</button>
+                </div>
+                <div class="preset-pills">
+                    <button class="preset-pill" data-preset="simple">Simple</button>
+                    <button class="preset-pill" data-preset="cancel">Cancellation</button>
+                    <button class="preset-pill" data-preset="grouping">Grouping</button>
+                    <button class="preset-pill" data-preset="sqrt">√ Instability</button>
+                    <button class="preset-pill" data-preset="quadratic">Quadratic</button>
+                </div>
+            </div>
+
+            <!-- Expression Input -->
+            <div class="input-section">
+                <label for="expr-input">Enter Expression</label>
+                <input type="text" id="expr-input" class="expression-input" placeholder="e.g., 1.234 * 5.678 - 1.234 * 5.679" autocomplete="off">
+                <div class="input-help">
+                    Operators: <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>^</code> (power) <code>sqrt()</code> <code>( )</code>
+                </div>
+            </div>
+
+            <!-- Calculator Workspace -->
+            <div class="calculator-workspace">
+                <!-- 4-Digit Calculator -->
+                <div class="calculator calc-4digit">
+                    <div class="calc-header">
+                        <span>🔶 4-Digit Calculator</span>
+                        <span class="calc-badge" id="mode-badge">ROUND</span>
+                    </div>
+                    <div class="calc-display">
+                        <div class="calc-expression" id="expr-4digit"></div>
+                        <div class="calc-result" id="result-4digit">0</div>
+                    </div>
+                </div>
+
+                <!-- Full Precision Calculator -->
+                <div class="calculator calc-full">
+                    <div class="calc-header">
+                        <span>🟢 Full Precision</span>
+                        <span class="calc-badge">EXACT</span>
+                    </div>
+                    <div class="calc-display">
+                        <div class="calc-expression" id="expr-full"></div>
+                        <div class="calc-result" id="result-full">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Analysis -->
+            <div class="error-panel">
+                <h3>📊 Error Analysis</h3>
+                <div class="error-grid">
+                    <div class="error-item" id="error-abs-container">
+                        <div class="error-label">Absolute Error</div>
+                        <div class="error-value" id="error-abs">0</div>
+                    </div>
+                    <div class="error-item" id="error-rel-container">
+                        <div class="error-label">Relative Error</div>
+                        <div class="error-value" id="error-rel">0%</div>
+                    </div>
+                    <div class="error-item" id="digits-lost-container">
+                        <div class="error-label">Digits Lost</div>
+                        <div class="error-value" id="digits-lost">0</div>
+                    </div>
+                    <div class="error-item" id="digits-reliable-container">
+                        <div class="error-label">Defensible Digits</div>
+                        <div class="error-value" id="digits-reliable">4</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step-by-step breakdown (shows for presets) -->
+            <div class="steps-panel" id="steps-panel" style="display: none;">
+                <h3>📝 Step-by-Step (4-digit arithmetic)</h3>
+                <div id="steps-content"></div>
+            </div>
+
+            <!-- Insight box -->
+            <div class="insight-box" id="insight-box" style="display: none;">
+                <h4>💡 What's happening?</h4>
+                <p id="insight-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        5103MATHS Numerical Methods — Finite Precision Arithmetic
+    </div>
+
+    <script>
+        // === State ===
+        let mode = 'round'; // 'round' or 'trunc'
+        let currentPreset = null;
+
+        // === Tab switching ===
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // === Mode toggle ===
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                mode = btn.dataset.mode;
+                document.getElementById('mode-badge').textContent = mode === 'round' ? 'ROUND' : 'TRUNC';
+                recalculate();
+            });
+        });
+
+        // === Preset examples ===
+        const presets = {
+            simple: {
+                expr: '5/7 + 1/3',
+                insight: 'Even simple fractions can\'t be represented exactly. Notice how 5/7 = 0.714285... becomes 0.7143 (rounded) or 0.7142 (truncated).'
+            },
+            cancel: {
+                expr: '1.234 * 5.678 - 1.234 * 5.679',
+                insight: 'Catastrophic cancellation! Both products are about 7.007, but their tiny difference (0.001234) loses significant digits when we subtract. The 4-digit calculator may give 0 or -0.001 instead of -0.001234.'
+            },
+            grouping: {
+                expr: '1.234 * (5.678 - 5.679)',
+                insight: 'Same algebra as the cancellation example, but computed differently. Subtracting first (5.678 - 5.679 = -0.001) then multiplying avoids the cancellation problem. Order of operations matters!'
+            },
+            sqrt: {
+                expr: '(sqrt(1.0001) - 1) / 0.0001',
+                insight: 'Classic instability! sqrt(1.0001) ≈ 1.00005, but rounding to 4 digits gives 1.000. Then 1.000 - 1 = 0, and we divide 0 by 0.0001 to get 0. The true answer is approximately 0.5!'
+            },
+            quadratic: {
+                expr: '(-62.10 + sqrt(62.10^2 - 4)) / 2',
+                insight: 'The quadratic formula can suffer when -b and √(b²-4ac) are nearly equal. Here 62.10 ≈ 62.06, so their difference loses digits. A reformulation would be more stable.'
+            }
+        };
+
+        document.querySelectorAll('.preset-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentPreset = pill.dataset.preset;
+                const preset = presets[currentPreset];
+                document.getElementById('expr-input').value = preset.expr;
+                document.getElementById('insight-text').textContent = preset.insight;
+                document.getElementById('insight-box').style.display = 'block';
+                recalculate();
+            });
+        });
+
+        // === Expression input ===
+        document.getElementById('expr-input').addEventListener('input', () => {
+            currentPreset = null;
+            document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
+            document.getElementById('insight-box').style.display = 'none';
+            recalculate();
+        });
+
+        // === 4-digit arithmetic functions ===
+        function toFourDigits(num, useRounding) {
+            if (num === 0) return 0;
+            if (!isFinite(num)) return num;
+            
+            const sign = num < 0 ? -1 : 1;
+            num = Math.abs(num);
+            
+            // Find the order of magnitude
+            const exp = Math.floor(Math.log10(num));
+            const scale = Math.pow(10, exp - 3); // 4 significant digits
+            
+            let result;
+            if (useRounding) {
+                result = Math.round(num / scale) * scale;
+            } else {
+                result = Math.floor(num / scale) * scale;
+            }
+            
+            return sign * result;
+        }
+
+        function fourDigitRound(num) {
+            return toFourDigits(num, true);
+        }
+
+        function fourDigitTrunc(num) {
+            return toFourDigits(num, false);
+        }
+
+        function applyFinitePrecision(num) {
+            return mode === 'round' ? fourDigitRound(num) : fourDigitTrunc(num);
+        }
+
+        // === TOKENIZER ===
+        function tokenize(expr) {
+            const tokens = [];
+            let i = 0;
+            
+            while (i < expr.length) {
+                const ch = expr[i];
+                
+                // Skip whitespace
+                if (/\s/.test(ch)) {
+                    i++;
+                    continue;
+                }
+                
+                // Number (including decimals and negative at start or after operator)
+                if (/[\d\.]/.test(ch) || (ch === '-' && (tokens.length === 0 || 
+                    ['(', '+', '-', '*', '/', '^'].includes(tokens[tokens.length-1]?.value)))) {
+                    let numStr = '';
+                    if (ch === '-') {
+                        numStr = '-';
+                        i++;
+                    }
+                    while (i < expr.length && /[\d\.]/.test(expr[i])) {
+                        numStr += expr[i];
+                        i++;
+                    }
+                    tokens.push({ type: 'number', value: parseFloat(numStr) });
+                    continue;
+                }
+                
+                // Operators
+                if (['+', '-', '*', '/', '^'].includes(ch)) {
+                    tokens.push({ type: 'operator', value: ch });
+                    i++;
+                    continue;
+                }
+                
+                // Parentheses
+                if (ch === '(') {
+                    tokens.push({ type: 'lparen', value: '(' });
+                    i++;
+                    continue;
+                }
+                if (ch === ')') {
+                    tokens.push({ type: 'rparen', value: ')' });
+                    i++;
+                    continue;
+                }
+                
+                // Functions (sqrt, sin, cos, etc.)
+                if (/[a-zA-Z]/.test(ch)) {
+                    let func = '';
+                    while (i < expr.length && /[a-zA-Z]/.test(expr[i])) {
+                        func += expr[i];
+                        i++;
+                    }
+                    func = func.toLowerCase();
+                    if (['sqrt', 'sin', 'cos', 'tan', 'log', 'ln', 'exp', 'abs'].includes(func)) {
+                        tokens.push({ type: 'function', value: func });
+                    } else if (func === 'pi') {
+                        tokens.push({ type: 'number', value: Math.PI });
+                    } else if (func === 'e') {
+                        tokens.push({ type: 'number', value: Math.E });
+                    }
+                    continue;
+                }
+                
+                i++; // Skip unknown characters
+            }
+            
+            return tokens;
+        }
+
+        // === SHUNTING YARD (Infix to RPN) ===
+        function toRPN(tokens) {
+            const output = [];
+            const opStack = [];
+            
+            const precedence = { '+': 1, '-': 1, '*': 2, '/': 2, '^': 3 };
+            const rightAssoc = { '^': true };
+            
+            for (const token of tokens) {
+                if (token.type === 'number') {
+                    output.push(token);
+                } else if (token.type === 'function') {
+                    opStack.push(token);
+                } else if (token.type === 'operator') {
+                    while (opStack.length > 0) {
+                        const top = opStack[opStack.length - 1];
+                        if (top.type === 'operator' &&
+                            ((precedence[top.value] > precedence[token.value]) ||
+                             (precedence[top.value] === precedence[token.value] && !rightAssoc[token.value]))) {
+                            output.push(opStack.pop());
+                        } else {
+                            break;
+                        }
+                    }
+                    opStack.push(token);
+                } else if (token.type === 'lparen') {
+                    opStack.push(token);
+                } else if (token.type === 'rparen') {
+                    while (opStack.length > 0 && opStack[opStack.length - 1].type !== 'lparen') {
+                        output.push(opStack.pop());
+                    }
+                    opStack.pop(); // Remove the lparen
+                    // If there's a function on top, pop it too
+                    if (opStack.length > 0 && opStack[opStack.length - 1].type === 'function') {
+                        output.push(opStack.pop());
+                    }
+                }
+            }
+            
+            while (opStack.length > 0) {
+                output.push(opStack.pop());
+            }
+            
+            return output;
+        }
+
+        // === RPN EVALUATOR with step-by-step precision ===
+        function evalRPN(rpn, applyPrecisionAfterEach = false) {
+            const stack = [];
+            const steps = [];
+            const fp = applyFinitePrecision;
+            
+            for (const token of rpn) {
+                if (token.type === 'number') {
+                    // Apply precision to input numbers
+                    const val = applyPrecisionAfterEach ? fp(token.value) : token.value;
+                    stack.push(val);
+                    if (applyPrecisionAfterEach && val !== token.value) {
+                        steps.push(`${token.value} → ${val}`);
+                    }
+                } else if (token.type === 'operator') {
+                    const b = stack.pop();
+                    const a = stack.pop();
+                    let result;
+                    let opSymbol;
+                    
+                    switch (token.value) {
+                        case '+': result = a + b; opSymbol = '+'; break;
+                        case '-': result = a - b; opSymbol = '−'; break;
+                        case '*': result = a * b; opSymbol = '×'; break;
+                        case '/': result = a / b; opSymbol = '÷'; break;
+                        case '^': result = Math.pow(a, b); opSymbol = '^'; break;
+                    }
+                    
+                    const exactResult = result;
+                    if (applyPrecisionAfterEach) {
+                        result = fp(result);
+                    }
+                    
+                    steps.push(`${formatStep(a)} ${opSymbol} ${formatStep(b)} = ${formatStep(exactResult)}${applyPrecisionAfterEach && result !== exactResult ? ' → ' + formatStep(result) : ''}`);
+                    stack.push(result);
+                    
+                } else if (token.type === 'function') {
+                    const a = stack.pop();
+                    let result;
+                    let funcName = token.value;
+                    
+                    switch (token.value) {
+                        case 'sqrt': result = Math.sqrt(a); break;
+                        case 'sin': result = Math.sin(a); break;
+                        case 'cos': result = Math.cos(a); break;
+                        case 'tan': result = Math.tan(a); break;
+                        case 'log': result = Math.log10(a); break;
+                        case 'ln': result = Math.log(a); break;
+                        case 'exp': result = Math.exp(a); break;
+                        case 'abs': result = Math.abs(a); break;
+                    }
+                    
+                    const exactResult = result;
+                    if (applyPrecisionAfterEach) {
+                        result = fp(result);
+                    }
+                    
+                    steps.push(`${funcName}(${formatStep(a)}) = ${formatStep(exactResult)}${applyPrecisionAfterEach && result !== exactResult ? ' → ' + formatStep(result) : ''}`);
+                    stack.push(result);
+                }
+            }
+            
+            return { result: stack[0], steps };
+        }
+        
+        function formatStep(num) {
+            if (!isFinite(num)) return num.toString();
+            if (num === 0) return '0';
+            if (Math.abs(num) < 0.0001 || Math.abs(num) >= 100000) {
+                return num.toExponential(4);
+            }
+            // Show enough digits to see what's happening
+            const str = num.toPrecision(8);
+            return parseFloat(str).toString();
+        }
+
+        // === Safe expression evaluator (for full precision) ===
+        function safeEval(expr) {
+            try {
+                const tokens = tokenize(expr);
+                const rpn = toRPN(tokens);
+                const { result } = evalRPN(rpn, false);
+                return result;
+            } catch (e) {
+                return NaN;
+            }
+        }
+        
+        // === 4-digit evaluation with steps ===
+        function evalFourDigitWithSteps(expr) {
+            try {
+                const tokens = tokenize(expr);
+                const rpn = toRPN(tokens);
+                return evalRPN(rpn, true);
+            } catch (e) {
+                return { result: NaN, steps: [] };
+            }
+        }
+
+        // === Main calculation ===
+        function recalculate() {
+            const expr = document.getElementById('expr-input').value.trim();
+            
+            if (!expr) {
+                document.getElementById('expr-4digit').textContent = '';
+                document.getElementById('expr-full').textContent = '';
+                document.getElementById('result-4digit').textContent = '0';
+                document.getElementById('result-full').textContent = '0';
+                document.getElementById('error-abs').textContent = '0';
+                document.getElementById('error-rel').textContent = '0%';
+                document.getElementById('digits-lost').textContent = '0';
+                document.getElementById('digits-reliable').textContent = '4';
+                document.getElementById('steps-panel').style.display = 'none';
+                resetErrorStyles();
+                return;
+            }
+            
+            // Full precision result
+            const fullResult = safeEval(expr);
+            
+            // 4-digit result with step-by-step evaluation
+            const { result: fourDigitResult, steps } = evalFourDigitWithSteps(expr);
+            
+            // Display results
+            document.getElementById('expr-4digit').textContent = expr;
+            document.getElementById('expr-full').textContent = expr;
+            
+            if (isNaN(fullResult) || isNaN(fourDigitResult)) {
+                document.getElementById('result-full').textContent = 'Error';
+                document.getElementById('result-4digit').textContent = 'Error';
+                document.getElementById('steps-panel').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('result-full').textContent = formatNumber(fullResult);
+            document.getElementById('result-4digit').textContent = formatNumber(fourDigitResult);
+            
+            // Error analysis
+            const absError = Math.abs(fullResult - fourDigitResult);
+            const relError = fullResult !== 0 ? absError / Math.abs(fullResult) : 0;
+            
+            document.getElementById('error-abs').textContent = absError.toExponential(4);
+            document.getElementById('error-rel').textContent = (relError * 100).toFixed(4) + '%';
+            
+            // Defensible digits from relative error (textbook definition)
+            // t significant digits means: relError ≤ 5 × 10^(-t)
+            // So: t = floor(-log10(relError / 5)) = floor(-log10(relError) + log10(5))
+            const defensibleDigits = computeDefensibleDigits(relError);
+            const digitsLost = Math.max(0, 4 - defensibleDigits);
+            
+            document.getElementById('digits-lost').textContent = digitsLost;
+            document.getElementById('digits-reliable').textContent = defensibleDigits;
+            
+            // Style error indicators
+            updateErrorStyles(relError, digitsLost);
+            
+            // Show steps - always show for any expression with multiple operations
+            if (steps.length > 1) {
+                document.getElementById('steps-panel').style.display = 'block';
+                document.getElementById('steps-content').innerHTML = steps.map((step, i) => `
+                    <div class="step">
+                        <div class="step-num">${i + 1}</div>
+                        <div class="step-content">${step}</div>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('steps-panel').style.display = 'none';
+            }
+        }
+
+        // Compute defensible digits from relative error (textbook Definition 1.16)
+        // t significant digits means: |p - p*|/|p| ≤ 5 × 10^(-t)
+        // Solving for t: t ≤ -log10(relError) + log10(5) ≈ -log10(relError) + 0.699
+        function computeDefensibleDigits(relError) {
+            if (relError === 0) return 4; // Perfect match
+            if (!isFinite(relError) || relError >= 0.5) return 0; // Completely unreliable
+            
+            // t = floor(-log10(relError) + log10(5))
+            const t = Math.floor(-Math.log10(relError) + Math.log10(5));
+            
+            // Clamp between 0 and 4 (since we're doing 4-digit arithmetic)
+            return Math.max(0, Math.min(4, t));
+        }
+
+        function formatNumber(num) {
+            if (!isFinite(num)) return num.toString();
+            if (Math.abs(num) < 0.0001 || Math.abs(num) >= 10000) {
+                return num.toExponential(6);
+            }
+            return num.toPrecision(8).replace(/\.?0+$/, '');
+        }
+
+        function resetErrorStyles() {
+            ['error-abs-container', 'error-rel-container', 'digits-lost-container', 'digits-reliable-container'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('warning', 'danger');
+            });
+        }
+
+        function updateErrorStyles(relError, digitsLost) {
+            resetErrorStyles();
+            
+            const relContainer = document.getElementById('error-rel-container');
+            const lostContainer = document.getElementById('digits-lost-container');
+            const reliableContainer = document.getElementById('digits-reliable-container');
+            
+            // Style based on digits lost
+            if (digitsLost >= 3) {
+                relContainer.classList.add('danger');
+                lostContainer.classList.add('danger');
+                reliableContainer.classList.add('danger');
+            } else if (digitsLost >= 1) {
+                lostContainer.classList.add('warning');
+            }
+            
+            // Also flag large relative errors
+            if (relError > 0.1) {
+                relContainer.classList.add('danger');
+            } else if (relError > 0.01) {
+                relContainer.classList.add('warning');
+            }
+        }
+
+        // Initialize
+        recalculate();
+    </script>
+</body>
+</html>
