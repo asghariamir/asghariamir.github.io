@@ -1,1 +1,2858 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Strategist | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0d5d56;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #dc2626;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --card-bg: white;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding-top: 60px;
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .mw-link svg {
+            width: 28px;
+            height: 28px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        
+        /* Main Tabs */
+        .main-tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .main-tab-btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .main-tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .main-tab-btn:hover:not(.active) {
+            background: var(--interactive);
+            color: var(--primary);
+        }
+        
+        .main-tab-btn .tab-icon {
+            font-size: 1.1rem;
+        }
+        
+        /* Tab Content */
+        .main-tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .main-tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Sub Tabs (Introduction/Explorer/Challenge) */
+        .sub-tabs {
+            display: flex;
+            gap: 0.25rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .sub-tab-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .sub-tab-btn:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .sub-tab-btn:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .sub-tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .sub-tab-btn:hover:not(.active) {
+            background: var(--interactive);
+        }
+        
+        .sub-tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .sub-tab-content.active {
+            display: block;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card h3 {
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Concept Cards Grid */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .concept-card {
+            background: var(--interactive);
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+        
+        .concept-card h4 {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Math Display */
+        .math-display {
+            background: var(--interactive);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+        
+        .math-large {
+            font-size: 1.4rem;
+        }
+        
+        /* Preset Pills */
+        .preset-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .preset-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Explorer Integral Display */
+        .integral-display {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .integral-display .integral {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Choice Buttons */
+        .choice-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .choice-label {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .choice-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+        
+        .choice-btn {
+            padding: 0.75rem 1.25rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+        
+        .choice-btn:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .choice-btn.selected {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Consequence Panel */
+        .consequence-panel {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .consequence-header {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+        }
+        
+        .consequence-body {
+            padding: 1.5rem;
+        }
+        
+        .consequence-section {
+            margin-bottom: 1.25rem;
+        }
+        
+        .consequence-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .consequence-section h4 {
+            color: var(--primary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .consequence-math {
+            background: var(--background);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+        
+        /* Verdict Box */
+        .verdict-box {
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+        }
+        
+        .verdict-box.success {
+            background: #ecfdf5;
+            border: 2px solid var(--success);
+        }
+        
+        .verdict-box.warning {
+            background: #fffbeb;
+            border: 2px solid var(--warning);
+        }
+        
+        .verdict-box.error {
+            background: #fef2f2;
+            border: 2px solid var(--accent-red);
+        }
+        
+        .verdict-header {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .verdict-box.success .verdict-header { color: var(--success); }
+        .verdict-box.warning .verdict-header { color: var(--warning); }
+        .verdict-box.error .verdict-header { color: var(--accent-red); }
+        
+        .verdict-text {
+            color: var(--text-muted);
+        }
+        
+        /* Side by Side Comparison (Parts Explorer) */
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .comparison-panel {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .comparison-panel.recommended {
+            border-color: var(--success);
+        }
+        
+        .comparison-panel.not-recommended {
+            border-color: var(--accent-red);
+        }
+        
+        .comparison-header {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .comparison-panel.recommended .comparison-header {
+            background: var(--success);
+            color: white;
+        }
+        
+        .comparison-panel.not-recommended .comparison-header {
+            background: var(--accent-red);
+            color: white;
+        }
+        
+        .comparison-body {
+            padding: 1rem;
+        }
+        
+        .comparison-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        
+        .comparison-row .label {
+            color: var(--text-muted);
+            min-width: 40px;
+        }
+        
+        .comparison-step {
+            background: var(--background);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .comparison-verdict {
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .comparison-panel.recommended .comparison-verdict {
+            background: #ecfdf5;
+            color: var(--success);
+        }
+        
+        .comparison-panel.not-recommended .comparison-verdict {
+            background: #fef2f2;
+            color: var(--accent-red);
+        }
+        
+        /* Challenge Section */
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .challenge-title {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+        
+        .streak-display {
+            background: var(--interactive);
+            border: 2px solid var(--primary);
+            border-radius: 999px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .streak-fire {
+            font-size: 1.2rem;
+        }
+        
+        /* Multiple Choice */
+        .mc-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+        
+        .mc-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mc-option:hover {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+        
+        .mc-option.selected {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+        
+        .mc-option.correct {
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+        
+        .mc-option.incorrect {
+            border-color: var(--accent-red);
+            background: #fef2f2;
+        }
+        
+        .mc-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .mc-option.selected .mc-radio {
+            border-color: var(--primary);
+        }
+        
+        .mc-option.selected .mc-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+        
+        .mc-option.correct .mc-radio {
+            border-color: var(--success);
+            background: var(--success);
+        }
+        
+        .mc-option.correct .mc-radio::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .mc-option.incorrect .mc-radio {
+            border-color: var(--accent-red);
+            background: var(--accent-red);
+        }
+        
+        .mc-option.incorrect .mc-radio::after {
+            content: '✗';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .mc-text {
+            font-size: 1.05rem;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Feedback Panel */
+        .feedback-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .feedback-panel.correct {
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+        
+        .feedback-panel.incorrect {
+            border-color: var(--accent-red);
+            background: #fef2f2;
+        }
+        
+        .feedback-header {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .feedback-panel.correct .feedback-header {
+            color: var(--success);
+        }
+        
+        .feedback-panel.incorrect .feedback-header {
+            color: var(--accent-red);
+        }
+        
+        .feedback-content {
+            color: var(--text-muted);
+        }
+        
+        .feedback-math {
+            background: rgba(255,255,255,0.7);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin: 0.75rem 0;
+        }
+        
+        /* Strategy Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .gallery-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .gallery-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .gallery-item.active {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+        
+        .gallery-integral {
+            font-size: 1.1rem;
+        }
+        
+        /* Technique Buttons */
+        .technique-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            max-width: 400px;
+            margin: 1.5rem auto;
+        }
+        
+        .technique-btn {
+            padding: 1rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .technique-btn:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .technique-btn.selected {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Navigation CTA */
+        .nav-cta {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .nav-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-cta-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Recent History */
+        .history-list {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .history-title {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .history-icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .history-item.correct .history-icon {
+            color: var(--success);
+        }
+        
+        .history-item.incorrect .history-icon {
+            color: var(--accent-red);
+        }
+        
+        .history-answer {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        /* Link Button */
+        .link-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            padding: 0;
+        }
+        
+        .link-btn:hover {
+            color: var(--primary-dark);
+        }
+        
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 640px) {
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .main-tab-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .integral-display .integral {
+                font-size: 1.2rem;
+            }
+            
+            .choice-btn {
+                min-width: 100px;
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .technique-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mathswell Navigation -->
+    <nav class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="20" fill="#0f766e"/>
+                <text x="50" y="65" text-anchor="middle" fill="white" font-family="serif" font-size="50" font-weight="bold">∫</text>
+            </svg>
+            <span>MATHSWELL</span>
+        </a>
+    </nav>
+    
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1>Integration Strategist</h1>
+            <p>Master the art of choosing the right integration technique</p>
+        </header>
+        
+        <!-- Main Tabs -->
+        <div class="main-tabs">
+            <button class="main-tab-btn active" data-tab="substitution">
+                <span class="tab-icon">🔄</span>
+                <span>Substitution</span>
+            </button>
+            <button class="main-tab-btn" data-tab="parts">
+                <span class="tab-icon">🧩</span>
+                <span>Parts</span>
+            </button>
+            <button class="main-tab-btn" data-tab="strategy">
+                <span class="tab-icon">🎯</span>
+                <span>Strategy</span>
+            </button>
+        </div>
+        
+        <!-- ==================== TAB 1: SUBSTITUTION ==================== -->
+        <div id="substitution" class="main-tab-content active">
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" data-subtab="sub-intro">Introduction</button>
+                <button class="sub-tab-btn" data-subtab="sub-explorer">Explorer</button>
+                <button class="sub-tab-btn" data-subtab="sub-challenge">Challenge</button>
+            </div>
+            
+            <!-- Substitution Introduction -->
+            <div id="sub-intro" class="sub-tab-content active">
+                <div class="card">
+                    <h2>🔄 The Art of Substitution</h2>
+                    <p>Transform a complex integral into a simpler one by recognising composite structure.</p>
+                </div>
+                
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <h4>📐 The Core Pattern</h4>
+                        <div class="math-display">
+                            $\displaystyle\int f(g(x)) \cdot g'(x)\, dx = \int f(u)\, du$
+                        </div>
+                        <p>The derivative of the "inner function" must be present (possibly with a constant factor).</p>
+                    </div>
+                    
+                    <div class="concept-card">
+                        <h4>🔍 What to Look For</h4>
+                        <p>• A function nested inside another<br>
+                        • Something resembling its derivative nearby<br>
+                        • Constants can be adjusted; missing factors cannot</p>
+                    </div>
+                    
+                    <div class="concept-card">
+                        <h4>✅ The Test</h4>
+                        <p>After substituting, can you eliminate <em>all</em> of the original variable? If $x$ remains, the substitution doesn't work cleanly.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Quick Example</h3>
+                    <p>Consider $\displaystyle\int x \cos(x^2)\, dx$</p>
+                    <p style="margin-top: 0.75rem;">Here $x^2$ is nested inside $\cos$, and $x$ (the derivative of $x^2$, up to a constant) is present.</p>
+                    <p style="margin-top: 0.5rem;">With $u = x^2$, we get $du = 2x\,dx$, so $x\,dx = \frac{1}{2}du$.</p>
+                    <div class="math-display">
+                        $\displaystyle\int x \cos(x^2)\, dx = \frac{1}{2}\int \cos(u)\, du = \frac{1}{2}\sin(u) + C = \frac{1}{2}\sin(x^2) + C$
+                    </div>
+                </div>
+                
+                <div class="nav-cta">
+                    <button class="nav-cta-btn" onclick="switchToSubTab('substitution', 'sub-explorer')">
+                        Try the Consequence Explorer →
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Substitution Explorer -->
+            <div id="sub-explorer" class="sub-tab-content">
+                <div class="card">
+                    <h2>🔬 Consequence Explorer</h2>
+                    <p>Choose a substitution and see what happens. Compare different choices to understand why some work better than others.</p>
+                </div>
+                
+                <div class="preset-container" id="sub-presets">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="integral-display" id="sub-integral-display">
+                    <div class="integral" id="sub-current-integral"></div>
+                </div>
+                
+                <div class="choice-container">
+                    <div class="choice-label">Choose your substitution:</div>
+                    <div class="choice-buttons" id="sub-choice-buttons">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                <div id="sub-consequence-panel" class="hidden">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="subShowAllChoices()">Compare All Choices</button>
+                    <button class="btn btn-secondary" onclick="subReset()">Reset</button>
+                </div>
+            </div>
+            
+            <!-- Substitution Challenge -->
+            <div id="sub-challenge" class="sub-tab-content">
+                <div class="card">
+                    <div class="challenge-header">
+                        <h2 class="challenge-title">🎯 Predict the Transform</h2>
+                        <div class="streak-display">
+                            <span class="streak-fire" id="sub-streak-fire">🔥</span>
+                            <span>Streak: <span id="sub-streak">0</span></span>
+                        </div>
+                    </div>
+                    
+                    <div id="sub-challenge-problem">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div class="mc-options" id="sub-mc-options">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="sub-check-btn" onclick="subCheckAnswer()" disabled>Check Answer</button>
+                        <button class="btn btn-secondary" id="sub-next-btn" onclick="subNextProblem()" class="hidden">Next Problem</button>
+                    </div>
+                    
+                    <div id="sub-feedback" class="hidden">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== TAB 2: PARTS ==================== -->
+        <div id="parts" class="main-tab-content">
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" data-subtab="parts-intro">Introduction</button>
+                <button class="sub-tab-btn" data-subtab="parts-explorer">Explorer</button>
+                <button class="sub-tab-btn" data-subtab="parts-challenge">Challenge</button>
+            </div>
+            
+            <!-- Parts Introduction -->
+            <div id="parts-intro" class="sub-tab-content active">
+                <div class="card">
+                    <h2>🧩 The Art of Integration by Parts</h2>
+                    <p>When the integrand is a product of "different worlds," strategically differentiate one part and integrate the other.</p>
+                </div>
+                
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <h4>📐 The Formula</h4>
+                        <div class="math-display">
+                            $\displaystyle\int u\, dv = uv - \int v\, du$
+                        </div>
+                        <p>You're trading one integral for another. The goal: make the new integral <em>simpler</em>.</p>
+                    </div>
+                    
+                    <div class="concept-card">
+                        <h4>🎯 The Strategic Choice</h4>
+                        <p><strong>u</strong> = the part you'll differentiate (should get simpler)<br><br>
+                        <strong>dv</strong> = the part you'll integrate (must be integrable)</p>
+                    </div>
+                    
+                    <div class="concept-card">
+                        <h4>✅ Signs of Success</h4>
+                        <p>The new integral $\int v\, du$ should be simpler than the original. If it's more complex, you've likely chosen poorly.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Quick Example</h3>
+                    <p>Consider $\displaystyle\int x e^x\, dx$</p>
+                    <p style="margin-top: 0.75rem;">This is a product of polynomial ($x$) and exponential ($e^x$) — different worlds.</p>
+                    <p style="margin-top: 0.5rem;">If we let $u = x$ and $dv = e^x dx$:</p>
+                    <div class="math-display">
+                        $du = dx, \quad v = e^x$
+                    </div>
+                    <p>Then $\displaystyle\int x e^x\, dx = x e^x - \int e^x\, dx = x e^x - e^x + C = e^x(x-1) + C$</p>
+                </div>
+                
+                <div class="nav-cta">
+                    <button class="nav-cta-btn" onclick="switchToSubTab('parts', 'parts-explorer')">
+                        Compare Choices in the Explorer →
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Parts Explorer -->
+            <div id="parts-explorer" class="sub-tab-content">
+                <div class="card">
+                    <h2>🔬 Consequence Comparator</h2>
+                    <p>See both possible choices side-by-side. Understand why one assignment leads to success and the other to a dead end.</p>
+                </div>
+                
+                <div class="preset-container" id="parts-presets">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="integral-display" id="parts-integral-display">
+                    <div class="integral" id="parts-current-integral"></div>
+                    <div style="margin-top: 0.75rem; color: var(--text-muted);">
+                        The integrand has two parts: <span id="parts-factors"></span>
+                    </div>
+                </div>
+                
+                <div class="choice-container">
+                    <div class="choice-label">Which should be $u$ (differentiated)?</div>
+                    <div class="choice-buttons" id="parts-choice-buttons">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                <div id="parts-comparison-container" class="hidden">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="partsCompare()">Compare Both Choices</button>
+                    <button class="btn btn-secondary" onclick="partsReset()">Reset</button>
+                </div>
+            </div>
+            
+            <!-- Parts Challenge -->
+            <div id="parts-challenge" class="sub-tab-content">
+                <div class="card">
+                    <div class="challenge-header">
+                        <h2 class="challenge-title">🎯 Predict the New Integral</h2>
+                        <div class="streak-display">
+                            <span class="streak-fire" id="parts-streak-fire">🔥</span>
+                            <span>Streak: <span id="parts-streak">0</span></span>
+                        </div>
+                    </div>
+                    
+                    <div id="parts-challenge-problem">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div class="mc-options" id="parts-mc-options">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="parts-check-btn" onclick="partsCheckAnswer()" disabled>Check Answer</button>
+                        <button class="btn btn-secondary" id="parts-next-btn" onclick="partsNextProblem()" class="hidden">Next Problem</button>
+                    </div>
+                    
+                    <div id="parts-feedback" class="hidden">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== TAB 3: STRATEGY ==================== -->
+        <div id="strategy" class="main-tab-content">
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" data-subtab="strat-intro">Introduction</button>
+                <button class="sub-tab-btn" data-subtab="strat-gallery">Gallery</button>
+                <button class="sub-tab-btn" data-subtab="strat-rapid">Rapid Recognition</button>
+            </div>
+            
+            <!-- Strategy Introduction -->
+            <div id="strat-intro" class="sub-tab-content active">
+                <div class="card">
+                    <h2>🎯 Choosing Your Approach</h2>
+                    <p>Before computing, the experienced integrator asks: <em>What technique fits this integral?</em></p>
+                </div>
+                
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <h4>🔄 Substitution Signals</h4>
+                        <p>• Composite function: something <em>inside</em> something else<br>
+                        • Derivative of the inner function present (up to constants)<br>
+                        • Examples: $x\cos(x^2)$, $\frac{e^x}{1+e^x}$</p>
+                    </div>
+                    
+                    <div class="concept-card">
+                        <h4>🧩 Parts Signals</h4>
+                        <p>• Product of "different worlds" (polynomial × trig, polynomial × exp, etc.)<br>
+                        • No obvious composite structure<br>
+                        • Examples: $x e^x$, $x \sin x$, $x^2 \ln x$</p>
+                    </div>
+                    
+                    <div class="concept-card">
+                        <h4>⚠️ The Traps</h4>
+                        <p>• $x e^{x^2}$ — Looks like parts, but substitution wins<br>
+                        • $\ln x$ — Needs parts with $dv = dx$<br>
+                        • $x^3\sqrt{1+x^2}$ — Product suggests parts, but substitution is better</p>
+                    </div>
+                    
+                    <div class="concept-card">
+                        <h4>🤔 Neither / Both</h4>
+                        <p>• Some integrals need other techniques (trig identities, partial fractions)<br>
+                        • Some work with either method — efficiency differs</p>
+                    </div>
+                </div>
+                
+                <div class="nav-cta">
+                    <button class="nav-cta-btn" onclick="switchToSubTab('strategy', 'strat-gallery')">
+                        Test Your Recognition →
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Strategy Gallery -->
+            <div id="strat-gallery" class="sub-tab-content">
+                <div class="card">
+                    <h2>📚 Technique Gallery</h2>
+                    <p>Click an integral and classify it. See immediate feedback on your technique recognition.</p>
+                </div>
+                
+                <div class="gallery-grid" id="strat-gallery-grid">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div id="strat-classify-panel" class="card hidden">
+                    <div class="integral-display">
+                        <div class="integral" id="strat-selected-integral"></div>
+                    </div>
+                    
+                    <div class="choice-label">Which technique is most appropriate?</div>
+                    
+                    <div class="technique-buttons" id="strat-technique-buttons">
+                        <button class="technique-btn" data-technique="substitution">Substitution</button>
+                        <button class="technique-btn" data-technique="parts">Parts</button>
+                        <button class="technique-btn" data-technique="either">Either works</button>
+                        <button class="technique-btn" data-technique="other">Different technique</button>
+                    </div>
+                    
+                    <div id="strat-gallery-feedback" class="hidden">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rapid Recognition -->
+            <div id="strat-rapid" class="sub-tab-content">
+                <div class="card">
+                    <div class="challenge-header">
+                        <h2 class="challenge-title">⚡ Rapid Recognition</h2>
+                        <div class="streak-display">
+                            <span class="streak-fire" id="strat-streak-fire">🔥</span>
+                            <span>Streak: <span id="strat-streak">0</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="integral-display">
+                        <div class="integral" id="strat-rapid-integral"></div>
+                    </div>
+                    
+                    <div class="technique-buttons" id="strat-rapid-buttons">
+                        <button class="technique-btn" data-technique="substitution" onclick="stratRapidAnswer('substitution')">Substitution</button>
+                        <button class="technique-btn" data-technique="parts" onclick="stratRapidAnswer('parts')">Parts</button>
+                        <button class="technique-btn" data-technique="either" onclick="stratRapidAnswer('either')">Either</button>
+                        <button class="technique-btn" data-technique="other" onclick="stratRapidAnswer('other')">Different</button>
+                    </div>
+                    
+                    <div id="strat-rapid-feedback" class="hidden">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div class="history-list" id="strat-history">
+                        <div class="history-title">Recent:</div>
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== DATA ====================
+        
+        // Substitution Explorer Data
+        const substitutionProblems = [
+            {
+                id: 'sub1',
+                integral: '\\int x \\cos(x^2)\\, dx',
+                choices: [
+                    { u: 'x', display: 'u = x' },
+                    { u: 'x^2', display: 'u = x^2' },
+                    { u: 'cos(x^2)', display: 'u = \\cos(x^2)' },
+                    { u: 'x*cos(x^2)', display: 'u = x\\cos(x^2)' }
+                ],
+                consequences: {
+                    'x': {
+                        du: 'du = dx',
+                        transform: '\\int u \\cos(u^2)\\, du',
+                        steps: [
+                            'Substituting $u = x$ just renames the variable.',
+                            'The integral $\\int u \\cos(u^2)\\, du$ is identical to the original.'
+                        ],
+                        verdict: 'warning',
+                        verdictTitle: '⚠️ No Progress',
+                        verdictText: 'This substitution just renames $x$ to $u$. No simplification occurs.'
+                    },
+                    'x^2': {
+                        du: 'du = 2x\\, dx \\quad \\Rightarrow \\quad x\\,dx = \\frac{1}{2}du',
+                        transform: '\\frac{1}{2}\\int \\cos(u)\\, du',
+                        steps: [
+                            'The $x$ from the original integral pairs with $dx$ to give $\\frac{1}{2}du$.',
+                            'The $\\cos(x^2)$ becomes $\\cos(u)$.',
+                            'Result: $\\frac{1}{2}\\int \\cos(u)\\, du = \\frac{1}{2}\\sin(u) + C = \\frac{1}{2}\\sin(x^2) + C$'
+                        ],
+                        verdict: 'success',
+                        verdictTitle: '✅ Simplified!',
+                        verdictText: 'The $x$ cancels perfectly. This is now a basic integral.'
+                    },
+                    'cos(x^2)': {
+                        du: 'du = -\\sin(x^2) \\cdot 2x\\, dx',
+                        transform: '\\int \\frac{x \\cdot u}{-2x\\sin(x^2)}\\, du = \\int \\frac{-u}{2\\sin(x^2)}\\, du',
+                        steps: [
+                            'We need $dx = \\frac{du}{-2x\\sin(x^2)}$',
+                            'The integral becomes $\\int \\frac{x \\cdot u}{-2x\\sin(x^2)}\\, du$',
+                            'We can cancel $x$, but $\\sin(x^2)$ remains as a function of $x$.',
+                            'To eliminate $x$: $\\sin(x^2) = \\pm\\sqrt{1 - \\cos^2(x^2)} = \\pm\\sqrt{1-u^2}$',
+                            'This gives $\\int \\frac{-u}{2\\sqrt{1-u^2}}\\, du$ — technically doable but unnecessarily complex.'
+                        ],
+                        verdict: 'error',
+                        verdictTitle: '❌ More Complex',
+                        verdictText: 'While technically possible, this creates a harder integral than we started with.'
+                    },
+                    'x*cos(x^2)': {
+                        du: 'du = \\cos(x^2) - 2x^2\\sin(x^2)\\, dx',
+                        transform: '\\int \\frac{u}{\\cos(x^2) - 2x^2\\sin(x^2)}\\, du',
+                        steps: [
+                            'Using the product rule: $du = [\\cos(x^2) + x \\cdot (-\\sin(x^2) \\cdot 2x)]\\,dx$',
+                            'This equals $du = [\\cos(x^2) - 2x^2\\sin(x^2)]\\,dx$',
+                            'We cannot solve for $dx$ in terms of $u$ alone.'
+                        ],
+                        verdict: 'error',
+                        verdictTitle: '🚫 Cannot Proceed',
+                        verdictText: 'This substitution does not allow us to express everything in terms of $u$.'
+                    }
+                },
+                correctU: 'x^2'
+            },
+            {
+                id: 'sub2',
+                integral: '\\int \\frac{e^x}{1+e^x}\\, dx',
+                choices: [
+                    { u: 'e^x', display: 'u = e^x' },
+                    { u: '1+e^x', display: 'u = 1+e^x' },
+                    { u: '1/(1+e^x)', display: 'u = \\frac{1}{1+e^x}' }
+                ],
+                consequences: {
+                    'e^x': {
+                        du: 'du = e^x\\, dx \\quad \\Rightarrow \\quad dx = \\frac{du}{u}',
+                        transform: '\\int \\frac{u}{1+u} \\cdot \\frac{du}{u} = \\int \\frac{1}{1+u}\\, du',
+                        steps: [
+                            'Substituting $e^x = u$, we have $dx = \\frac{du}{e^x} = \\frac{du}{u}$',
+                            'The integral becomes $\\int \\frac{u}{1+u} \\cdot \\frac{1}{u}\\, du = \\int \\frac{1}{1+u}\\, du$',
+                            'This gives $\\ln|1+u| + C = \\ln(1+e^x) + C$'
+                        ],
+                        verdict: 'success',
+                        verdictTitle: '✅ Simplified!',
+                        verdictText: 'This works nicely. The $u$ in numerator and denominator cancel.'
+                    },
+                    '1+e^x': {
+                        du: 'du = e^x\\, dx',
+                        transform: '\\int \\frac{1}{u}\\, du',
+                        steps: [
+                            'Since $du = e^x\\, dx$, the $e^x\\, dx$ in the numerator becomes just $du$.',
+                            'The integral becomes $\\int \\frac{1}{u}\\, du = \\ln|u| + C = \\ln(1+e^x) + C$'
+                        ],
+                        verdict: 'success',
+                        verdictTitle: '✅ Simplified!',
+                        verdictText: 'Excellent choice! The $e^x$ is exactly the derivative of the denominator.'
+                    },
+                    '1/(1+e^x)': {
+                        du: 'du = \\frac{-e^x}{(1+e^x)^2}\\, dx',
+                        transform: '\\int \\frac{e^x}{1/u} \\cdot \\frac{-(1+e^x)^2}{e^x}\\, du = \\int \\frac{-(1+e^x)^2}{1/u}\\, du',
+                        steps: [
+                            'We have $u = \\frac{1}{1+e^x}$, so $\\frac{1}{u} = 1+e^x$',
+                            'Then $du = \\frac{-e^x}{(1+e^x)^2}\\,dx$, giving $dx = \\frac{-(1+e^x)^2}{e^x}\\,du$',
+                            'The integral becomes extremely complicated with mixed $u$ and $x$ terms.',
+                            'We would need $e^x = \\frac{1}{u} - 1 = \\frac{1-u}{u}$ to eliminate $x$.',
+                            'This leads to $\\int \\frac{-1}{u^2(1-u)}\\, du$ — requiring partial fractions.'
+                        ],
+                        verdict: 'error',
+                        verdictTitle: '❌ More Complex',
+                        verdictText: 'While possible, this creates unnecessary complexity requiring partial fractions.'
+                    }
+                },
+                correctU: '1+e^x'
+            },
+            {
+                id: 'sub3',
+                integral: '\\int \\tan x\\, dx',
+                choices: [
+                    { u: 'tan(x)', display: 'u = \\tan x' },
+                    { u: 'sin(x)', display: 'u = \\sin x' },
+                    { u: 'cos(x)', display: 'u = \\cos x' }
+                ],
+                consequences: {
+                    'tan(x)': {
+                        du: 'du = \\sec^2 x\\, dx',
+                        transform: '\\int \\frac{u}{\\sec^2 x}\\, du',
+                        steps: [
+                            'We have $dx = \\frac{du}{\\sec^2 x}$',
+                            'But $\\sec^2 x = 1 + \\tan^2 x = 1 + u^2$',
+                            'So the integral becomes $\\int \\frac{u}{1+u^2}\\, du$',
+                            'This equals $\\frac{1}{2}\\ln(1+u^2) + C = \\frac{1}{2}\\ln(\\sec^2 x) + C = \\ln|\\sec x| + C$'
+                        ],
+                        verdict: 'warning',
+                        verdictTitle: '⚠️ Works, But Indirect',
+                        verdictText: 'This works but requires recognising $\\sec^2 x = 1 + \\tan^2 x$. There\'s a more direct approach.'
+                    },
+                    'sin(x)': {
+                        du: 'du = \\cos x\\, dx',
+                        transform: '\\int \\frac{u}{\\cos^2 x}\\, du',
+                        steps: [
+                            'Writing $\\tan x = \\frac{\\sin x}{\\cos x}$ and $dx = \\frac{du}{\\cos x}$',
+                            'The integral becomes $\\int \\frac{u}{\\cos x} \\cdot \\frac{1}{\\cos x}\\, du = \\int \\frac{u}{\\cos^2 x}\\, du$',
+                            'We need $\\cos x = \\pm\\sqrt{1-\\sin^2 x} = \\pm\\sqrt{1-u^2}$',
+                            'This gives $\\int \\frac{u}{1-u^2}\\, du = -\\frac{1}{2}\\ln|1-u^2| + C$',
+                            'Which simplifies to $-\\ln|\\cos x| + C = \\ln|\\sec x| + C$'
+                        ],
+                        verdict: 'warning',
+                        verdictTitle: '⚠️ Works, But Roundabout',
+                        verdictText: 'This works but involves the identity $\\cos^2 x = 1 - \\sin^2 x$. Not the simplest path.'
+                    },
+                    'cos(x)': {
+                        du: 'du = -\\sin x\\, dx \\quad \\Rightarrow \\quad \\sin x\\, dx = -du',
+                        transform: '\\int \\frac{-1}{u}\\, du',
+                        steps: [
+                            'Writing $\\tan x = \\frac{\\sin x}{\\cos x}$, the integral is $\\int \\frac{\\sin x}{\\cos x}\\, dx$',
+                            'With $u = \\cos x$, we have $\\sin x\\, dx = -du$',
+                            'The integral becomes $\\int \\frac{-du}{u} = -\\ln|u| + C = -\\ln|\\cos x| + C = \\ln|\\sec x| + C$'
+                        ],
+                        verdict: 'success',
+                        verdictTitle: '✅ Simplified!',
+                        verdictText: 'Perfect! Writing $\\tan x = \\frac{\\sin x}{\\cos x}$ reveals that $\\sin x$ is the derivative of the denominator (up to sign).'
+                    }
+                },
+                correctU: 'cos(x)'
+            },
+            {
+                id: 'sub4',
+                integral: '\\int \\frac{1}{x \\ln x}\\, dx',
+                choices: [
+                    { u: 'x', display: 'u = x' },
+                    { u: 'ln(x)', display: 'u = \\ln x' },
+                    { u: 'x*ln(x)', display: 'u = x \\ln x' },
+                    { u: '1/ln(x)', display: 'u = \\frac{1}{\\ln x}' }
+                ],
+                consequences: {
+                    'x': {
+                        du: 'du = dx',
+                        transform: '\\int \\frac{1}{u \\ln u}\\, du',
+                        steps: [
+                            'This just renames $x$ to $u$.',
+                            'The integral $\\int \\frac{1}{u \\ln u}\\, du$ is identical to the original.'
+                        ],
+                        verdict: 'warning',
+                        verdictTitle: '⚠️ No Progress',
+                        verdictText: 'This substitution achieves nothing — it\'s the same integral with a different letter.'
+                    },
+                    'ln(x)': {
+                        du: 'du = \\frac{1}{x}\\, dx \\quad \\Rightarrow \\quad \\frac{dx}{x} = du',
+                        transform: '\\int \\frac{1}{u}\\, du',
+                        steps: [
+                            'With $u = \\ln x$, we have $du = \\frac{dx}{x}$',
+                            'The integrand $\\frac{1}{x \\ln x}\\, dx = \\frac{1}{\\ln x} \\cdot \\frac{dx}{x} = \\frac{1}{u}\\, du$',
+                            'This gives $\\ln|u| + C = \\ln|\\ln x| + C$'
+                        ],
+                        verdict: 'success',
+                        verdictTitle: '✅ Simplified!',
+                        verdictText: 'The $\\frac{1}{x}$ is exactly the derivative of $\\ln x$. Perfect recognition!'
+                    },
+                    'x*ln(x)': {
+                        du: 'du = (\\ln x + 1)\\, dx',
+                        transform: '\\int \\frac{1}{u(\\ln x + 1)}\\, du',
+                        steps: [
+                            'Using the product rule: $du = (\\ln x + x \\cdot \\frac{1}{x})\\,dx = (\\ln x + 1)\\,dx$',
+                            'We get $dx = \\frac{du}{\\ln x + 1}$',
+                            'The integral becomes $\\int \\frac{1}{u} \\cdot \\frac{1}{\\ln x + 1}\\, du$',
+                            'We cannot easily express $\\ln x$ in terms of $u = x\\ln x$.'
+                        ],
+                        verdict: 'error',
+                        verdictTitle: '🚫 Cannot Proceed Cleanly',
+                        verdictText: 'This substitution doesn\'t allow us to eliminate $x$ from the integral.'
+                    },
+                    '1/ln(x)': {
+                        du: 'du = \\frac{-1}{x(\\ln x)^2}\\, dx',
+                        transform: '\\int \\frac{-u^2 (\\ln x)^2}{x}\\, du',
+                        steps: [
+                            'With $u = \\frac{1}{\\ln x}$, we have $\\ln x = \\frac{1}{u}$',
+                            '$du = \\frac{-1}{x(\\ln x)^2}\\,dx$, so $dx = -x(\\ln x)^2\\, du = -x \\cdot \\frac{1}{u^2}\\, du$',
+                            'The integral becomes $\\int \\frac{u}{x} \\cdot \\left(-\\frac{x}{u^2}\\right)\\, du = \\int \\frac{-1}{u}\\, du$',
+                            'This gives $-\\ln|u| + C = -\\ln\\left|\\frac{1}{\\ln x}\\right| + C = \\ln|\\ln x| + C$'
+                        ],
+                        verdict: 'warning',
+                        verdictTitle: '⚠️ Works, But Overcomplicated',
+                        verdictText: 'This reaches the same answer but through unnecessary complexity. The simpler choice is $u = \\ln x$.'
+                    }
+                },
+                correctU: 'ln(x)'
+            },
+            {
+                id: 'sub5',
+                integral: '\\int x e^{x^2}\\, dx',
+                choices: [
+                    { u: 'x', display: 'u = x' },
+                    { u: 'e^(x^2)', display: 'u = e^{x^2}' },
+                    { u: 'x^2', display: 'u = x^2' },
+                    { u: 'x*e^(x^2)', display: 'u = x e^{x^2}' }
+                ],
+                consequences: {
+                    'x': {
+                        du: 'du = dx',
+                        transform: '\\int u e^{u^2}\\, du',
+                        steps: [
+                            'This just renames $x$ to $u$.',
+                            'The integral remains unchanged in structure.'
+                        ],
+                        verdict: 'warning',
+                        verdictTitle: '⚠️ No Progress',
+                        verdictText: 'Renaming the variable doesn\'t simplify anything.'
+                    },
+                    'e^(x^2)': {
+                        du: 'du = 2x e^{x^2}\\, dx',
+                        transform: '\\int \\frac{x \\cdot u}{2x e^{x^2}}\\, du = \\int \\frac{1}{2e^{x^2}}\\, du',
+                        steps: [
+                            'We have $dx = \\frac{du}{2x e^{x^2}}$',
+                            'The integral becomes $\\int x \\cdot u \\cdot \\frac{1}{2x e^{x^2}}\\, du = \\int \\frac{u}{2e^{x^2}}\\, du$',
+                            'But $e^{x^2} = u$, so this is $\\int \\frac{u}{2u}\\, du = \\int \\frac{1}{2}\\, du = \\frac{u}{2} + C$',
+                            'This equals $\\frac{1}{2}e^{x^2} + C$'
+                        ],
+                        verdict: 'success',
+                        verdictTitle: '✅ Simplified!',
+                        verdictText: 'This works! The $u$ terms cancel nicely.'
+                    },
+                    'x^2': {
+                        du: 'du = 2x\\, dx \\quad \\Rightarrow \\quad x\\, dx = \\frac{1}{2}du',
+                        transform: '\\frac{1}{2}\\int e^u\\, du',
+                        steps: [
+                            'With $u = x^2$, we have $x\\, dx = \\frac{1}{2}du$',
+                            'The integral becomes $\\int e^u \\cdot \\frac{1}{2}\\, du = \\frac{1}{2}\\int e^u\\, du$',
+                            'This gives $\\frac{1}{2}e^u + C = \\frac{1}{2}e^{x^2} + C$'
+                        ],
+                        verdict: 'success',
+                        verdictTitle: '✅ Simplified!',
+                        verdictText: 'Excellent! The $x$ pairs perfectly with $dx$ to form $\\frac{1}{2}du$. This is the cleanest approach.'
+                    },
+                    'x*e^(x^2)': {
+                        du: 'du = (e^{x^2} + 2x^2 e^{x^2})\\, dx = e^{x^2}(1 + 2x^2)\\, dx',
+                        transform: '\\int \\frac{u}{e^{x^2}(1+2x^2)}\\, du',
+                        steps: [
+                            'Using the product rule: $du = e^{x^2}\\,dx + x \\cdot 2x e^{x^2}\\,dx = e^{x^2}(1+2x^2)\\,dx$',
+                            'We cannot easily express $e^{x^2}$ or $x^2$ purely in terms of $u$.',
+                            'This substitution creates an intractable mess.'
+                        ],
+                        verdict: 'error',
+                        verdictTitle: '🚫 Cannot Proceed',
+                        verdictText: 'This substitution doesn\'t allow clean elimination of the original variable.'
+                    }
+                },
+                correctU: 'x^2'
+            },
+            {
+                id: 'sub6',
+                integral: '\\int \\sinh x \\cosh^3 x\\, dx',
+                choices: [
+                    { u: 'sinh(x)', display: 'u = \\sinh x' },
+                    { u: 'cosh(x)', display: 'u = \\cosh x' },
+                    { u: 'cosh^3(x)', display: 'u = \\cosh^3 x' }
+                ],
+                consequences: {
+                    'sinh(x)': {
+                        du: 'du = \\cosh x\\, dx',
+                        transform: '\\int u \\cosh^2 x\\, du',
+                        steps: [
+                            'With $du = \\cosh x\\, dx$, we need $dx = \\frac{du}{\\cosh x}$',
+                            'The integral becomes $\\int u \\cdot \\cosh^3 x \\cdot \\frac{1}{\\cosh x}\\, du = \\int u \\cosh^2 x\\, du$',
+                            'Using $\\cosh^2 x = 1 + \\sinh^2 x = 1 + u^2$:',
+                            '$\\int u(1+u^2)\\, du = \\int (u + u^3)\\, du = \\frac{u^2}{2} + \\frac{u^4}{4} + C$',
+                            'This equals $\\frac{\\sinh^2 x}{2} + \\frac{\\sinh^4 x}{4} + C$'
+                        ],
+                        verdict: 'warning',
+                        verdictTitle: '⚠️ Works, But Indirect',
+                        verdictText: 'This works but requires using the identity $\\cosh^2 x = 1 + \\sinh^2 x$. There\'s a cleaner path.'
+                    },
+                    'cosh(x)': {
+                        du: 'du = \\sinh x\\, dx',
+                        transform: '\\int u^3\\, du',
+                        steps: [
+                            'With $du = \\sinh x\\, dx$, the $\\sinh x\\, dx$ in the integral becomes $du$.',
+                            'The integral becomes $\\int \\cosh^3 x\\, du = \\int u^3\\, du$',
+                            'This gives $\\frac{u^4}{4} + C = \\frac{\\cosh^4 x}{4} + C$'
+                        ],
+                        verdict: 'success',
+                        verdictTitle: '✅ Simplified!',
+                        verdictText: 'Perfect! The $\\sinh x$ is exactly the derivative of $\\cosh x$. Immediate simplification.'
+                    },
+                    'cosh^3(x)': {
+                        du: 'du = 3\\cosh^2 x \\cdot \\sinh x\\, dx',
+                        transform: '\\int \\frac{u^{1/3}}{3}\\, du',
+                        steps: [
+                            'We have $du = 3\\cosh^2 x \\sinh x\\, dx$',
+                            'So $\\sinh x\\, dx = \\frac{du}{3\\cosh^2 x}$',
+                            'Since $\\cosh^3 x = u$, we have $\\cosh x = u^{1/3}$ and $\\cosh^2 x = u^{2/3}$',
+                            'The integral becomes $\\int u \\cdot \\frac{1}{3u^{2/3}}\\, du = \\frac{1}{3}\\int u^{1/3}\\, du$',
+                            'This gives $\\frac{1}{3} \\cdot \\frac{u^{4/3}}{4/3} + C = \\frac{u^{4/3}}{4} + C = \\frac{\\cosh^4 x}{4} + C$'
+                        ],
+                        verdict: 'warning',
+                        verdictTitle: '⚠️ Works, But Overcomplicated',
+                        verdictText: 'This reaches the same answer but through fractional powers. The simpler choice is $u = \\cosh x$.'
+                    }
+                },
+                correctU: 'cosh(x)'
+            }
+        ];
+        
+        // Substitution Challenge Data
+        const substitutionChallenges = [
+            {
+                integral: '\\int \\frac{e^x}{1+e^x}\\, dx',
+                givenU: '1 + e^x',
+                options: [
+                    { text: '\\int \\frac{1}{u}\\, du', correct: true },
+                    { text: '\\int \\frac{e^x}{u}\\, du', correct: false },
+                    { text: '\\int \\frac{u-1}{u}\\, du', correct: false },
+                    { text: '\\int \\frac{1}{u \\cdot e^x}\\, du', correct: false }
+                ],
+                explanation: 'Since $u = 1 + e^x$, we have $du = e^x\\, dx$. The $e^x\\, dx$ in the numerator becomes $du$, leaving $\\int \\frac{1}{u}\\, du$.'
+            },
+            {
+                integral: '\\int x \\sin(x^2)\\, dx',
+                givenU: 'x^2',
+                options: [
+                    { text: '\\int \\sin(u)\\, du', correct: false },
+                    { text: '\\frac{1}{2}\\int \\sin(u)\\, du', correct: true },
+                    { text: '2\\int \\sin(u)\\, du', correct: false },
+                    { text: '\\int x \\sin(u)\\, du', correct: false }
+                ],
+                explanation: 'With $u = x^2$, we have $du = 2x\\, dx$, so $x\\, dx = \\frac{1}{2}du$. The integral becomes $\\frac{1}{2}\\int \\sin(u)\\, du$.'
+            },
+            {
+                integral: '\\int \\frac{\\cos(\\ln x)}{x}\\, dx',
+                givenU: '\\ln x',
+                options: [
+                    { text: '\\int \\cos(u)\\, du', correct: true },
+                    { text: '\\int \\frac{\\cos(u)}{u}\\, du', correct: false },
+                    { text: '\\int x \\cos(u)\\, du', correct: false },
+                    { text: '\\int \\frac{\\cos(u)}{e^u}\\, du', correct: false }
+                ],
+                explanation: 'With $u = \\ln x$, we have $du = \\frac{1}{x}\\, dx$. The $\\frac{dx}{x}$ becomes $du$, leaving $\\int \\cos(u)\\, du$.'
+            },
+            {
+                integral: '\\int \\frac{x}{1+x^2}\\, dx',
+                givenU: '1 + x^2',
+                options: [
+                    { text: '\\int \\frac{1}{u}\\, du', correct: false },
+                    { text: '\\frac{1}{2}\\int \\frac{1}{u}\\, du', correct: true },
+                    { text: '\\int \\frac{x}{u}\\, du', correct: false },
+                    { text: '2\\int \\frac{1}{u}\\, du', correct: false }
+                ],
+                explanation: 'With $u = 1 + x^2$, we have $du = 2x\\, dx$, so $x\\, dx = \\frac{1}{2}du$. The integral becomes $\\frac{1}{2}\\int \\frac{1}{u}\\, du$.'
+            },
+            {
+                integral: '\\int e^{\\sin x} \\cos x\\, dx',
+                givenU: '\\sin x',
+                options: [
+                    { text: '\\int e^u\\, du', correct: true },
+                    { text: '\\int e^u \\cos(u)\\, du', correct: false },
+                    { text: '\\int \\frac{e^u}{\\cos x}\\, du', correct: false },
+                    { text: '-\\int e^u\\, du', correct: false }
+                ],
+                explanation: 'With $u = \\sin x$, we have $du = \\cos x\\, dx$. The $\\cos x\\, dx$ becomes $du$, leaving $\\int e^u\\, du$.'
+            },
+            {
+                integral: '\\int \\sec^2 x \\tan^3 x\\, dx',
+                givenU: '\\tan x',
+                options: [
+                    { text: '\\int u^3\\, du', correct: true },
+                    { text: '\\int \\sec^2(u) \\cdot u^3\\, du', correct: false },
+                    { text: '\\int u^3 \\sec^2 x\\, du', correct: false },
+                    { text: '\\frac{1}{\\sec^2 x}\\int u^3\\, du', correct: false }
+                ],
+                explanation: 'With $u = \\tan x$, we have $du = \\sec^2 x\\, dx$. The $\\sec^2 x\\, dx$ becomes $du$, leaving $\\int u^3\\, du$.'
+            },
+            {
+                integral: '\\int \\frac{(\\ln x)^2}{x}\\, dx',
+                givenU: '\\ln x',
+                options: [
+                    { text: '\\int u^2\\, du', correct: true },
+                    { text: '\\int \\frac{u^2}{x}\\, du', correct: false },
+                    { text: '\\frac{1}{x}\\int u^2\\, du', correct: false },
+                    { text: '\\int u^2 e^{-u}\\, du', correct: false }
+                ],
+                explanation: 'With $u = \\ln x$, we have $du = \\frac{1}{x}\\, dx$. The $\\frac{dx}{x}$ becomes $du$, leaving $\\int u^2\\, du$.'
+            },
+            {
+                integral: '\\int \\frac{x^2}{\\sqrt{1-x^3}}\\, dx',
+                givenU: '1 - x^3',
+                options: [
+                    { text: '-\\frac{1}{3}\\int \\frac{1}{\\sqrt{u}}\\, du', correct: true },
+                    { text: '\\frac{1}{3}\\int \\frac{1}{\\sqrt{u}}\\, du', correct: false },
+                    { text: '\\int \\frac{x^2}{\\sqrt{u}}\\, du', correct: false },
+                    { text: '-3\\int \\frac{1}{\\sqrt{u}}\\, du', correct: false }
+                ],
+                explanation: 'With $u = 1 - x^3$, we have $du = -3x^2\\, dx$, so $x^2\\, dx = -\\frac{1}{3}du$. The integral becomes $-\\frac{1}{3}\\int u^{-1/2}\\, du$.'
+            }
+        ];
+        
+        // Parts Explorer Data
+        const partsProblems = [
+            {
+                id: 'parts1',
+                integral: '\\int x e^x\\, dx',
+                factor1: 'x',
+                factor2: 'e^x',
+                choiceA: {
+                    u: 'x', dv: 'e^x\\, dx',
+                    du: 'dx', v: 'e^x',
+                    formula: 'x \\cdot e^x - \\int e^x\\, dx',
+                    newIntegral: '\\int e^x\\, dx',
+                    result: 'x e^x - e^x + C = e^x(x-1) + C',
+                    verdict: 'success',
+                    verdictText: 'The polynomial degree decreased from 1 to 0. Solved!'
+                },
+                choiceB: {
+                    u: 'e^x', dv: 'x\\, dx',
+                    du: 'e^x\\, dx', v: '\\frac{x^2}{2}',
+                    formula: 'e^x \\cdot \\frac{x^2}{2} - \\int \\frac{x^2}{2} e^x\\, dx',
+                    newIntegral: '\\frac{1}{2}\\int x^2 e^x\\, dx',
+                    result: null,
+                    verdict: 'error',
+                    verdictText: 'The polynomial degree increased from 1 to 2. Wrong direction!'
+                },
+                recommended: 'A'
+            },
+            {
+                id: 'parts2',
+                integral: '\\int x \\sin x\\, dx',
+                factor1: 'x',
+                factor2: '\\sin x',
+                choiceA: {
+                    u: 'x', dv: '\\sin x\\, dx',
+                    du: 'dx', v: '-\\cos x',
+                    formula: 'x \\cdot (-\\cos x) - \\int (-\\cos x)\\, dx',
+                    newIntegral: '\\int \\cos x\\, dx',
+                    result: '-x\\cos x + \\sin x + C',
+                    verdict: 'success',
+                    verdictText: 'The polynomial disappears from the new integral. Solved!'
+                },
+                choiceB: {
+                    u: '\\sin x', dv: 'x\\, dx',
+                    du: '\\cos x\\, dx', v: '\\frac{x^2}{2}',
+                    formula: '\\sin x \\cdot \\frac{x^2}{2} - \\int \\frac{x^2}{2} \\cos x\\, dx',
+                    newIntegral: '\\frac{1}{2}\\int x^2 \\cos x\\, dx',
+                    result: null,
+                    verdict: 'error',
+                    verdictText: 'The polynomial degree increased. This makes things harder.'
+                },
+                recommended: 'A'
+            },
+            {
+                id: 'parts3',
+                integral: '\\int \\ln x\\, dx',
+                factor1: '\\ln x',
+                factor2: '1',
+                choiceA: {
+                    u: '\\ln x', dv: 'dx',
+                    du: '\\frac{1}{x}\\, dx', v: 'x',
+                    formula: '\\ln x \\cdot x - \\int x \\cdot \\frac{1}{x}\\, dx',
+                    newIntegral: '\\int 1\\, dx',
+                    result: 'x \\ln x - x + C',
+                    verdict: 'success',
+                    verdictText: 'The $x$ and $\\frac{1}{x}$ cancel perfectly. Solved!'
+                },
+                choiceB: {
+                    u: '1', dv: '\\ln x\\, dx',
+                    du: '0', v: '???',
+                    formula: '\\text{Cannot proceed}',
+                    newIntegral: '\\text{(cannot integrate } \\ln x \\text{ directly)}',
+                    result: null,
+                    verdict: 'error',
+                    verdictText: 'We cannot integrate $\\ln x$ without first knowing the answer!'
+                },
+                recommended: 'A'
+            },
+            {
+                id: 'parts4',
+                integral: '\\int x \\ln x\\, dx',
+                factor1: '\\ln x',
+                factor2: 'x',
+                choiceA: {
+                    u: '\\ln x', dv: 'x\\, dx',
+                    du: '\\frac{1}{x}\\, dx', v: '\\frac{x^2}{2}',
+                    formula: '\\ln x \\cdot \\frac{x^2}{2} - \\int \\frac{x^2}{2} \\cdot \\frac{1}{x}\\, dx',
+                    newIntegral: '\\frac{1}{2}\\int x\\, dx',
+                    result: '\\frac{x^2}{2}\\ln x - \\frac{x^2}{4} + C',
+                    verdict: 'success',
+                    verdictText: 'The $x^2$ and $\\frac{1}{x}$ simplify to $x$. Clean solution!'
+                },
+                choiceB: {
+                    u: 'x', dv: '\\ln x\\, dx',
+                    du: 'dx', v: '???',
+                    formula: '\\text{Cannot proceed}',
+                    newIntegral: '\\text{(cannot integrate } \\ln x \\text{ directly)}',
+                    result: null,
+                    verdict: 'error',
+                    verdictText: 'We cannot directly integrate $\\ln x$ for $v$.'
+                },
+                recommended: 'A'
+            },
+            {
+                id: 'parts5',
+                integral: '\\int x^2 e^x\\, dx',
+                factor1: 'x^2',
+                factor2: 'e^x',
+                choiceA: {
+                    u: 'x^2', dv: 'e^x\\, dx',
+                    du: '2x\\, dx', v: 'e^x',
+                    formula: 'x^2 e^x - \\int 2x e^x\\, dx',
+                    newIntegral: '2\\int x e^x\\, dx',
+                    result: 'x^2 e^x - 2(xe^x - e^x) + C = e^x(x^2 - 2x + 2) + C',
+                    verdict: 'success',
+                    verdictText: 'Polynomial degree decreased (2 → 1). Apply parts again to finish.'
+                },
+                choiceB: {
+                    u: 'e^x', dv: 'x^2\\, dx',
+                    du: 'e^x\\, dx', v: '\\frac{x^3}{3}',
+                    formula: 'e^x \\cdot \\frac{x^3}{3} - \\int \\frac{x^3}{3} e^x\\, dx',
+                    newIntegral: '\\frac{1}{3}\\int x^3 e^x\\, dx',
+                    result: null,
+                    verdict: 'error',
+                    verdictText: 'Polynomial degree increased (2 → 3). This makes things worse!'
+                },
+                recommended: 'A'
+            },
+            {
+                id: 'parts6',
+                integral: '\\int e^x \\cos x\\, dx',
+                factor1: 'e^x',
+                factor2: '\\cos x',
+                choiceA: {
+                    u: 'e^x', dv: '\\cos x\\, dx',
+                    du: 'e^x\\, dx', v: '\\sin x',
+                    formula: 'e^x \\sin x - \\int e^x \\sin x\\, dx',
+                    newIntegral: '\\int e^x \\sin x\\, dx',
+                    result: '\\text{Apply parts again, then solve algebraically}',
+                    verdict: 'success',
+                    verdictText: 'Same complexity, but apply parts again and solve the resulting equation for the integral.'
+                },
+                choiceB: {
+                    u: '\\cos x', dv: 'e^x\\, dx',
+                    du: '-\\sin x\\, dx', v: 'e^x',
+                    formula: 'e^x \\cos x - \\int e^x (-\\sin x)\\, dx',
+                    newIntegral: '\\int e^x \\sin x\\, dx',
+                    result: '\\text{Apply parts again, then solve algebraically}',
+                    verdict: 'success',
+                    verdictText: 'Also works! This is a "cycling" case — either choice leads to the same method.'
+                },
+                recommended: 'either'
+            },
+            {
+                id: 'parts7',
+                integral: '\\int x \\arctan x\\, dx',
+                factor1: '\\arctan x',
+                factor2: 'x',
+                choiceA: {
+                    u: '\\arctan x', dv: 'x\\, dx',
+                    du: '\\frac{1}{1+x^2}\\, dx', v: '\\frac{x^2}{2}',
+                    formula: '\\arctan x \\cdot \\frac{x^2}{2} - \\int \\frac{x^2}{2(1+x^2)}\\, dx',
+                    newIntegral: '\\frac{1}{2}\\int \\frac{x^2}{1+x^2}\\, dx',
+                    result: '\\frac{x^2}{2}\\arctan x - \\frac{1}{2}(x - \\arctan x) + C',
+                    verdict: 'success',
+                    verdictText: 'The new integral is rational and can be solved by rewriting $\\frac{x^2}{1+x^2} = 1 - \\frac{1}{1+x^2}$.'
+                },
+                choiceB: {
+                    u: 'x', dv: '\\arctan x\\, dx',
+                    du: 'dx', v: '???',
+                    formula: '\\text{Cannot proceed directly}',
+                    newIntegral: '\\text{(integrating } \\arctan x \\text{ requires parts itself)}',
+                    result: null,
+                    verdict: 'error',
+                    verdictText: 'We cannot easily integrate $\\arctan x$ without knowing a formula or using parts on it.'
+                },
+                recommended: 'A'
+            }
+        ];
+        
+        // Parts Challenge Data
+        const partsChallenges = [
+            {
+                integral: '\\int x \\sin x\\, dx',
+                u: 'x', dv: '\\sin x\\, dx',
+                du: 'dx', v: '-\\cos x',
+                options: [
+                    { text: '\\int \\cos x\\, dx', correct: false },
+                    { text: '-\\int \\cos x\\, dx', correct: false },
+                    { text: '\\int (-\\cos x)\\, dx', correct: true },
+                    { text: '\\int x \\cos x\\, dx', correct: false }
+                ],
+                explanation: 'With $v = -\\cos x$ and $du = dx$, the new integral is $\\int v\\, du = \\int (-\\cos x)\\, dx$. Note: this equals $-\\int \\cos x\\, dx$, but the direct substitution gives $\\int (-\\cos x)\\, dx$.'
+            },
+            {
+                integral: '\\int x \\cos x\\, dx',
+                u: 'x', dv: '\\cos x\\, dx',
+                du: 'dx', v: '\\sin x',
+                options: [
+                    { text: '\\int \\sin x\\, dx', correct: true },
+                    { text: '-\\int \\sin x\\, dx', correct: false },
+                    { text: '\\int x \\sin x\\, dx', correct: false },
+                    { text: '\\int \\frac{\\sin x}{x}\\, dx', correct: false }
+                ],
+                explanation: 'With $v = \\sin x$ and $du = dx$, the new integral $\\int v\\, du = \\int \\sin x\\, dx$.'
+            },
+            {
+                integral: '\\int x^2 e^x\\, dx',
+                u: 'x^2', dv: 'e^x\\, dx',
+                du: '2x\\, dx', v: 'e^x',
+                options: [
+                    { text: '\\int e^x\\, dx', correct: false },
+                    { text: '\\int 2x e^x\\, dx', correct: true },
+                    { text: '\\int x^2 e^x\\, dx', correct: false },
+                    { text: '2\\int e^x\\, dx', correct: false }
+                ],
+                explanation: 'With $v = e^x$ and $du = 2x\\, dx$, the new integral is $\\int v\\, du = \\int e^x \\cdot 2x\\, dx = \\int 2x e^x\\, dx$.'
+            },
+            {
+                integral: '\\int \\ln x\\, dx',
+                u: '\\ln x', dv: 'dx',
+                du: '\\frac{1}{x}\\, dx', v: 'x',
+                options: [
+                    { text: '\\int x\\, dx', correct: false },
+                    { text: '\\int \\frac{1}{x}\\, dx', correct: false },
+                    { text: '\\int 1\\, dx', correct: true },
+                    { text: '\\int \\frac{x}{\\ln x}\\, dx', correct: false }
+                ],
+                explanation: 'With $v = x$ and $du = \\frac{1}{x}\\, dx$, the new integral is $\\int v\\, du = \\int x \\cdot \\frac{1}{x}\\, dx = \\int 1\\, dx$.'
+            },
+            {
+                integral: '\\int x \\ln x\\, dx',
+                u: '\\ln x', dv: 'x\\, dx',
+                du: '\\frac{1}{x}\\, dx', v: '\\frac{x^2}{2}',
+                options: [
+                    { text: '\\int \\frac{x^2}{2}\\, dx', correct: false },
+                    { text: '\\int \\frac{x}{2}\\, dx', correct: true },
+                    { text: '\\int \\frac{x^2}{2x}\\, dx', correct: false },
+                    { text: '\\int \\frac{1}{2x}\\, dx', correct: false }
+                ],
+                explanation: 'With $v = \\frac{x^2}{2}$ and $du = \\frac{1}{x}\\, dx$, we get $\\int v\\, du = \\int \\frac{x^2}{2} \\cdot \\frac{1}{x}\\, dx = \\int \\frac{x}{2}\\, dx$.'
+            },
+            {
+                integral: '\\int e^x \\sin x\\, dx',
+                u: 'e^x', dv: '\\sin x\\, dx',
+                du: 'e^x\\, dx', v: '-\\cos x',
+                options: [
+                    { text: '\\int e^x \\cos x\\, dx', correct: false },
+                    { text: '-\\int e^x \\cos x\\, dx', correct: true },
+                    { text: '\\int -\\cos x\\, dx', correct: false },
+                    { text: '\\int e^x (-\\cos x)\\, dx', correct: false }
+                ],
+                explanation: 'With $v = -\\cos x$ and $du = e^x\\, dx$, we get $\\int v\\, du = \\int (-\\cos x) \\cdot e^x\\, dx = -\\int e^x \\cos x\\, dx$.'
+            },
+            {
+                integral: '\\int x \\sec^2 x\\, dx',
+                u: 'x', dv: '\\sec^2 x\\, dx',
+                du: 'dx', v: '\\tan x',
+                options: [
+                    { text: '\\int \\tan x\\, dx', correct: true },
+                    { text: '\\int x \\tan x\\, dx', correct: false },
+                    { text: '\\int \\sec^2 x\\, dx', correct: false },
+                    { text: '\\int \\frac{\\tan x}{x}\\, dx', correct: false }
+                ],
+                explanation: 'With $v = \\tan x$ and $du = dx$, the new integral is $\\int v\\, du = \\int \\tan x\\, dx$.'
+            }
+        ];
+        
+        // Strategy Data
+        const strategyProblems = [
+            { integral: '\\int x e^x\\, dx', technique: 'parts', explanation: 'Product of polynomial and exponential — different "worlds." No composite structure, so parts is the way.' },
+            { integral: '\\int x \\cos(x^2)\\, dx', technique: 'substitution', explanation: 'The $x^2$ is inside $\\cos$, and $x$ is (up to a constant) the derivative of $x^2$. Classic substitution pattern.' },
+            { integral: '\\int \\ln x\\, dx', technique: 'parts', explanation: 'Use parts with $u = \\ln x$ and $dv = dx$. The trick: the "other factor" is just 1.' },
+            { integral: '\\int \\tan x\\, dx', technique: 'substitution', explanation: 'Write as $\\int \\frac{\\sin x}{\\cos x}\\, dx$. With $u = \\cos x$, the $\\sin x$ becomes (minus) the derivative.' },
+            { integral: '\\int x^2 e^x\\, dx', technique: 'parts', explanation: 'Polynomial times exponential. Apply parts twice to reduce the polynomial degree to zero.' },
+            { integral: '\\int x e^{x^2}\\, dx', technique: 'substitution', explanation: 'Trap! Despite the product, $x$ is the derivative of $x^2$. Substitution $u = x^2$ gives $\\frac{1}{2}\\int e^u\\, du$.' },
+            { integral: '\\int \\frac{e^x}{1+e^x}\\, dx', technique: 'substitution', explanation: 'The $e^x$ in the numerator is the derivative of $1 + e^x$ in the denominator. Classic substitution.' },
+            { integral: '\\int x \\sin x\\, dx', technique: 'parts', explanation: 'Polynomial times trigonometric. Parts with $u = x$ reduces the polynomial.' },
+            { integral: '\\int \\frac{1}{x \\ln x}\\, dx', technique: 'substitution', explanation: 'With $u = \\ln x$, we have $du = \\frac{dx}{x}$, giving $\\int \\frac{1}{u}\\, du$.' },
+            { integral: '\\int x \\ln x\\, dx', technique: 'parts', explanation: 'Parts with $u = \\ln x$ and $dv = x\\, dx$. The $\\ln x$ differentiates to $\\frac{1}{x}$ which simplifies nicely.' },
+            { integral: '\\int e^x \\cos x\\, dx', technique: 'either', explanation: 'The "cycling" case. Either choice works — apply parts twice and solve the resulting equation.' },
+            { integral: '\\int \\sinh x \\cosh^3 x\\, dx', technique: 'substitution', explanation: '$\\sinh x$ is the derivative of $\\cosh x$. With $u = \\cosh x$, this becomes $\\int u^3\\, du$.' },
+            { integral: '\\int x \\arctan x\\, dx', technique: 'parts', explanation: 'Parts with $u = \\arctan x$. Its derivative $\\frac{1}{1+x^2}$ combines nicely with the resulting polynomial.' },
+            { integral: '\\int \\frac{(\\ln x)^2}{x}\\, dx', technique: 'substitution', explanation: 'With $u = \\ln x$, the $\\frac{dx}{x}$ becomes $du$, giving $\\int u^2\\, du$.' },
+            { integral: '\\int x^3 e^{x^2}\\, dx', technique: 'substitution', explanation: 'Write as $\\int x^2 \\cdot x e^{x^2}\\, dx$. With $u = x^2$, we get $\\frac{1}{2}\\int u e^u\\, du$ — then parts!' },
+            { integral: '\\int \\arcsin x\\, dx', technique: 'parts', explanation: 'Like $\\int \\ln x\\, dx$: use $u = \\arcsin x$ and $dv = dx$.' },
+            { integral: '\\int \\sec^2 x \\tan^3 x\\, dx', technique: 'substitution', explanation: '$\\sec^2 x$ is the derivative of $\\tan x$. With $u = \\tan x$, this becomes $\\int u^3\\, du$.' },
+            { integral: '\\int x \\cosh x\\, dx', technique: 'parts', explanation: 'Polynomial times hyperbolic — same pattern as $\\int x e^x\\, dx$ or $\\int x \\sin x\\, dx$.' },
+            { integral: '\\int e^{\\sin x} \\cos x\\, dx', technique: 'substitution', explanation: '$\\cos x$ is the derivative of $\\sin x$. With $u = \\sin x$, this becomes $\\int e^u\\, du$.' },
+            { integral: '\\int x^2 \\ln x\\, dx', technique: 'parts', explanation: 'Parts with $u = \\ln x$ and $dv = x^2\\, dx$. The derivative of $\\ln x$ simplifies the resulting integral.' }
+        ];
+        
+        // ==================== STATE ====================
+        
+        let currentSubProblem = 0;
+        let currentSubChoice = null;
+        let subStreak = 0;
+        let subChallengeIndex = 0;
+        let subSelectedOption = null;
+        
+        let currentPartsProblem = 0;
+        let partsStreak = 0;
+        let partsChallengeIndex = 0;
+        let partsSelectedOption = null;
+        
+        let stratStreak = 0;
+        let stratRapidIndex = 0;
+        let stratHistory = [];
+        let currentGalleryItem = null;
+        
+        // ==================== INITIALIZATION ====================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize KaTeX
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+            
+            // Main tab switching
+            document.querySelectorAll('.main-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+                    document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Sub tab switching
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const subtabId = btn.dataset.subtab;
+                    const parent = btn.closest('.main-tab-content');
+                    parent.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    parent.querySelectorAll('.sub-tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(subtabId).classList.add('active');
+                });
+            });
+            
+            // Initialize explorers
+            initSubstitutionExplorer();
+            initSubstitutionChallenge();
+            initPartsExplorer();
+            initPartsChallenge();
+            initStrategyGallery();
+            initStrategyRapid();
+            
+            // Technique buttons for gallery
+            document.querySelectorAll('#strat-technique-buttons .technique-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    stratGalleryAnswer(btn.dataset.technique);
+                });
+            });
+        });
+        
+        // ==================== UTILITY FUNCTIONS ====================
+        
+        function renderMath(element) {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(element, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+        
+        function switchToSubTab(mainTab, subTab) {
+            // Switch to main tab
+            document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.main-tab-btn[data-tab="${mainTab}"]`).classList.add('active');
+            document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(mainTab).classList.add('active');
+            
+            // Switch to sub tab
+            const parent = document.getElementById(mainTab);
+            parent.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+            parent.querySelector(`.sub-tab-btn[data-subtab="${subTab}"]`).classList.add('active');
+            parent.querySelectorAll('.sub-tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(subTab).classList.add('active');
+        }
+        
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        
+        function updateStreak(elementId, fireId, value) {
+            document.getElementById(elementId).textContent = value;
+            const fire = document.getElementById(fireId);
+            if (value >= 10) fire.textContent = '🔥🔥🔥';
+            else if (value >= 5) fire.textContent = '🔥🔥';
+            else if (value > 0) fire.textContent = '🔥';
+            else fire.textContent = '💨';
+        }
+        
+        // ==================== SUBSTITUTION EXPLORER ====================
+        
+        function initSubstitutionExplorer() {
+            const presetsContainer = document.getElementById('sub-presets');
+            substitutionProblems.forEach((problem, index) => {
+                const pill = document.createElement('button');
+                pill.className = 'preset-pill' + (index === 0 ? ' active' : '');
+                pill.innerHTML = `$${problem.integral.replace('\\int ', '').replace('\\, dx', '')}$`;
+                pill.onclick = () => loadSubProblem(index);
+                presetsContainer.appendChild(pill);
+            });
+            renderMath(presetsContainer);
+            loadSubProblem(0);
+        }
+        
+        function loadSubProblem(index) {
+            currentSubProblem = index;
+            currentSubChoice = null;
+            
+            // Update preset pills
+            document.querySelectorAll('#sub-presets .preset-pill').forEach((pill, i) => {
+                pill.classList.toggle('active', i === index);
+            });
+            
+            const problem = substitutionProblems[index];
+            
+            // Display integral
+            document.getElementById('sub-current-integral').innerHTML = `$${problem.integral}$`;
+            renderMath(document.getElementById('sub-integral-display'));
+            
+            // Create choice buttons
+            const choiceContainer = document.getElementById('sub-choice-buttons');
+            choiceContainer.innerHTML = '';
+            problem.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerHTML = `$${choice.display}$`;
+                btn.onclick = () => selectSubChoice(choice.u);
+                choiceContainer.appendChild(btn);
+            });
+            renderMath(choiceContainer);
+            
+            // Hide consequence panel
+            document.getElementById('sub-consequence-panel').classList.add('hidden');
+        }
+        
+        function selectSubChoice(u) {
+            currentSubChoice = u;
+            
+            // Update button styles
+            const problem = substitutionProblems[currentSubProblem];
+            document.querySelectorAll('#sub-choice-buttons .choice-btn').forEach((btn, i) => {
+                btn.classList.toggle('selected', problem.choices[i].u === u);
+            });
+            
+            // Show consequence
+            showSubConsequence(u);
+        }
+        
+        function showSubConsequence(u) {
+            const problem = substitutionProblems[currentSubProblem];
+            const consequence = problem.consequences[u];
+            const choice = problem.choices.find(c => c.u === u);
+            
+            const panel = document.getElementById('sub-consequence-panel');
+            panel.classList.remove('hidden');
+            
+            let stepsHtml = consequence.steps.map(step => `<p style="margin-bottom: 0.5rem;">${step}</p>`).join('');
+            
+            panel.innerHTML = `
+                <div class="consequence-panel">
+                    <div class="consequence-header">Consequence of $${choice.display}$</div>
+                    <div class="consequence-body">
+                        <div class="consequence-section">
+                            <h4>What Follows</h4>
+                            <div class="consequence-math">$${consequence.du}$</div>
+                        </div>
+                        <div class="consequence-section">
+                            <h4>The Transformed Integral</h4>
+                            <div class="consequence-math">$${consequence.transform}$</div>
+                        </div>
+                        <div class="consequence-section">
+                            <h4>Analysis</h4>
+                            ${stepsHtml}
+                        </div>
+                        <div class="verdict-box ${consequence.verdict}">
+                            <div class="verdict-header">${consequence.verdictTitle}</div>
+                            <div class="verdict-text">${consequence.verdictText}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            renderMath(panel);
+        }
+        
+        function subShowAllChoices() {
+            const problem = substitutionProblems[currentSubProblem];
+            const panel = document.getElementById('sub-consequence-panel');
+            panel.classList.remove('hidden');
+            
+            let allChoicesHtml = '';
+            problem.choices.forEach(choice => {
+                const consequence = problem.consequences[choice.u];
+                allChoicesHtml += `
+                    <div class="consequence-panel" style="margin-bottom: 1rem;">
+                        <div class="consequence-header" style="background: ${consequence.verdict === 'success' ? 'var(--success)' : consequence.verdict === 'warning' ? 'var(--warning)' : 'var(--accent-red)'}">
+                            $${choice.display}$
+                        </div>
+                        <div class="consequence-body">
+                            <div class="consequence-math">$${consequence.transform}$</div>
+                            <div class="verdict-box ${consequence.verdict}" style="margin-top: 0.75rem;">
+                                <div class="verdict-header">${consequence.verdictTitle}</div>
+                                <div class="verdict-text">${consequence.verdictText}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            panel.innerHTML = allChoicesHtml;
+            renderMath(panel);
+        }
+        
+        function subReset() {
+            currentSubChoice = null;
+            document.querySelectorAll('#sub-choice-buttons .choice-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('sub-consequence-panel').classList.add('hidden');
+        }
+        
+        // ==================== SUBSTITUTION CHALLENGE ====================
+        
+        function initSubstitutionChallenge() {
+            loadSubChallenge();
+        }
+        
+        function loadSubChallenge() {
+            subSelectedOption = null;
+            const challenge = substitutionChallenges[subChallengeIndex % substitutionChallenges.length];
+            
+            document.getElementById('sub-challenge-problem').innerHTML = `
+                <p style="margin-bottom: 0.5rem;">Given: $${challenge.integral}$ with $u = ${challenge.givenU}$</p>
+                <p style="font-weight: 500;">What does the integral become?</p>
+            `;
+            
+            const optionsContainer = document.getElementById('sub-mc-options');
+            optionsContainer.innerHTML = '';
+            
+            const shuffledOptions = shuffleArray(challenge.options);
+            shuffledOptions.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'mc-option';
+                optionDiv.innerHTML = `
+                    <div class="mc-radio"></div>
+                    <div class="mc-text">$${option.text}$</div>
+                `;
+                optionDiv.onclick = () => selectSubChallengeOption(index, option.correct);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            renderMath(document.getElementById('sub-challenge-problem'));
+            renderMath(optionsContainer);
+            
+            document.getElementById('sub-check-btn').disabled = true;
+            document.getElementById('sub-check-btn').classList.remove('hidden');
+            document.getElementById('sub-next-btn').classList.add('hidden');
+            document.getElementById('sub-feedback').classList.add('hidden');
+            
+            // Reset option states
+            document.querySelectorAll('#sub-mc-options .mc-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+        }
+        
+        function selectSubChallengeOption(index, isCorrect) {
+            if (document.getElementById('sub-check-btn').classList.contains('hidden')) return;
+            
+            subSelectedOption = { index, isCorrect };
+            
+            document.querySelectorAll('#sub-mc-options .mc-option').forEach((opt, i) => {
+                opt.classList.toggle('selected', i === index);
+            });
+            
+            document.getElementById('sub-check-btn').disabled = false;
+        }
+        
+        function subCheckAnswer() {
+            if (!subSelectedOption) return;
+            
+            const challenge = substitutionChallenges[subChallengeIndex % substitutionChallenges.length];
+            const options = document.querySelectorAll('#sub-mc-options .mc-option');
+            
+            options.forEach((opt, i) => {
+                opt.classList.remove('selected');
+                const optionData = shuffleArray(challenge.options)[i]; // Need to track which was correct
+            });
+            
+            // Find and mark the selected and correct options
+            const selectedOpt = options[subSelectedOption.index];
+            
+            if (subSelectedOption.isCorrect) {
+                selectedOpt.classList.add('correct');
+                subStreak++;
+                document.getElementById('sub-feedback').innerHTML = `
+                    <div class="feedback-panel correct">
+                        <div class="feedback-header">✅ Correct!</div>
+                        <div class="feedback-content">
+                            <p>${challenge.explanation}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                selectedOpt.classList.add('incorrect');
+                // Find and highlight correct answer
+                options.forEach((opt, i) => {
+                    // We need to check against original options - this is a simplification
+                });
+                subStreak = 0;
+                document.getElementById('sub-feedback').innerHTML = `
+                    <div class="feedback-panel incorrect">
+                        <div class="feedback-header">❌ Not quite</div>
+                        <div class="feedback-content">
+                            <p>${challenge.explanation}</p>
+                            <p style="margin-top: 0.75rem;">
+                                <button class="link-btn" onclick="exploreSubInExplorer()">Explore this in the Consequence Explorer →</button>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            updateStreak('sub-streak', 'sub-streak-fire', subStreak);
+            renderMath(document.getElementById('sub-feedback'));
+            document.getElementById('sub-feedback').classList.remove('hidden');
+            document.getElementById('sub-check-btn').classList.add('hidden');
+            document.getElementById('sub-next-btn').classList.remove('hidden');
+        }
+        
+        function subNextProblem() {
+            subChallengeIndex++;
+            loadSubChallenge();
+        }
+        
+        function exploreSubInExplorer() {
+            // Switch to explorer tab - would need to load appropriate problem
+            switchToSubTab('substitution', 'sub-explorer');
+        }
+        
+        // ==================== PARTS EXPLORER ====================
+        
+        function initPartsExplorer() {
+            const presetsContainer = document.getElementById('parts-presets');
+            partsProblems.forEach((problem, index) => {
+                const pill = document.createElement('button');
+                pill.className = 'preset-pill' + (index === 0 ? ' active' : '');
+                pill.innerHTML = `$${problem.integral.replace('\\int ', '').replace('\\, dx', '')}$`;
+                pill.onclick = () => loadPartsProblem(index);
+                presetsContainer.appendChild(pill);
+            });
+            renderMath(presetsContainer);
+            loadPartsProblem(0);
+        }
+        
+        function loadPartsProblem(index) {
+            currentPartsProblem = index;
+            
+            // Update preset pills
+            document.querySelectorAll('#parts-presets .preset-pill').forEach((pill, i) => {
+                pill.classList.toggle('active', i === index);
+            });
+            
+            const problem = partsProblems[index];
+            
+            // Display integral
+            document.getElementById('parts-current-integral').innerHTML = `$${problem.integral}$`;
+            document.getElementById('parts-factors').innerHTML = `$${problem.factor1}$ and $${problem.factor2}$`;
+            renderMath(document.getElementById('parts-integral-display'));
+            
+            // Create choice buttons
+            const choiceContainer = document.getElementById('parts-choice-buttons');
+            choiceContainer.innerHTML = `
+                <button class="choice-btn" onclick="partsSelectChoice('A')">$u = ${problem.factor1}$</button>
+                <button class="choice-btn" onclick="partsSelectChoice('B')">$u = ${problem.factor2}$</button>
+            `;
+            renderMath(choiceContainer);
+            
+            // Hide comparison
+            document.getElementById('parts-comparison-container').classList.add('hidden');
+        }
+        
+        function partsSelectChoice(choice) {
+            document.querySelectorAll('#parts-choice-buttons .choice-btn').forEach((btn, i) => {
+                btn.classList.toggle('selected', (choice === 'A' && i === 0) || (choice === 'B' && i === 1));
+            });
+            
+            // Show just that choice's consequence
+            const problem = partsProblems[currentPartsProblem];
+            const data = choice === 'A' ? problem.choiceA : problem.choiceB;
+            
+            const container = document.getElementById('parts-comparison-container');
+            container.classList.remove('hidden');
+            
+            const verdictClass = data.verdict === 'success' ? 'recommended' : 'not-recommended';
+            
+            container.innerHTML = `
+                <div class="comparison-panel ${verdictClass}">
+                    <div class="comparison-header">
+                        ${data.verdict === 'success' ? '✅' : '❌'} Choice: $u = ${data.u}$, $dv = ${data.dv}$
+                    </div>
+                    <div class="comparison-body">
+                        <div class="comparison-row">
+                            <span class="label">$du =$</span>
+                            <span>$${data.du}$</span>
+                        </div>
+                        <div class="comparison-row">
+                            <span class="label">$v =$</span>
+                            <span>$${data.v}$</span>
+                        </div>
+                        <div class="comparison-step">
+                            <strong>Applying the formula:</strong><br>
+                            $${data.formula}$
+                        </div>
+                        <div class="comparison-step">
+                            <strong>New integral:</strong><br>
+                            $${data.newIntegral}$
+                        </div>
+                        ${data.result ? `
+                        <div class="comparison-step">
+                            <strong>Result:</strong><br>
+                            $${data.result}$
+                        </div>
+                        ` : ''}
+                        <div class="comparison-verdict">
+                            ${data.verdictText}
+                        </div>
+                    </div>
+                </div>
+            `;
+            renderMath(container);
+        }
+        
+        function partsCompare() {
+            const problem = partsProblems[currentPartsProblem];
+            const container = document.getElementById('parts-comparison-container');
+            container.classList.remove('hidden');
+            
+            const choiceAClass = problem.choiceA.verdict === 'success' ? 'recommended' : 'not-recommended';
+            const choiceBClass = problem.choiceB.verdict === 'success' ? 'recommended' : 'not-recommended';
+            
+            container.innerHTML = `
+                <div class="comparison-container">
+                    <div class="comparison-panel ${choiceAClass}">
+                        <div class="comparison-header">
+                            Choice A: $u = ${problem.choiceA.u}$
+                        </div>
+                        <div class="comparison-body">
+                            <div class="comparison-row">
+                                <span class="label">$u =$</span>
+                                <span>$${problem.choiceA.u}$</span>
+                            </div>
+                            <div class="comparison-row">
+                                <span class="label">$dv =$</span>
+                                <span>$${problem.choiceA.dv}$</span>
+                            </div>
+                            <div class="comparison-row">
+                                <span class="label">$du =$</span>
+                                <span>$${problem.choiceA.du}$</span>
+                            </div>
+                            <div class="comparison-row">
+                                <span class="label">$v =$</span>
+                                <span>$${problem.choiceA.v}$</span>
+                            </div>
+                            <div class="comparison-step">
+                                <strong>New integral:</strong><br>
+                                $${problem.choiceA.newIntegral}$
+                            </div>
+                            <div class="comparison-verdict">
+                                ${problem.choiceA.verdict === 'success' ? '✅' : '❌'} ${problem.choiceA.verdictText}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comparison-panel ${choiceBClass}">
+                        <div class="comparison-header">
+                            Choice B: $u = ${problem.choiceB.u}$
+                        </div>
+                        <div class="comparison-body">
+                            <div class="comparison-row">
+                                <span class="label">$u =$</span>
+                                <span>$${problem.choiceB.u}$</span>
+                            </div>
+                            <div class="comparison-row">
+                                <span class="label">$dv =$</span>
+                                <span>$${problem.choiceB.dv}$</span>
+                            </div>
+                            <div class="comparison-row">
+                                <span class="label">$du =$</span>
+                                <span>$${problem.choiceB.du}$</span>
+                            </div>
+                            <div class="comparison-row">
+                                <span class="label">$v =$</span>
+                                <span>$${problem.choiceB.v}$</span>
+                            </div>
+                            <div class="comparison-step">
+                                <strong>New integral:</strong><br>
+                                $${problem.choiceB.newIntegral}$
+                            </div>
+                            <div class="comparison-verdict">
+                                ${problem.choiceB.verdict === 'success' ? '✅' : '❌'} ${problem.choiceB.verdictText}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            renderMath(container);
+            
+            // Clear button selection
+            document.querySelectorAll('#parts-choice-buttons .choice-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+        
+        function partsReset() {
+            document.querySelectorAll('#parts-choice-buttons .choice-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('parts-comparison-container').classList.add('hidden');
+        }
+        
+        // ==================== PARTS CHALLENGE ====================
+        
+        function initPartsChallenge() {
+            loadPartsChallenge();
+        }
+        
+        function loadPartsChallenge() {
+            partsSelectedOption = null;
+            const challenge = partsChallenges[partsChallengeIndex % partsChallenges.length];
+            
+            document.getElementById('parts-challenge-problem').innerHTML = `
+                <p style="margin-bottom: 0.5rem;">Given: $${challenge.integral}$</p>
+                <p style="margin-bottom: 0.5rem;">With: $u = ${challenge.u}$, $dv = ${challenge.dv}$</p>
+                <p style="margin-bottom: 0.5rem; color: var(--text-muted);">So: $du = ${challenge.du}$, $v = ${challenge.v}$</p>
+                <p style="font-weight: 500;">What is the new integral $\\int v\\, du$?</p>
+            `;
+            
+            const optionsContainer = document.getElementById('parts-mc-options');
+            optionsContainer.innerHTML = '';
+            
+            const shuffledOptions = shuffleArray(challenge.options);
+            shuffledOptions.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'mc-option';
+                optionDiv.innerHTML = `
+                    <div class="mc-radio"></div>
+                    <div class="mc-text">$${option.text}$</div>
+                `;
+                optionDiv.onclick = () => selectPartsChallengeOption(index, option.correct);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            renderMath(document.getElementById('parts-challenge-problem'));
+            renderMath(optionsContainer);
+            
+            document.getElementById('parts-check-btn').disabled = true;
+            document.getElementById('parts-check-btn').classList.remove('hidden');
+            document.getElementById('parts-next-btn').classList.add('hidden');
+            document.getElementById('parts-feedback').classList.add('hidden');
+        }
+        
+        function selectPartsChallengeOption(index, isCorrect) {
+            if (document.getElementById('parts-check-btn').classList.contains('hidden')) return;
+            
+            partsSelectedOption = { index, isCorrect };
+            
+            document.querySelectorAll('#parts-mc-options .mc-option').forEach((opt, i) => {
+                opt.classList.toggle('selected', i === index);
+            });
+            
+            document.getElementById('parts-check-btn').disabled = false;
+        }
+        
+        function partsCheckAnswer() {
+            if (!partsSelectedOption) return;
+            
+            const challenge = partsChallenges[partsChallengeIndex % partsChallenges.length];
+            const options = document.querySelectorAll('#parts-mc-options .mc-option');
+            const selectedOpt = options[partsSelectedOption.index];
+            
+            if (partsSelectedOption.isCorrect) {
+                selectedOpt.classList.add('correct');
+                partsStreak++;
+                document.getElementById('parts-feedback').innerHTML = `
+                    <div class="feedback-panel correct">
+                        <div class="feedback-header">✅ Correct!</div>
+                        <div class="feedback-content">
+                            <p>${challenge.explanation}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                selectedOpt.classList.add('incorrect');
+                partsStreak = 0;
+                document.getElementById('parts-feedback').innerHTML = `
+                    <div class="feedback-panel incorrect">
+                        <div class="feedback-header">❌ Not quite</div>
+                        <div class="feedback-content">
+                            <p>${challenge.explanation}</p>
+                            <p style="margin-top: 0.75rem;">
+                                <button class="link-btn" onclick="switchToSubTab('parts', 'parts-explorer')">Explore this in the Consequence Comparator →</button>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            updateStreak('parts-streak', 'parts-streak-fire', partsStreak);
+            renderMath(document.getElementById('parts-feedback'));
+            document.getElementById('parts-feedback').classList.remove('hidden');
+            document.getElementById('parts-check-btn').classList.add('hidden');
+            document.getElementById('parts-next-btn').classList.remove('hidden');
+        }
+        
+        function partsNextProblem() {
+            partsChallengeIndex++;
+            loadPartsChallenge();
+        }
+        
+        // ==================== STRATEGY GALLERY ====================
+        
+        function initStrategyGallery() {
+            const grid = document.getElementById('strat-gallery-grid');
+            grid.innerHTML = '';
+            
+            // Show first 12 problems in gallery
+            strategyProblems.slice(0, 12).forEach((problem, index) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.innerHTML = `<div class="gallery-integral">$${problem.integral}$</div>`;
+                item.onclick = () => selectGalleryItem(index);
+                grid.appendChild(item);
+            });
+            renderMath(grid);
+        }
+        
+        function selectGalleryItem(index) {
+            currentGalleryItem = index;
+            
+            document.querySelectorAll('.gallery-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+            
+            const problem = strategyProblems[index];
+            document.getElementById('strat-selected-integral').innerHTML = `$${problem.integral}$`;
+            renderMath(document.getElementById('strat-selected-integral'));
+            
+            document.getElementById('strat-classify-panel').classList.remove('hidden');
+            document.getElementById('strat-gallery-feedback').classList.add('hidden');
+            
+            // Reset technique buttons
+            document.querySelectorAll('#strat-technique-buttons .technique-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+        
+        function stratGalleryAnswer(technique) {
+            if (currentGalleryItem === null) return;
+            
+            const problem = strategyProblems[currentGalleryItem];
+            const isCorrect = technique === problem.technique;
+            
+            // Highlight selected button
+            document.querySelectorAll('#strat-technique-buttons .technique-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.technique === technique);
+            });
+            
+            const feedbackDiv = document.getElementById('strat-gallery-feedback');
+            feedbackDiv.classList.remove('hidden');
+            
+            if (isCorrect) {
+                feedbackDiv.innerHTML = `
+                    <div class="feedback-panel correct">
+                        <div class="feedback-header">✅ Correct! ${problem.technique.charAt(0).toUpperCase() + problem.technique.slice(1)}</div>
+                        <div class="feedback-content">
+                            <p>${problem.explanation}</p>
+                            ${problem.technique !== 'other' && problem.technique !== 'either' ? `
+                            <p style="margin-top: 0.75rem;">
+                                <button class="link-btn" onclick="switchToSubTab('${problem.technique}', '${problem.technique === 'substitution' ? 'sub' : 'parts'}-explorer')">Explore in ${problem.technique.charAt(0).toUpperCase() + problem.technique.slice(1)} Explorer →</button>
+                            </p>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                feedbackDiv.innerHTML = `
+                    <div class="feedback-panel incorrect">
+                        <div class="feedback-header">❌ The better choice is: ${problem.technique.charAt(0).toUpperCase() + problem.technique.slice(1)}</div>
+                        <div class="feedback-content">
+                            <p>${problem.explanation}</p>
+                            ${problem.technique !== 'other' && problem.technique !== 'either' ? `
+                            <p style="margin-top: 0.75rem;">
+                                <button class="link-btn" onclick="switchToSubTab('${problem.technique}', '${problem.technique === 'substitution' ? 'sub' : 'parts'}-explorer')">See why in the ${problem.technique.charAt(0).toUpperCase() + problem.technique.slice(1)} Explorer →</button>
+                            </p>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            renderMath(feedbackDiv);
+        }
+        
+        // ==================== STRATEGY RAPID ====================
+        
+        function initStrategyRapid() {
+            loadStrategyRapid();
+        }
+        
+        function loadStrategyRapid() {
+            stratRapidIndex = Math.floor(Math.random() * strategyProblems.length);
+            const problem = strategyProblems[stratRapidIndex];
+            
+            document.getElementById('strat-rapid-integral').innerHTML = `$${problem.integral}$`;
+            renderMath(document.getElementById('strat-rapid-integral'));
+            
+            document.getElementById('strat-rapid-feedback').classList.add('hidden');
+            
+            // Reset buttons
+            document.querySelectorAll('#strat-rapid-buttons .technique-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                btn.disabled = false;
+            });
+        }
+        
+        function stratRapidAnswer(technique) {
+            const problem = strategyProblems[stratRapidIndex];
+            const isCorrect = technique === problem.technique;
+            
+            // Disable buttons
+            document.querySelectorAll('#strat-rapid-buttons .technique-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.classList.toggle('selected', btn.dataset.technique === technique);
+            });
+            
+            // Update streak
+            if (isCorrect) {
+                stratStreak++;
+            } else {
+                stratStreak = 0;
+            }
+            updateStreak('strat-streak', 'strat-streak-fire', stratStreak);
+            
+            // Add to history
+            stratHistory.unshift({
+                integral: problem.integral,
+                correct: isCorrect,
+                userAnswer: technique,
+                correctAnswer: problem.technique
+            });
+            if (stratHistory.length > 5) stratHistory.pop();
+            updateStratHistory();
+            
+            // Show feedback
+            const feedbackDiv = document.getElementById('strat-rapid-feedback');
+            feedbackDiv.classList.remove('hidden');
+            
+            if (isCorrect) {
+                feedbackDiv.innerHTML = `
+                    <div class="feedback-panel correct">
+                        <div class="feedback-header">✅ Correct!</div>
+                        <div class="feedback-content">
+                            <p>${problem.explanation}</p>
+                            <p style="margin-top: 0.75rem;">
+                                <button class="btn btn-primary" onclick="loadStrategyRapid()">Next →</button>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                feedbackDiv.innerHTML = `
+                    <div class="feedback-panel incorrect">
+                        <div class="feedback-header">❌ It's ${problem.technique}</div>
+                        <div class="feedback-content">
+                            <p>${problem.explanation}</p>
+                            <p style="margin-top: 0.75rem;">
+                                <button class="btn btn-primary" onclick="loadStrategyRapid()">Try Another →</button>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+            renderMath(feedbackDiv);
+        }
+        
+        function updateStratHistory() {
+            const historyDiv = document.getElementById('strat-history');
+            let historyHtml = '<div class="history-title">Recent:</div>';
+            
+            stratHistory.forEach(item => {
+                historyHtml += `
+                    <div class="history-item ${item.correct ? 'correct' : 'incorrect'}">
+                        <span class="history-icon">${item.correct ? '✅' : '❌'}</span>
+                        <span>$${item.integral.replace('\\int ', '').replace('\\, dx', '')}$</span>
+                        ${!item.correct ? `<span class="history-answer">→ ${item.correctAnswer}</span>` : ''}
+                    </div>
+                `;
+            });
+            
+            historyDiv.innerHTML = historyHtml;
+            renderMath(historyDiv);
+        }
+    </script>
+</body>
+</html>
