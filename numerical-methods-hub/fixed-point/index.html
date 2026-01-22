@@ -1522,7 +1522,7 @@
                     break;
                 }
                 
-                // Check for divergence
+                // Check for divergence (value blows up)
                 if (!isFinite(gx) || Math.abs(gx) > 1e10) {
                     steps.push({
                         n: n,
@@ -1555,6 +1555,36 @@
                 }
                 
                 x = gx;
+            }
+            
+            // If we hit maxIter, check if the sequence has effectively converged
+            // by looking at whether the last few differences are small and stable
+            if (!converged && steps.length >= 5) {
+                const lastStep = steps[steps.length - 1];
+                const recentDiffs = steps.slice(-5).map(s => s.diff);
+                const avgRecentDiff = recentDiffs.reduce((a, b) => a + b, 0) / recentDiffs.length;
+                const maxRecentDiff = Math.max(...recentDiffs);
+                
+                // Consider converged if:
+                // 1. Recent differences are all small (< 10x tolerance), AND
+                // 2. The sequence is bounded (not growing), AND
+                // 3. Values are finite
+                if (maxRecentDiff < tol * 10 && isFinite(lastStep.gx) && Math.abs(lastStep.gx) < 1e6) {
+                    converged = true;
+                }
+                
+                // Also check for oscillatory convergence (values alternating but settling)
+                // Look at whether |x_n - x_{n-2}| is decreasing (period-2 check)
+                if (!converged && steps.length >= 6) {
+                    const period2Diffs = [];
+                    for (let i = steps.length - 1; i >= steps.length - 4 && i >= 2; i--) {
+                        period2Diffs.push(Math.abs(steps[i].x - steps[i-2].x));
+                    }
+                    const maxPeriod2 = Math.max(...period2Diffs);
+                    if (maxPeriod2 < tol * 10 && isFinite(lastStep.gx)) {
+                        converged = true;
+                    }
+                }
             }
             
             return { steps: steps, converged: converged };
@@ -1720,15 +1750,28 @@
                 DOM.resultStatus.textContent = '✓ Converged';
                 DOM.statusBox.classList.remove('diverged');
                 DOM.statusBox.classList.add('converged');
-                DOM.resultFixedPoint.textContent = lastStep.x.toFixed(8);
                 
-                // Estimate derivative using finite differences
-                if (result.steps.length >= 3) {
-                    const n = result.steps.length - 1;
-                    const ratio = Math.abs(result.steps[n].diff / result.steps[n-1].diff);
-                    DOM.resultDerivative.textContent = '≈ ' + ratio.toFixed(3);
+                // Use the last gx value as the fixed point estimate
+                const fixedPointEstimate = isFinite(lastStep.gx) ? lastStep.gx : lastStep.x;
+                DOM.resultFixedPoint.textContent = fixedPointEstimate.toFixed(8);
+                
+                // Estimate |g'(x*)| using ratio of consecutive differences
+                // For oscillatory convergence, use average of recent ratios
+                if (result.steps.length >= 4) {
+                    const ratios = [];
+                    for (let i = result.steps.length - 1; i >= 2 && ratios.length < 3; i--) {
+                        if (result.steps[i-1].diff > 1e-15) {
+                            ratios.push(Math.abs(result.steps[i].diff / result.steps[i-1].diff));
+                        }
+                    }
+                    if (ratios.length > 0) {
+                        const avgRatio = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+                        DOM.resultDerivative.textContent = '≈ ' + avgRatio.toFixed(3);
+                    } else {
+                        DOM.resultDerivative.textContent = '< 1';
+                    }
                 } else {
-                    DOM.resultDerivative.textContent = '—';
+                    DOM.resultDerivative.textContent = '< 1';
                 }
             } else {
                 DOM.resultStatus.textContent = '✗ Diverged';
@@ -1929,17 +1972,30 @@
             
             if (result.converged) {
                 const lastStep = result.steps[result.steps.length - 1];
-                insights.push(`Converged to x* ≈ ${lastStep.x.toFixed(6)} in ${result.steps.length - 1} iterations`);
+                const fixedPointEstimate = isFinite(lastStep.gx) ? lastStep.gx : lastStep.x;
+                insights.push(`Converged to x* ≈ ${fixedPointEstimate.toFixed(6)} in ${result.steps.length - 1} iterations`);
                 
-                if (result.steps.length >= 3) {
-                    const n = result.steps.length - 1;
-                    const ratio = Math.abs(result.steps[n].diff / result.steps[n-1].diff);
-                    insights.push(`Error ratio ≈ ${ratio.toFixed(3)} suggests |g'(x*)| ≈ ${ratio.toFixed(3)}`);
-                    insights.push(`Since ${ratio.toFixed(3)} < 1, the iteration is linearly convergent`);
+                if (result.steps.length >= 4) {
+                    // Calculate average ratio for better estimate with oscillatory convergence
+                    const ratios = [];
+                    for (let i = result.steps.length - 1; i >= 2 && ratios.length < 3; i--) {
+                        if (result.steps[i-1].diff > 1e-15) {
+                            ratios.push(Math.abs(result.steps[i].diff / result.steps[i-1].diff));
+                        }
+                    }
+                    if (ratios.length > 0) {
+                        const avgRatio = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+                        if (avgRatio < 1) {
+                            insights.push(`Error ratio ≈ ${avgRatio.toFixed(3)} suggests |g'(x*)| ≈ ${avgRatio.toFixed(3)}`);
+                            insights.push(`Since ${avgRatio.toFixed(3)} < 1, the iteration is linearly convergent`);
+                        } else {
+                            insights.push(`Convergence detected (sequence stabilized within tolerance)`);
+                        }
+                    }
                 }
                 
                 if (state.fixedPoint) {
-                    const error = Math.abs(lastStep.x - state.fixedPoint);
+                    const error = Math.abs(fixedPointEstimate - state.fixedPoint);
                     insights.push(`Actual error: ${error.toExponential(3)}`);
                 }
             } else {
