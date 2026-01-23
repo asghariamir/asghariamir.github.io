@@ -1393,7 +1393,7 @@
                 katex.render("|x - x^*|", document.getElementById('abs-error-formula'), {displayMode: false});
                 katex.render("\\frac{|x - x^*|}{|x^*|}", document.getElementById('rel-error-formula'), {displayMode: false});
                 katex.render("m = \\frac{a + b}{2}", document.getElementById('bisection-formula'), {displayMode: false});
-                katex.render("\\text{After } n \\text{ steps: error} \\leq \\frac{b-a}{2^n}", document.getElementById('error-bound-formula'), {displayMode: false});
+                katex.render("\\text{After } n \\text{ steps: error} \\leq \\frac{b-a}{2^{n+1}}", document.getElementById('error-bound-formula'), {displayMode: false});
             } catch (e) {
                 console.error('KaTeX render error:', e);
             }
@@ -1846,7 +1846,7 @@
                 insights.push(`Actual error: ${actualError.toExponential(3)} (exact root ≈ ${state.exactRoot.toFixed(8)})`);
             }
             
-            const stepsFor6Digits = Math.ceil(Math.log2((state.originalB - state.originalA) / 1e-6));
+            const stepsFor6Digits = Math.ceil(Math.log2((state.originalB - state.originalA) / 1e-6) - 1);
             insights.push(`To get 6 decimal places accuracy, you'd need ~${stepsFor6Digits} steps`);
             
             DOM.insightsList.innerHTML = insights.map(i => `<li>${i}</li>`).join('');
@@ -2050,8 +2050,9 @@
             const interval = intervals[Math.floor(Math.random() * intervals.length)];
             const tol = tolerances[Math.floor(Math.random() * tolerances.length)];
             
-            // Calculate required steps: width / 2^n < tol => n > log2(width/tol)
-            const requiredSteps = Math.ceil(Math.log2(interval.width / tol));
+            // Calculate required steps: (b-a) / 2^(n+1) < tol 
+            // => 2^(n+1) > (b-a)/tol => n+1 > log2((b-a)/tol) => n > log2((b-a)/tol) - 1
+            const requiredSteps = Math.ceil(Math.log2(interval.width / tol) - 1);
             
             challengeState.currentProblem = {
                 type: 'error-prediction',
@@ -2077,20 +2078,21 @@
                 <div class="worked-example-step">
                     <div class="step-label">Step 1: Recall the error bound formula</div>
                     <div class="step-content">
-                        <div class="step-math">After n steps, error ≤ (b − a) / 2ⁿ</div>
+                        <div class="step-math">After n steps, error ≤ (b − a) / 2ⁿ⁺¹</div>
                     </div>
                 </div>
                 <div class="worked-example-step">
                     <div class="step-label">Step 2: Set up the inequality</div>
                     <div class="step-content">
-                        We need: ${interval.width} / 2ⁿ < ${tol}
+                        We need: ${interval.width} / 2ⁿ⁺¹ < ${tol}
                     </div>
                 </div>
                 <div class="worked-example-step">
                     <div class="step-label">Step 3: Solve for n</div>
                     <div class="step-content">
-                        2ⁿ > ${interval.width} / ${tol} = ${interval.width / tol}<br>
-                        n > log₂(${interval.width / tol}) = ${Math.log2(interval.width / tol).toFixed(2)}
+                        2ⁿ⁺¹ > ${interval.width} / ${tol} = ${interval.width / tol}<br>
+                        n + 1 > log₂(${interval.width / tol}) = ${Math.log2(interval.width / tol).toFixed(2)}<br>
+                        n > ${(Math.log2(interval.width / tol) - 1).toFixed(2)}
                     </div>
                 </div>
                 <div class="worked-example-step">
