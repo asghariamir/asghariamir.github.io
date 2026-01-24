@@ -1,1 +1,1887 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order of Convergence | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Plotly -->
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js@2.27.0/dist/plotly.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0d5d56;
+            --bg-light: #f7faf9;
+            --interactive-bg: #e6fffb;
+            --text-dark: #212121;
+            --text-muted: #4b5563;
+            --border-light: #d1d5db;
+            --accent-amber: #f59e0b;
+            --error-red: #dc2626;
+            --success-green: #10b981;
+            
+            /* Method colors */
+            --bisection-color: #6366f1;
+            --fixedpoint-color: #f59e0b;
+            --newton-color: #10b981;
+            --secant-color: #ec4899;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .tab-button:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section styling */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .section h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--interactive-bg) 0%, white 100%);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Concept Cards */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .concept-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .concept-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.1);
+        }
+        
+        .concept-card.linear {
+            border-left: 4px solid var(--accent-amber);
+        }
+        
+        .concept-card.quadratic {
+            border-left: 4px solid var(--success-green);
+        }
+        
+        .concept-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .concept-card .formula {
+            background: var(--bg-light);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        /* Key insight box */
+        .key-insight {
+            background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+            border: 2px solid var(--accent-amber);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+        }
+        
+        .key-insight h4 {
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .key-insight p {
+            color: #78350f;
+        }
+        
+        /* Dial/Slider styling */
+        .dial-container {
+            background: var(--interactive-bg);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .dial-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .dial-label span {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .dial-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Monaco', monospace;
+        }
+        
+        .dial-slider {
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(to right, #fecaca, #fef08a, #bbf7d0);
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .dial-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .dial-slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .dial-result {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .dial-result-box {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+        }
+        
+        .dial-result-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .dial-result-box .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Monaco', monospace;
+        }
+        
+        .dial-result-box .value.highlight {
+            color: var(--accent-amber);
+        }
+        
+        /* Pi display */
+        .pi-display {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .pi-display .label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pi-digits {
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            line-height: 1.8;
+        }
+        
+        .pi-digits .correct {
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.15);
+            padding: 2px 0;
+        }
+        
+        .pi-digits .incorrect {
+            color: #64748b;
+        }
+        
+        .pi-digits .decimal {
+            color: #f59e0b;
+        }
+        
+        /* Sequence display */
+        .sequence-display {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .sequence-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 120px 100px;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            align-items: center;
+            font-family: 'Monaco', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .sequence-row.header {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-family: inherit;
+        }
+        
+        .sequence-row .n {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .sequence-row .error {
+            color: var(--error-red);
+        }
+        
+        .sequence-row .digits {
+            color: var(--success-green);
+            font-weight: 600;
+        }
+        
+        /* Mode toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .mode-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .mode-btn:hover {
+            background: var(--interactive-bg);
+        }
+        
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .mode-btn.linear.active {
+            background: var(--accent-amber);
+            border-color: var(--accent-amber);
+        }
+        
+        .mode-btn.quadratic.active {
+            background: var(--success-green);
+            border-color: var(--success-green);
+        }
+        
+        /* Graph container */
+        .graph-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            min-height: 350px;
+        }
+        
+        /* Comparison panel */
+        .comparison-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .comparison-side {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 2px solid var(--border-light);
+        }
+        
+        .comparison-side.linear {
+            border-color: var(--accent-amber);
+        }
+        
+        .comparison-side.quadratic {
+            border-color: var(--success-green);
+        }
+        
+        .comparison-side h4 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .comparison-side.linear h4 {
+            color: #b45309;
+        }
+        
+        .comparison-side.quadratic h4 {
+            color: #047857;
+        }
+        
+        /* Tab 3: Methods Race */
+        .method-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--border-light);
+        }
+        
+        .method-card.bisection { border-left-color: var(--bisection-color); }
+        .method-card.fixedpoint { border-left-color: var(--fixedpoint-color); }
+        .method-card.newton { border-left-color: var(--newton-color); }
+        .method-card.secant { border-left-color: var(--secant-color); }
+        
+        .method-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .method-card.bisection h4 { color: var(--bisection-color); }
+        .method-card.fixedpoint h4 { color: var(--fixedpoint-color); }
+        .method-card.newton h4 { color: var(--newton-color); }
+        .method-card.secant h4 { color: var(--secant-color); }
+        
+        .method-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .method-badge.linear {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .method-badge.quadratic {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .method-badge.superlinear {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+        
+        .method-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .method-stat {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+        
+        .method-stat .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .method-stat .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Monaco', monospace;
+        }
+        
+        /* Race controls */
+        .race-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        
+        .race-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .race-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .race-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .race-btn.secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        /* Race results */
+        .race-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .race-result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid var(--border-light);
+            transition: all 0.3s;
+        }
+        
+        .race-result-card.winner {
+            border-color: var(--success-green);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        
+        .race-result-card .method-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .race-result-card.bisection .method-name { color: var(--bisection-color); }
+        .race-result-card.fixedpoint .method-name { color: var(--fixedpoint-color); }
+        .race-result-card.newton .method-name { color: var(--newton-color); }
+        .race-result-card.secant .method-name { color: var(--secant-color); }
+        
+        .race-result-card .iterations {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .race-result-card .iterations-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .race-result-card .digits-display {
+            margin-top: 0.75rem;
+            font-family: 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        /* CTA button */
+        .cta-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Inputs */
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Presets */
+        .preset-pills {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .preset-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive-bg);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Footer nav */
+        .week-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            margin-top: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .week-nav-bar a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .week-nav-bar a:hover {
+            background: var(--interactive-bg);
+        }
+        
+        /* Utility */
+        .text-center { text-align: center; }
+        .mt-1 { margin-top: 1rem; }
+        .mt-2 { margin-top: 2rem; }
+        .mb-1 { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="mathswell-nav">
+        <a href="/numerical-methods-hub/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    
+    <div class="container">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('intro')">Introduction</button>
+            <button class="tab-button" onclick="switchTab('explorer')">π Laboratory</button>
+            <button class="tab-button" onclick="switchTab('methods')">Methods Race</button>
+        </div>
+        
+        <!-- ==================== TAB 1: INTRODUCTION ==================== -->
+        <div id="intro" class="tab-content active">
+            <div class="hero">
+                <h1>Order of Convergence</h1>
+                <p>Not "does it converge?" but "how fast do the digits appear?" Understanding convergence order explains why Newton beats Bisection — it's not magic, it's mathematics.</p>
+            </div>
+            
+            <div class="section">
+                <h2>The Central Question</h2>
+                <p>When an iterative method produces approximations x₀, x₁, x₂, ... that approach a root x*, we want to know:</p>
+                
+                <div class="key-insight">
+                    <h4>💡 Key Question</h4>
+                    <p><strong>How quickly does the error shrink?</strong> Specifically, how many correct decimal digits do we gain per iteration?</p>
+                </div>
+                
+                <p>Watch two different behaviours approaching π = 3.14159265358979...</p>
+            </div>
+            
+            <div class="concept-cards">
+                <div class="concept-card linear">
+                    <div class="icon">🐢</div>
+                    <h3>Linear (Steady)</h3>
+                    <p>Each step gains about the <strong>same</strong> number of digits:</p>
+                    <div style="font-family: monospace; margin: 0.75rem 0; line-height: 1.8;">
+                        3.<span style="color: var(--success-green);">1</span><br>
+                        3.<span style="color: var(--success-green);">14</span><br>
+                        3.<span style="color: var(--success-green);">141</span><br>
+                        3.<span style="color: var(--success-green);">1415</span><br>
+                        3.<span style="color: var(--success-green);">14159</span>
+                    </div>
+                    <div class="formula" id="linear-formula"></div>
+                </div>
+                
+                <div class="concept-card quadratic">
+                    <div class="icon">🚀</div>
+                    <h3>Quadratic (Accelerating)</h3>
+                    <p>Correct digits roughly <strong>double</strong> each step:</p>
+                    <div style="font-family: monospace; margin: 0.75rem 0; line-height: 1.8;">
+                        3.<span style="color: var(--success-green);">1</span><br>
+                        3.<span style="color: var(--success-green);">14</span><br>
+                        3.<span style="color: var(--success-green);">141592</span><br>
+                        3.<span style="color: var(--success-green);">14159265358979</span>
+                    </div>
+                    <div class="formula" id="quadratic-formula"></div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>The Logarithm Surprise</h2>
+                <p>Here's where intuition fails most students:</p>
+                
+                <div class="key-insight">
+                    <h4>⚠️ Common Misconception</h4>
+                    <p>"If C = 0.5, the error is halved, so I gain half a digit per step."</p>
+                    <p style="margin-top: 0.5rem;"><strong>Wrong!</strong> You gain −log₁₀(0.5) ≈ <strong>0.301 digits</strong> per step.</p>
+                </div>
+                
+                <p>The relationship is <em>logarithmic</em>, not linear:</p>
+                
+                <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 12px; margin: 1rem 0;">
+                    <div style="text-align: center; font-size: 1.2rem;">
+                        <strong>Digits gained per step = −log₁₀(C)</strong>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; text-align: center;">
+                        <div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">C = 0.9</div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: var(--error-red);">0.046 digits</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">C = 0.5</div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: var(--accent-amber);">0.301 digits</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">C = 0.1</div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: var(--success-green);">1.0 digit</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p>This is why Bisection (which always has C = 0.5) gains only about <strong>0.3 digits per step</strong> — it takes about 3.3 iterations to gain one full decimal digit!</p>
+            </div>
+            
+            <div class="section">
+                <h2>Why Quadratic is Dramatically Faster</h2>
+                <p>With quadratic convergence, |eₙ₊₁| ≈ K|eₙ|², the number of correct digits roughly <strong>doubles</strong> each step:</p>
+                
+                <div style="background: var(--interactive-bg); padding: 1.5rem; border-radius: 12px; margin: 1rem 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 2px solid var(--primary);">
+                            <th style="padding: 0.5rem; text-align: left;">Step</th>
+                            <th style="padding: 0.5rem; text-align: center;">Linear (C=0.5)</th>
+                            <th style="padding: 0.5rem; text-align: center;">Quadratic</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;">n = 0</td>
+                            <td style="padding: 0.5rem; text-align: center;">1 digit</td>
+                            <td style="padding: 0.5rem; text-align: center;">1 digit</td>
+                        </tr>
+                        <tr style="background: white;">
+                            <td style="padding: 0.5rem;">n = 5</td>
+                            <td style="padding: 0.5rem; text-align: center;">~2.5 digits</td>
+                            <td style="padding: 0.5rem; text-align: center;">~32 digits</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;">n = 10</td>
+                            <td style="padding: 0.5rem; text-align: center;">~4 digits</td>
+                            <td style="padding: 0.5rem; text-align: center;">~1024 digits</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <p>After just 10 iterations, quadratic convergence could give you over 1000 digits — while linear convergence gives you only 4!</p>
+            </div>
+            
+            <div class="text-center mt-2">
+                <button class="cta-button" onclick="switchTab('explorer')">Explore in the π Laboratory →</button>
+            </div>
+        </div>
+        
+        <!-- ==================== TAB 2: π LABORATORY ==================== -->
+        <div id="explorer" class="tab-content">
+            <div class="section">
+                <h2>The π Laboratory</h2>
+                <p>Using π as a known reference, watch how the error shrinks and digits appear under different convergence behaviours.</p>
+                
+                <div class="mode-toggle">
+                    <button class="mode-btn linear active" onclick="setMode('linear')">🐢 Linear</button>
+                    <button class="mode-btn quadratic" onclick="setMode('quadratic')">🚀 Quadratic</button>
+                    <button class="mode-btn" onclick="setMode('compare')">⚔️ Compare</button>
+                </div>
+            </div>
+            
+            <!-- Linear Mode -->
+            <div id="linear-mode" class="mode-content">
+                <div class="dial-container">
+                    <div class="dial-label">
+                        <span>Convergence Rate C</span>
+                        <span class="dial-value" id="c-value">0.50</span>
+                    </div>
+                    <input type="range" class="dial-slider" id="c-slider" min="0.05" max="0.95" step="0.01" value="0.50">
+                    
+                    <div class="dial-result">
+                        <div class="dial-result-box">
+                            <div class="label">Error multiplied by</div>
+                            <div class="value" id="c-multiplier">0.50</div>
+                        </div>
+                        <div class="dial-result-box">
+                            <div class="label">Digits gained per step</div>
+                            <div class="value highlight" id="digits-per-step">0.301</div>
+                        </div>
+                        <div class="dial-result-box">
+                            <div class="label">Steps to gain 1 digit</div>
+                            <div class="value" id="steps-per-digit">3.32</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Watch the Digits Appear</h3>
+                    <p>Starting error: 0.1 (about 1 correct digit). Watch how digits of π emerge:</p>
+                    
+                    <div class="pi-display">
+                        <div class="label">π = 3.14159265358979323846...</div>
+                        <div class="pi-digits" id="pi-digits-linear">
+                            <span class="correct">3</span><span class="decimal">.</span><span class="incorrect">????????</span>
+                        </div>
+                    </div>
+                    
+                    <div class="sequence-display" id="linear-sequence">
+                        <div class="sequence-row header">
+                            <div>n</div>
+                            <div>Approximation</div>
+                            <div>Error |eₙ|</div>
+                            <div>Digits</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="graph-container">
+                    <div id="linear-error-graph" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+            
+            <!-- Quadratic Mode -->
+            <div id="quadratic-mode" class="mode-content" style="display: none;">
+                <div class="dial-container">
+                    <div class="dial-label">
+                        <span>Constant K</span>
+                        <span class="dial-value" id="k-value">0.50</span>
+                    </div>
+                    <input type="range" class="dial-slider" id="k-slider" min="0.1" max="2.0" step="0.1" value="0.5">
+                    
+                    <div class="dial-result">
+                        <div class="dial-result-box">
+                            <div class="label">Formula</div>
+                            <div class="value" style="font-size: 1rem;">|eₙ₊₁| ≈ K|eₙ|²</div>
+                        </div>
+                        <div class="dial-result-box">
+                            <div class="label">Digit behaviour</div>
+                            <div class="value highlight" style="font-size: 1rem;">Roughly doubles</div>
+                        </div>
+                        <div class="dial-result-box">
+                            <div class="label">After 5 steps</div>
+                            <div class="value" id="quad-digits-5">~32 digits</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Watch the Digits Explode</h3>
+                    <p>Same starting error (0.1), but now digits roughly double each step:</p>
+                    
+                    <div class="pi-display">
+                        <div class="label">π = 3.14159265358979323846...</div>
+                        <div class="pi-digits" id="pi-digits-quadratic">
+                            <span class="correct">3</span><span class="decimal">.</span><span class="incorrect">????????</span>
+                        </div>
+                    </div>
+                    
+                    <div class="sequence-display" id="quadratic-sequence">
+                        <div class="sequence-row header">
+                            <div>n</div>
+                            <div>Approximation</div>
+                            <div>Error |eₙ|</div>
+                            <div>Digits</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="graph-container">
+                    <div id="quadratic-error-graph" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+            
+            <!-- Compare Mode -->
+            <div id="compare-mode" class="mode-content" style="display: none;">
+                <div class="section">
+                    <h3>Side-by-Side: Same Starting Point, Different Convergence</h3>
+                    <p>Both start with error = 0.1. Watch how differently they behave:</p>
+                </div>
+                
+                <div class="comparison-panel">
+                    <div class="comparison-side linear">
+                        <h4>🐢 Linear (C = 0.5)</h4>
+                        <div class="pi-display" style="font-size: 0.9rem;">
+                            <div class="pi-digits" id="pi-compare-linear"></div>
+                        </div>
+                        <div id="compare-linear-stats" style="margin-top: 1rem;"></div>
+                    </div>
+                    
+                    <div class="comparison-side quadratic">
+                        <h4>🚀 Quadratic (K = 0.5)</h4>
+                        <div class="pi-display" style="font-size: 0.9rem;">
+                            <div class="pi-digits" id="pi-compare-quadratic"></div>
+                        </div>
+                        <div id="compare-quadratic-stats" style="margin-top: 1rem;"></div>
+                    </div>
+                </div>
+                
+                <div class="dial-container">
+                    <div class="dial-label">
+                        <span>Step through iterations</span>
+                        <span class="dial-value">n = <span id="compare-n">0</span></span>
+                    </div>
+                    <input type="range" class="dial-slider" id="compare-slider" min="0" max="15" step="1" value="0">
+                </div>
+                
+                <div class="graph-container">
+                    <div id="compare-error-graph" style="width: 100%; height: 350px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== TAB 3: METHODS RACE ==================== -->
+        <div id="methods" class="tab-content">
+            <div class="section">
+                <h2>The Methods Race</h2>
+                <p>Four methods, one problem: find √2. Watch how convergence order determines the winner.</p>
+                
+                <div class="preset-pills">
+                    <span style="color: var(--text-muted); margin-right: 0.5rem;">Target accuracy:</span>
+                    <button class="preset-pill active" onclick="setTargetAccuracy(1e-6)">10⁻⁶</button>
+                    <button class="preset-pill" onclick="setTargetAccuracy(1e-10)">10⁻¹⁰</button>
+                    <button class="preset-pill" onclick="setTargetAccuracy(1e-15)">10⁻¹⁵</button>
+                </div>
+            </div>
+            
+            <!-- Method Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="method-card bisection">
+                    <h4>
+                        <span style="font-size: 1.5rem;">🎯</span>
+                        Bisection
+                        <span class="method-badge linear">Linear</span>
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Halves the interval each step. Guaranteed but slow.</p>
+                    <div class="method-stats">
+                        <div class="method-stat">
+                            <div class="label">Rate C</div>
+                            <div class="value" style="color: var(--bisection-color);">0.5</div>
+                        </div>
+                        <div class="method-stat">
+                            <div class="label">Digits/step</div>
+                            <div class="value" style="color: var(--bisection-color);">0.301</div>
+                        </div>
+                        <div class="method-stat">
+                            <div class="label">Order</div>
+                            <div class="value" style="color: var(--bisection-color);">1</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="method-card fixedpoint">
+                    <h4>
+                        <span style="font-size: 1.5rem;">🔄</span>
+                        Fixed-Point
+                        <span class="method-badge linear">Linear</span>
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Rate depends on |g'(x*)|. Using g(x) = ½(x + 2/x).</p>
+                    <div class="method-stats">
+                        <div class="method-stat">
+                            <div class="label">Rate C</div>
+                            <div class="value" style="color: var(--fixedpoint-color);" id="fp-rate">—</div>
+                        </div>
+                        <div class="method-stat">
+                            <div class="label">Digits/step</div>
+                            <div class="value" style="color: var(--fixedpoint-color);" id="fp-digits">—</div>
+                        </div>
+                        <div class="method-stat">
+                            <div class="label">Order</div>
+                            <div class="value" style="color: var(--fixedpoint-color);">1*</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="method-card newton">
+                    <h4>
+                        <span style="font-size: 1.5rem;">📐</span>
+                        Newton
+                        <span class="method-badge quadratic">Quadratic</span>
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Uses tangent lines. Digits roughly double each step!</p>
+                    <div class="method-stats">
+                        <div class="method-stat">
+                            <div class="label">K constant</div>
+                            <div class="value" style="color: var(--newton-color);" id="newton-k">—</div>
+                        </div>
+                        <div class="method-stat">
+                            <div class="label">Behaviour</div>
+                            <div class="value" style="color: var(--newton-color); font-size: 0.9rem;">Doubles</div>
+                        </div>
+                        <div class="method-stat">
+                            <div class="label">Order</div>
+                            <div class="value" style="color: var(--newton-color);">2</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="method-card secant">
+                    <h4>
+                        <span style="font-size: 1.5rem;">📏</span>
+                        Secant
+                        <span class="method-badge superlinear">Superlinear</span>
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">No derivative needed. Order ≈ 1.618 (golden ratio!).</p>
+                    <div class="method-stats">
+                        <div class="method-stat">
+                            <div class="label">Order</div>
+                            <div class="value" style="color: var(--secant-color);">φ ≈ 1.618</div>
+                        </div>
+                        <div class="method-stat">
+                            <div class="label">Behaviour</div>
+                            <div class="value" style="color: var(--secant-color); font-size: 0.9rem;">×1.6/step</div>
+                        </div>
+                        <div class="method-stat">
+                            <div class="label">Type</div>
+                            <div class="value" style="color: var(--secant-color); font-size: 0.8rem;">Super</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="race-controls">
+                <button class="race-btn primary" onclick="runRace()">▶️ Run Race</button>
+                <button class="race-btn secondary" onclick="stepRace()">⏭️ Step</button>
+                <button class="race-btn secondary" onclick="resetRace()">🔄 Reset</button>
+            </div>
+            
+            <div class="race-results" id="race-results">
+                <div class="race-result-card bisection">
+                    <div class="method-name">🎯 Bisection</div>
+                    <div class="iterations" id="bisection-iters">—</div>
+                    <div class="iterations-label">iterations</div>
+                    <div class="digits-display" id="bisection-digits"></div>
+                </div>
+                <div class="race-result-card fixedpoint">
+                    <div class="method-name">🔄 Fixed-Point</div>
+                    <div class="iterations" id="fixedpoint-iters">—</div>
+                    <div class="iterations-label">iterations</div>
+                    <div class="digits-display" id="fixedpoint-digits"></div>
+                </div>
+                <div class="race-result-card newton">
+                    <div class="method-name">📐 Newton</div>
+                    <div class="iterations" id="newton-iters">—</div>
+                    <div class="iterations-label">iterations</div>
+                    <div class="digits-display" id="newton-digits"></div>
+                </div>
+                <div class="race-result-card secant">
+                    <div class="method-name">📏 Secant</div>
+                    <div class="iterations" id="secant-iters">—</div>
+                    <div class="iterations-label">iterations</div>
+                    <div class="digits-display" id="secant-digits"></div>
+                </div>
+            </div>
+            
+            <div class="graph-container">
+                <div id="race-graph" style="width: 100%; height: 400px;"></div>
+            </div>
+            
+            <div class="section">
+                <h3>The Key Insight</h3>
+                <div class="key-insight">
+                    <h4>💡 Why Newton Wins</h4>
+                    <p>Bisection always has C = 0.5 because each step halves the interval (error bound). Newton achieves <strong>quadratic convergence</strong> by using the tangent line, which makes the error <em>square</em> itself each step.</p>
+                    <p style="margin-top: 0.5rem;">The derivative |g'(x*)| isn't just about whether fixed-point converges — it tells you exactly how many digits you gain per step: <strong>−log₁₀(|g'(x*)|)</strong>.</p>
+                </div>
+                
+                <p><em>*Note: The fixed-point iteration g(x) = ½(x + 2/x) is actually Newton's method in disguise! It achieves quadratic convergence because g'(x*) = 0 at the fixed point.</em></p>
+            </div>
+        </div>
+        
+        <!-- Week Navigation -->
+        <div class="week-nav-bar">
+            <a href="../fixed-point/">← Week 2: Fixed-Point</a>
+            <a href="../">🏠 Hub</a>
+            <a href="../newton/">Week 3: Newton →</a>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ============ CONSTANTS ============
+        const PI = Math.PI;
+        const PI_STRING = '3.14159265358979323846264338327950288419716939937510';
+        const SQRT2 = Math.SQRT2;
+        
+        // ============ STATE ============
+        const state = {
+            mode: 'linear',
+            C: 0.5,
+            K: 0.5,
+            compareStep: 0,
+            targetAccuracy: 1e-6,
+            raceStep: 0,
+            raceRunning: false,
+            raceData: null
+        };
+        
+        // ============ INITIALIZATION ============
+        function initialize() {
+            renderKaTeX();
+            setupSliders();
+            updateLinearDisplay();
+            updateRaceStats();
+        }
+        
+        function renderKaTeX() {
+            if (typeof katex === 'undefined') {
+                setTimeout(renderKaTeX, 100);
+                return;
+            }
+            try {
+                katex.render("|e_{n+1}| \\approx C|e_n|, \\quad 0 < C < 1", document.getElementById('linear-formula'), {displayMode: false});
+                katex.render("|e_{n+1}| \\approx K|e_n|^2", document.getElementById('quadratic-formula'), {displayMode: false});
+            } catch (e) {
+                console.error('KaTeX error:', e);
+            }
+        }
+        
+        function setupSliders() {
+            document.getElementById('c-slider').addEventListener('input', function() {
+                state.C = parseFloat(this.value);
+                updateLinearDisplay();
+            });
+            
+            document.getElementById('k-slider').addEventListener('input', function() {
+                state.K = parseFloat(this.value);
+                updateQuadraticDisplay();
+            });
+            
+            document.getElementById('compare-slider').addEventListener('input', function() {
+                state.compareStep = parseInt(this.value);
+                updateCompareDisplay();
+            });
+        }
+        
+        // ============ TAB SWITCHING ============
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.tab-button:nth-child(${tabName === 'intro' ? 1 : tabName === 'explorer' ? 2 : 3})`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'explorer') {
+                setTimeout(() => {
+                    if (state.mode === 'linear') updateLinearDisplay();
+                    else if (state.mode === 'quadratic') updateQuadraticDisplay();
+                    else updateCompareDisplay();
+                }, 100);
+            } else if (tabName === 'methods') {
+                setTimeout(updateRaceStats, 100);
+            }
+        };
+        
+        // ============ MODE SWITCHING ============
+        window.setMode = function(mode) {
+            state.mode = mode;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Select the correct button
+            if (mode === 'linear') {
+                document.querySelector('.mode-btn.linear').classList.add('active');
+            } else if (mode === 'quadratic') {
+                document.querySelector('.mode-btn.quadratic').classList.add('active');
+            } else {
+                // Compare mode - third button
+                document.querySelectorAll('.mode-btn')[2].classList.add('active');
+            }
+            
+            document.getElementById('linear-mode').style.display = mode === 'linear' ? 'block' : 'none';
+            document.getElementById('quadratic-mode').style.display = mode === 'quadratic' ? 'block' : 'none';
+            document.getElementById('compare-mode').style.display = mode === 'compare' ? 'block' : 'none';
+            
+            if (mode === 'linear') updateLinearDisplay();
+            else if (mode === 'quadratic') updateQuadraticDisplay();
+            else updateCompareDisplay();
+        };
+        
+        // ============ LINEAR CONVERGENCE ============
+        function generateLinearSequence(C, e0, maxSteps) {
+            const sequence = [];
+            let error = e0;
+            
+            for (let n = 0; n <= maxSteps; n++) {
+                const digits = error > 0 ? Math.max(0, -Math.log10(error)) : 15;
+                sequence.push({
+                    n: n,
+                    error: error,
+                    digits: digits,
+                    approx: PI + (Math.random() > 0.5 ? 1 : -1) * error
+                });
+                error *= C;
+                if (error < 1e-16) break;
+            }
+            
+            return sequence;
+        }
+        
+        function updateLinearDisplay() {
+            const C = state.C;
+            
+            // Update dial values
+            document.getElementById('c-value').textContent = C.toFixed(2);
+            document.getElementById('c-multiplier').textContent = C.toFixed(2);
+            
+            const digitsPerStep = -Math.log10(C);
+            document.getElementById('digits-per-step').textContent = digitsPerStep.toFixed(3);
+            document.getElementById('steps-per-digit').textContent = (1 / digitsPerStep).toFixed(2);
+            
+            // Generate sequence
+            const sequence = generateLinearSequence(C, 0.1, 20);
+            
+            // Update pi display
+            updatePiDisplay('pi-digits-linear', sequence[sequence.length - 1].digits);
+            
+            // Update sequence table
+            const container = document.getElementById('linear-sequence');
+            container.innerHTML = `
+                <div class="sequence-row header">
+                    <div>n</div>
+                    <div>Error |eₙ|</div>
+                    <div>Digits gained</div>
+                    <div>Total digits</div>
+                </div>
+            `;
+            
+            sequence.slice(0, 12).forEach((step, i) => {
+                const digitsGained = i > 0 ? (step.digits - sequence[i-1].digits).toFixed(3) : '—';
+                container.innerHTML += `
+                    <div class="sequence-row">
+                        <div class="n">${step.n}</div>
+                        <div class="error">${step.error.toExponential(3)}</div>
+                        <div style="color: var(--accent-amber);">${digitsGained}</div>
+                        <div class="digits">${step.digits.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            
+            // Plot
+            plotLinearError(sequence);
+        }
+        
+        function plotLinearError(sequence) {
+            if (typeof Plotly === 'undefined') return;
+            
+            const trace = {
+                x: sequence.map(s => s.n),
+                y: sequence.map(s => s.error),
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Error',
+                line: { color: '#f59e0b', width: 3 },
+                marker: { size: 8 }
+            };
+            
+            const layout = {
+                title: 'Error vs Iteration (Log Scale)',
+                xaxis: { title: 'Iteration n' },
+                yaxis: { 
+                    title: '|eₙ|', 
+                    type: 'log',
+                    exponentformat: 'power'
+                },
+                margin: { t: 40, r: 20, b: 50, l: 60 },
+                annotations: [{
+                    x: sequence.length / 2,
+                    y: Math.log10(sequence[Math.floor(sequence.length/2)].error),
+                    text: 'Straight line = Linear convergence',
+                    showarrow: false,
+                    yshift: 30,
+                    font: { color: '#f59e0b' }
+                }]
+            };
+            
+            Plotly.newPlot('linear-error-graph', [trace], layout, { responsive: true });
+        }
+        
+        // ============ QUADRATIC CONVERGENCE ============
+        function generateQuadraticSequence(K, e0, maxSteps) {
+            const sequence = [];
+            let error = e0;
+            
+            for (let n = 0; n <= maxSteps; n++) {
+                const digits = error > 0 ? Math.max(0, -Math.log10(error)) : 50;
+                sequence.push({
+                    n: n,
+                    error: error,
+                    digits: Math.min(digits, 50)
+                });
+                error = K * error * error;
+                if (error < 1e-50) break;
+            }
+            
+            return sequence;
+        }
+        
+        function updateQuadraticDisplay() {
+            const K = state.K;
+            
+            document.getElementById('k-value').textContent = K.toFixed(2);
+            
+            const sequence = generateQuadraticSequence(K, 0.1, 10);
+            const digits5 = sequence.length > 5 ? sequence[5].digits : sequence[sequence.length-1].digits;
+            document.getElementById('quad-digits-5').textContent = `~${Math.round(digits5)} digits`;
+            
+            // Update pi display
+            updatePiDisplay('pi-digits-quadratic', sequence[sequence.length - 1].digits);
+            
+            // Update sequence table
+            const container = document.getElementById('quadratic-sequence');
+            container.innerHTML = `
+                <div class="sequence-row header">
+                    <div>n</div>
+                    <div>Error |eₙ|</div>
+                    <div>Digit ratio</div>
+                    <div>Total digits</div>
+                </div>
+            `;
+            
+            sequence.forEach((step, i) => {
+                const digitRatio = i > 0 && sequence[i-1].digits > 0 ? 
+                    (step.digits / sequence[i-1].digits).toFixed(2) + 'x' : '—';
+                container.innerHTML += `
+                    <div class="sequence-row">
+                        <div class="n">${step.n}</div>
+                        <div class="error">${step.error < 1e-50 ? '< 10⁻⁵⁰' : step.error.toExponential(3)}</div>
+                        <div style="color: var(--success-green);">${digitRatio}</div>
+                        <div class="digits">${step.digits.toFixed(1)}</div>
+                    </div>
+                `;
+            });
+            
+            plotQuadraticError(sequence);
+        }
+        
+        function plotQuadraticError(sequence) {
+            if (typeof Plotly === 'undefined') return;
+            
+            const trace = {
+                x: sequence.map(s => s.n),
+                y: sequence.map(s => Math.max(s.error, 1e-50)),
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Error',
+                line: { color: '#10b981', width: 3 },
+                marker: { size: 8 }
+            };
+            
+            const layout = {
+                title: 'Error vs Iteration (Log Scale)',
+                xaxis: { title: 'Iteration n' },
+                yaxis: { 
+                    title: '|eₙ|', 
+                    type: 'log',
+                    exponentformat: 'power'
+                },
+                margin: { t: 40, r: 20, b: 50, l: 60 },
+                annotations: [{
+                    x: sequence.length / 2,
+                    y: Math.log10(sequence[Math.floor(sequence.length/2)].error),
+                    text: 'Curves down = Quadratic convergence',
+                    showarrow: false,
+                    yshift: 30,
+                    font: { color: '#10b981' }
+                }]
+            };
+            
+            Plotly.newPlot('quadratic-error-graph', [trace], layout, { responsive: true });
+        }
+        
+        // ============ COMPARE MODE ============
+        function updateCompareDisplay() {
+            const n = state.compareStep;
+            document.getElementById('compare-n').textContent = n;
+            
+            const linearSeq = generateLinearSequence(0.5, 0.1, 15);
+            const quadSeq = generateQuadraticSequence(0.5, 0.1, 15);
+            
+            const linearStep = linearSeq[Math.min(n, linearSeq.length - 1)];
+            const quadStep = quadSeq[Math.min(n, quadSeq.length - 1)];
+            
+            updatePiDisplay('pi-compare-linear', linearStep.digits);
+            updatePiDisplay('pi-compare-quadratic', quadStep.digits);
+            
+            document.getElementById('compare-linear-stats').innerHTML = `
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Error:</span>
+                    <strong style="color: var(--error-red);">${linearStep.error.toExponential(2)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Digits:</span>
+                    <strong style="color: var(--success-green);">${linearStep.digits.toFixed(1)}</strong>
+                </div>
+            `;
+            
+            document.getElementById('compare-quadratic-stats').innerHTML = `
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Error:</span>
+                    <strong style="color: var(--error-red);">${quadStep.error < 1e-50 ? '< 10⁻⁵⁰' : quadStep.error.toExponential(2)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Digits:</span>
+                    <strong style="color: var(--success-green);">${quadStep.digits.toFixed(1)}</strong>
+                </div>
+            `;
+            
+            plotCompareError(linearSeq, quadSeq, n);
+        }
+        
+        function plotCompareError(linearSeq, quadSeq, currentN) {
+            if (typeof Plotly === 'undefined') return;
+            
+            const traces = [
+                {
+                    x: linearSeq.map(s => s.n),
+                    y: linearSeq.map(s => s.error),
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Linear (C=0.5)',
+                    line: { color: '#f59e0b', width: 2 },
+                    marker: { size: 6 }
+                },
+                {
+                    x: quadSeq.map(s => s.n),
+                    y: quadSeq.map(s => Math.max(s.error, 1e-50)),
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Quadratic (K=0.5)',
+                    line: { color: '#10b981', width: 2 },
+                    marker: { size: 6 }
+                }
+            ];
+            
+            // Add current position markers
+            if (currentN < linearSeq.length) {
+                traces.push({
+                    x: [currentN],
+                    y: [linearSeq[currentN].error],
+                    type: 'scatter',
+                    mode: 'markers',
+                    name: 'Current (Linear)',
+                    marker: { size: 15, color: '#f59e0b', symbol: 'diamond' },
+                    showlegend: false
+                });
+            }
+            if (currentN < quadSeq.length) {
+                traces.push({
+                    x: [currentN],
+                    y: [Math.max(quadSeq[currentN].error, 1e-50)],
+                    type: 'scatter',
+                    mode: 'markers',
+                    name: 'Current (Quadratic)',
+                    marker: { size: 15, color: '#10b981', symbol: 'diamond' },
+                    showlegend: false
+                });
+            }
+            
+            const layout = {
+                title: 'Error Comparison (Log Scale)',
+                xaxis: { title: 'Iteration n' },
+                yaxis: { 
+                    title: '|eₙ|', 
+                    type: 'log', 
+                    range: [-50, 0],
+                    exponentformat: 'power'
+                },
+                margin: { t: 40, r: 20, b: 50, l: 60 },
+                legend: { x: 0.7, y: 0.95 },
+                shapes: [{
+                    type: 'line',
+                    x0: currentN, x1: currentN,
+                    y0: 0, y1: 1,
+                    yref: 'paper',
+                    line: { color: '#64748b', width: 1, dash: 'dot' }
+                }]
+            };
+            
+            Plotly.newPlot('compare-error-graph', traces, layout, { responsive: true });
+        }
+        
+        // ============ PI DISPLAY HELPER ============
+        function updatePiDisplay(elementId, correctDigits) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            
+            const numCorrect = Math.min(Math.floor(correctDigits) + 1, PI_STRING.length - 2); // +1 for the '3'
+            
+            let html = '';
+            for (let i = 0; i < Math.min(PI_STRING.length, 20); i++) {
+                const char = PI_STRING[i];
+                if (char === '.') {
+                    html += `<span class="decimal">.</span>`;
+                } else if (i <= numCorrect) {
+                    html += `<span class="correct">${char}</span>`;
+                } else {
+                    html += `<span class="incorrect">?</span>`;
+                }
+            }
+            if (PI_STRING.length > 20) {
+                html += '<span class="incorrect">...</span>';
+            }
+            
+            el.innerHTML = html;
+        }
+        
+        // ============ METHODS RACE ============
+        window.setTargetAccuracy = function(tol) {
+            state.targetAccuracy = tol;
+            document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            resetRace();
+            updateRaceStats();
+        };
+        
+        function updateRaceStats() {
+            // For √2, the Babylonian method g(x) = ½(x + 2/x) has g'(x*) = 0
+            // So it's actually quadratic! Let's use a different g for fair comparison
+            // g(x) = 1 + 1/(1+x) which converges to √2 with |g'(√2)| ≈ 0.172
+            
+            const gPrime = 0.172;  // |g'(√2)| for g(x) = 1 + 1/(1+x)
+            const fpDigits = -Math.log10(gPrime);
+            
+            document.getElementById('fp-rate').textContent = gPrime.toFixed(3);
+            document.getElementById('fp-digits').textContent = fpDigits.toFixed(2);
+            
+            // Newton: K = |f''(x*)|/(2|f'(x*)|) = |2|/(2|2√2|) ≈ 0.354
+            const newtonK = 1 / (2 * SQRT2);
+            document.getElementById('newton-k').textContent = newtonK.toFixed(3);
+        }
+        
+        function runAllMethods(tol) {
+            const results = {
+                bisection: runBisection(1, 2, tol),
+                fixedpoint: runFixedPoint(x => 1 + 1/(1+x), 1, tol, 100),
+                newton: runNewton(x => x*x - 2, x => 2*x, 1.5, tol, 50),
+                secant: runSecant(x => x*x - 2, 1, 2, tol, 50)
+            };
+            return results;
+        }
+        
+        function runBisection(a, b, tol) {
+            const steps = [];
+            let fa = a*a - 2, fb = b*b - 2;
+            
+            while ((b - a) / 2 > tol && steps.length < 100) {
+                const m = (a + b) / 2;
+                const fm = m*m - 2;
+                const error = Math.abs(m - SQRT2);
+                steps.push({ x: m, error: error, digits: -Math.log10(error) });
+                
+                if (fa * fm < 0) {
+                    b = m; fb = fm;
+                } else {
+                    a = m; fa = fm;
+                }
+            }
+            return steps;
+        }
+        
+        function runFixedPoint(g, x0, tol, maxIter) {
+            const steps = [];
+            let x = x0;
+            
+            for (let i = 0; i < maxIter; i++) {
+                const error = Math.abs(x - SQRT2);
+                steps.push({ x: x, error: error, digits: error > 0 ? -Math.log10(error) : 15 });
+                
+                if (error < tol) break;
+                x = g(x);
+            }
+            return steps;
+        }
+        
+        function runNewton(f, fp, x0, tol, maxIter) {
+            const steps = [];
+            let x = x0;
+            
+            for (let i = 0; i < maxIter; i++) {
+                const error = Math.abs(x - SQRT2);
+                steps.push({ x: x, error: error, digits: error > 0 ? -Math.log10(error) : 15 });
+                
+                if (error < tol) break;
+                x = x - f(x) / fp(x);
+            }
+            return steps;
+        }
+        
+        function runSecant(f, x0, x1, tol, maxIter) {
+            const steps = [];
+            let xPrev = x0, x = x1;
+            
+            steps.push({ x: xPrev, error: Math.abs(xPrev - SQRT2), digits: -Math.log10(Math.abs(xPrev - SQRT2)) });
+            
+            for (let i = 0; i < maxIter; i++) {
+                const error = Math.abs(x - SQRT2);
+                steps.push({ x: x, error: error, digits: error > 0 ? -Math.log10(error) : 15 });
+                
+                if (error < tol) break;
+                
+                const fxPrev = f(xPrev), fx = f(x);
+                const xNew = x - fx * (x - xPrev) / (fx - fxPrev);
+                xPrev = x;
+                x = xNew;
+            }
+            return steps;
+        }
+        
+        window.runRace = function() {
+            state.raceData = runAllMethods(state.targetAccuracy);
+            displayRaceResults(state.raceData);
+            plotRaceGraph(state.raceData);
+        };
+        
+        window.stepRace = function() {
+            if (!state.raceData) {
+                state.raceData = runAllMethods(state.targetAccuracy);
+            }
+            state.raceStep++;
+            displayRaceResults(state.raceData, state.raceStep);
+            plotRaceGraph(state.raceData, state.raceStep);
+        };
+        
+        window.resetRace = function() {
+            state.raceStep = 0;
+            state.raceData = null;
+            
+            ['bisection', 'fixedpoint', 'newton', 'secant'].forEach(method => {
+                document.getElementById(`${method}-iters`).textContent = '—';
+                document.getElementById(`${method}-digits`).textContent = '';
+                document.querySelector(`.race-result-card.${method}`).classList.remove('winner');
+            });
+            
+            if (typeof Plotly !== 'undefined') {
+                Plotly.purge('race-graph');
+            }
+        };
+        
+        function displayRaceResults(data, maxStep = Infinity) {
+            const methods = ['bisection', 'fixedpoint', 'newton', 'secant'];
+            let winner = null;
+            let minIters = Infinity;
+            
+            methods.forEach(method => {
+                const steps = data[method];
+                const displaySteps = Math.min(steps.length, maxStep);
+                const lastStep = steps[displaySteps - 1];
+                
+                document.getElementById(`${method}-iters`).textContent = displaySteps;
+                
+                if (lastStep) {
+                    const digitsStr = lastStep.digits.toFixed(1);
+                    document.getElementById(`${method}-digits`).textContent = `${digitsStr} digits`;
+                }
+                
+                // Check for winner
+                if (lastStep && lastStep.error <= state.targetAccuracy && displaySteps < minIters) {
+                    minIters = displaySteps;
+                    winner = method;
+                }
+                
+                document.querySelector(`.race-result-card.${method}`).classList.remove('winner');
+            });
+            
+            if (winner) {
+                document.querySelector(`.race-result-card.${winner}`).classList.add('winner');
+            }
+        }
+        
+        function plotRaceGraph(data, maxStep = Infinity) {
+            if (typeof Plotly === 'undefined') return;
+            
+            const colors = {
+                bisection: '#6366f1',
+                fixedpoint: '#f59e0b',
+                newton: '#10b981',
+                secant: '#ec4899'
+            };
+            
+            const names = {
+                bisection: 'Bisection',
+                fixedpoint: 'Fixed-Point',
+                newton: 'Newton',
+                secant: 'Secant'
+            };
+            
+            const traces = [];
+            
+            Object.keys(data).forEach(method => {
+                const steps = data[method].slice(0, maxStep);
+                traces.push({
+                    x: steps.map((_, i) => i),
+                    y: steps.map(s => s.error),
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: names[method],
+                    line: { color: colors[method], width: 2 },
+                    marker: { size: 6 }
+                });
+            });
+            
+            // Add target line
+            traces.push({
+                x: [0, Math.max(...Object.values(data).map(d => Math.min(d.length, maxStep)))],
+                y: [state.targetAccuracy, state.targetAccuracy],
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Target',
+                line: { color: '#64748b', width: 2, dash: 'dash' }
+            });
+            
+            const layout = {
+                title: 'Race to ' + state.targetAccuracy.toExponential(0) + ' Accuracy',
+                xaxis: { title: 'Iteration' },
+                yaxis: { 
+                    title: 'Error |xₙ - √2|', 
+                    type: 'log',
+                    exponentformat: 'power'
+                },
+                margin: { t: 40, r: 20, b: 50, l: 60 },
+                legend: { x: 0.7, y: 0.95 }
+            };
+            
+            Plotly.newPlot('race-graph', traces, layout, { responsive: true });
+        }
+        
+        // ============ INITIALIZE ============
+        initialize();
+    });
+    </script>
+</body>
+</html>
