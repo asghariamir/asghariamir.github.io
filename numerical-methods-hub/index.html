@@ -260,11 +260,12 @@
         
         .week-card:nth-of-type(1) .week-number { background: var(--week1-color); }
         .week-card:nth-of-type(2) .week-number { background: var(--week2-color); }
-        .week-card:nth-of-type(3) .week-number { background: var(--week3-color); }
-        .week-card:nth-of-type(4) .week-number { background: var(--week4-color); }
-        .week-card:nth-of-type(5) .week-number { background: var(--week5-color); }
-        .week-card:nth-of-type(6) .week-number { background: var(--week6-color); }
-        .week-card:nth-of-type(7) .week-number { background: var(--week7-color); }
+        /* nth-of-type(3) is the Convergence card - styled inline */
+        .week-card:nth-of-type(4) .week-number { background: var(--week3-color); }
+        .week-card:nth-of-type(5) .week-number { background: var(--week4-color); }
+        .week-card:nth-of-type(6) .week-number { background: var(--week5-color); }
+        .week-card:nth-of-type(7) .week-number { background: var(--week6-color); }
+        .week-card:nth-of-type(8) .week-number { background: var(--week7-color); }
         
         .week-content {
             flex: 1;
@@ -613,6 +614,23 @@
                         <span class="topic-tag">Cobweb diagrams</span>
                         <span class="topic-tag">Convergence criteria</span>
                         <span class="topic-tag">Rearrangements</span>
+                    </div>
+                </div>
+                <div class="week-arrow">→</div>
+            </a>
+            
+            <a href="convergence/" class="week-card" style="border-left: 4px solid var(--accent-amber);">
+                <div class="week-number" style="background: linear-gradient(135deg, var(--week2-color), var(--week3-color));">
+                    <span class="num" style="font-size: 1.2rem;">📊</span>
+                    <span class="label">Bridge</span>
+                </div>
+                <div class="week-content">
+                    <h3>Order of Convergence</h3>
+                    <p class="description">Why do some methods gain digits faster? The logarithm surprise: C = 0.5 means 0.3 digits, not 0.5!</p>
+                    <div class="topics">
+                        <span class="topic-tag">Linear vs Quadratic</span>
+                        <span class="topic-tag">Digits per step</span>
+                        <span class="topic-tag">Why Newton wins</span>
                     </div>
                 </div>
                 <div class="week-arrow">→</div>
