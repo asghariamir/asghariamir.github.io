@@ -1972,8 +1972,31 @@
             }
             
             // Compare with bisection
-            const bisectionSteps = Math.ceil(Math.log2(1 / parseFloat(DOM.tolInput.value)));
-            insights.push(`Bisection would need ~${bisectionSteps} steps for same accuracy`);
+            // Assume a reasonable interval width of 2 (could be [x0-1, x0+1])
+            const intervalWidth = 2;
+            let bisectionSteps;
+            
+            if (state.exactRoot) {
+                // Use actual achieved error for comparison
+                const finalError = Math.abs(lastStep.x - state.exactRoot);
+                if (finalError > 0) {
+                    // Bisection needs: intervalWidth / 2^(n+1) < finalError
+                    // So: n > log2(intervalWidth / finalError) - 1
+                    bisectionSteps = Math.ceil(Math.log2(intervalWidth / finalError) - 1);
+                }
+            }
+            
+            if (!bisectionSteps || !isFinite(bisectionSteps)) {
+                // Fallback: use tolerance setting
+                const tol = parseFloat(DOM.tolInput.value);
+                if (tol > 0) {
+                    bisectionSteps = Math.ceil(Math.log2(intervalWidth / tol) - 1);
+                }
+            }
+            
+            if (bisectionSteps && isFinite(bisectionSteps) && bisectionSteps > 0) {
+                insights.push(`Bisection would need ~${bisectionSteps} steps for same accuracy (assuming interval width = ${intervalWidth})`);
+            }
             
             DOM.insightsList.innerHTML = insights.map(i => `<li>${i}</li>`).join('');
         }
