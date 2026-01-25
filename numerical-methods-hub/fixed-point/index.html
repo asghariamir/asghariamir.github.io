@@ -32,6 +32,7 @@
             --success-green: #10b981;
             --diverge-red: #ef4444;
             --converge-green: #10b981;
+            --oscillate-amber: #f59e0b;
         }
         
         * {
@@ -410,6 +411,14 @@
         
         .result-box.diverged .value {
             color: var(--diverge-red);
+        }
+        
+        .result-box.oscillating {
+            border-color: var(--oscillate-amber);
+        }
+        
+        .result-box.oscillating .value {
+            color: var(--oscillate-amber);
         }
         
         /* Step Table */
@@ -1335,6 +1344,7 @@
             currentStepIndex: 0,
             allSteps: [],
             converged: null,
+            oscillating: null,
             fixedPoint: null
         };
         
@@ -1559,11 +1569,14 @@
             
             // If we hit maxIter, check if the sequence has effectively converged
             // by looking at whether the last few differences are small and stable
+            let oscillating = false;
+            
             if (!converged && steps.length >= 5) {
                 const lastStep = steps[steps.length - 1];
                 const recentDiffs = steps.slice(-5).map(s => s.diff);
                 const avgRecentDiff = recentDiffs.reduce((a, b) => a + b, 0) / recentDiffs.length;
                 const maxRecentDiff = Math.max(...recentDiffs);
+                const minRecentDiff = Math.min(...recentDiffs);
                 
                 // Consider converged if:
                 // 1. Recent differences are all small (< 10x tolerance), AND
@@ -1573,21 +1586,33 @@
                     converged = true;
                 }
                 
-                // Also check for oscillatory convergence (values alternating but settling)
-                // Look at whether |x_n - x_{n-2}| is decreasing (period-2 check)
-                if (!converged && steps.length >= 6) {
+                // Check for oscillatory convergence vs stable period-2 orbit
+                // Key distinction:
+                // - True oscillatory convergence: period-2 diffs shrink AND regular diffs shrink
+                // - Stable period-2 orbit: period-2 diffs small but regular diffs stay LARGE (like g(x)=2/x)
+                if (!converged && steps.length >= 8) {
                     const period2Diffs = [];
                     for (let i = steps.length - 1; i >= steps.length - 4 && i >= 2; i--) {
                         period2Diffs.push(Math.abs(steps[i].x - steps[i-2].x));
                     }
                     const maxPeriod2 = Math.max(...period2Diffs);
+                    
                     if (maxPeriod2 < tol * 10 && isFinite(lastStep.gx)) {
-                        converged = true;
+                        // Period-2 diffs are small - but is it convergence or oscillation?
+                        // Check if regular diffs are also small (true convergence)
+                        // or large and stable (period-2 orbit)
+                        if (minRecentDiff < tol * 100) {
+                            // Regular diffs are also getting small - true oscillatory convergence
+                            converged = true;
+                        } else {
+                            // Period-2 diffs small but regular diffs large = stable orbit!
+                            oscillating = true;
+                        }
                     }
                 }
             }
             
-            return { steps: steps, converged: converged };
+            return { steps: steps, converged: converged, oscillating: oscillating };
         }
         
         // ============ RUN ITERATION ============
@@ -1616,6 +1641,7 @@
                 
                 state.allSteps = result.steps;
                 state.converged = result.converged;
+                state.oscillating = result.oscillating;
                 state.stepMode = false;
                 
                 displayResults(result);
@@ -1655,6 +1681,7 @@
                 
                 state.allSteps = result.steps;
                 state.converged = result.converged;
+                state.oscillating = result.oscillating;
                 state.stepMode = true;
                 state.currentStepIndex = 0;
                 
@@ -1713,7 +1740,7 @@
             state.stepMode = false;
             document.getElementById('step-controls').style.display = 'none';
             
-            const result = { steps: state.allSteps, converged: state.converged };
+            const result = { steps: state.allSteps, converged: state.converged, oscillating: state.oscillating };
             displayResults(result);
             buildStepTable(state.allSteps);
             
@@ -1748,7 +1775,7 @@
             
             if (result.converged) {
                 DOM.resultStatus.textContent = '✓ Converged';
-                DOM.statusBox.classList.remove('diverged');
+                DOM.statusBox.classList.remove('diverged', 'oscillating');
                 DOM.statusBox.classList.add('converged');
                 
                 // Use the last gx value as the fixed point estimate
@@ -1773,9 +1800,23 @@
                 } else {
                     DOM.resultDerivative.textContent = '< 1';
                 }
+            } else if (result.oscillating) {
+                DOM.resultStatus.textContent = '↻ Stable Orbit (Period-2)';
+                DOM.statusBox.classList.remove('converged', 'diverged');
+                DOM.statusBox.classList.add('oscillating');
+                
+                // For period-2 orbit, show the two alternating values
+                const lastX = lastStep.x;
+                const prevX = result.steps[result.steps.length - 2]?.x;
+                if (prevX !== undefined && Math.abs(lastX - prevX) > 1e-10) {
+                    DOM.resultFixedPoint.textContent = `${Math.min(lastX, prevX).toFixed(4)} ↔ ${Math.max(lastX, prevX).toFixed(4)}`;
+                } else {
+                    DOM.resultFixedPoint.textContent = 'Stable orbit';
+                }
+                DOM.resultDerivative.textContent = '|g\'| = 1 (boundary)';
             } else {
                 DOM.resultStatus.textContent = '✗ Diverged';
-                DOM.statusBox.classList.remove('converged');
+                DOM.statusBox.classList.remove('converged', 'oscillating');
                 DOM.statusBox.classList.add('diverged');
                 DOM.resultFixedPoint.textContent = 'N/A';
                 DOM.resultDerivative.textContent = '> 1';
@@ -1808,6 +1849,13 @@
             
             DOM.stepTableBody.querySelectorAll('tr').forEach(r => r.classList.remove('highlight-row'));
             DOM.stepTableBody.insertAdjacentHTML('beforeend', row);
+        }
+        
+        // Helper function to get status color
+        function getStatusColor() {
+            if (state.converged) return '#10b981';  // green
+            if (state.oscillating) return '#f59e0b';  // amber
+            return '#ef4444';  // red
         }
         
         function plotCobweb(g, steps, x0) {
@@ -1889,7 +1937,7 @@
                     y: cobwebY,
                     mode: 'lines',
                     name: 'Cobweb',
-                    line: { color: state.converged ? '#10b981' : '#ef4444', width: 2 }
+                    line: { color: getStatusColor(), width: 2 }
                 },
                 // Starting point
                 {
@@ -1910,7 +1958,7 @@
                         y: [last.x],
                         mode: 'markers',
                         name: 'Current',
-                        marker: { color: state.converged ? '#10b981' : '#ef4444', size: 12, symbol: 'diamond' }
+                        marker: { color: getStatusColor(), size: 12, symbol: 'diamond' }
                     });
                 }
             }
@@ -1939,7 +1987,7 @@
                     y: xVals,
                     mode: 'lines+markers',
                     name: 'xₙ',
-                    line: { color: state.converged ? '#10b981' : '#ef4444', width: 2 },
+                    line: { color: getStatusColor(), width: 2 },
                     marker: { size: 8 }
                 }
             ];
@@ -1998,6 +2046,13 @@
                     const error = Math.abs(fixedPointEstimate - state.fixedPoint);
                     insights.push(`Actual error: ${error.toExponential(3)}`);
                 }
+            } else if (result.oscillating) {
+                const lastStep = result.steps[result.steps.length - 1];
+                const prevStep = result.steps[result.steps.length - 2];
+                insights.push(`Detected a period-2 orbit: sequence alternates between ${Math.min(lastStep.x, prevStep.x).toFixed(4)} and ${Math.max(lastStep.x, prevStep.x).toFixed(4)}`);
+                insights.push('This happens when |g\'(x*)| = 1 exactly at the fixed point (boundary case)');
+                insights.push('The iteration neither converges nor truly diverges — it cycles forever');
+                insights.push('The fixed point exists (x* = √2 ≈ 1.414...) but the iteration cannot reach it');
             } else {
                 insights.push('The iteration diverged — |g\'(x*)| > 1 near the fixed point');
                 insights.push('Try a different rearrangement of the same equation');
@@ -2013,7 +2068,7 @@
             DOM.resultIterations.textContent = '—';
             DOM.resultFixedPoint.textContent = '—';
             DOM.resultDerivative.textContent = '—';
-            DOM.statusBox.classList.remove('converged', 'diverged');
+            DOM.statusBox.classList.remove('converged', 'diverged', 'oscillating');
             DOM.dynamicInsights.style.display = 'none';
             document.getElementById('step-controls').style.display = 'none';
             
@@ -2021,6 +2076,7 @@
             state.currentStepIndex = 0;
             state.allSteps = [];
             state.converged = null;
+            state.oscillating = null;
             
             if (typeof Plotly !== 'undefined') {
                 Plotly.purge('cobweb-graph');
