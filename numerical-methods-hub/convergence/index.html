@@ -469,12 +469,12 @@
         /* Comparison panel */
         .comparison-panel {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
             margin: 1.5rem 0;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .comparison-panel {
                 grid-template-columns: 1fr;
             }
@@ -483,23 +483,31 @@
         .comparison-side {
             background: white;
             border-radius: 12px;
-            padding: 1.25rem;
+            padding: 1rem;
             border: 2px solid var(--border-light);
         }
         
         .comparison-side.linear {
             border-color: var(--accent-amber);
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
         }
         
         .comparison-side.quadratic {
             border-color: var(--success-green);
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        }
+        
+        .comparison-side.superlinear {
+            border-color: var(--secant-color);
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
         }
         
         .comparison-side h4 {
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.95rem;
         }
         
         .comparison-side.linear h4 {
@@ -508,6 +516,10 @@
         
         .comparison-side.quadratic h4 {
             color: #047857;
+        }
+        
+        .comparison-side.superlinear h4 {
+            color: var(--secant-color);
         }
         
         /* Tab 3: Methods Race */
@@ -906,6 +918,41 @@
                 <p>After just 10 iterations, quadratic convergence could give you over 1000 digits — while linear convergence gives you only 4!</p>
             </div>
             
+            <div class="section">
+                <h2>Beyond Linear and Quadratic: Order p</h2>
+                <p>Linear (p=1) and quadratic (p=2) are special cases of a more general formula:</p>
+                
+                <div style="background: var(--interactive-bg); padding: 1.5rem; border-radius: 12px; margin: 1rem 0; text-align: center;">
+                    <div style="font-size: 1.3rem; font-weight: 600; color: var(--primary);">|eₙ₊₁| ≈ K|eₙ|<sup>p</sup></div>
+                    <p style="margin-top: 0.75rem; color: var(--text-muted);">The order p determines how fast digits accumulate</p>
+                </div>
+                
+                <p>What about values between 1 and 2? The <strong>Secant method</strong> has order p = φ ≈ 1.618 (the golden ratio!) — faster than linear but not quite quadratic. This is called <em>superlinear</em> convergence.</p>
+                
+                <div style="background: var(--bg-light); padding: 1rem; border-radius: 12px; margin: 1rem 0;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; text-align: center;">
+                        <div style="padding: 0.75rem; background: #fef3c7; border-radius: 8px;">
+                            <div style="font-weight: 700; font-size: 1.2rem; color: var(--accent-amber);">p = 1</div>
+                            <div style="font-size: 0.85rem;">Linear</div>
+                        </div>
+                        <div style="padding: 0.75rem; background: #fce7f3; border-radius: 8px;">
+                            <div style="font-weight: 700; font-size: 1.2rem; color: #ec4899;">p ≈ 1.618</div>
+                            <div style="font-size: 0.85rem;">Superlinear (φ)</div>
+                        </div>
+                        <div style="padding: 0.75rem; background: #d1fae5; border-radius: 8px;">
+                            <div style="font-weight: 700; font-size: 1.2rem; color: var(--success-green);">p = 2</div>
+                            <div style="font-size: 0.85rem;">Quadratic</div>
+                        </div>
+                        <div style="padding: 0.75rem; background: #ede9fe; border-radius: 8px;">
+                            <div style="font-weight: 700; font-size: 1.2rem; color: #7c3aed;">p = 3</div>
+                            <div style="font-size: 0.85rem;">Cubic</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p>For p > 1, correct digits multiply by approximately p each step. Explore this in the <strong>Order p</strong> mode of the π Laboratory!</p>
+            </div>
+            
             <div class="text-center mt-2">
                 <button class="cta-button" onclick="switchTab('explorer')">Explore in the π Laboratory →</button>
             </div>
@@ -920,6 +967,7 @@
                 <div class="mode-toggle">
                     <button class="mode-btn linear active" onclick="setMode('linear')">🐢 Linear</button>
                     <button class="mode-btn quadratic" onclick="setMode('quadratic')">🚀 Quadratic</button>
+                    <button class="mode-btn" onclick="setMode('orderp')">📊 Order p</button>
                     <button class="mode-btn" onclick="setMode('compare')">⚔️ Compare</button>
                 </div>
             </div>
@@ -1029,38 +1077,170 @@
             <!-- Compare Mode -->
             <div id="compare-mode" class="mode-content" style="display: none;">
                 <div class="section">
-                    <h3>Side-by-Side: Same Starting Point, Different Convergence</h3>
-                    <p>Both start with error = 0.1. Watch how differently they behave:</p>
+                    <h3>Side-by-Side: Same Starting Point, Different Orders</h3>
+                    <p>All three start with error = 0.1. Watch how the order p determines the speed:</p>
                 </div>
                 
                 <div class="comparison-panel">
                     <div class="comparison-side linear">
-                        <h4>🐢 Linear (C = 0.5)</h4>
-                        <div class="pi-display" style="font-size: 0.9rem;">
+                        <h4>🐢 Linear (p = 1)</h4>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Bisection-like</div>
+                        <div class="pi-display" style="font-size: 0.85rem;">
                             <div class="pi-digits" id="pi-compare-linear"></div>
                         </div>
-                        <div id="compare-linear-stats" style="margin-top: 1rem;"></div>
+                        <div id="compare-linear-stats" style="margin-top: 0.75rem;"></div>
+                    </div>
+                    
+                    <div class="comparison-side superlinear">
+                        <h4 style="color: var(--secant-color);">⚡ Order p = <span id="compare-p-display">φ</span></h4>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Secant-like</div>
+                        <div class="pi-display" style="font-size: 0.85rem;">
+                            <div class="pi-digits" id="pi-compare-orderp"></div>
+                        </div>
+                        <div id="compare-orderp-stats" style="margin-top: 0.75rem;"></div>
                     </div>
                     
                     <div class="comparison-side quadratic">
-                        <h4>🚀 Quadratic (K = 0.5)</h4>
-                        <div class="pi-display" style="font-size: 0.9rem;">
+                        <h4>🚀 Quadratic (p = 2)</h4>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Newton-like</div>
+                        <div class="pi-display" style="font-size: 0.85rem;">
                             <div class="pi-digits" id="pi-compare-quadratic"></div>
                         </div>
-                        <div id="compare-quadratic-stats" style="margin-top: 1rem;"></div>
+                        <div id="compare-quadratic-stats" style="margin-top: 0.75rem;"></div>
+                    </div>
+                </div>
+                
+                <div class="dial-container">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div>
+                            <div class="dial-label">
+                                <span>Step through iterations</span>
+                                <span class="dial-value">n = <span id="compare-n">0</span></span>
+                            </div>
+                            <input type="range" class="dial-slider" id="compare-slider" min="0" max="12" step="1" value="0">
+                        </div>
+                        <div>
+                            <div class="dial-label">
+                                <span>Middle order p</span>
+                                <span class="dial-value" id="compare-p-value">1.618</span>
+                            </div>
+                            <input type="range" class="dial-slider" id="compare-p-slider" min="1.1" max="1.9" step="0.01" value="1.618">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                <span>1.1</span>
+                                <button onclick="document.getElementById('compare-p-slider').value=1.618; state.compareP=1.618; updateCompareDisplay();" style="background: none; border: none; color: var(--secant-color); cursor: pointer; font-size: 0.75rem;">φ ≈ 1.618</button>
+                                <span>1.9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="graph-container">
+                    <div id="compare-error-graph" style="width: 100%; height: 350px;"></div>
+                </div>
+                
+                <div class="key-insight" style="margin-top: 1rem;">
+                    <h4>💡 Key Observation</h4>
+                    <p>On the log scale graph, notice how the <strong>slopes</strong> differ: linear is constant, while higher orders curve downward more steeply. The order p determines how quickly the curve bends!</p>
+                </div>
+            </div>
+            
+            <!-- Order p Mode -->
+            <div id="orderp-mode" class="mode-content" style="display: none;">
+                <div class="section">
+                    <h3>General Order p Convergence</h3>
+                    <p>The general convergence formula is <strong>|eₙ₊₁| ≈ K|eₙ|<sup>p</sup></strong>. Explore how different orders p affect digit growth.</p>
+                    
+                    <div class="key-insight" style="margin: 1rem 0;">
+                        <h4>📐 The Order p Determines Everything</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-top: 0.75rem;">
+                            <div style="text-align: center; padding: 0.5rem; background: #fef3c7; border-radius: 8px;">
+                                <div style="font-weight: 600; color: var(--accent-amber);">p = 1</div>
+                                <div style="font-size: 0.85rem;">Linear</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Bisection</div>
+                            </div>
+                            <div style="text-align: center; padding: 0.5rem; background: #fce7f3; border-radius: 8px;">
+                                <div style="font-weight: 600; color: var(--secant-color);">p ≈ 1.618</div>
+                                <div style="font-size: 0.85rem;">Golden ratio φ</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Secant</div>
+                            </div>
+                            <div style="text-align: center; padding: 0.5rem; background: #d1fae5; border-radius: 8px;">
+                                <div style="font-weight: 600; color: var(--success-green);">p = 2</div>
+                                <div style="font-size: 0.85rem;">Quadratic</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Newton</div>
+                            </div>
+                            <div style="text-align: center; padding: 0.5rem; background: #ede9fe; border-radius: 8px;">
+                                <div style="font-weight: 600; color: #7c3aed;">p = 3</div>
+                                <div style="font-size: 0.85rem;">Cubic</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Halley</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="dial-container">
                     <div class="dial-label">
-                        <span>Step through iterations</span>
-                        <span class="dial-value">n = <span id="compare-n">0</span></span>
+                        <span>Order of Convergence p</span>
+                        <span class="dial-value" id="p-value">1.618</span>
                     </div>
-                    <input type="range" class="dial-slider" id="compare-slider" min="0" max="15" step="1" value="0">
+                    <input type="range" class="dial-slider" id="p-slider" min="1.0" max="3.0" step="0.01" value="1.618">
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                        <span>Linear (p=1)</span>
+                        <button onclick="document.getElementById('p-slider').value=1.618; updateOrderP();" style="background: none; border: none; color: var(--secant-color); cursor: pointer; font-size: 0.8rem;">φ ≈ 1.618</button>
+                        <span>Quadratic (p=2)</span>
+                        <span>Cubic (p=3)</span>
+                    </div>
+                    
+                    <div class="dial-result" style="margin-top: 1rem;">
+                        <div class="dial-result-box">
+                            <div class="label">Formula</div>
+                            <div class="value" style="font-size: 0.95rem;" id="orderp-formula">|eₙ₊₁| ≈ K|eₙ|<sup>φ</sup></div>
+                        </div>
+                        <div class="dial-result-box">
+                            <div class="label">Digit multiplier</div>
+                            <div class="value highlight" id="digit-multiplier">×1.618</div>
+                        </div>
+                        <div class="dial-result-box">
+                            <div class="label">After 5 steps</div>
+                            <div class="value" id="orderp-digits-5">~11 digits</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Digit Growth: p Determines the Pattern</h3>
+                    <p>For order p > 1, correct digits multiply by approximately p each step:</p>
+                    
+                    <div class="pi-display">
+                        <div class="label">π = 3.14159265358979323846...</div>
+                        <div class="pi-digits" id="pi-digits-orderp">
+                            <span class="correct">3</span><span class="decimal">.</span><span class="incorrect">????????</span>
+                        </div>
+                    </div>
+                    
+                    <div class="sequence-display" id="orderp-sequence">
+                        <div class="sequence-row header">
+                            <div>n</div>
+                            <div>Error |eₙ|</div>
+                            <div>Digits</div>
+                            <div>Growth</div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="graph-container">
-                    <div id="compare-error-graph" style="width: 100%; height: 350px;"></div>
+                    <h4 style="margin-bottom: 0.5rem;">Log-Log Plot: Slope = Order p</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">On a log-log plot of |eₙ₊₁| vs |eₙ|, the slope reveals the order of convergence.</p>
+                    <div id="orderp-loglog-graph" style="width: 100%; height: 300px;"></div>
+                </div>
+                
+                <div class="section" style="margin-top: 1.5rem;">
+                    <h3>🔬 Determine Order Experimentally</h3>
+                    <p>Given errors from an actual method, we can estimate p using:</p>
+                    <div style="background: var(--interactive-bg); padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0;">
+                        <div style="font-size: 1.1rem; font-weight: 600;" id="orderp-experimental-formula"></div>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">The Methods Race tab shows real methods — try to verify their orders experimentally!</p>
                 </div>
             </div>
         </div>
@@ -1243,7 +1423,9 @@
             mode: 'linear',
             C: 0.5,
             K: 0.5,
+            p: 1.618,
             compareStep: 0,
+            compareP: 1.618,
             targetAccuracy: 1e-6,
             raceStep: 0,
             raceRunning: false,
@@ -1266,6 +1448,12 @@
             try {
                 katex.render("|e_{n+1}| \\approx C|e_n|, \\quad 0 < C < 1", document.getElementById('linear-formula'), {displayMode: false});
                 katex.render("|e_{n+1}| \\approx K|e_n|^2", document.getElementById('quadratic-formula'), {displayMode: false});
+                
+                // Experimental order formula
+                const expFormula = document.getElementById('orderp-experimental-formula');
+                if (expFormula) {
+                    katex.render("p \\approx \\frac{\\ln|e_{n+1}/e_n|}{\\ln|e_n/e_{n-1}|}", expFormula, {displayMode: true});
+                }
             } catch (e) {
                 console.error('KaTeX error:', e);
             }
@@ -1282,8 +1470,18 @@
                 updateQuadraticDisplay();
             });
             
+            document.getElementById('p-slider').addEventListener('input', function() {
+                state.p = parseFloat(this.value);
+                updateOrderPDisplay();
+            });
+            
             document.getElementById('compare-slider').addEventListener('input', function() {
                 state.compareStep = parseInt(this.value);
+                updateCompareDisplay();
+            });
+            
+            document.getElementById('compare-p-slider').addEventListener('input', function() {
+                state.compareP = parseFloat(this.value);
                 updateCompareDisplay();
             });
         }
@@ -1300,6 +1498,7 @@
                 setTimeout(() => {
                     if (state.mode === 'linear') updateLinearDisplay();
                     else if (state.mode === 'quadratic') updateQuadraticDisplay();
+                    else if (state.mode === 'orderp') updateOrderPDisplay();
                     else updateCompareDisplay();
                 }, 100);
             } else if (tabName === 'methods') {
@@ -1318,17 +1517,21 @@
                 document.querySelector('.mode-btn.linear').classList.add('active');
             } else if (mode === 'quadratic') {
                 document.querySelector('.mode-btn.quadratic').classList.add('active');
-            } else {
-                // Compare mode - third button
+            } else if (mode === 'orderp') {
                 document.querySelectorAll('.mode-btn')[2].classList.add('active');
+            } else {
+                // Compare mode - fourth button
+                document.querySelectorAll('.mode-btn')[3].classList.add('active');
             }
             
             document.getElementById('linear-mode').style.display = mode === 'linear' ? 'block' : 'none';
             document.getElementById('quadratic-mode').style.display = mode === 'quadratic' ? 'block' : 'none';
+            document.getElementById('orderp-mode').style.display = mode === 'orderp' ? 'block' : 'none';
             document.getElementById('compare-mode').style.display = mode === 'compare' ? 'block' : 'none';
             
             if (mode === 'linear') updateLinearDisplay();
             else if (mode === 'quadratic') updateQuadraticDisplay();
+            else if (mode === 'orderp') updateOrderPDisplay();
             else updateCompareDisplay();
         };
         
@@ -1524,47 +1727,193 @@
             Plotly.newPlot('quadratic-error-graph', [trace], layout, { responsive: true });
         }
         
+        // ============ ORDER P MODE ============
+        function generateOrderPSequence(p, K, e0, maxSteps) {
+            const sequence = [];
+            let error = e0;
+            
+            for (let n = 0; n <= maxSteps; n++) {
+                const digits = error > 0 ? Math.max(0, -Math.log10(error)) : 20;
+                const prevDigits = n > 0 ? sequence[n-1].digits : 0;
+                const growth = n > 0 ? (digits / prevDigits).toFixed(2) : '—';
+                
+                sequence.push({
+                    n: n,
+                    error: error,
+                    digits: digits,
+                    growth: growth
+                });
+                
+                // Apply |e_{n+1}| = K * |e_n|^p
+                error = K * Math.pow(error, p);
+                if (error < 1e-20) break;
+            }
+            
+            return sequence;
+        }
+        
+        function updateOrderPDisplay() {
+            const p = parseFloat(document.getElementById('p-slider').value);
+            const K = 0.5; // Fixed K for simplicity
+            
+            document.getElementById('p-value').textContent = p.toFixed(3);
+            
+            // Update formula display
+            let pDisplay = p.toFixed(2);
+            if (Math.abs(p - 1.618) < 0.01) pDisplay = 'φ';
+            else if (Math.abs(p - 1) < 0.01) pDisplay = '1';
+            else if (Math.abs(p - 2) < 0.01) pDisplay = '2';
+            else if (Math.abs(p - 3) < 0.01) pDisplay = '3';
+            
+            document.getElementById('orderp-formula').innerHTML = `|e<sub>n+1</sub>| ≈ K|e<sub>n</sub>|<sup>${pDisplay}</sup>`;
+            
+            // Digit multiplier - for p > 1, digits multiply by approximately p each step
+            if (p === 1) {
+                document.getElementById('digit-multiplier').textContent = '+const';
+            } else {
+                document.getElementById('digit-multiplier').textContent = `×${p.toFixed(2)}`;
+            }
+            
+            // Generate sequence
+            const sequence = generateOrderPSequence(p, K, 0.1, 10);
+            
+            // After 5 steps calculation
+            const digitsAfter5 = sequence[Math.min(5, sequence.length - 1)].digits;
+            document.getElementById('orderp-digits-5').textContent = `~${Math.round(digitsAfter5)} digits`;
+            
+            // Update pi display
+            const lastStep = sequence[sequence.length - 1];
+            updatePiDisplay('pi-digits-orderp', lastStep.digits);
+            
+            // Build sequence table
+            let seqHtml = '<div class="sequence-row header"><div>n</div><div>Error |eₙ|</div><div>Digits</div><div>Growth</div></div>';
+            sequence.forEach(step => {
+                seqHtml += `
+                    <div class="sequence-row">
+                        <div>${step.n}</div>
+                        <div style="font-family: monospace;">${step.error.toExponential(2)}</div>
+                        <div style="color: var(--success-green); font-weight: 600;">${step.digits.toFixed(1)}</div>
+                        <div style="color: var(--primary);">${step.growth}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('orderp-sequence').innerHTML = seqHtml;
+            
+            // Plot log-log graph
+            plotOrderPLogLog(sequence, p);
+        }
+        
+        function plotOrderPLogLog(sequence, p) {
+            // For log-log plot: log|e_{n+1}| vs log|e_n|
+            // Slope should be p
+            const logErrors = sequence.map(s => Math.log10(s.error));
+            const xVals = logErrors.slice(0, -1);
+            const yVals = logErrors.slice(1);
+            
+            // Theoretical line with slope p
+            const xRange = [Math.min(...xVals) - 1, Math.max(...xVals) + 1];
+            const theoreticalY = xRange.map(x => p * x + Math.log10(0.5)); // y = p*x + log(K)
+            
+            const traces = [
+                {
+                    x: xVals,
+                    y: yVals,
+                    mode: 'markers',
+                    name: 'Actual errors',
+                    marker: { color: '#0f766e', size: 10 }
+                },
+                {
+                    x: xRange,
+                    y: theoreticalY,
+                    mode: 'lines',
+                    name: `Slope = ${p.toFixed(2)}`,
+                    line: { color: '#f59e0b', dash: 'dash', width: 2 }
+                }
+            ];
+            
+            const layout = {
+                title: `Log-Log Plot: Slope ≈ ${p.toFixed(2)} = Order`,
+                xaxis: { title: 'log₁₀|eₙ|' },
+                yaxis: { title: 'log₁₀|eₙ₊₁|' },
+                margin: { t: 40, r: 20, b: 50, l: 60 },
+                showlegend: true,
+                legend: { x: 0.02, y: 0.98 }
+            };
+            
+            Plotly.newPlot('orderp-loglog-graph', traces, layout, { responsive: true });
+        }
+        
+        window.updateOrderP = function() {
+            updateOrderPDisplay();
+        };
+        
         // ============ COMPARE MODE ============
         function updateCompareDisplay() {
             const n = state.compareStep;
-            document.getElementById('compare-n').textContent = n;
+            const p = state.compareP;
             
-            const linearSeq = generateLinearSequence(0.5, 0.1, 15);
-            const quadSeq = generateQuadraticSequence(0.5, 0.1, 15);
+            document.getElementById('compare-n').textContent = n;
+            document.getElementById('compare-p-value').textContent = p.toFixed(3);
+            
+            // Display p value nicely
+            let pDisplay = p.toFixed(2);
+            if (Math.abs(p - 1.618) < 0.01) pDisplay = 'φ';
+            document.getElementById('compare-p-display').textContent = pDisplay;
+            
+            const linearSeq = generateLinearSequence(0.5, 0.1, 12);
+            const orderpSeq = generateOrderPSequence(p, 0.5, 0.1, 12);
+            const quadSeq = generateQuadraticSequence(0.5, 0.1, 12);
             
             const linearStep = linearSeq[Math.min(n, linearSeq.length - 1)];
+            const orderpStep = orderpSeq[Math.min(n, orderpSeq.length - 1)];
             const quadStep = quadSeq[Math.min(n, quadSeq.length - 1)];
             
             updatePiDisplay('pi-compare-linear', linearStep.digits);
+            updatePiDisplay('pi-compare-orderp', orderpStep.digits);
             updatePiDisplay('pi-compare-quadratic', quadStep.digits);
             
             document.getElementById('compare-linear-stats').innerHTML = `
-                <div style="display: flex; justify-content: space-between;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
                     <span>Error:</span>
-                    <strong style="color: var(--error-red);">${linearStep.error.toExponential(2)}</strong>
+                    <strong style="color: var(--error-red);">${linearStep.error.toExponential(1)}</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
                     <span>Digits:</span>
                     <strong style="color: var(--success-green);">${linearStep.digits.toFixed(1)}</strong>
                 </div>
             `;
             
-            document.getElementById('compare-quadratic-stats').innerHTML = `
-                <div style="display: flex; justify-content: space-between;">
+            document.getElementById('compare-orderp-stats').innerHTML = `
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
                     <span>Error:</span>
-                    <strong style="color: var(--error-red);">${quadStep.error < 1e-50 ? '< 10⁻⁵⁰' : quadStep.error.toExponential(2)}</strong>
+                    <strong style="color: var(--error-red);">${orderpStep.error < 1e-20 ? '< 10⁻²⁰' : orderpStep.error.toExponential(1)}</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                    <span>Digits:</span>
+                    <strong style="color: var(--success-green);">${orderpStep.digits.toFixed(1)}</strong>
+                </div>
+            `;
+            
+            document.getElementById('compare-quadratic-stats').innerHTML = `
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                    <span>Error:</span>
+                    <strong style="color: var(--error-red);">${quadStep.error < 1e-20 ? '< 10⁻²⁰' : quadStep.error.toExponential(1)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
                     <span>Digits:</span>
                     <strong style="color: var(--success-green);">${quadStep.digits.toFixed(1)}</strong>
                 </div>
             `;
             
-            plotCompareError(linearSeq, quadSeq, n);
+            plotCompareError(linearSeq, orderpSeq, quadSeq, n, p);
         }
         
-        function plotCompareError(linearSeq, quadSeq, currentN) {
+        function plotCompareError(linearSeq, orderpSeq, quadSeq, currentN, p) {
             if (typeof Plotly === 'undefined') return;
+            
+            // Display p nicely in legend
+            let pDisplay = p.toFixed(2);
+            if (Math.abs(p - 1.618) < 0.01) pDisplay = 'φ≈1.62';
             
             const traces = [
                 {
@@ -1572,18 +1921,27 @@
                     y: linearSeq.map(s => s.error),
                     type: 'scatter',
                     mode: 'lines+markers',
-                    name: 'Linear (C=0.5)',
+                    name: 'Linear (p=1)',
                     line: { color: '#f59e0b', width: 2 },
-                    marker: { size: 6 }
+                    marker: { size: 5 }
+                },
+                {
+                    x: orderpSeq.map(s => s.n),
+                    y: orderpSeq.map(s => Math.max(s.error, 1e-20)),
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: `Order p=${pDisplay}`,
+                    line: { color: '#ec4899', width: 2 },
+                    marker: { size: 5 }
                 },
                 {
                     x: quadSeq.map(s => s.n),
-                    y: quadSeq.map(s => Math.max(s.error, 1e-50)),
+                    y: quadSeq.map(s => Math.max(s.error, 1e-20)),
                     type: 'scatter',
                     mode: 'lines+markers',
-                    name: 'Quadratic (K=0.5)',
+                    name: 'Quadratic (p=2)',
                     line: { color: '#10b981', width: 2 },
-                    marker: { size: 6 }
+                    marker: { size: 5 }
                 }
             ];
             
@@ -1594,34 +1952,42 @@
                     y: [linearSeq[currentN].error],
                     type: 'scatter',
                     mode: 'markers',
-                    name: 'Current (Linear)',
-                    marker: { size: 15, color: '#f59e0b', symbol: 'diamond' },
+                    marker: { size: 14, color: '#f59e0b', symbol: 'diamond' },
+                    showlegend: false
+                });
+            }
+            if (currentN < orderpSeq.length) {
+                traces.push({
+                    x: [currentN],
+                    y: [Math.max(orderpSeq[currentN].error, 1e-20)],
+                    type: 'scatter',
+                    mode: 'markers',
+                    marker: { size: 14, color: '#ec4899', symbol: 'diamond' },
                     showlegend: false
                 });
             }
             if (currentN < quadSeq.length) {
                 traces.push({
                     x: [currentN],
-                    y: [Math.max(quadSeq[currentN].error, 1e-50)],
+                    y: [Math.max(quadSeq[currentN].error, 1e-20)],
                     type: 'scatter',
                     mode: 'markers',
-                    name: 'Current (Quadratic)',
-                    marker: { size: 15, color: '#10b981', symbol: 'diamond' },
+                    marker: { size: 14, color: '#10b981', symbol: 'diamond' },
                     showlegend: false
                 });
             }
             
             const layout = {
-                title: 'Error Comparison (Log Scale)',
-                xaxis: { title: 'Iteration n' },
+                title: 'Error Comparison: Three Orders (Log Scale)',
+                xaxis: { title: 'Iteration n', dtick: 1 },
                 yaxis: { 
                     title: '|eₙ|', 
                     type: 'log', 
-                    range: [-50, 0],
+                    range: [-22, 0],
                     exponentformat: 'power'
                 },
                 margin: { t: 40, r: 20, b: 50, l: 60 },
-                legend: { x: 0.7, y: 0.95 },
+                legend: { x: 0.65, y: 0.95 },
                 shapes: [{
                     type: 'line',
                     x0: currentN, x1: currentN,
