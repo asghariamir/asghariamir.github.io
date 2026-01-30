@@ -1234,13 +1234,78 @@
                     <div id="orderp-loglog-graph" style="width: 100%; height: 300px;"></div>
                 </div>
                 
-                <div class="section" style="margin-top: 1.5rem;">
-                    <h3>🔬 Determine Order Experimentally</h3>
-                    <p>Given errors from an actual method, we can estimate p using:</p>
-                    <div style="background: var(--interactive-bg); padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0;">
-                        <div style="font-size: 1.1rem; font-weight: 600;" id="orderp-experimental-formula"></div>
+                <div class="section" style="margin-top: 1.5rem; background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid var(--primary);">
+                    <h3>🔬 Measure Order from Iteration Data</h3>
+                    
+                    <div class="key-insight" style="margin: 1rem 0; background: #fef3c7;">
+                        <h4>⚠️ The Practical Problem</h4>
+                        <p>In theory, we'd use <strong>true errors</strong> eₙ = |xₙ - x*|. But we don't know x*!</p>
+                        <p style="margin-top: 0.5rem;">Instead, we use <strong>step sizes</strong> dₙ = |xₙ - xₙ₋₁| as a proxy:</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem;">
+                            <div style="background: white; padding: 0.75rem; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Theory (unknown)</div>
+                                <div style="font-weight: 600;" id="formula-theory"></div>
+                            </div>
+                            <div style="background: white; padding: 0.75rem; border-radius: 8px; text-align: center; border: 2px solid var(--primary);">
+                                <div style="font-size: 0.8rem; color: var(--primary);">Practice (computable)</div>
+                                <div style="font-weight: 600;" id="formula-practice"></div>
+                            </div>
+                        </div>
                     </div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">The Methods Race tab shows real methods — try to verify their orders experimentally!</p>
+                    
+                    <div style="margin: 1rem 0;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Choose a method to analyze:</label>
+                        <div class="preset-pills" style="justify-content: flex-start;">
+                            <button class="preset-pill active" onclick="setExperimentalMethod('bisection')">🎯 Bisection</button>
+                            <button class="preset-pill" onclick="setExperimentalMethod('newton')">📐 Newton</button>
+                            <button class="preset-pill" onclick="setExperimentalMethod('secant')">📏 Secant</button>
+                            <button class="preset-pill" onclick="setExperimentalMethod('custom')">✏️ Custom</button>
+                        </div>
+                    </div>
+                    
+                    <div id="custom-input-area" style="display: none; margin: 1rem 0; padding: 1rem; background: var(--bg-light); border-radius: 8px;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Enter iterates (one per line or comma-separated):</label>
+                        <textarea id="custom-iterates" rows="4" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-light); border-radius: 6px; font-family: monospace;" placeholder="1.0&#10;1.5&#10;1.4166666667&#10;1.4142156863&#10;..."></textarea>
+                        <button onclick="analyzeCustomIterates()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;">Analyze</button>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <h4 style="margin-bottom: 0.75rem;">Iteration Data for √2:</h4>
+                        <div style="overflow-x: auto;">
+                            <table id="experimental-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                                <thead>
+                                    <tr style="background: var(--interactive-bg);">
+                                        <th style="padding: 0.5rem; border: 1px solid var(--border-light); text-align: center;">n</th>
+                                        <th style="padding: 0.5rem; border: 1px solid var(--border-light); text-align: center;">xₙ</th>
+                                        <th style="padding: 0.5rem; border: 1px solid var(--border-light); text-align: center;">dₙ = |xₙ - xₙ₋₁|</th>
+                                        <th style="padding: 0.5rem; border: 1px solid var(--border-light); text-align: center;">ln(dₙ)</th>
+                                        <th style="padding: 0.5rem; border: 1px solid var(--border-light); text-align: center; background: #d1fae5;"><strong>pₙ</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="experimental-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--interactive-bg); border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">Observed order (pₙ stabilizes to):</div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);" id="observed-order">—</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">Expected order:</div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--success-green);" id="expected-order">—</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">Match?</div>
+                                <div style="font-size: 1.5rem;" id="order-match">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="experimental-graph" style="width: 100%; height: 250px; margin-top: 1rem;"></div>
                 </div>
             </div>
         </div>
@@ -1498,7 +1563,10 @@
                 setTimeout(() => {
                     if (state.mode === 'linear') updateLinearDisplay();
                     else if (state.mode === 'quadratic') updateQuadraticDisplay();
-                    else if (state.mode === 'orderp') updateOrderPDisplay();
+                    else if (state.mode === 'orderp') {
+                        updateOrderPDisplay();
+                        initExperimental();
+                    }
                     else updateCompareDisplay();
                 }, 100);
             } else if (tabName === 'methods') {
@@ -1531,7 +1599,10 @@
             
             if (mode === 'linear') updateLinearDisplay();
             else if (mode === 'quadratic') updateQuadraticDisplay();
-            else if (mode === 'orderp') updateOrderPDisplay();
+            else if (mode === 'orderp') {
+                updateOrderPDisplay();
+                initExperimental();
+            }
             else updateCompareDisplay();
         };
         
@@ -1846,6 +1917,270 @@
         window.updateOrderP = function() {
             updateOrderPDisplay();
         };
+        
+        // ============ EXPERIMENTAL ORDER MEASUREMENT ============
+        // (Uses SQRT2 already defined above)
+        
+        // Generate Bisection iterates for √2 on [1, 2]
+        function generateBisectionIterates(n) {
+            const iterates = [];
+            let a = 1, b = 2;
+            
+            for (let i = 0; i <= n; i++) {
+                const mid = (a + b) / 2;
+                iterates.push(mid);
+                if (mid * mid < 2) {
+                    a = mid;
+                } else {
+                    b = mid;
+                }
+            }
+            return iterates;
+        }
+        
+        // Generate Newton iterates for √2: x_{n+1} = (x_n + 2/x_n) / 2
+        function generateNewtonIterates(n) {
+            const iterates = [1.0];
+            let x = 1.0;
+            
+            for (let i = 1; i <= n; i++) {
+                x = 0.5 * (x + 2 / x);
+                iterates.push(x);
+            }
+            return iterates;
+        }
+        
+        // Generate Secant iterates for √2: using f(x) = x² - 2
+        function generateSecantIterates(n) {
+            const iterates = [1.0, 2.0];
+            let x0 = 1.0, x1 = 2.0;
+            
+            for (let i = 2; i <= n; i++) {
+                const f0 = x0 * x0 - 2;
+                const f1 = x1 * x1 - 2;
+                const x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
+                iterates.push(x2);
+                x0 = x1;
+                x1 = x2;
+            }
+            return iterates;
+        }
+        
+        // Compute step differences and observed order
+        function computeExperimentalOrder(iterates) {
+            const data = [];
+            
+            for (let i = 0; i < iterates.length; i++) {
+                const x = iterates[i];
+                const d = i > 0 ? Math.abs(iterates[i] - iterates[i-1]) : null;
+                const lnD = d && d > 0 ? Math.log(d) : null;
+                
+                // Compute pₙ using dₙ formula: pₙ = ln(d_{n+1}/d_n) / ln(d_n/d_{n-1})
+                // Which requires d_{n-1}, d_n, d_{n+1} - so we compute p for index n using d[n-1], d[n], d[n+1]
+                // Actually, to compute pₙ at step n, we need d_n and d_{n-1} and d_{n+1}
+                // The formula pₙ = ln(d_{n+1}/d_n) / ln(d_n/d_{n-1}) gives order estimate at step n
+                let p = null;
+                
+                data.push({
+                    n: i,
+                    x: x,
+                    d: d,
+                    lnD: lnD,
+                    p: p // will fill in below
+                });
+            }
+            
+            // Now compute pₙ values - need 3 consecutive d values
+            for (let i = 2; i < data.length - 1; i++) {
+                const dPrev = data[i-1].d;
+                const dCurr = data[i].d;
+                const dNext = data[i+1].d;
+                
+                if (dPrev > 1e-15 && dCurr > 1e-15 && dNext > 1e-15) {
+                    const numerator = Math.log(dNext / dCurr);
+                    const denominator = Math.log(dCurr / dPrev);
+                    if (Math.abs(denominator) > 1e-10) {
+                        data[i].p = numerator / denominator;
+                    }
+                }
+            }
+            
+            return data;
+        }
+        
+        let experimentalMethod = 'bisection';
+        
+        window.setExperimentalMethod = function(method) {
+            experimentalMethod = method;
+            
+            // Update button states
+            document.querySelectorAll('#orderp-mode .preset-pill').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide custom input
+            document.getElementById('custom-input-area').style.display = method === 'custom' ? 'block' : 'none';
+            
+            if (method !== 'custom') {
+                updateExperimentalDisplay(method);
+            }
+        };
+        
+        window.analyzeCustomIterates = function() {
+            const text = document.getElementById('custom-iterates').value;
+            const iterates = text.split(/[\n,]/)
+                .map(s => parseFloat(s.trim()))
+                .filter(n => !isNaN(n));
+            
+            if (iterates.length < 4) {
+                alert('Please enter at least 4 iterates');
+                return;
+            }
+            
+            updateExperimentalDisplay('custom', iterates);
+        };
+        
+        function updateExperimentalDisplay(method, customIterates) {
+            let iterates, expectedOrder, methodName;
+            
+            switch(method) {
+                case 'bisection':
+                    iterates = generateBisectionIterates(12);
+                    expectedOrder = 1;
+                    methodName = 'Bisection';
+                    break;
+                case 'newton':
+                    iterates = generateNewtonIterates(8);
+                    expectedOrder = 2;
+                    methodName = 'Newton';
+                    break;
+                case 'secant':
+                    iterates = generateSecantIterates(10);
+                    expectedOrder = 1.618;
+                    methodName = 'Secant';
+                    break;
+                case 'custom':
+                    iterates = customIterates;
+                    expectedOrder = null;
+                    methodName = 'Custom';
+                    break;
+            }
+            
+            const data = computeExperimentalOrder(iterates);
+            
+            // Build table
+            let tableHTML = '';
+            data.forEach((row, idx) => {
+                const xStr = row.x.toFixed(10);
+                const dStr = row.d !== null ? row.d.toExponential(4) : '—';
+                const lnDStr = row.lnD !== null ? row.lnD.toFixed(4) : '—';
+                const pStr = row.p !== null ? row.p.toFixed(3) : '—';
+                const pColor = row.p !== null ? (
+                    Math.abs(row.p - 1) < 0.15 ? 'var(--accent-amber)' :
+                    Math.abs(row.p - 2) < 0.15 ? 'var(--success-green)' :
+                    'var(--secant-color)'
+                ) : 'var(--text-muted)';
+                
+                tableHTML += `
+                    <tr>
+                        <td style="padding: 0.4rem; border: 1px solid var(--border-light); text-align: center;">${row.n}</td>
+                        <td style="padding: 0.4rem; border: 1px solid var(--border-light); text-align: right; font-family: monospace; font-size: 0.8rem;">${xStr}</td>
+                        <td style="padding: 0.4rem; border: 1px solid var(--border-light); text-align: right; font-family: monospace;">${dStr}</td>
+                        <td style="padding: 0.4rem; border: 1px solid var(--border-light); text-align: right; font-family: monospace;">${lnDStr}</td>
+                        <td style="padding: 0.4rem; border: 1px solid var(--border-light); text-align: center; font-weight: 600; color: ${pColor}; background: #f0fdf4;">${pStr}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('experimental-table-body').innerHTML = tableHTML;
+            
+            // Compute observed order (average of last few valid pₙ values)
+            const validPs = data.filter(d => d.p !== null && isFinite(d.p) && Math.abs(d.p) < 10);
+            const lastPs = validPs.slice(-3);
+            const observedOrder = lastPs.length > 0 
+                ? lastPs.reduce((a, b) => a + b.p, 0) / lastPs.length 
+                : null;
+            
+            document.getElementById('observed-order').textContent = observedOrder !== null 
+                ? observedOrder.toFixed(3) 
+                : '—';
+            
+            document.getElementById('expected-order').textContent = expectedOrder !== null 
+                ? (expectedOrder === 1.618 ? 'φ ≈ 1.618' : expectedOrder.toString())
+                : '—';
+            
+            // Check match
+            if (observedOrder !== null && expectedOrder !== null) {
+                const match = Math.abs(observedOrder - expectedOrder) < 0.15;
+                document.getElementById('order-match').textContent = match ? '✓' : '≈';
+                document.getElementById('order-match').style.color = match ? 'var(--success-green)' : 'var(--accent-amber)';
+            } else {
+                document.getElementById('order-match').textContent = '—';
+            }
+            
+            // Plot pₙ convergence
+            plotExperimentalOrder(data, expectedOrder, methodName);
+        }
+        
+        function plotExperimentalOrder(data, expectedOrder, methodName) {
+            if (typeof Plotly === 'undefined') return;
+            
+            const validData = data.filter(d => d.p !== null && isFinite(d.p) && Math.abs(d.p) < 10);
+            
+            const traces = [{
+                x: validData.map(d => d.n),
+                y: validData.map(d => d.p),
+                mode: 'lines+markers',
+                name: 'Observed pₙ',
+                line: { color: '#0f766e', width: 2 },
+                marker: { size: 8 }
+            }];
+            
+            // Add expected order line
+            if (expectedOrder !== null) {
+                traces.push({
+                    x: [0, Math.max(...validData.map(d => d.n))],
+                    y: [expectedOrder, expectedOrder],
+                    mode: 'lines',
+                    name: `Expected p = ${expectedOrder === 1.618 ? 'φ' : expectedOrder}`,
+                    line: { color: '#f59e0b', width: 2, dash: 'dash' }
+                });
+            }
+            
+            const layout = {
+                title: `Observed Order pₙ (${methodName})`,
+                xaxis: { title: 'Iteration n', dtick: 1 },
+                yaxis: { 
+                    title: 'pₙ',
+                    range: [0.5, 2.5]
+                },
+                margin: { t: 40, r: 20, b: 50, l: 50 },
+                legend: { x: 0.7, y: 0.95 },
+                shapes: expectedOrder ? [{
+                    type: 'line',
+                    x0: 0, x1: 1,
+                    y0: expectedOrder, y1: expectedOrder,
+                    xref: 'paper',
+                    line: { color: '#f59e0b', width: 1, dash: 'dot' }
+                }] : []
+            };
+            
+            Plotly.newPlot('experimental-graph', traces, layout, { responsive: true });
+        }
+        
+        // Initialize experimental display on first load
+        function initExperimental() {
+            // Render formulas with KaTeX
+            if (typeof katex !== 'undefined') {
+                try {
+                    katex.render("p_n = \\frac{\\ln(e_{n+1}/e_n)}{\\ln(e_n/e_{n-1})}", 
+                        document.getElementById('formula-theory'), {displayMode: false});
+                    katex.render("p_n = \\frac{\\ln(d_{n+1}/d_n)}{\\ln(d_n/d_{n-1})}", 
+                        document.getElementById('formula-practice'), {displayMode: false});
+                } catch(e) { console.error('KaTeX error', e); }
+            }
+            updateExperimentalDisplay('bisection');
+        }
         
         // ============ COMPARE MODE ============
         function updateCompareDisplay() {
