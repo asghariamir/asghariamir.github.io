@@ -1,1 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numerical Integration Explorer | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
+    <style>
+        :root{--primary:#0f766e;--primary-light:#10b981;--primary-dark:#0d5d56;--bg-light:#f7faf9;--interactive-bg:#e6fffb;--text-dark:#212121;--text-muted:#4b5563;--border-light:#d1d5db;--accent-amber:#f59e0b;--error-red:#c62828;--success-green:#10b981;--method-left:#3b82f6;--method-right:#8b5cf6;--method-mid:#10b981;--method-trap:#f59e0b;--method-simp:#ef4444}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-light);color:var(--text-dark);line-height:1.6;padding-top:60px}
+        .mathswell-nav{position:fixed;top:0;left:0;right:0;background:#fff;border-bottom:2px solid var(--primary);padding:.75rem 1rem;z-index:1000;display:flex;justify-content:center;align-items:center}
+        .mw-link{display:flex;align-items:center;gap:.5rem;text-decoration:none;color:var(--primary);font-weight:600;letter-spacing:1px}
+        .container{max-width:1100px;margin:0 auto;padding:1.5rem}
+        .tabs{display:flex;gap:.5rem;justify-content:center;background:#fff;padding:.5rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:2rem}
+        .tab-button{padding:.75rem 1.5rem;border:none;background:0 0;color:var(--text-muted);cursor:pointer;border-radius:8px;font-weight:500;font-size:.95rem;transition:all .2s}
+        .tab-button:hover{background:var(--interactive-bg);color:var(--primary)}
+        .tab-button.active{background:var(--primary);color:#fff}
+        .tab-content{display:none;animation:fadeIn .3s ease}
+        .tab-content.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .hero{text-align:center;padding:2rem 1rem;margin-bottom:2rem;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+        .hero h1{color:var(--primary);font-size:1.8rem;margin-bottom:.5rem}
+        .hero p{color:var(--text-muted);max-width:650px;margin:0 auto}
+        .section{background:#fff;border-radius:12px;padding:1.5rem;box-shadow:0 4px 16px rgba(0,0,0,.06);margin-bottom:1.5rem}
+        .section h2{color:var(--primary);margin-bottom:.75rem;font-size:1.3rem}
+        .section h3{color:var(--primary);margin:1.25rem 0 .75rem;font-size:1.1rem}
+        .concept-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1.5rem 0}
+        .concept-card{background:var(--bg-light);border-radius:10px;padding:1.25rem;border:1px solid #e5e7eb;transition:all .2s}
+        .concept-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+        .concept-card .icon{font-size:1.8rem;margin-bottom:.5rem}
+        .concept-card h3{font-size:.95rem;color:var(--primary);margin:0 0 .4rem}
+        .concept-card p{font-size:.85rem;color:var(--text-muted);line-height:1.5}
+        .concept-card .method-color{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:middle}
+        .formula-box{background:var(--interactive-bg);border:1px solid var(--primary);border-radius:8px;padding:1rem;margin:.75rem 0;text-align:center;overflow-x:auto}
+        .formula-label{font-size:.85rem;color:var(--text-muted);margin-bottom:.4rem}
+        .perspectives{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+        .perspective-card{background:var(--bg-light);border-left:3px solid var(--primary);padding:1rem 1.25rem;border-radius:0 8px 8px 0}
+        .perspective-card h4{color:var(--primary);font-size:.95rem;margin-bottom:.3rem}
+        .perspective-card p{font-size:.85rem;color:var(--text-muted)}
+        .control-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1rem 0}
+        .control-group label{display:block;font-size:.85rem;color:var(--text-muted);margin-bottom:.3rem;font-weight:500}
+        .control-group select,.control-group input[type=number],.control-group input[type=text]{width:100%;padding:.5rem .75rem;border:1px solid var(--border-light);border-radius:6px;font-size:.95rem;background:#fff}
+        .control-group input[type=range]{width:100%;accent-color:var(--primary)}
+        .preset-pills{display:flex;flex-wrap:wrap;gap:.5rem;margin:.75rem 0}
+        .preset-pill{padding:.4rem 1rem;border-radius:999px;background:#fff;border:2px solid var(--primary);color:var(--primary);cursor:pointer;font-size:.85rem;font-weight:500;transition:all .2s}
+        .preset-pill:hover{background:var(--interactive-bg);transform:translateY(-2px)}
+        .preset-pill.active{background:var(--primary);color:#fff}
+        .preset-pill.active .katex{color:#fff}
+        .primary-button{background:var(--primary);color:#fff;border:none;padding:.6rem 1.25rem;border-radius:6px;font-weight:600;cursor:pointer;font-size:.9rem;transition:all .2s}
+        .primary-button:hover{background:var(--primary-dark)}
+        .secondary-button{background:#fff;color:var(--primary);border:2px solid var(--primary);padding:.55rem 1.25rem;border-radius:6px;font-weight:600;cursor:pointer;font-size:.9rem;transition:all .2s}
+        .secondary-button:hover{background:var(--interactive-bg)}
+        .nav-buttons{display:flex;justify-content:space-between;margin-top:1.5rem;gap:1rem}
+        .nav-button{background:#fff;color:var(--primary);border:2px solid var(--primary);padding:.6rem 1.25rem;border-radius:6px;font-weight:600;cursor:pointer;font-size:.9rem;transition:all .2s}
+        .nav-button:hover{background:var(--interactive-bg)}
+        .mode-selector{display:flex;gap:.5rem;margin-bottom:1.5rem;background:var(--bg-light);padding:.35rem;border-radius:10px}
+        .mode-btn{flex:1;padding:.6rem;border:none;background:0 0;color:var(--text-muted);cursor:pointer;border-radius:8px;font-weight:500;font-size:.88rem;transition:all .2s;text-align:center}
+        .mode-btn:hover{color:var(--primary)}
+        .mode-btn.active{background:#fff;color:var(--primary);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+        .mode-content{display:none}.mode-content.active{display:block}
+        .canvas-container{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin:1rem 0}
+        canvas{display:block;width:100%}
+        .results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;margin:1rem 0}
+        .result-card{background:var(--interactive-bg);border:1px solid var(--primary);border-radius:8px;padding:.75rem;text-align:center}
+        .result-card .label{font-size:.78rem;color:var(--text-muted);margin-bottom:.2rem}
+        .result-card .value{font-family:'SF Mono','Fira Code',monospace;font-size:1rem;font-weight:600;color:var(--primary)}
+        .result-card .value.error{color:var(--error-red)}
+        .result-card.highlight{border-color:var(--accent-amber);background:#fffbeb}
+        .formula-display{background:var(--bg-light);border:1px solid #e5e7eb;border-radius:8px;padding:1rem;margin:1rem 0;overflow-x:auto;text-align:center}
+        .data-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:1rem 0}
+        .data-table th{background:var(--primary);color:#fff;padding:.6rem .75rem;text-align:center;font-weight:600}
+        .data-table td{padding:.5rem .75rem;text-align:center;border-bottom:1px solid #e5e7eb;font-family:'SF Mono','Fira Code',monospace}
+        .data-table tr:hover{background:var(--interactive-bg)}
+        .data-table .order-cell{font-weight:700;color:var(--primary)}
+        .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .challenge-type-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:1rem 0}
+        .challenge-type-card{background:var(--bg-light);border:2px solid #e5e7eb;border-radius:10px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s}
+        .challenge-type-card:hover{border-color:var(--primary);transform:translateY(-2px)}
+        .challenge-type-card.active{border-color:var(--primary);background:var(--interactive-bg)}
+        .challenge-type-icon{font-size:2rem;margin-bottom:.5rem}
+        .challenge-type-card h4{color:var(--primary);font-size:.95rem;margin-bottom:.2rem}
+        .challenge-type-card p{font-size:.8rem;color:var(--text-muted)}
+        .problem-area{margin-top:1.5rem}
+        .problem-box{background:#fff;border:2px solid var(--primary);border-radius:10px;padding:1.5rem;margin-bottom:1rem}
+        .problem-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+        .problem-type-badge{background:var(--primary);color:#fff;padding:.25rem .75rem;border-radius:999px;font-size:.8rem;font-weight:600}
+        .problem-number{color:var(--text-muted);font-size:.85rem}
+        .problem-question{margin-bottom:1.25rem;line-height:1.7}
+        .problem-input-area{margin-bottom:1rem}
+        .problem-input-area input,.problem-input-area select{width:100%;max-width:300px;padding:.6rem .75rem;border:2px solid var(--border-light);border-radius:6px;font-size:1rem;font-family:'SF Mono','Fira Code',monospace}
+        .problem-input-area input:focus,.problem-input-area select:focus{border-color:var(--primary);outline:0}
+        .problem-feedback{margin-top:1rem;padding:1rem;border-radius:8px;display:none;font-size:.9rem;line-height:1.6}
+        .problem-feedback.correct{display:block;background:#ecfdf5;border:1px solid var(--success-green);color:#065f46}
+        .problem-feedback.incorrect{display:block;background:#fef2f2;border:1px solid var(--error-red);color:#991b1b}
+        .worked-example-container{margin:1rem 0}
+        .worked-example-toggle{display:flex;align-items:center;gap:.5rem;background:var(--bg-light);border:1px solid #e5e7eb;padding:.75rem 1rem;border-radius:8px;cursor:pointer;font-size:.9rem;color:var(--primary);font-weight:500;width:100%;transition:all .2s}
+        .worked-example-toggle:hover{background:var(--interactive-bg)}
+        .toggle-icon{transition:transform .2s}.toggle-icon.open{transform:rotate(90deg)}
+        .worked-example-content{display:none;background:#fefce8;border:1px solid #fde68a;border-radius:0 0 8px 8px;padding:1.25rem;margin-top:-1px}
+        .worked-example-content.show{display:block}
+        .worked-example-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+        .worked-example-steps{font-size:.9rem;line-height:1.8}
+        .worked-example-steps .step{margin-bottom:.75rem;padding-left:1rem;border-left:2px solid var(--accent-amber)}
+        .generate-new-container{text-align:center;margin-top:1rem}
+        .challenge-prompt{text-align:center;padding:2rem;color:var(--text-muted);font-size:1.1rem}
+        .learning-points{background:var(--interactive-bg);border:1px solid var(--primary);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0}
+        .learning-points h4{color:var(--primary);margin-bottom:.5rem}
+        .learning-points ul{padding-left:1.25rem}
+        .learning-points li{font-size:.88rem;color:var(--text-muted);margin-bottom:.3rem}
+        @media(max-width:768px){.tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}.tab-button{padding:.6rem 1rem;font-size:.85rem;white-space:nowrap}.concept-cards,.perspectives,.compare-grid,.control-grid{grid-template-columns:1fr}.challenge-type-cards{grid-template-columns:1fr 1fr}.mode-selector{flex-wrap:wrap}.mode-btn{font-size:.8rem;padding:.5rem}input,select,button{font-size:16px;min-height:44px}}
+    </style>
+</head>
+<body>
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('intro')">Introduction</button>
+            <button class="tab-button" onclick="switchTab('explorer')">Explorer</button>
+            <button class="tab-button" onclick="switchTab('challenge')">Challenge</button>
+        </div>
 
+        <!-- ==================== INTRODUCTION ==================== -->
+        <div id="intro-tab" class="tab-content active">
+            <div class="hero">
+                <h1>📐 Numerical Integration Explorer</h1>
+                <p>Approximate definite integrals by replacing curves with simple shapes — rectangles, trapezoids, and parabolas. See each method geometrically, compare their accuracy, and discover why some converge faster than others.</p>
+            </div>
+            <div class="section">
+                <h3>The Five Methods</h3>
+                <div class="concept-cards">
+                    <div class="concept-card"><div class="icon">◀️</div><h3><span class="method-color" style="background:var(--method-left)"></span>Left Rectangle</h3><p>Height from the left endpoint. Simple but biased — always overestimates or underestimates on monotone functions.</p></div>
+                    <div class="concept-card"><div class="icon">▶️</div><h3><span class="method-color" style="background:var(--method-right)"></span>Right Rectangle</h3><p>Height from the right endpoint. Same simplicity, opposite bias to the left rule on monotone functions.</p></div>
+                    <div class="concept-card"><div class="icon">⏺️</div><h3><span class="method-color" style="background:var(--method-mid)"></span>Midpoint</h3><p>Height from the midpoint. Balances over- and underestimation. Often more accurate than the trapezoidal rule!</p></div>
+                    <div class="concept-card"><div class="icon">📐</div><h3><span class="method-color" style="background:var(--method-trap)"></span>Trapezoid</h3><p>Straight lines between endpoints. Follows the curve better than rectangles. Error is $O(h^2)$.</p></div>
+                    <div class="concept-card"><div class="icon">〰️</div><h3><span class="method-color" style="background:var(--method-simp)"></span>Simpson's Rule</h3><p>Parabolas through groups of three points. Exact for cubics! Error is $O(h^4)$ — dramatically better.</p></div>
+                </div>
+                <h3>Key Formulas</h3>
+                <div class="formula-box"><div class="formula-label">Composite Trapezoidal Rule</div><div id="formula-trap"></div></div>
+                <div class="formula-box"><div class="formula-label">Composite Simpson's Rule ($n$ even)</div><div id="formula-simp"></div></div>
+                <h3>Two Key Perspectives</h3>
+                <div class="perspectives">
+                    <div class="perspective-card"><h4>📊 Order Tells You Speed</h4><p>Doubling $n$ on a method with error $O(h^p)$ reduces error by a factor of $2^p$. Trapezoid: factor of 4. Simpson: factor of 16.</p></div>
+                    <div class="perspective-card"><h4>🔗 Gateway to Richardson &amp; Romberg</h4><p>Once you see that errors decrease predictably, you can use Richardson extrapolation to cancel the leading error term — the foundation of Romberg integration.</p></div>
+                </div>
+                <div class="learning-points">
+                    <h4>💡 Integration Block Connection</h4>
+                    <ul>
+                        <li>This explorer covers Parts I–III of the Integration Booklet</li>
+                        <li>Use it to verify your hand calculations from the Activities</li>
+                        <li>The same three functions appear throughout: $e^{-x^2}$, $\sin(x^2)$, $\tfrac{1}{1+x^4}$</li>
+                        <li>After mastering these, move to the Richardson and Romberg apps</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="nav-buttons"><div></div><button class="nav-button" onclick="switchTab('explorer')">Try the Explorer →</button></div>
+        </div>
+
+        <!-- ==================== EXPLORER ==================== -->
+        <div id="explorer-tab" class="tab-content">
+            <div class="section">
+                <h2>Numerical Integration Explorer</h2>
+                <p style="color:var(--text-muted);margin-bottom:1rem;">Visualise methods geometrically, compare them side by side, or study convergence as $n$ increases.</p>
+                <div class="mode-selector">
+                    <button class="mode-btn active" onclick="switchMode('visualise')">📐 Visualise</button>
+                    <button class="mode-btn" onclick="switchMode('compare')">⚖️ Compare</button>
+                    <button class="mode-btn" onclick="switchMode('convergence')">📊 Convergence</button>
+                </div>
+                <h3>Preset Functions</h3>
+                <div class="preset-pills" id="preset-pills"></div>
+                <div class="control-grid">
+                    <div class="control-group"><label>Function $f(x)$:</label><input type="text" id="func-input" value="exp(-x^2)" placeholder="e.g., exp(-x^2)" oninput="updateFuncPreview()"><div id="func-preview" style="margin-top:.4rem;padding:.4rem .75rem;background:var(--interactive-bg);border-radius:6px;font-size:.95rem;min-height:1.8rem"></div></div>
+                    <div class="control-group"><label>Interval $[a, b]$:</label><div style="display:flex;gap:.5rem"><input type="number" id="a-input" value="0" step="0.1" style="width:50%"><input type="number" id="b-input" value="1" step="0.1" style="width:50%"></div></div>
+                </div>
+            </div>
+
+            <!-- VISUALISE -->
+            <div id="mode-visualise" class="mode-content active">
+                <div class="section">
+                    <div class="control-grid">
+                        <div class="control-group"><label>Method:</label><select id="vis-method"><option value="left">Left Rectangle</option><option value="right">Right Rectangle</option><option value="mid">Midpoint</option><option value="trap" selected>Trapezoid</option><option value="simp">Simpson's Rule</option></select></div>
+                        <div class="control-group"><label>Subintervals $n$: <strong id="vis-n-label">4</strong></label><input type="range" id="vis-n-slider" min="1" max="32" value="4"></div>
+                    </div>
+                    <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem"><button class="primary-button" onclick="runVisualise()">▶ Draw</button><button class="secondary-button" onclick="resetVisualise()">↺ Reset</button></div>
+                    <div class="canvas-container"><canvas id="vis-canvas" width="1000" height="440"></canvas></div>
+                    <div class="results-grid">
+                        <div class="result-card"><div class="label">Approximation</div><div class="value" id="vis-val">—</div></div>
+                        <div class="result-card"><div class="label">Benchmark ($n$=1000)</div><div class="value" id="vis-exact">—</div></div>
+                        <div class="result-card"><div class="label">|Error|</div><div class="value error" id="vis-err">—</div></div>
+                        <div class="result-card"><div class="label">Step size $h$</div><div class="value" id="vis-h">—</div></div>
+                    </div>
+                    <div class="formula-display" id="vis-formula-display" style="display:none"></div>
+                </div>
+            </div>
+
+            <!-- COMPARE -->
+            <div id="mode-compare" class="mode-content">
+                <div class="section">
+                    <div class="control-grid">
+                        <div class="control-group"><label>Method A:</label><select id="cmp-method-a"><option value="left">Left Rectangle</option><option value="mid" selected>Midpoint</option><option value="trap">Trapezoid</option><option value="simp">Simpson's Rule</option></select></div>
+                        <div class="control-group"><label>Method B:</label><select id="cmp-method-b"><option value="left">Left Rectangle</option><option value="mid">Midpoint</option><option value="trap" selected>Trapezoid</option><option value="simp">Simpson's Rule</option></select></div>
+                        <div class="control-group"><label>$n$: <strong id="cmp-n-label">4</strong></label><input type="range" id="cmp-n-slider" min="2" max="32" value="4" step="2"></div>
+                    </div>
+                    <button class="primary-button" onclick="runCompare()" style="margin-top:.5rem">▶ Compare</button>
+                    <div class="compare-grid" style="margin-top:1rem">
+                        <div><div class="canvas-container"><canvas id="cmp-canvas-a" width="500" height="380"></canvas></div><div class="results-grid"><div class="result-card"><div class="label">Method A</div><div class="value" id="cmp-val-a">—</div></div><div class="result-card"><div class="label">|Error|</div><div class="value error" id="cmp-err-a">—</div></div></div></div>
+                        <div><div class="canvas-container"><canvas id="cmp-canvas-b" width="500" height="380"></canvas></div><div class="results-grid"><div class="result-card"><div class="label">Method B</div><div class="value" id="cmp-val-b">—</div></div><div class="result-card"><div class="label">|Error|</div><div class="value error" id="cmp-err-b">—</div></div></div></div>
+                    </div>
+                    <div class="results-grid" style="margin-top:.5rem"><div class="result-card highlight"><div class="label">Benchmark ($n$=1000)</div><div class="value" id="cmp-exact">—</div></div><div class="result-card highlight"><div class="label">Winner</div><div class="value" id="cmp-winner">—</div></div></div>
+                </div>
+            </div>
+
+            <!-- CONVERGENCE -->
+            <div id="mode-convergence" class="mode-content">
+                <div class="section">
+                    <div class="control-grid">
+                        <div class="control-group"><label>Methods to track:</label><div style="display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.3rem"><label style="font-size:.85rem;display:flex;align-items:center;gap:.3rem"><input type="checkbox" id="conv-left"> Left Rect</label><label style="font-size:.85rem;display:flex;align-items:center;gap:.3rem"><input type="checkbox" id="conv-mid" checked> Midpoint</label><label style="font-size:.85rem;display:flex;align-items:center;gap:.3rem"><input type="checkbox" id="conv-trap" checked> Trapezoid</label><label style="font-size:.85rem;display:flex;align-items:center;gap:.3rem"><input type="checkbox" id="conv-simp" checked> Simpson</label></div></div>
+                        <div class="control-group"><label>Maximum $n$ (doubles from 2):</label><select id="conv-max-n"><option value="32">32</option><option value="64" selected>64</option><option value="128">128</option><option value="256">256</option></select></div>
+                    </div>
+                    <button class="primary-button" onclick="runConvergence()" style="margin-top:.5rem">▶ Build Convergence Table</button>
+                    <div id="conv-table-container" style="overflow-x:auto;margin-top:1rem"></div>
+                    <div class="canvas-container" style="margin-top:1rem"><canvas id="conv-canvas" width="1000" height="400"></canvas></div>
+                    <div id="conv-insights" class="learning-points" style="display:none"><h4>💡 What the Ratios Tell You</h4><ul id="conv-insights-list"></ul></div>
+                </div>
+            </div>
+
+            <div class="nav-buttons"><button class="nav-button" onclick="switchTab('intro')">← Back to Introduction</button><button class="nav-button" onclick="switchTab('challenge')">Try Challenges →</button></div>
+        </div>
+
+        <!-- ==================== CHALLENGE ==================== -->
+        <div id="challenge-tab" class="tab-content">
+            <div class="section">
+                <h2>Challenge Your Understanding</h2>
+                <p style="color:var(--text-muted);margin-bottom:1.5rem">Choose a challenge type to practice. Generate as many problems as you need — a worked example is always available.</p>
+                <div class="challenge-type-cards">
+                    <div class="challenge-type-card" data-type="compute" onclick="selectChallengeType('compute')"><div class="challenge-type-icon">🔢</div><h4>Compute Approximation</h4><p>Apply a method step by step</p></div>
+                    <div class="challenge-type-card" data-type="weights" onclick="selectChallengeType('weights')"><div class="challenge-type-icon">⚖️</div><h4>Identify the Weights</h4><p>Which method uses which pattern?</p></div>
+                    <div class="challenge-type-card" data-type="order" onclick="selectChallengeType('order')"><div class="challenge-type-icon">📈</div><h4>Order from Ratios</h4><p>Determine convergence order</p></div>
+                </div>
+            </div>
+            <div id="problem-area" class="problem-area" style="display:none">
+                <div class="problem-box">
+                    <div class="problem-header"><span class="problem-type-badge" id="problem-type-label">Type</span><span class="problem-number" id="problem-number">Problem #1</span></div>
+                    <div id="problem-question" class="problem-question"></div>
+                    <div id="problem-input-area" class="problem-input-area"></div>
+                    <button class="primary-button" onclick="checkChallengeAnswer()">✓ Check Answer</button>
+                    <div id="problem-feedback" class="problem-feedback"></div>
+                </div>
+                <div class="worked-example-container">
+                    <button class="worked-example-toggle" onclick="toggleWorkedExample()"><span class="toggle-icon" id="we-toggle-icon">▶</span><span>📖 See Worked Example</span></button>
+                    <div id="worked-example-content" class="worked-example-content">
+                        <div class="worked-example-header">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            <div><h4 style="margin:0;color:var(--primary)">Worked Example</h4><p style="margin:0;font-size:.82rem;color:var(--text-muted)">Step-by-step solution</p></div>
+                        </div>
+                        <div id="worked-example-steps" class="worked-example-steps"></div>
+                    </div>
+                </div>
+                <div class="generate-new-container"><button class="secondary-button" onclick="generateNewProblem()">🔄 Generate New Problem</button></div>
+            </div>
+            <div id="challenge-prompt" class="challenge-prompt"><p>👆 Select a challenge type above to begin practicing</p></div>
+            <div class="nav-buttons" style="margin-top:2rem"><button class="nav-button" onclick="switchTab('explorer')">← Back to Explorer</button></div>
+        </div>
+    </div>
+
+<script>
+// ── Render all $...$ inline math in an element ──
+function renderMath(el) {
+    if (typeof renderMathInElement === 'function') {
+        renderMathInElement(el, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false }
+            ], throwOnError: false
+        });
+    }
+}
+
+// ── Math engine ──
+function safeEval(expr, x) { try { return math.evaluate(expr, { x }); } catch(e) { return NaN; } }
+
+function integrate(expr, a, b, n, method) {
+    const h = (b - a) / n; let sum = 0;
+    if (method === 'left')  { for (let i = 0; i < n; i++) sum += safeEval(expr, a + i * h); return sum * h; }
+    if (method === 'right') { for (let i = 1; i <= n; i++) sum += safeEval(expr, a + i * h); return sum * h; }
+    if (method === 'mid')   { for (let i = 0; i < n; i++) sum += safeEval(expr, a + (i + .5) * h); return sum * h; }
+    if (method === 'trap')  { sum = safeEval(expr, a) + safeEval(expr, b); for (let i = 1; i < n; i++) sum += 2 * safeEval(expr, a + i * h); return sum * h / 2; }
+    if (method === 'simp')  { const nE = n % 2 === 0 ? n : n + 1; const hS = (b - a) / nE; sum = safeEval(expr, a) + safeEval(expr, b); for (let i = 1; i < nE; i++) sum += (i % 2 === 0 ? 2 : 4) * safeEval(expr, a + i * hS); return sum * hS / 3; }
+    return NaN;
+}
+function benchmark(expr, a, b) { return integrate(expr, a, b, 1000, 'simp'); }
+
+// ── Presets ──
+const PRESETS = [
+    { latex: 'e^{-x^2}', expr: 'exp(-x^2)', a: 0, b: 1 },
+    { latex: '\\sin(x^2)', expr: 'sin(x^2)', a: 0, b: 1 },
+    { latex: '\\tfrac{1}{1+x^4}', expr: '1/(1+x^4)', a: 0, b: 1 },
+    { latex: '\\sin(x)', expr: 'sin(x)', a: 0, b: 3.14159265 },
+    { latex: 'x^2', expr: 'x^2', a: 0, b: 1 },
+    { latex: '\\sqrt{x}', expr: 'sqrt(x)', a: 0, b: 1 },
+];
+function renderPresets() {
+    const c = document.getElementById('preset-pills'); c.innerHTML = '';
+    PRESETS.forEach(p => {
+        const pill = document.createElement('button'); pill.className = 'preset-pill';
+        katex.render(p.latex, pill, { throwOnError: false });
+        pill.onclick = () => { document.getElementById('func-input').value = p.expr; document.getElementById('a-input').value = p.a; document.getElementById('b-input').value = p.b; document.querySelectorAll('.preset-pill').forEach(pp => pp.classList.remove('active')); pill.classList.add('active'); updateFuncPreview(); };
+        c.appendChild(pill);
+    });
+}
+// Map common math.js expressions to LaTeX for the preview
+function exprToLatex(expr) {
+    const map = {};
+    PRESETS.forEach(p => { map[p.expr] = p.latex; });
+    if (map[expr]) return map[expr];
+    // Simple auto-conversion for common patterns
+    let s = expr;
+    s = s.replace(/\bexp\(([^)]+)\)/g, 'e^{$1}');
+    s = s.replace(/\bsqrt\(([^)]+)\)/g, '\\sqrt{$1}');
+    s = s.replace(/\bsin\(([^)]+)\)/g, '\\sin($1)');
+    s = s.replace(/\bcos\(([^)]+)\)/g, '\\cos($1)');
+    s = s.replace(/\btan\(([^)]+)\)/g, '\\tan($1)');
+    s = s.replace(/\blog\(([^)]+)\)/g, '\\ln($1)');
+    s = s.replace(/\^(\w)/g, '^{$1}');
+    s = s.replace(/\*/g, ' \\cdot ');
+    return s;
+}
+function updateFuncPreview() {
+    const expr = document.getElementById('func-input').value;
+    const prev = document.getElementById('func-preview');
+    if (!prev) return;
+    try { katex.render('f(x) = ' + exprToLatex(expr), prev, { throwOnError: false }); }
+    catch(e) { prev.textContent = 'f(x) = ' + expr; }
+}
+function getInputs() { return { expr: document.getElementById('func-input').value, a: parseFloat(document.getElementById('a-input').value), b: parseFloat(document.getElementById('b-input').value) }; }
+
+// ── Drawing ── consistent transparent fills + approximating edge stroke
+const MC = {
+    left:  { fill: 'rgba(59,130,246,0.20)',  stroke: '#3b82f6' },
+    right: { fill: 'rgba(139,92,246,0.20)',   stroke: '#8b5cf6' },
+    mid:   { fill: 'rgba(16,185,129,0.20)',   stroke: '#10b981' },
+    trap:  { fill: 'rgba(245,158,11,0.20)',   stroke: '#f59e0b' },
+    simp:  { fill: 'rgba(239,68,68,0.20)',    stroke: '#ef4444' },
+};
+const MN = { left:'Left Rectangle', right:'Right Rectangle', mid:'Midpoint', trap:'Trapezoid', simp:"Simpson's Rule" };
+
+function drawIntegration(cid, expr, a, b, n, method) {
+    const cvs = document.getElementById(cid), ctx = cvs.getContext('2d');
+    const W = cvs.width, H = cvs.height;
+    const pad = { t:30, b:45, l:55, r:25 }, pw = W-pad.l-pad.r, ph = H-pad.t-pad.b;
+    ctx.clearRect(0,0,W,H);
+
+    // sample
+    const nS = 300; let yMin = 1/0, yMax = -1/0; const pts = [];
+    for (let i=0; i<=nS; i++) { const x = a+(b-a)*i/nS, y = safeEval(expr,x); if (isFinite(y)) { yMin = Math.min(yMin,y); yMax = Math.max(yMax,y); } pts.push({x, y: isFinite(y)?y:0}); }
+    yMin = Math.min(yMin,0); yMax = Math.max(yMax,0);
+    const yP = (yMax-yMin)*.1||.5; yMin -= yP; yMax += yP;
+    function tX(x){ return pad.l+(x-a)/(b-a)*pw; }
+    function tY(y){ return pad.t+(1-(y-yMin)/(yMax-yMin))*ph; }
+
+    // grid
+    ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=.5;
+    for(let i=0;i<=5;i++){const yv=yMin+(yMax-yMin)*i/5; ctx.beginPath(); ctx.moveTo(pad.l,tY(yv)); ctx.lineTo(W-pad.r,tY(yv)); ctx.stroke();}
+    // axes
+    ctx.strokeStyle='#9ca3af'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,tY(0)); ctx.lineTo(W-pad.r,tY(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,H-pad.b); ctx.stroke();
+    // labels
+    ctx.fillStyle='#6b7280'; ctx.font='11px -apple-system,sans-serif'; ctx.textAlign='center';
+    for(let i=0;i<=4;i++){const xv=a+(b-a)*i/4; ctx.fillText(xv.toFixed(2),tX(xv),H-pad.b+16);}
+    ctx.textAlign='right';
+    for(let i=0;i<=5;i++){const yv=yMin+(yMax-yMin)*i/5; ctx.fillText(yv.toFixed(2),pad.l-6,tY(yv)+4);}
+
+    const h = (b-a)/n, col = MC[method];
+    const nE = (method==='simp'&&n%2!==0)?n+1:n, hE=(b-a)/nE;
+
+    // subinterval dashed boundaries
+    ctx.save(); ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(0,0,0,0.1)'; ctx.lineWidth=.8;
+    const nb = method==='simp'?nE:n, hb=(b-a)/nb;
+    for(let i=1;i<nb;i++){const xv=a+i*hb; ctx.beginPath(); ctx.moveTo(tX(xv),pad.t); ctx.lineTo(tX(xv),H-pad.b); ctx.stroke();}
+    ctx.restore();
+
+    // helper: thin vertical side
+    function vEdge(x,fy){ctx.save();ctx.strokeStyle=col.stroke;ctx.lineWidth=.8;ctx.globalAlpha=.35;ctx.beginPath();ctx.moveTo(tX(x),tY(0));ctx.lineTo(tX(x),tY(fy));ctx.stroke();ctx.restore();}
+
+    if(method==='left'||method==='right'||method==='mid'){
+        for(let i=0;i<n;i++){
+            const x0=a+i*h,x1=a+(i+1)*h;
+            let fv,sx; if(method==='left'){fv=safeEval(expr,x0);sx=x0;} else if(method==='right'){fv=safeEval(expr,x1);sx=x1;} else{sx=(x0+x1)/2;fv=safeEval(expr,sx);}
+            // fill
+            ctx.fillStyle=col.fill; ctx.beginPath(); ctx.moveTo(tX(x0),tY(0)); ctx.lineTo(tX(x0),tY(fv)); ctx.lineTo(tX(x1),tY(fv)); ctx.lineTo(tX(x1),tY(0)); ctx.closePath(); ctx.fill();
+            // top edge
+            ctx.strokeStyle=col.stroke; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(tX(x0),tY(fv)); ctx.lineTo(tX(x1),tY(fv)); ctx.stroke();
+            // side edges
+            vEdge(x0,fv); vEdge(x1,fv);
+            // sample dot
+            ctx.fillStyle=col.stroke; ctx.beginPath(); ctx.arc(tX(sx),tY(fv),3.5,0,2*Math.PI); ctx.fill();
+        }
+    } else if(method==='trap'){
+        for(let i=0;i<n;i++){
+            const x0=a+i*h,x1=a+(i+1)*h,f0=safeEval(expr,x0),f1=safeEval(expr,x1);
+            ctx.fillStyle=col.fill; ctx.beginPath(); ctx.moveTo(tX(x0),tY(0)); ctx.lineTo(tX(x0),tY(f0)); ctx.lineTo(tX(x1),tY(f1)); ctx.lineTo(tX(x1),tY(0)); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle=col.stroke; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(tX(x0),tY(f0)); ctx.lineTo(tX(x1),tY(f1)); ctx.stroke();
+            vEdge(x0,f0); vEdge(x1,f1);
+        }
+        for(let i=0;i<=n;i++){const xv=a+i*h; ctx.fillStyle=col.stroke; ctx.beginPath(); ctx.arc(tX(xv),tY(safeEval(expr,xv)),3.5,0,2*Math.PI); ctx.fill();}
+    } else if(method==='simp'){
+        for(let i=0;i<nE;i+=2){
+            const x0=a+i*hE,x1=a+(i+1)*hE,x2=a+(i+2)*hE;
+            const f0=safeEval(expr,x0),f1=safeEval(expr,x1),f2=safeEval(expr,x2);
+            function pY(xp){const L0=((xp-x1)*(xp-x2))/((x0-x1)*(x0-x2)),L1=((xp-x0)*(xp-x2))/((x1-x0)*(x1-x2)),L2=((xp-x0)*(xp-x1))/((x2-x0)*(x2-x1));return f0*L0+f1*L1+f2*L2;}
+            const st=40;
+            ctx.fillStyle=col.fill; ctx.beginPath(); ctx.moveTo(tX(x0),tY(0));
+            for(let j=0;j<=st;j++){const xp=x0+j/st*(x2-x0); ctx.lineTo(tX(xp),tY(pY(xp)));}
+            ctx.lineTo(tX(x2),tY(0)); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle=col.stroke; ctx.lineWidth=2; ctx.beginPath();
+            for(let j=0;j<=st;j++){const xp=x0+j/st*(x2-x0); if(j===0)ctx.moveTo(tX(xp),tY(pY(xp))); else ctx.lineTo(tX(xp),tY(pY(xp)));}
+            ctx.stroke();
+            vEdge(x0,f0); vEdge(x2,f2);
+        }
+        for(let i=0;i<=nE;i++){const xv=a+i*hE; ctx.fillStyle=col.stroke; ctx.beginPath(); ctx.arc(tX(xv),tY(safeEval(expr,xv)),3.5,0,2*Math.PI); ctx.fill();}
+    }
+
+    // function curve on top
+    ctx.strokeStyle='#0f766e'; ctx.lineWidth=2.5; ctx.beginPath();
+    pts.forEach((p,i)=>{if(i===0)ctx.moveTo(tX(p.x),tY(p.y));else ctx.lineTo(tX(p.x),tY(p.y));}); ctx.stroke();
+
+    ctx.fillStyle='#0f766e'; ctx.font='bold 13px -apple-system,sans-serif'; ctx.textAlign='left';
+    ctx.fillText(MN[method]+'  (n='+(method==='simp'?nE:n)+')',pad.l+5,18);
+    ctx.textAlign='right'; ctx.font='12px -apple-system,sans-serif';
+    ctx.fillText('f(x) = '+expr,W-pad.r-5,18);
+}
+
+// ── Visualise ──
+document.getElementById('vis-n-slider').addEventListener('input',function(){let v=parseInt(this.value);if(document.getElementById('vis-method').value==='simp'&&v%2!==0)v=Math.max(2,v-1);document.getElementById('vis-n-label').textContent=v;});
+document.getElementById('vis-method').addEventListener('change',function(){const s=document.getElementById('vis-n-slider');if(this.value==='simp'){s.min=2;s.step=2;let v=parseInt(s.value);if(v%2!==0){v=Math.max(2,v-1);s.value=v;}document.getElementById('vis-n-label').textContent=v;}else{s.min=1;s.step=1;}});
+
+window.runVisualise=function(){
+    const{expr,a,b}=getInputs(),method=document.getElementById('vis-method').value;
+    let n=parseInt(document.getElementById('vis-n-slider').value);if(method==='simp'&&n%2!==0)n=Math.max(2,n-1);
+    drawIntegration('vis-canvas',expr,a,b,n,method);
+    const val=integrate(expr,a,b,n,method),exact=benchmark(expr,a,b),h=(b-a)/n;
+    document.getElementById('vis-val').textContent=val.toFixed(8);
+    document.getElementById('vis-exact').textContent=exact.toFixed(8);
+    document.getElementById('vis-err').textContent=Math.abs(val-exact).toExponential(3);
+    document.getElementById('vis-h').textContent=h.toFixed(6);
+    buildFormulaDisplay(expr,a,b,n,method,val);
+};
+
+function buildFormulaDisplay(expr,a,b,n,method,result){
+    const el=document.getElementById('vis-formula-display');el.style.display='block';
+    const h=(b-a)/n;let latex='';
+    if(method==='left'){const t=[];for(let i=0;i<Math.min(n,6);i++)t.push('f('+( a+i*h).toFixed(3)+')');if(n>6)t.push('\\cdots');latex='L_{'+n+'}=h\\bigl['+t.join('+')+' \\bigr]='+result.toFixed(6);}
+    else if(method==='right'){const t=[];for(let i=1;i<=Math.min(n,6);i++)t.push('f('+(a+i*h).toFixed(3)+')');if(n>6)t.push('\\cdots');latex='R_{'+n+'}=h\\bigl['+t.join('+')+' \\bigr]='+result.toFixed(6);}
+    else if(method==='mid'){const t=[];for(let i=0;i<Math.min(n,6);i++)t.push('f('+(a+(i+.5)*h).toFixed(3)+')');if(n>6)t.push('\\cdots');latex='M_{'+n+'}=h\\bigl['+t.join('+')+' \\bigr]='+result.toFixed(6);}
+    else if(method==='trap'){latex='T_{'+n+'}=\\frac{h}{2}\\bigl[f('+a+')';for(let i=1;i<Math.min(n,6);i++)latex+='+2f('+(a+i*h).toFixed(3)+')';if(n>6)latex+='+\\cdots';latex+='+f('+b+')\\bigr]='+result.toFixed(6);}
+    else if(method==='simp'){const nE=n%2===0?n:n+1,hE=(b-a)/nE;latex='S_{'+nE+'}=\\frac{h}{3}\\bigl[f('+a+')';for(let i=1;i<Math.min(nE,8);i++)latex+='+'+(i%2===0?'2':'4')+'f('+(a+i*hE).toFixed(3)+')';if(nE>8)latex+='+\\cdots';latex+='+f('+b+')\\bigr]='+result.toFixed(6);}
+    try{katex.render(latex,el,{displayMode:true,throwOnError:false});}catch(e){el.innerHTML='<code>'+latex+'</code>';}
+}
+
+window.resetVisualise=function(){const c=document.getElementById('vis-canvas');c.getContext('2d').clearRect(0,0,c.width,c.height);['vis-val','vis-exact','vis-err','vis-h'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('vis-formula-display').style.display='none';};
+
+// ── Compare ──
+window.runCompare=function(){
+    const{expr,a,b}=getInputs(),mA=document.getElementById('cmp-method-a').value,mB=document.getElementById('cmp-method-b').value;
+    let n=parseInt(document.getElementById('cmp-n-slider').value);if((mA==='simp'||mB==='simp')&&n%2!==0)n=Math.max(2,n-1);
+    drawIntegration('cmp-canvas-a',expr,a,b,n,mA);drawIntegration('cmp-canvas-b',expr,a,b,n,mB);
+    const vA=integrate(expr,a,b,n,mA),vB=integrate(expr,a,b,n,mB),exact=benchmark(expr,a,b),eA=Math.abs(vA-exact),eB=Math.abs(vB-exact);
+    document.getElementById('cmp-val-a').textContent=vA.toFixed(8);document.getElementById('cmp-val-b').textContent=vB.toFixed(8);
+    document.getElementById('cmp-err-a').textContent=eA.toExponential(3);document.getElementById('cmp-err-b').textContent=eB.toExponential(3);
+    document.getElementById('cmp-exact').textContent=exact.toFixed(8);
+    document.getElementById('cmp-winner').textContent=eA<eB?MN[mA]:(eB<eA?MN[mB]:'Tie');
+};
+document.getElementById('cmp-n-slider').addEventListener('input',function(){document.getElementById('cmp-n-label').textContent=this.value;});
+
+// ── Convergence ──
+window.runConvergence=function(){
+    const{expr,a,b}=getInputs(),maxN=parseInt(document.getElementById('conv-max-n').value),exact=benchmark(expr,a,b);
+    const methods=[];
+    if(document.getElementById('conv-left').checked)methods.push({key:'left',name:'Left Rect',color:'#3b82f6'});
+    if(document.getElementById('conv-mid').checked)methods.push({key:'mid',name:'Midpoint',color:'#10b981'});
+    if(document.getElementById('conv-trap').checked)methods.push({key:'trap',name:'Trapezoid',color:'#f59e0b'});
+    if(document.getElementById('conv-simp').checked)methods.push({key:'simp',name:'Simpson',color:'#ef4444'});
+    if(!methods.length){alert('Select at least one method.');return;}
+    const ns=[];for(let n=2;n<=maxN;n*=2)ns.push(n);
+    const data={};methods.forEach(m=>{data[m.key]=ns.map(n=>{const val=integrate(expr,a,b,n,m.key);return{n,val,err:Math.abs(val-exact)};});});
+
+    // table
+    let html='<table class="data-table"><thead><tr><th>$n$</th><th>$h$</th>';
+    methods.forEach(m=>html+='<th>'+m.name+'</th><th>|Error|</th><th>$E_n/E_{2n}$</th>');
+    html+='</tr></thead><tbody>';
+    ns.forEach((n,idx)=>{html+='<tr><td><strong>'+n+'</strong></td><td>'+((b-a)/n).toFixed(4)+'</td>';methods.forEach(m=>{const d=data[m.key][idx],prev=idx>0?data[m.key][idx-1]:null,ratio=prev&&d.err>0?prev.err/d.err:null;html+='<td>'+d.val.toFixed(8)+'</td><td style="color:var(--error-red)">'+d.err.toExponential(2)+'</td><td class="order-cell">'+(ratio!==null?ratio.toFixed(2):'—')+'</td>';});html+='</tr>';});
+    html+='</tbody></table>';
+    document.getElementById('conv-table-container').innerHTML=html;
+    renderMath(document.getElementById('conv-table-container'));
+
+    // log-log plot
+    const cvs=document.getElementById('conv-canvas'),ctx=cvs.getContext('2d'),W=cvs.width,H=cvs.height;
+    const pad={t:30,b:50,l:70,r:30},pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;ctx.clearRect(0,0,W,H);
+    const logNs=ns.map(n=>Math.log2(n));let allLE=[];methods.forEach(m=>{data[m.key].forEach(d=>{if(d.err>0)allLE.push(Math.log10(d.err));});});
+    if(!allLE.length)return;
+    let lMin=Math.min(...allLE)-.5,lMax=Math.max(...allLE)+.5;const lNMin=logNs[0]-.3,lNMax=logNs[logNs.length-1]+.3;
+    function tX(ln){return pad.l+(ln-lNMin)/(lNMax-lNMin)*pw;}function tY(le){return pad.t+(1-(le-lMin)/(lMax-lMin))*ph;}
+    ctx.strokeStyle='#e5e7eb';ctx.lineWidth=.5;
+    for(let le=Math.ceil(lMin);le<=Math.floor(lMax);le++){ctx.beginPath();ctx.moveTo(pad.l,tY(le));ctx.lineTo(W-pad.r,tY(le));ctx.stroke();ctx.fillStyle='#6b7280';ctx.font='11px -apple-system,sans-serif';ctx.textAlign='right';ctx.fillText('10\u02E2\u207B'[0]?'10^'+le:'10^'+le,pad.l-6,tY(le)+4);}
+    logNs.forEach(ln=>{ctx.strokeStyle='#e5e7eb';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(tX(ln),pad.t);ctx.lineTo(tX(ln),H-pad.b);ctx.stroke();ctx.fillStyle='#6b7280';ctx.font='11px -apple-system,sans-serif';ctx.textAlign='center';ctx.fillText('n='+Math.round(Math.pow(2,ln)),tX(ln),H-pad.b+16);});
+    ctx.fillStyle='#374151';ctx.font='12px -apple-system,sans-serif';ctx.textAlign='center';ctx.fillText('log\u2082(n)',W/2,H-8);
+    ctx.save();ctx.translate(14,H/2);ctx.rotate(-Math.PI/2);ctx.fillText('log\u2081\u2080(|Error|)',0,0);ctx.restore();
+    methods.forEach(m=>{const pts=data[m.key].filter(d=>d.err>0).map(d=>({x:tX(Math.log2(d.n)),y:tY(Math.log10(d.err))}));if(pts.length<2)return;ctx.strokeStyle=m.color;ctx.lineWidth=2.5;ctx.beginPath();pts.forEach((p,i)=>{if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});ctx.stroke();pts.forEach(p=>{ctx.fillStyle=m.color;ctx.beginPath();ctx.arc(p.x,p.y,4,0,2*Math.PI);ctx.fill();});const last=pts[pts.length-1];ctx.fillStyle=m.color;ctx.font='bold 11px -apple-system,sans-serif';ctx.textAlign='left';ctx.fillText(m.name,last.x+8,last.y+4);});
+    ctx.fillStyle='#0f766e';ctx.font='bold 13px -apple-system,sans-serif';ctx.textAlign='left';ctx.fillText('Error vs n  (log-log scale)',pad.l+5,18);
+
+    // insights
+    const list=document.getElementById('conv-insights-list');list.innerHTML='';
+    methods.forEach(m=>{const d=data[m.key];if(d.length>=3){const r=d[d.length-2].err/d[d.length-1].err,p=Math.log2(r);const li=document.createElement('li');li.innerHTML='<strong>'+m.name+':</strong> ratio ≈ '+r.toFixed(1)+', suggesting order ≈ '+p.toFixed(1)+(Math.abs(p-1)<.3?' — first order, $O(h)$':Math.abs(p-2)<.4?' — second order, $O(h^2)$':Math.abs(p-4)<.6?' — fourth order, $O(h^4)$':'');list.appendChild(li);}});
+    document.getElementById('conv-insights').style.display=list.children.length?'block':'none';
+    renderMath(document.getElementById('conv-insights'));
+};
+
+// ── Challenge Engine ──
+let CS={type:null,count:0,answer:null};
+
+window.selectChallengeType=function(type){
+    document.querySelectorAll('.challenge-type-card').forEach(c=>c.classList.remove('active'));
+    document.querySelector('.challenge-type-card[data-type="'+type+'"]').classList.add('active');
+    CS.type=type;CS.count=0;document.getElementById('challenge-prompt').style.display='none';document.getElementById('problem-area').style.display='block';generateNewProblem();
+};
+
+window.generateNewProblem=function(){
+    CS.count++;const fb=document.getElementById('problem-feedback');fb.className='problem-feedback';fb.style.display='none';
+    document.getElementById('worked-example-content').classList.remove('show');document.getElementById('we-toggle-icon').classList.remove('open');
+    document.getElementById('problem-number').textContent='Problem #'+CS.count;
+    if(CS.type==='compute')genCompute();else if(CS.type==='weights')genWeights();else if(CS.type==='order')genOrder();
+};
+
+function genCompute(){
+    document.getElementById('problem-type-label').textContent='Compute';
+    const funcs=[{expr:'exp(-x^2)',display:'e^{-x^2}',a:0,b:1},{expr:'sin(x^2)',display:'\\sin(x^2)',a:0,b:1},{expr:'1/(1+x^4)',display:'\\tfrac{1}{1+x^4}',a:0,b:1},{expr:'x^2',display:'x^2',a:0,b:1}];
+    const meths=[{key:'trap',name:'trapezoidal rule',ns:[2,4]},{key:'simp',name:"Simpson's rule",ns:[2,4]},{key:'mid',name:'midpoint rule',ns:[2,4]}];
+    const f=funcs[Math.floor(Math.random()*funcs.length)],m=meths[Math.floor(Math.random()*meths.length)],n=m.ns[Math.floor(Math.random()*m.ns.length)];
+    const answer=integrate(f.expr,f.a,f.b,n,m.key);CS.answer=answer;
+    const qEl=document.getElementById('problem-question');
+    qEl.innerHTML='<p>Compute the <strong>'+m.name+'</strong> approximation of</p><div id="cq-formula" style="text-align:center;margin:.75rem 0"></div><p>using <strong>$n='+n+'$</strong> subintervals. Give your answer to 4 decimal places.</p>';
+    katex.render('\\int_{'+f.a+'}^{'+f.b+'} '+f.display+'\\, dx',document.getElementById('cq-formula'),{displayMode:true,throwOnError:false});
+    renderMath(qEl);
+    document.getElementById('problem-input-area').innerHTML='<input type="text" id="challenge-answer-input" placeholder="e.g., '+answer.toFixed(4)+'" autocomplete="off">';
+
+    const h=(f.b-f.a)/n;let steps='<div class="step"><strong>Step 1:</strong> $h=('+f.b+'-'+f.a+')/'+n+'='+h.toFixed(4)+'$</div>';
+    if(m.key==='mid'){const mids=[];for(let i=0;i<n;i++)mids.push((f.a+(i+.5)*h).toFixed(4));steps+='<div class="step"><strong>Step 2:</strong> Midpoints: $x='+mids.join(',\\;')+'$</div>';steps+='<div class="step"><strong>Step 3:</strong> Evaluate $f$ at each midpoint:</div>';let sum=0;mids.forEach(mx=>{const fv=safeEval(f.expr,parseFloat(mx));sum+=fv;steps+='<div class="step">$f('+mx+')='+fv.toFixed(6)+'$</div>';});steps+='<div class="step"><strong>Step 4:</strong> $M=h\\times[\\text{sum}]='+h.toFixed(4)+'\\times'+sum.toFixed(6)+'=\\mathbf{'+answer.toFixed(6)+'}$</div>';}
+    else if(m.key==='trap'){const nodes=[];for(let i=0;i<=n;i++)nodes.push((f.a+i*h).toFixed(4));steps+='<div class="step"><strong>Step 2:</strong> Nodes: $'+nodes.join(',\\;')+'$</div>';steps+='<div class="step"><strong>Step 3:</strong> Evaluate $f$ at each node:</div>';const vals=nodes.map(x=>safeEval(f.expr,parseFloat(x)));nodes.forEach((x,i)=>{steps+='<div class="step">$f('+x+')='+vals[i].toFixed(6)+'$</div>';});let wsum=vals[0]+vals[vals.length-1];for(let i=1;i<vals.length-1;i++)wsum+=2*vals[i];steps+='<div class="step"><strong>Step 4:</strong> Apply weights $[1,2,2,\\ldots,2,1]$ and multiply by $h/2$:</div><div class="step">$T=\\frac{'+h.toFixed(4)+'}{2}\\times'+wsum.toFixed(6)+'=\\mathbf{'+answer.toFixed(6)+'}$</div>';}
+    else if(m.key==='simp'){const nE=n%2===0?n:n+1,hE=(f.b-f.a)/nE;const nodes=[];for(let i=0;i<=nE;i++)nodes.push((f.a+i*hE).toFixed(4));steps+='<div class="step"><strong>Step 2:</strong> Nodes: $'+nodes.join(',\\;')+'$</div>';steps+='<div class="step"><strong>Step 3:</strong> Evaluate $f$ at each node:</div>';const vals=nodes.map(x=>safeEval(f.expr,parseFloat(x)));nodes.forEach((x,i)=>{steps+='<div class="step">$f('+x+')='+vals[i].toFixed(6)+'$</div>';});let wsum=vals[0]+vals[vals.length-1];for(let i=1;i<vals.length-1;i++)wsum+=(i%2===0?2:4)*vals[i];steps+='<div class="step"><strong>Step 4:</strong> Apply weights $[1,4,2,4,\\ldots,4,1]$ and multiply by $h/3$:</div><div class="step">$S=\\frac{'+hE.toFixed(4)+'}{3}\\times'+wsum.toFixed(6)+'=\\mathbf{'+answer.toFixed(6)+'}$</div>';}
+    const weSteps=document.getElementById('worked-example-steps');weSteps.innerHTML=steps;renderMath(weSteps);
+}
+
+function genWeights(){
+    document.getElementById('problem-type-label').textContent='Identify Weights';
+    const sc=[{weights:'1, 1, 1, 1',answer:'left',desc:'All evaluations receive equal weight, summed then multiplied by $h$.',name:'Left/Right Rectangle'},{weights:'1, 2, 2, 2, 1',answer:'trap',desc:'Endpoints count once, interior points count twice, all multiplied by $h/2$.',name:'Trapezoid'},{weights:'1, 4, 2, 4, 1',answer:'simp',desc:'Alternating pattern: $1, 4, 2, 4, \\ldots, 4, 1$, all multiplied by $h/3$.',name:"Simpson's Rule"},{weights:'evaluated at midpoints only',answer:'mid',desc:'Function evaluated only at the midpoint of each subinterval, multiplied by $h$.',name:'Midpoint Rule'}];
+    const s=sc[Math.floor(Math.random()*sc.length)];CS.answer=s.answer;
+    const qEl=document.getElementById('problem-question');
+    qEl.innerHTML='<p>A numerical integration method uses the following weight pattern for $n=4$:</p><div style="background:var(--interactive-bg);padding:.75rem 1rem;border-radius:6px;font-family:monospace;font-size:1.1rem;text-align:center;margin:.75rem 0"><strong>'+s.weights+'</strong></div><p>'+s.desc+'</p><p>Which method is this?</p>';
+    renderMath(qEl);
+    document.getElementById('problem-input-area').innerHTML='<select id="challenge-answer-input"><option value="">— Select —</option><option value="left">Left/Right Rectangle</option><option value="mid">Midpoint Rule</option><option value="trap">Trapezoid Rule</option><option value="simp">Simpson\'s Rule</option></select>';
+    const weSteps=document.getElementById('worked-example-steps');
+    weSteps.innerHTML='<div class="step"><strong>Pattern recognition:</strong></div><div class="step">• Rectangle rules: all weights equal (just $\\text{sum} \\times h$)</div><div class="step">• Midpoint: evaluated at subinterval centres only</div><div class="step">• Trapezoid: endpoints $\\times 1$, interior $\\times 2$, then $\\times h/2$</div><div class="step">• Simpson: alternating $1, 4, 2, 4, \\ldots, 4, 1$, then $\\times h/3$</div><div class="step"><strong>Answer:</strong> This is the <strong>'+s.name+'</strong>.</div>';
+    renderMath(weSteps);
+}
+
+function genOrder(){
+    document.getElementById('problem-type-label').textContent='Order from Ratios';
+    const funcs=[{expr:'exp(-x^2)',display:'e^{-x^2}'},{expr:'1/(1+x^4)',display:'\\tfrac{1}{1+x^4}'},{expr:'sin(x^2)',display:'\\sin(x^2)'}];
+    const meths=[{key:'mid',name:'Midpoint',eo:2},{key:'trap',name:'Trapezoid',eo:2},{key:'simp',name:"Simpson's",eo:4},{key:'left',name:'Left Rectangle',eo:1}];
+    const f=funcs[Math.floor(Math.random()*funcs.length)],m=meths[Math.floor(Math.random()*meths.length)],exact=benchmark(f.expr,0,1);
+    const e4=Math.abs(integrate(f.expr,0,1,4,m.key)-exact),e8=Math.abs(integrate(f.expr,0,1,8,m.key)-exact),e16=Math.abs(integrate(f.expr,0,1,16,m.key)-exact);
+    const r1=e4/e8,r2=e8/e16;CS.answer=m.eo;
+    const qEl=document.getElementById('problem-question');
+    qEl.innerHTML='<p>An unknown integration method applied to $f(x)='+f.display+'$ on $[0,1]$ gives:</p><table class="data-table" style="max-width:420px;margin:.75rem auto"><tr><th>$n$</th><th>|Error|</th><th>$E_n/E_{2n}$</th></tr><tr><td>4</td><td>'+e4.toExponential(3)+'</td><td>—</td></tr><tr><td>8</td><td>'+e8.toExponential(3)+'</td><td>'+r1.toFixed(2)+'</td></tr><tr><td>16</td><td>'+e16.toExponential(3)+'</td><td>'+r2.toFixed(2)+'</td></tr></table><p>What is the <strong>order of accuracy</strong> of this method?</p>';
+    renderMath(qEl);
+    document.getElementById('problem-input-area').innerHTML='<select id="challenge-answer-input"><option value="">— Select —</option><option value="1">Order 1 (ratios ≈ 2)</option><option value="2">Order 2 (ratios ≈ 4)</option><option value="4">Order 4 (ratios ≈ 16)</option></select>';
+    const avgR=(r1+r2)/2,weSteps=document.getElementById('worked-example-steps');
+    weSteps.innerHTML='<div class="step"><strong>Step 1:</strong> Read the error ratios from the table.</div><div class="step">$E_4/E_8='+r1.toFixed(2)+'$, &ensp; $E_8/E_{16}='+r2.toFixed(2)+'$</div><div class="step"><strong>Step 2:</strong> Average ratio $\\approx '+avgR.toFixed(2)+'$</div><div class="step"><strong>Step 3:</strong> Since $E_n/E_{2n} \\approx 2^p$:</div><div class="step">• Ratio $\\approx 2 \\Rightarrow p=1$ (first order)</div><div class="step">• Ratio $\\approx 4 \\Rightarrow p=2$ (second order)</div><div class="step">• Ratio $\\approx 16 \\Rightarrow p=4$ (fourth order)</div><div class="step"><strong>Answer:</strong> Ratios $\\approx '+avgR.toFixed(1)+'$, so this is <strong>order '+m.eo+'</strong> ('+m.name+' rule).</div>';
+    renderMath(weSteps);
+}
+
+window.checkChallengeAnswer=function(){
+    const input=document.getElementById('challenge-answer-input');if(!input)return;
+    const fb=document.getElementById('problem-feedback'),v=input.value.trim();
+    if(CS.type==='compute'){const num=parseFloat(v);if(isNaN(num)){fb.className='problem-feedback incorrect';fb.style.display='block';fb.textContent='Please enter a number.';return;}const ok=Math.abs(num-CS.answer)<.01;fb.className='problem-feedback '+(ok?'correct':'incorrect');fb.style.display='block';fb.textContent=ok?'✓ Correct! The answer is '+CS.answer.toFixed(6)+'.':'✗ Not quite. You entered '+num.toFixed(4)+', but the answer is '+CS.answer.toFixed(6)+'. Check the worked example.';}
+    else{if(!v){fb.className='problem-feedback incorrect';fb.style.display='block';fb.textContent='Please select an answer.';return;}const ok=v===String(CS.answer);fb.className='problem-feedback '+(ok?'correct':'incorrect');fb.style.display='block';fb.textContent=ok?'✓ Correct!':'✗ Not quite. Check the worked example for details.';}
+};
+
+window.toggleWorkedExample=function(){document.getElementById('worked-example-content').classList.toggle('show');document.getElementById('we-toggle-icon').classList.toggle('open');};
+
+// ── Tab & Mode switching ──
+window.switchTab=function(tabName){
+    document.querySelectorAll('.tab-button').forEach(btn=>{btn.classList.remove('active');if(btn.textContent.toLowerCase().replace(/\s/g,'').includes(tabName.substring(0,5)))btn.classList.add('active');});
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    document.getElementById(tabName+'-tab').classList.add('active');
+    renderMath(document.getElementById(tabName+'-tab'));
+};
+window.switchMode=function(mode){
+    document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));if(event&&event.target)event.target.classList.add('active');
+    document.querySelectorAll('.mode-content').forEach(c=>c.classList.remove('active'));document.getElementById('mode-'+mode).classList.add('active');
+};
+
+// ── Init ──
+renderPresets();
+updateFuncPreview();
+katex.render('T_n = \\frac{h}{2}\\bigl[f(x_0) + 2f(x_1) + 2f(x_2) + \\cdots + 2f(x_{n-1}) + f(x_n)\\bigr]',document.getElementById('formula-trap'),{displayMode:true,throwOnError:false});
+katex.render('S_n = \\frac{h}{3}\\bigl[f(x_0) + 4f(x_1) + 2f(x_2) + 4f(x_3) + \\cdots + 4f(x_{n-1}) + f(x_n)\\bigr]',document.getElementById('formula-simp'),{displayMode:true,throwOnError:false});
+renderMath(document.body);
+</script>
+</body>
+</html>
