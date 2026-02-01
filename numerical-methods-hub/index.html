@@ -24,14 +24,16 @@
             --accent-amber: #f59e0b;
             --success-green: #10b981;
             
-            /* Week colors */
-            --week1-color: #6366f1;
-            --week2-color: #8b5cf6;
-            --week3-color: #f97316;
-            --week4-color: #06b6d4;
-            --week5-color: #ec4899;
-            --week6-color: #10b981;
-            --week7-color: #f59e0b;
+            /* Topic colors */
+            --roots-1: #6366f1;
+            --roots-2: #8b5cf6;
+            --roots-3: #f97316;
+            --roots-4: #06b6d4;
+            --bridge: linear-gradient(135deg, #8b5cf6, #f97316);
+            --integ-1: #10b981;
+            --integ-2: #0d9488;
+            --extrap: #ec4899;
+            --ode: #f59e0b;
         }
         
         * {
@@ -199,25 +201,18 @@
             font-size: 0.9rem;
         }
         
-        .theme-card .weeks {
-            margin-top: 0.75rem;
-            font-size: 0.85rem;
-            color: var(--primary);
-            font-weight: 500;
-        }
-        
-        /* Weekly Cards */
-        .weeks-section {
+        /* App Cards */
+        .apps-section {
             margin-bottom: 2rem;
         }
         
-        .weeks-section h2 {
+        .apps-section h2 {
             color: var(--primary);
             text-align: center;
             margin-bottom: 1.5rem;
         }
         
-        .week-card {
+        .app-card {
             display: flex;
             align-items: stretch;
             background: white;
@@ -230,12 +225,12 @@
             color: inherit;
         }
         
-        .week-card:hover {
+        .app-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(15, 118, 110, 0.15);
         }
         
-        .week-number {
+        .app-icon-panel {
             width: 80px;
             min-width: 80px;
             display: flex;
@@ -247,27 +242,21 @@
             font-weight: 600;
         }
         
-        .week-number .num {
-            font-size: 2rem;
+        .app-icon-panel .icon-emoji {
+            font-size: 1.8rem;
             line-height: 1;
+            margin-bottom: 0.25rem;
         }
         
-        .week-number .label {
-            font-size: 0.7rem;
+        .app-icon-panel .icon-label {
+            font-size: 0.6rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-align: center;
+            line-height: 1.2;
         }
         
-        .week-card:nth-of-type(1) .week-number { background: var(--week1-color); }
-        .week-card:nth-of-type(2) .week-number { background: var(--week2-color); }
-        /* nth-of-type(3) is the Convergence card - styled inline */
-        .week-card:nth-of-type(4) .week-number { background: var(--week3-color); }
-        .week-card:nth-of-type(5) .week-number { background: var(--week4-color); }
-        .week-card:nth-of-type(6) .week-number { background: var(--week5-color); }
-        .week-card:nth-of-type(7) .week-number { background: var(--week6-color); }
-        .week-card:nth-of-type(8) .week-number { background: var(--week7-color); }
-        
-        .week-content {
+        .app-content {
             flex: 1;
             padding: 1.25rem 1.5rem;
             display: flex;
@@ -275,19 +264,19 @@
             justify-content: center;
         }
         
-        .week-content h3 {
+        .app-content h3 {
             color: var(--text-dark);
             font-size: 1.15rem;
             margin-bottom: 0.25rem;
         }
         
-        .week-content .description {
+        .app-content .description {
             color: var(--text-muted);
             font-size: 0.9rem;
             margin-bottom: 0.5rem;
         }
         
-        .week-content .topics {
+        .app-content .topics {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
@@ -301,7 +290,7 @@
             font-size: 0.75rem;
         }
         
-        .week-arrow {
+        .app-arrow {
             width: 60px;
             display: flex;
             align-items: center;
@@ -309,6 +298,27 @@
             color: var(--primary);
             font-size: 1.5rem;
             background: var(--bg-light);
+        }
+        
+        /* Section dividers */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-light);
         }
         
         /* Roadmap */
@@ -499,20 +509,20 @@
         <div class="hero">
             <span class="hero-badge">Level 5 · BSc Mathematics</span>
             <h1>Numerical Methods</h1>
-            <p class="subtitle">Interactive Explorations for Weeks 1–7</p>
+            <p class="subtitle">Interactive Explorations</p>
             <p class="author">Dr Amir Asghari</p>
         </div>
 
         <!-- Quick Start -->
         <div class="quick-start">
             <h3>🚀 Quick Start</h3>
-            <p>New to the module? Start with the Numerical Toolbox. Revising? Jump to any week.</p>
+            <p>New to the module? Start with the Numerical Toolbox. Otherwise, jump to any topic.</p>
             <div class="quick-start-buttons">
                 <a href="error/" class="quick-start-btn primary">
                     The Toolbox →
                 </a>
-                <a href="#weeks" class="quick-start-btn secondary">
-                    Browse All Weeks
+                <a href="#apps" class="quick-start-btn secondary">
+                    Browse Topics
                 </a>
             </div>
         </div>
@@ -534,19 +544,16 @@
                     <div class="icon">🎯</div>
                     <h3>Root Finding</h3>
                     <p>Solve f(x) = 0 by local linearisation or guaranteed bracketing</p>
-                    <div class="weeks">Weeks 1–4</div>
                 </div>
                 <div class="theme-card">
                     <div class="icon">📐</div>
                     <h3>Integration</h3>
                     <p>Replace curves by shapes; extrapolate to cancel error</p>
-                    <div class="weeks">Weeks 5–6</div>
                 </div>
                 <div class="theme-card">
                     <div class="icon">📈</div>
                     <h3>ODEs</h3>
                     <p>Replace the curve by local slope steps; combine slopes</p>
-                    <div class="weeks">Week 7</div>
                 </div>
             </div>
         </div>
@@ -581,16 +588,19 @@
             </div>
         </div>
 
-        <!-- Weekly Cards -->
-        <div class="weeks-section" id="weeks">
-            <h2>Weekly Explorations</h2>
+        <!-- App Cards -->
+        <div class="apps-section" id="apps">
+            <h2>Explorations</h2>
             
-            <a href="bisection/" class="week-card">
-                <div class="week-number">
-                    <span class="num">1</span>
-                    <span class="label">Week</span>
+            <!-- ===== ROOT FINDING ===== -->
+            <div class="section-divider">Root Finding</div>
+            
+            <a href="bisection/" class="app-card">
+                <div class="app-icon-panel" style="background: var(--roots-1);">
+                    <span class="icon-emoji">🎯</span>
+                    <span class="icon-label">Roots</span>
                 </div>
-                <div class="week-content">
+                <div class="app-content">
                     <h3>Bisection Method</h3>
                     <p class="description">Guaranteed root finding through interval halving. Slow but safe.</p>
                     <div class="topics">
@@ -599,15 +609,15 @@
                         <span class="topic-tag">Linear convergence</span>
                     </div>
                 </div>
-                <div class="week-arrow">→</div>
+                <div class="app-arrow">→</div>
             </a>
             
-            <a href="fixed-point/" class="week-card">
-                <div class="week-number">
-                    <span class="num">2</span>
-                    <span class="label">Week</span>
+            <a href="fixed-point/" class="app-card">
+                <div class="app-icon-panel" style="background: var(--roots-2);">
+                    <span class="icon-emoji">🔄</span>
+                    <span class="icon-label">Roots</span>
                 </div>
-                <div class="week-content">
+                <div class="app-content">
                     <h3>Fixed-Point Iteration</h3>
                     <p class="description">Transform f(x)=0 into x=g(x). Convergence depends on |g'(x*)|.</p>
                     <div class="topics">
@@ -616,15 +626,15 @@
                         <span class="topic-tag">Rearrangements</span>
                     </div>
                 </div>
-                <div class="week-arrow">→</div>
+                <div class="app-arrow">→</div>
             </a>
             
-            <a href="convergence/" class="week-card" style="border-left: 4px solid var(--accent-amber);">
-                <div class="week-number" style="background: linear-gradient(135deg, var(--week2-color), var(--week3-color));">
-                    <span class="num" style="font-size: 1.2rem;">📊</span>
-                    <span class="label">Bridge</span>
+            <a href="convergence/" class="app-card" style="border-left: 4px solid var(--accent-amber);">
+                <div class="app-icon-panel" style="background: linear-gradient(135deg, #8b5cf6, #f97316);">
+                    <span class="icon-emoji">📊</span>
+                    <span class="icon-label">Bridge</span>
                 </div>
-                <div class="week-content">
+                <div class="app-content">
                     <h3>Order of Convergence</h3>
                     <p class="description">Why do some methods gain digits faster? The logarithm surprise: C = 0.5 means 0.3 digits, not 0.5!</p>
                     <div class="topics">
@@ -633,15 +643,15 @@
                         <span class="topic-tag">Why Newton wins</span>
                     </div>
                 </div>
-                <div class="week-arrow">→</div>
+                <div class="app-arrow">→</div>
             </a>
             
-            <a href="newton/" class="week-card">
-                <div class="week-number">
-                    <span class="num">3</span>
-                    <span class="label">Week</span>
+            <a href="newton/" class="app-card">
+                <div class="app-icon-panel" style="background: var(--roots-3);">
+                    <span class="icon-emoji">⚡</span>
+                    <span class="icon-label">Roots</span>
                 </div>
-                <div class="week-content">
+                <div class="app-content">
                     <h3>Newton's Method</h3>
                     <p class="description">Follow the tangent line. Quadratic convergence — digits double each step!</p>
                     <div class="topics">
@@ -650,16 +660,16 @@
                         <span class="topic-tag">Failure modes</span>
                     </div>
                 </div>
-                <div class="week-arrow">→</div>
+                <div class="app-arrow">→</div>
             </a>
             
-            <a href="secant/" class="week-card">
-                <div class="week-number">
-                    <span class="num">4</span>
-                    <span class="label">Week</span>
+            <a href="secant/" class="app-card">
+                <div class="app-icon-panel" style="background: var(--roots-4);">
+                    <span class="icon-emoji">📐</span>
+                    <span class="icon-label">Roots</span>
                 </div>
-                <div class="week-content">
-                    <h3>Secant Method & Comparison</h3>
+                <div class="app-content">
+                    <h3>Secant Method &amp; Comparison</h3>
                     <p class="description">Newton without derivatives. Compare all four methods side by side.</p>
                     <div class="topics">
                         <span class="topic-tag">Finite differences</span>
@@ -667,15 +677,38 @@
                         <span class="topic-tag">Method comparison</span>
                     </div>
                 </div>
-                <div class="week-arrow">→</div>
+                <div class="app-arrow">→</div>
             </a>
             
-            <a href="richardson/" class="week-card">
-                <div class="week-number">
-                    <span class="num">5</span>
-                    <span class="label">Week</span>
+            <!-- ===== INTEGRATION ===== -->
+            <div class="section-divider">Integration</div>
+            
+            <a href="integration/" class="app-card">
+                <div class="app-icon-panel" style="background: var(--integ-1);">
+                    <span class="icon-emoji">∫</span>
+                    <span class="icon-label">Integration</span>
                 </div>
-                <div class="week-content">
+                <div class="app-content">
+                    <h3>Numerical Integration</h3>
+                    <p class="description">Five methods for approximating areas: left, right, midpoint, trapezoid, and Simpson's rule.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Quadrature rules</span>
+                        <span class="topic-tag">Visualisation</span>
+                        <span class="topic-tag">Convergence comparison</span>
+                    </div>
+                </div>
+                <div class="app-arrow">→</div>
+            </a>
+            
+            <!-- ===== EXTRAPOLATION ===== -->
+            <div class="section-divider">Extrapolation</div>
+            
+            <a href="richardson/" class="app-card">
+                <div class="app-icon-panel" style="background: var(--extrap);">
+                    <span class="icon-emoji">🔬</span>
+                    <span class="icon-label">Extrap.</span>
+                </div>
+                <div class="app-content">
                     <h3>Richardson Extrapolation</h3>
                     <p class="description">Combine two rough answers into one better answer. The engine behind Simpson and Romberg.</p>
                     <div class="topics">
@@ -684,32 +717,35 @@
                         <span class="topic-tag">Extrapolation formula</span>
                     </div>
                 </div>
-                <div class="week-arrow">→</div>
+                <div class="app-arrow">→</div>
             </a>
             
-            <a href="romberg/" class="week-card">
-                <div class="week-number">
-                    <span class="num">6</span>
-                    <span class="label">Week</span>
+            <a href="romberg/" class="app-card">
+                <div class="app-icon-panel" style="background: var(--integ-2);">
+                    <span class="icon-emoji">📊</span>
+                    <span class="icon-label">Integration</span>
                 </div>
-                <div class="week-content">
-                    <h3>Numerical Integration</h3>
-                    <p class="description">Midpoint, trapezium, Simpson, and Romberg. Repeated extrapolation in action.</p>
+                <div class="app-content">
+                    <h3>Romberg Integration</h3>
+                    <p class="description">Repeated extrapolation in action. Build a triangular table of ever-improving estimates.</p>
                     <div class="topics">
-                        <span class="topic-tag">Quadrature rules</span>
-                        <span class="topic-tag">Simpson's rule</span>
+                        <span class="topic-tag">Simpson from trapezoid</span>
                         <span class="topic-tag">Romberg table</span>
+                        <span class="topic-tag">Higher-order cancellation</span>
                     </div>
                 </div>
-                <div class="week-arrow">→</div>
+                <div class="app-arrow">→</div>
             </a>
             
-            <a href="ode/" class="week-card">
-                <div class="week-number">
-                    <span class="num">7</span>
-                    <span class="label">Week</span>
+            <!-- ===== ODEs ===== -->
+            <div class="section-divider">ODEs</div>
+            
+            <a href="ode/" class="app-card">
+                <div class="app-icon-panel" style="background: var(--ode);">
+                    <span class="icon-emoji">📈</span>
+                    <span class="icon-label">ODEs</span>
                 </div>
-                <div class="week-content">
+                <div class="app-content">
                     <h3>ODE Methods</h3>
                     <p class="description">Euler, Modified Euler, and RK4. Quadrature rules applied to differential equations.</p>
                     <div class="topics">
@@ -718,7 +754,7 @@
                         <span class="topic-tag">Local vs global error</span>
                     </div>
                 </div>
-                <div class="week-arrow">→</div>
+                <div class="app-arrow">→</div>
             </a>
         </div>
 
