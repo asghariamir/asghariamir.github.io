@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
@@ -1150,6 +1150,14 @@ function updBaskets(){
     for(let p=0;p<2;p++){
         $(`bkp${p+1}`).innerHTML=ST.pairs[p].map(pr=>
             `<span class="bk-c">${N(pr.a)}×${N(pr.b)}=${N(pr.p)}</span>`
+        ).join('');
+    }
+}
+
+applyT();
+</script>
+</body>
+</html>
         ).join('');
     }
 }
