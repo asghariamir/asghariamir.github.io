@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nagmeh — The Multiplication Chase | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #0a5c56;
+            --bg: #f7faf9;
+            --interactive: #e6fffb;
+            --text: #212121;
+            --muted: #4b5563;
+            --amber: #f59e0b;
+            --gold: #d97706;
+            --red: #dc2626;
+            --success: #10b981;
+            --p1: #0f766e;
+            --p1-bg: #e6fffb;
+            --p2: #d97706;
+            --p2-bg: #fef3c7;
+            --card-w: 74px;
+            --card-h: 74px;
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        button, input, select, textarea { font-family:inherit; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg); color: var(--text);
+            padding-top: 52px; min-height: 100vh;
+        }
+        [dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+
+        /* NAV */
+        .nav { position:fixed; top:0; left:0; right:0; background:white;
+            border-bottom:2px solid var(--primary); padding:0.6rem 1rem;
+            z-index:1000; display:flex; justify-content:center; align-items:center; }
+        .nav a { display:flex; align-items:center; gap:0.5rem; text-decoration:none;
+            color:var(--primary); font-weight:600; letter-spacing:1px; font-size:0.85rem; }
+
+        /* LANG */
+        .lang { position:fixed; top:58px; right:10px; z-index:999;
+            display:flex; gap:3px; background:white; border-radius:18px; padding:2px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+        [dir="rtl"] .lang { right:auto; left:10px; }
+        .lang button { padding:3px 10px; border:none; border-radius:14px; font-size:0.78rem;
+            cursor:pointer; font-weight:600; background:transparent; color:var(--muted); transition:0.2s; }
+        .lang button.on { background:var(--primary); color:white; }
+
+        .wrap { max-width:700px; margin:0 auto; padding:0.75rem 1rem 2rem; }
+
+        .scr { display:none; animation: fadeUp 0.35s ease; }
+        .scr.on { display:block; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ─── SETUP ─── */
+        .hero { text-align:center; padding:1.25rem 0 0.5rem; }
+        .hero-icon { font-size:3rem; color:var(--primary); font-weight:800; line-height:1;
+            text-shadow: 0 2px 8px rgba(15,118,110,0.2); }
+        .hero h1 { font-size:2rem; color:var(--primary); font-weight:800; }
+        [dir="rtl"] .hero h1 { font-size:2.2rem; }
+        .hero .sub { font-size:1rem; color:var(--muted); margin-top:0.1rem; font-weight:500; }
+        .hero .tag { font-size:0.82rem; color:var(--gold); font-style:italic; margin-top:0.25rem; }
+
+        .ded { text-align:center; background:var(--interactive); border:1px solid var(--primary);
+            border-radius:10px; padding:0.6rem 1rem; margin:0.6rem 0 1rem;
+            font-size:0.82rem; color:var(--primary-dark); line-height:1.5; }
+        .ded small { display:block; font-style:italic; color:var(--muted); margin-top:0.15rem; font-size:0.78rem; }
+
+        /* HOW TO PLAY */
+        .htp { background:white; border-radius:12px; margin-bottom:1rem;
+            box-shadow:0 4px 16px rgba(0,0,0,0.08); overflow:hidden; }
+        .htp-toggle { width:100%; padding:0.85rem 1.25rem; border:none; background:white;
+            display:flex; justify-content:space-between; align-items:center;
+            cursor:pointer; font-size:1rem; font-weight:700; color:var(--primary); }
+        .htp-toggle:hover { background:var(--interactive); }
+        .htp-arrow { transition:transform 0.3s; font-size:1.2rem; }
+        .htp.open .htp-arrow { transform:rotate(180deg); }
+        .htp-body { display:none; padding:0 1.25rem 1.25rem; }
+        .htp.open .htp-body { display:block; }
+
+        .htp-section { margin-bottom:1rem; }
+        .htp-section:last-child { margin-bottom:0; }
+        .htp-h { font-size:0.88rem; font-weight:700; color:var(--primary-dark); margin-bottom:0.4rem; }
+        .htp-p { font-size:0.82rem; color:var(--muted); line-height:1.6; margin-bottom:0.35rem; }
+
+        .htp-steps { counter-reset:step; padding:0; list-style:none; }
+        .htp-steps li { counter-increment:step; position:relative;
+            padding:0.35rem 0 0.35rem 2.2rem; font-size:0.82rem; color:var(--text); line-height:1.5; }
+        .htp-steps li::before { content:counter(step); position:absolute; left:0; top:0.3rem;
+            width:1.5rem; height:1.5rem; border-radius:50%; background:var(--primary); color:white;
+            font-size:0.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+        [dir="rtl"] .htp-steps li { padding:0.35rem 2.2rem 0.35rem 0; }
+        [dir="rtl"] .htp-steps li::before { left:auto; right:0; }
+
+        .htp-mode-box { display:flex; gap:10px; margin-top:0.5rem; }
+        .htp-mode { flex:1; padding:0.65rem; border-radius:8px; border:2px solid #e5e7eb; }
+        .htp-mode-title { font-size:0.78rem; font-weight:700; margin-bottom:0.3rem; }
+        .htp-mode.classic-box { border-color:var(--primary); }
+        .htp-mode.classic-box .htp-mode-title { color:var(--primary); }
+        .htp-mode.reverse-box { border-color:var(--gold); }
+        .htp-mode.reverse-box .htp-mode-title { color:var(--gold); }
+        .htp-card-demo { display:inline-flex; align-items:center; justify-content:center;
+            padding:3px 8px; border-radius:5px; font-size:0.75rem; font-weight:700; margin:1px 2px; }
+        .htp-card-hidden { background:linear-gradient(135deg, var(--primary), var(--primary-light));
+            color:rgba(255,255,255,0.5); }
+        .htp-card-hidden.amber-back { background:linear-gradient(135deg, var(--gold), var(--amber)); }
+        .htp-card-visible { background:white; border:1.5px solid #d1d5db; color:var(--text); }
+        .htp-mode p { font-size:0.75rem; color:var(--muted); line-height:1.5; margin-top:0.3rem; }
+
+        /* SETTINGS PANEL */
+        .panel { background:white; border-radius:12px; padding:1.25rem;
+            box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+        .panel-title { font-size:1.05rem; font-weight:700; color:var(--primary);
+            text-align:center; margin-bottom:1rem; }
+
+        .sg { margin-bottom:1rem; }
+        .sg-label { font-size:0.82rem; font-weight:600; display:block; margin-bottom:0.35rem; }
+        .sg-desc { font-size:0.72rem; color:var(--muted); margin-top:2px; }
+
+        .pills { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; }
+        .pill { width:40px; height:40px; border-radius:50%; border:2px solid var(--primary);
+            background:white; color:var(--primary); font-weight:700; font-size:0.95rem;
+            cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s; }
+        .pill:hover { background:var(--interactive); transform:translateY(-2px); }
+        .pill.on { background:var(--primary); color:white; box-shadow:0 2px 8px rgba(15,118,110,0.3); }
+
+        .opts { display:flex; gap:7px; flex-wrap:wrap; }
+        .opt { flex:1; min-width:110px; padding:0.55rem 0.7rem; border:2px solid var(--primary);
+            border-radius:8px; background:white; color:var(--primary); font-weight:600;
+            font-size:0.82rem; cursor:pointer; text-align:center; transition:0.2s; }
+        .opt:hover { background:var(--interactive); }
+        .opt.on { background:var(--primary); color:white; }
+
+        .sld { display:flex; align-items:center; gap:8px; }
+        .sld input[type=range] { flex:1; accent-color:var(--primary); }
+        .sld-v { font-weight:700; color:var(--primary); min-width:30px; text-align:center; font-size:1rem; }
+
+        .go { display:block; width:100%; padding:0.9rem; margin-top:1.2rem;
+            background:var(--primary); color:white; border:none; border-radius:10px;
+            font-size:1.1rem; font-weight:700; cursor:pointer; transition:0.2s; letter-spacing:0.5px; }
+        .go:hover { background:var(--primary-dark); transform:translateY(-2px);
+            box-shadow:0 4px 12px rgba(15,118,110,0.3); }
+
+        /* ─── GAME ─── */
+        .pbar { display:flex; gap:8px; margin-bottom:0.6rem; align-items:stretch; }
+        .pbox { flex:1; padding:0.45rem 0.6rem; border-radius:10px; text-align:center;
+            border:2px solid transparent; transition:0.3s; }
+        .pbox.p1 { background:var(--p1-bg); }
+        .pbox.p2 { background:var(--p2-bg); }
+        .pbox.cur.p1 { border-color:var(--p1); box-shadow:0 0 10px rgba(15,118,110,0.2); }
+        .pbox.cur.p2 { border-color:var(--p2); box-shadow:0 0 10px rgba(217,119,6,0.2); }
+        .pn { font-weight:700; font-size:0.82rem; }
+        .pbox.p1 .pn { color:var(--p1); }
+        .pbox.p2 .pn { color:var(--p2); }
+        .pscore { font-size:1.3rem; font-weight:800; margin-top:1px; }
+        .pbox.p1 .pscore { color:var(--p1); }
+        .pbox.p2 .pscore { color:var(--p2); }
+
+        .tmr { display:flex; align-items:center; justify-content:center; padding:0 0.4rem;
+            font-size:1rem; font-weight:700; color:var(--primary); min-width:56px; }
+        .tmr.low { color:var(--red); animation: pulse 0.5s infinite alternate; }
+        @keyframes pulse { from{transform:scale(1)} to{transform:scale(1.06)} }
+
+        .msg { text-align:center; padding:0.45rem 0.5rem; border-radius:8px; font-weight:600;
+            font-size:0.88rem; margin-bottom:0.6rem; min-height:2.2em;
+            display:flex; align-items:center; justify-content:center; transition:0.3s; }
+        .msg.n { background:var(--interactive); color:var(--primary); }
+        .msg.g { background:#d1fae5; color:#065f46; }
+        .msg.b { background:#fee2e2; color:#991b1b; }
+        .msg.i { background:#fef3c7; color:#92400e; }
+
+        .slbl { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px;
+            color:var(--muted); margin-bottom:0.35rem; text-align:center; }
+
+        /* CARDS */
+        .cgrid { display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-bottom:0.85rem;
+            perspective:1000px; }
+        .crd { width:var(--card-w); height:var(--card-h); perspective:600px;
+            cursor:pointer; transition:opacity 0.3s, transform 0.3s; }
+        .crd.gone { opacity:0; pointer-events:none; transform:scale(0.4); }
+        .crd.off { pointer-events:none; opacity:0.45; }
+        .ci { position:relative; width:100%; height:100%; transition:transform 0.4s ease;
+            transform-style:preserve-3d; }
+        .crd.flip .ci { transform:rotateY(180deg); }
+        .cf { position:absolute; width:100%; height:100%; backface-visibility:hidden;
+            border-radius:8px; display:flex; align-items:center; justify-content:center;
+            font-weight:700; border:2px solid transparent; }
+
+        /* Card backs */
+        .cb { background:linear-gradient(145deg, var(--primary) 0%, var(--primary-light) 100%);
+            color:rgba(255,255,255,0.25); font-size:1.2rem; border-color:rgba(255,255,255,0.12); }
+        .cb::before { content:'?'; }
+        .crd.ans .cb { background:linear-gradient(145deg, var(--gold) 0%, var(--amber) 100%); }
+
+        /* Card fronts */
+        .cff { transform:rotateY(180deg); background:white; border-color:#d1d5db; }
+        .crd.fact .cff { font-size:0.85rem; color:var(--text); padding:2px; line-height:1.2; text-align:center; }
+        .crd.ans .cff { font-size:1.15rem; color:var(--text); }
+
+        /* Card states */
+        .crd.elig .cff { border-color:var(--success); background:#ecfdf5; }
+        .crd.nelig .cff { border-color:var(--red); background:#fef2f2; }
+        .crd.sel .cff { border-color:var(--primary); box-shadow:0 0 10px rgba(15,118,110,0.3); background:var(--interactive); }
+        .crd.ans.sel .cff { border-color:var(--amber); box-shadow:0 0 10px rgba(245,158,11,0.3); background:var(--p2-bg); }
+        .crd.cok .cff { border-color:var(--success); background:#d1fae5; }
+        .crd.cbad .cff { border-color:var(--red); background:#fee2e2; }
+        .crd.nomatch .cff { border-color:var(--red); background:#fef2f2; }
+
+        @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)}
+            40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+        .crd.shk { animation:shake 0.35s ease; }
+        @keyframes celeb { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(0.3);opacity:0} }
+        .crd.cel { animation:celeb 0.55s ease forwards; }
+
+        /* TRAY */
+        .tray { display:flex; align-items:center; justify-content:center; gap:10px;
+            background:white; border:2px dashed var(--primary); border-radius:12px;
+            padding:0.65rem 0.8rem; margin-bottom:0.85rem; min-height:66px; }
+        .ts { width:88px; height:52px; border:2px dashed #cbd5e1; border-radius:8px;
+            display:flex; align-items:center; justify-content:center; font-weight:700;
+            font-size:0.92rem; color:var(--muted); background:var(--bg); transition:0.3s; }
+        .ts.f { border-style:solid; background:white; color:var(--text); }
+        .ts.ff.f { border-color:var(--primary); background:var(--interactive); }
+        .ts.af.f { border-color:var(--amber); background:var(--p2-bg); }
+        .ta { font-size:1.2rem; color:var(--primary); font-weight:700; }
+        [dir="rtl"] .gbar .gbtn:first-child span:first-child { display:inline-block; transform:scaleX(-1); }
+        .tw { display:flex; flex-direction:column; align-items:center; }
+        .tlbl { font-size:0.62rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-top:2px; }
+
+        /* BASKETS */
+        .bks { display:flex; gap:8px; margin-top:0.6rem; }
+        .bk { flex:1; padding:0.4rem 0.5rem; border-radius:8px; min-height:40px; }
+        .bk.b1 { background:var(--p1-bg); border:1px solid rgba(15,118,110,0.15); }
+        .bk.b2 { background:var(--p2-bg); border:1px solid rgba(217,119,6,0.15); }
+        .bk-t { font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+        .bk.b1 .bk-t { color:var(--p1); }
+        .bk.b2 .bk-t { color:var(--p2); }
+        .bk-p { display:flex; flex-wrap:wrap; gap:3px; }
+        .bk-c { font-size:0.68rem; padding:2px 5px; border-radius:4px; font-weight:600; background:white; }
+        .bk.b1 .bk-c { color:var(--p1); }
+        .bk.b2 .bk-c { color:var(--p2); }
+
+        /* ─── GAME OVER ─── */
+        .gop { text-align:center; background:white; border-radius:16px; padding:2rem 1.5rem;
+            box-shadow:0 8px 32px rgba(0,0,0,0.12); margin-top:1rem; }
+        .gop h2 { font-size:1.7rem; color:var(--primary); margin-bottom:0.4rem; }
+        .wt { font-size:1.2rem; font-weight:700; margin-bottom:1rem; }
+        .fs { display:flex; gap:1rem; justify-content:center; margin-bottom:1.5rem; }
+        .fsb { padding:0.9rem 1.3rem; border-radius:12px; min-width:110px; }
+        .fsb.p1 { background:var(--p1-bg); }
+        .fsb.p2 { background:var(--p2-bg); }
+        .fsb .fn { font-weight:700; font-size:0.85rem; }
+        .fsb.p1 .fn { color:var(--p1); }
+        .fsb.p2 .fn { color:var(--p2); }
+        .fsb .fv { font-size:2rem; font-weight:800; margin-top:2px; }
+        .fsb.p1 .fv { color:var(--p1); }
+        .fsb.p2 .fv { color:var(--p2); }
+        .fsb .fc { font-size:0.78rem; color:var(--muted); margin-top:2px; }
+        .brow { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+        .bp { padding:0.7rem 1.4rem; border:none; border-radius:8px; background:var(--primary);
+            color:white; font-weight:700; font-size:0.95rem; cursor:pointer; transition:0.2s; }
+        .bp:hover { background:var(--primary-dark); transform:translateY(-2px); }
+        .bs { padding:0.7rem 1.4rem; border:2px solid var(--primary); border-radius:8px;
+            background:white; color:var(--primary); font-weight:700; font-size:0.95rem;
+            cursor:pointer; transition:0.2s; }
+        .bs:hover { background:var(--interactive); }
+
+        .hid { display:none !important; }
+
+        /* Game controls bar */
+        .gbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; }
+        .gbtn { padding:0.35rem 0.7rem; border:1.5px solid var(--primary); border-radius:6px;
+            background:white; color:var(--primary); font-size:0.78rem; font-weight:600;
+            cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:4px; }
+        .gbtn:hover { background:var(--interactive); }
+        .gbar-info { font-size:0.75rem; color:var(--muted); font-weight:600; text-align:center; }
+
+        @media(max-width:520px) {
+            :root { --card-w:62px; --card-h:62px; }
+            .hero h1 { font-size:1.6rem; }
+            .crd.fact .cff { font-size:0.72rem; }
+            .ts { width:72px; height:44px; font-size:0.82rem; }
+            .pill { width:36px; height:36px; font-size:0.85rem; }
+            .htp-mode-box { flex-direction:column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/">
+            <img src="/logo-mathswell-square-mirror.svg" alt="" width="26" height="26" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    <div class="lang">
+        <button class="on" onclick="setLang('en')">EN</button>
+        <button onclick="setLang('fa')">فا</button>
+    </div>
+
+    <div class="wrap">
+        <!-- ═══ SETUP ═══ -->
+        <div id="S" class="scr on">
+            <div class="hero">
+                <div class="hero-icon">×</div>
+                <h1 id="t-title">Nagmeh</h1>
+                <div class="sub" id="t-sub">The Multiplication Chase</div>
+                <div class="tag" id="t-tag">Catch the right multiplication before it's gone</div>
+            </div>
+            <div class="ded">
+                <span id="t-ded">Inspired by a classroom card game shared by an Iranian mathematics teacher</span>
+                <small id="t-ded2">Because the best learning feels like play</small>
+            </div>
+
+            <!-- HOW TO PLAY -->
+            <div class="htp open" id="htpBox">
+                <button class="htp-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    <span id="t-htp">How to Play</span>
+                    <span class="htp-arrow">▾</span>
+                </button>
+                <div class="htp-body">
+                    <div class="htp-section">
+                        <div class="htp-h" id="t-htpGoal">Goal</div>
+                        <p class="htp-p" id="t-htpGoalP">Be the first to collect matching pairs of multiplication facts and their answers for a chosen target number.</p>
+                    </div>
+
+                    <div class="htp-section">
+                        <div class="htp-h" id="t-htpTurn">Your Turn</div>
+                        <ol class="htp-steps" id="htpSteps">
+                            <li id="t-hs1">Reveal a hidden card by tapping it.</li>
+                            <li id="t-hs2">If it belongs to your target number's table — great, continue! If not, your turn is over.</li>
+                            <li id="t-hs3">Now find its match from the visible cards on the board.</li>
+                            <li id="t-hs4">Correct match? The pair goes to your basket. Wrong? Both cards go back.</li>
+                        </ol>
+                    </div>
+
+                    <div class="htp-section">
+                        <div class="htp-h" id="t-htpModes">Two Ways to Play</div>
+                        <div class="htp-mode-box">
+                            <div class="htp-mode classic-box">
+                                <div class="htp-mode-title" id="t-htpClassic">Classic</div>
+                                <div>
+                                    <span class="htp-card-demo htp-card-hidden">?</span>
+                                    <span style="font-size:0.72rem;color:var(--muted)" id="t-htpCFact">← Fact cards hidden</span>
+                                </div>
+                                <div style="margin-top:3px">
+                                    <span class="htp-card-demo htp-card-visible" id="htp-demo-ans">35</span>
+                                    <span style="font-size:0.72rem;color:var(--muted)" id="t-htpCAns">← Answer cards visible</span>
+                                </div>
+                                <p id="t-htpCP">You reveal a fact (e.g. 7 × 5), then find its answer (35) from the visible cards.</p>
+                            </div>
+                            <div class="htp-mode reverse-box">
+                                <div class="htp-mode-title" id="t-htpReverse">Reverse</div>
+                                <div>
+                                    <span class="htp-card-demo htp-card-visible" id="htp-demo-fact">7 × 5</span>
+                                    <span style="font-size:0.72rem;color:var(--muted)" id="t-htpRFact">← Fact cards visible</span>
+                                </div>
+                                <div style="margin-top:3px">
+                                    <span class="htp-card-demo htp-card-hidden amber-back">?</span>
+                                    <span style="font-size:0.72rem;color:var(--muted)" id="t-htpRAns">← Answer cards hidden</span>
+                                </div>
+                                <p id="t-htpRP">You reveal an answer (e.g. 35), then find the fact (7 × 5) from the visible cards.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="htp-section">
+                        <div class="htp-h" id="t-htpRules">Rules</div>
+                        <p class="htp-p" id="t-htpR1"><strong style="color:var(--primary)">Pure Table:</strong> only facts written as Target × n count (e.g. for target 7: only 7×2, 7×3, … 7×12).</p>
+                        <p class="htp-p" id="t-htpR2"><strong style="color:var(--primary)">Multiples:</strong> any fact whose product is a multiple of the target counts (e.g. for target 7: both 7×5 and 5×7 count since 35 is a multiple of 7).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div class="panel">
+                <div class="panel-title" id="t-set">Game Settings</div>
+
+                <div class="sg">
+                    <label class="sg-label" id="t-tgt">Target Number</label>
+                    <div class="pills" id="tgt-pills"></div>
+                </div>
+
+                <div class="sg">
+                    <label class="sg-label" id="t-rule">Eligibility Rule</label>
+                    <div class="opts">
+                        <button class="opt on" data-s="rule" data-v="pure" onclick="setS(this)">
+                            <span id="t-pure">Pure Table</span></button>
+                        <button class="opt" data-s="rule" data-v="multiples" onclick="setS(this)">
+                            <span id="t-mult">Multiples</span></button>
+                    </div>
+                    <div class="sg-desc" id="rule-desc"></div>
+                </div>
+
+                <div class="sg">
+                    <label class="sg-label" id="t-mode">Card Mode</label>
+                    <div class="opts">
+                        <button class="opt on" data-s="mode" data-v="classic" onclick="setS(this)">
+                            <span id="t-classic">Classic</span></button>
+                        <button class="opt" data-s="mode" data-v="reverse" onclick="setS(this)">
+                            <span id="t-rev">Reverse</span></button>
+                    </div>
+                    <div class="sg-desc" id="mode-desc"></div>
+                </div>
+
+                <div class="sg">
+                    <label class="sg-label" id="t-win">Win Condition</label>
+                    <div class="opts" style="margin-bottom:7px">
+                        <button class="opt on" data-s="winType" data-v="pairs" onclick="setS(this)">
+                            <span id="t-fp">First to N pairs</span></button>
+                        <button class="opt" data-s="winType" data-v="time" onclick="setS(this)">
+                            <span id="t-tl">Time Limit</span></button>
+                    </div>
+                    <div id="psl" class="sld">
+                        <span style="font-size:0.78rem;color:var(--muted)" id="psl-min">3</span>
+                        <input type="range" min="3" max="8" value="5" id="pR"
+                            oninput="C.targetPairs=+this.value;$('pV').textContent=N(this.value)">
+                        <span style="font-size:0.78rem;color:var(--muted)" id="psl-max">8</span>
+                        <span class="sld-v" id="pV">5</span>
+                        <span style="font-size:0.78rem;color:var(--muted)" id="t-pr">pairs</span>
+                    </div>
+                    <div id="tsl" class="sld hid">
+                        <span style="font-size:0.78rem;color:var(--muted)" id="tsl-min">1</span>
+                        <input type="range" min="1" max="5" value="2" id="tR"
+                            oninput="C.timeLimit=+this.value*60;$('tV').textContent=N(this.value)">
+                        <span style="font-size:0.78rem;color:var(--muted)" id="tsl-max">5</span>
+                        <span class="sld-v" id="tV">2</span>
+                        <span style="font-size:0.78rem;color:var(--muted)" id="t-mn">min</span>
+                    </div>
+                </div>
+
+                <div class="sg">
+                    <label class="sg-label" id="t-pl">Players</label>
+                    <div class="opts">
+                        <button class="opt" data-s="players" data-v="1" onclick="setS(this)">
+                            <span id="t-solo">Solo</span></button>
+                        <button class="opt on" data-s="players" data-v="2" onclick="setS(this)">
+                            <span id="t-2p">2 Players</span></button>
+                    </div>
+                </div>
+
+                <div class="sg">
+                    <label class="sg-label" id="t-str">Streak Mode</label>
+                    <div class="opts">
+                        <button class="opt" data-s="streak" data-v="on" onclick="setS(this)">
+                            <span id="t-on">On</span></button>
+                        <button class="opt on" data-s="streak" data-v="off" onclick="setS(this)">
+                            <span id="t-off">Off</span></button>
+                    </div>
+                    <div class="sg-desc" id="t-strd">Extra turn on correct match</div>
+                </div>
+
+                <button class="go" onclick="startGame()" id="t-go">▶ Start Game</button>
+            </div>
+        </div>
+
+        <!-- ═══ GAME ═══ -->
+        <div id="G" class="scr">
+            <div class="gbar">
+                <button class="gbtn" onclick="back()">
+                    <span>←</span> <span id="t-backSet">Settings</span>
+                </button>
+                <div class="gbar-info" id="gbar-info"></div>
+                <button class="gbtn" onclick="startGame()">
+                    <span>↻</span> <span id="t-restart">Restart</span>
+                </button>
+            </div>
+            <div class="pbar">
+                <div class="pbox p1" id="pb1">
+                    <div class="pn" id="pn1"></div>
+                    <div class="pscore" id="ps1">0</div>
+                </div>
+                <div class="tmr hid" id="tmr"></div>
+                <div class="pbox p2" id="pb2">
+                    <div class="pn" id="pn2"></div>
+                    <div class="pscore" id="ps2">0</div>
+                </div>
+            </div>
+            <div class="msg n" id="msg"></div>
+
+            <div class="slbl" id="t-fc">Fact Cards</div>
+            <div class="cgrid" id="fg"></div>
+
+            <div class="tray">
+                <div class="tw">
+                    <div class="ts ff" id="tf"><span class="ts-ph">—</span></div>
+                    <div class="tlbl" id="tfl">Fact</div>
+                </div>
+                <div class="ta">=</div>
+                <div class="tw">
+                    <div class="ts af" id="ta"><span class="ts-ph">—</span></div>
+                    <div class="tlbl" id="tal">Answer</div>
+                </div>
+            </div>
+
+            <div class="slbl" id="t-ac">Answer Cards</div>
+            <div class="cgrid" id="ag"></div>
+
+            <div class="bks">
+                <div class="bk b1">
+                    <div class="bk-t" id="bkt1"></div>
+                    <div class="bk-p" id="bkp1"></div>
+                </div>
+                <div class="bk b2" id="bk2w">
+                    <div class="bk-t" id="bkt2"></div>
+                    <div class="bk-p" id="bkp2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ GAME OVER ═══ -->
+        <div id="O" class="scr">
+            <div class="gop">
+                <h2 id="t-go2">Game Over!</h2>
+                <div class="wt" id="wt"></div>
+                <div class="fs" id="fsc"></div>
+                <div class="brow">
+                    <button class="bp" onclick="startGame()" id="t-pa">Play Again</button>
+                    <button class="bs" onclick="back()" id="t-ng">New Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* ═══ TRANSLATIONS ═══ */
+const L={
+en:{
+    title:'Nagmeh', sub:'The Multiplication Chase',
+    tag:'Catch the right multiplication before it\'s gone',
+    ded:'Inspired by a classroom card game shared by an Iranian mathematics teacher',
+    ded2:'Because the best learning feels like play',
+    htp:'How to Play',
+    htpGoal:'Goal', htpGoalP:'Be the first to collect matching pairs of multiplication facts and their answers for a chosen target number.',
+    htpTurn:'Your Turn',
+    hs1:'Reveal a hidden card by tapping it.',
+    hs2:'If it belongs to your target number\'s table — great, continue! If not, your turn is over.',
+    hs3:'Now find its match from the visible cards on the board.',
+    hs4:'Correct match? The pair goes to your basket. Wrong? Both cards go back.',
+    htpModes:'Two Ways to Play',
+    htpClassic:'Classic', htpCFact:'← Fact cards hidden', htpCAns:'← Answer cards visible',
+    htpCP:'You reveal a fact (e.g. 7 × 5), then find its answer (35) from the visible cards.',
+    htpReverse:'Reverse', htpRFact:'← Fact cards visible', htpRAns:'← Answer cards hidden',
+    htpRP:'You reveal an answer (e.g. 35), then find the matching fact (7 × 5) from the visible cards.',
+    htpRules:'Rules',
+    htpR1:'Pure Table: only facts written as Target × n count (e.g. for target 7: only 7×2, 7×3, … 7×12).',
+    htpR2:'Multiples: any fact whose product is a multiple of the target counts (e.g. for target 7: both 7×5 and 5×7 count since 35 is a multiple of 7).',
+    set:'Game Settings', tgt:'Target Number', rule:'Eligibility Rule',
+    pure:'Pure Table', mult:'Multiples',
+    pureD:'Only __T__ × n facts count', multD:'Any fact whose product is a multiple of __T__',
+    mode:'Card Mode', classic:'Classic', rev:'Reverse',
+    classicD:'Hidden facts, visible answers', revD:'Visible facts, hidden answers',
+    win:'Win Condition', fp:'First to N pairs', tl:'Time Limit',
+    pr:'pairs', mn:'min',
+    pl:'Players', solo:'Solo', '2p':'2 Players',
+    str:'Streak Mode', strd:'Extra turn on correct match',
+    on:'On', off:'Off', go:'▶ Start Game',
+    player:'Player', fc:'Fact Cards', ac:'Answer Cards',
+    fl:'Fact', al:'Answer',
+    pickFact:'Tap a hidden fact card!',
+    pickAns:'Tap a hidden answer card!',
+    nelig:'Not a __T__× fact! Turn lost.',
+    neligM:'Product is not a multiple of __T__! Turn lost.',
+    noMatch:'No eligible fact for this answer! Turn lost.',
+    eligFact:'✓ It\'s a __T__× fact! Now find the answer.',
+    eligFactM:'✓ Product is a multiple of __T__! Now find the answer.',
+    revealedAns:'Revealed __V__! Now find the matching fact.',
+    matchFact:'Now pick the fact that equals __V__.',
+    ok:'✓ Correct!',
+    wrongAns:'__A__ × __B__ = __P__, not __W__',
+    wrongFact:'__A__ × __B__ = __P__, not __V__',
+    notEligFact:'That fact is not eligible for __T__!',
+    bonus:'Bonus turn!',
+    over:'Game Over!', wins:'__N__ wins!', draw:'It\'s a draw!',
+    soloW:'You did it!', soloL:'Time\'s up!',
+    pa:'Play Again', ng:'New Game',
+    backSet:'Settings', restart:'Restart', gbarInfo:'Target: __T__',
+    noEl:'No more playable pairs on the board!',
+    bask:'pairs', turn:'__N__\'s turn'
+},
+fa:{
+    title:'نغمه', sub:'مسابقه ضرب',
+    tag:'ضرب درست رو قبل از اینکه بره پیدا کن',
+    ded:'الهام‌گرفته از یک بازی کلاسی پیشنهادشده توسط یک معلم ریاضی ایرانی',
+    ded2:'چون بهترین یادگیری، شبیه بازی است',
+    htp:'طرز بازی',
+    htpGoal:'هدف', htpGoalP:'اولین نفری باشید که جفت‌های درست ضرب و جواب را برای عدد هدف انتخابی جمع می‌کند.',
+    htpTurn:'نوبت شما',
+    hs1:'با ضربه زدن، یک کارت پنهان را رو کنید.',
+    hs2:'اگر به جدول ضرب عدد هدف شما مربوط است — عالی، ادامه دهید! اگر نه، نوبتتان تمام می‌شود.',
+    hs3:'حالا جفت آن را از بین کارت‌های آشکار روی میز پیدا کنید.',
+    hs4:'جفت درست؟ به سبد شما می‌رود. اشتباه؟ هر دو کارت برمی‌گردند.',
+    htpModes:'دو حالت بازی',
+    htpClassic:'کلاسیک', htpCFact:'← کارت ضرب پنهان', htpCAns:'← کارت جواب آشکار',
+    htpCP:'شما یک ضرب رو می‌کنید (مثلاً ۷ × ۵)، بعد جوابش (۳۵) را از کارت‌های آشکار پیدا می‌کنید.',
+    htpReverse:'معکوس', htpRFact:'← کارت ضرب آشکار', htpRAns:'← کارت جواب پنهان',
+    htpRP:'شما یک جواب رو می‌کنید (مثلاً ۳۵)، بعد ضربش (۷ × ۵) را از کارت‌های آشکار پیدا می‌کنید.',
+    htpRules:'قوانین',
+    htpR1:'جدول خالص: فقط ضرب‌هایی که به شکل هدف × n نوشته شده‌اند قبول هستند (مثلاً برای هدف ۷: فقط ۷×۲، ۷×۳، … ۷×۱۲).',
+    htpR2:'مضارب: هر ضربی که حاصلش مضرب عدد هدف باشد قبول است (مثلاً برای هدف ۷: هم ۷×۵ و هم ۵×۷ قبول هستند چون ۳۵ مضرب ۷ است).',
+    set:'تنظیمات بازی', tgt:'عدد هدف', rule:'قانون بازی',
+    pure:'جدول خالص', mult:'مضارب',
+    pureD:'فقط ضرب‌های __T__ × n قبول هستند', multD:'هر ضربی که حاصلش مضرب __T__ باشد',
+    mode:'حالت کارت‌ها', classic:'کلاسیک', rev:'معکوس',
+    classicD:'کارت ضرب پنهان، کارت جواب آشکار', revD:'کارت ضرب آشکار، کارت جواب پنهان',
+    win:'شرط برد', fp:'اولین نفر با N جفت', tl:'محدودیت زمانی',
+    pr:'جفت', mn:'دقیقه',
+    pl:'بازیکنان', solo:'تکی', '2p':'۲ نفره',
+    str:'حالت متوالی', strd:'نوبت اضافه با جواب درست',
+    on:'روشن', off:'خاموش', go:'▶ شروع بازی',
+    player:'بازیکن', fc:'کارت‌های ضرب', ac:'کارت‌های جواب',
+    fl:'ضرب', al:'جواب',
+    pickFact:'یک کارت ضرب پنهان را بزنید!',
+    pickAns:'یک کارت جواب پنهان را بزنید!',
+    nelig:'این ضربِ __T__ نیست! نوبت از دست رفت.',
+    neligM:'حاصل‌ضرب، مضرب __T__ نیست! نوبت از دست رفت.',
+    noMatch:'هیچ ضرب مجازی برای این جواب نیست! نوبت از دست رفت.',
+    eligFact:'✓ ضرب __T__ هست! حالا جواب رو پیدا کن.',
+    eligFactM:'✓ حاصل‌ضرب، مضرب __T__ هست! حالا جواب رو پیدا کن.',
+    revealedAns:'__V__ رو شد! حالا ضربش رو پیدا کن.',
+    matchFact:'حالا ضربی که برابر __V__ باشد را انتخاب کن.',
+    ok:'✓ آفرین!',
+    wrongAns:'__P__ = __A__ × __B__، نه __W__',
+    wrongFact:'__P__ = __A__ × __B__، نه __V__',
+    notEligFact:'این ضرب برای __T__ مجاز نیست!',
+    bonus:'نوبت اضافه!',
+    over:'بازی تمام شد!', wins:'__N__ برنده شد!', draw:'مساوی!',
+    soloW:'موفق شدی!', soloL:'وقت تمام شد!',
+    pa:'بازی دوباره', ng:'بازی جدید',
+    backSet:'تنظیمات', restart:'از نو', gbarInfo:'هدف: __T__',
+    noEl:'جفت قابل بازی دیگری روی میز نیست!',
+    bask:'جفت‌ها', turn:'نوبتِ __N__'
+}};
+
+let lang='en';
+const PN=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const N=n=>lang==='fa'?PN(n):String(n);
+const t=k=>(L[lang]&&L[lang][k])||L.en[k]||k;
+
+function setLang(l){
+    lang=l;
+    document.documentElement.lang=l;
+    document.documentElement.dir=l==='fa'?'rtl':'ltr';
+    document.querySelectorAll('.lang button').forEach(b=>{
+        b.classList.toggle('on',(l==='fa'&&b.textContent.includes('فا'))||(l==='en'&&b.textContent==='EN'));
+    });
+    applyT();
+}
+
+function applyT(){
+    const T=C.target;
+    const r=(id,k)=>{const e=$(id);if(e){
+        let txt=t(k); txt=txt.replace(/__T__/g,N(T)); e.textContent=txt;
+    }};
+    // Setup screen
+    r('t-title','title'); r('t-sub','sub'); r('t-tag','tag');
+    r('t-ded','ded'); r('t-ded2','ded2');
+    r('t-htp','htp');
+    r('t-htpGoal','htpGoal'); r('t-htpGoalP','htpGoalP');
+    r('t-htpTurn','htpTurn');
+    r('t-hs1','hs1'); r('t-hs2','hs2'); r('t-hs3','hs3'); r('t-hs4','hs4');
+    r('t-htpModes','htpModes');
+    r('t-htpClassic','htpClassic'); r('t-htpCFact','htpCFact'); r('t-htpCAns','htpCAns');
+    r('t-htpCP','htpCP');
+    r('t-htpReverse','htpReverse'); r('t-htpRFact','htpRFact'); r('t-htpRAns','htpRAns');
+    r('t-htpRP','htpRP');
+    r('t-htpRules','htpRules');
+    // Rules use innerHTML for bold
+    const r1=$('t-htpR1');
+    if(r1) r1.innerHTML=`<strong style="color:var(--primary)">${t('pure')}:</strong> ${t('htpR1').replace(/^[^:]+:\s*/,'')}`;
+    const r2=$('t-htpR2');
+    if(r2) r2.innerHTML=`<strong style="color:var(--primary)">${t('mult')}:</strong> ${t('htpR2').replace(/^[^:]+:\s*/,'')}`;
+
+    r('t-set','set'); r('t-tgt','tgt'); r('t-rule','rule'); r('t-pure','pure');
+    r('t-mult','mult'); r('t-mode','mode'); r('t-classic','classic');
+    r('t-rev','rev'); r('t-win','win'); r('t-fp','fp');
+    r('t-tl','tl'); r('t-pr','pr'); r('t-mn','mn');
+    r('t-pl','pl'); r('t-solo','solo'); r('t-2p','2p');
+    r('t-str','str'); r('t-strd','strd'); r('t-on','on');
+    r('t-off','off'); r('t-go','go');
+    r('t-fc','fc'); r('t-ac','ac');
+    r('tfl','fl'); r('tal','al');
+    r('t-go2','over'); r('t-pa','pa'); r('t-ng','ng');
+    // Game bar
+    r('t-backSet','backSet'); r('t-restart','restart');
+    const gi=$('gbar-info');
+    if(gi) gi.textContent=t('gbarInfo').replace(/__T__/g,N(T));
+    updDesc();
+    // Slider range labels
+    $('psl-min').textContent=N(3); $('psl-max').textContent=N(8);
+    $('tsl-min').textContent=N(1); $('tsl-max').textContent=N(5);
+    $('pV').textContent=N(C.targetPairs);
+    $('tV').textContent=N(Math.round(C.timeLimit/60));
+    // HTP demo cards
+    const hda=$('htp-demo-ans'); if(hda) hda.textContent=N(35);
+    const hdf=$('htp-demo-fact'); if(hdf) hdf.textContent=N(7)+' × '+N(5);
+    // Target pills
+    document.querySelectorAll('#tgt-pills .pill').forEach(b=>{b.textContent=N(+b.dataset.n);});
+    // If game is active, re-render card faces with correct numerals
+    if(ST.phase!=='setup') reRenderCards();
+}
+
+function updDesc(){
+    const rd=$('rule-desc');
+    if(rd) rd.textContent=t(C.rule==='pure'?'pureD':'multD').replace(/__T__/g,N(C.target));
+    const md=$('mode-desc');
+    if(md) md.textContent=t(C.mode==='classic'?'classicD':'revD');
+}
+
+/* ═══ CONFIG ═══ */
+const C={target:7,rule:'pure',mode:'classic',winType:'pairs',targetPairs:5,timeLimit:120,players:2,streak:false};
+
+/* ═══ STATE ═══ */
+let ST;
+function freshState(){
+    return {phase:'setup',cp:1,sc:[0,0],pairs:[[],[]],fc:[],ac:[],selF:null,selA:null,ti:null,tr:0};
+}
+ST=freshState();
+
+/* ═══ SETUP UI ═══ */
+(function(){
+    const w=$('tgt-pills');
+    for(let n=2;n<=12;n++){
+        const b=document.createElement('button');
+        b.className='pill'+(n===7?' on':'');
+        b.textContent=n; b.dataset.n=n;
+        b.onclick=()=>{
+            w.querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));
+            b.classList.add('on'); C.target=n; updDesc();
+        };
+        w.appendChild(b);
+    }
+})();
+
+function setS(btn){
+    const s=btn.dataset.s, v=btn.dataset.v;
+    btn.parentElement.querySelectorAll('.opt').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    switch(s){
+        case'rule': C.rule=v; updDesc(); break;
+        case'mode': C.mode=v; updDesc(); break;
+        case'winType': C.winType=v;
+            $('psl').classList.toggle('hid',v!=='pairs');
+            $('tsl').classList.toggle('hid',v!=='time'); break;
+        case'players': C.players=+v; break;
+        case'streak': C.streak=v==='on'; break;
+    }
+}
+
+/* ═══ CARD GENERATION ═══ */
+function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function genCards(){
+    const tgt=C.target, rule=C.rule;
+    const all=[];
+    for(let a=2;a<=12;a++) for(let b=2;b<=12;b++) all.push({a,b,p:a*b});
+    all.forEach(f=>{ f.eligible = rule==='pure' ? f.a===tgt : f.p%tgt===0; });
+
+    // Eligible facts grouped by product
+    const byP={};
+    all.filter(f=>f.eligible).forEach(f=>{if(!byP[f.p])byP[f.p]=[];byP[f.p].push(f);});
+    const ups=shuf(Object.keys(byP).map(Number));
+    const NE=Math.min(8,ups.length);
+    const selE=[];
+    for(let i=0;i<NE;i++){
+        const fs=byP[ups[i]]; selE.push({...fs[Math.random()*fs.length|0]});
+    }
+
+    // Distractor facts (not eligible)
+    const ep=new Set(selE.map(f=>f.p));
+    const inel=shuf(all.filter(f=>!f.eligible));
+    const dist=[];
+    for(const f of inel){ if(dist.length>=16-NE) break; dist.push({...f}); }
+
+    // In classic mode: facts hidden, answers visible
+    // In reverse mode: facts visible, answers hidden
+    const isClassic = C.mode==='classic';
+
+    const fc=shuf([...selE,...dist]).map((f,i)=>({
+        id:i, a:f.a, b:f.b, p:f.p, eligible:f.eligible,
+        flipped:!isClassic, // visible when reverse
+        collected:false
+    }));
+
+    // Answer cards: correct + distractors
+    const corr=[...ep];
+    const cands=new Set();
+    for(let a=2;a<=12;a++) for(let b=2;b<=12;b++){const p=a*b; if(!ep.has(p))cands.add(p);}
+    const uniqC=shuf([...cands]).slice(0,4);
+
+    const ac=shuf([...corr,...uniqC]).map((v,i)=>({
+        id:i, value:v, isCorr:corr.includes(v),
+        flipped:isClassic, // visible when classic
+        collected:false
+    }));
+    return{fc,ac};
+}
+
+/* ═══ GAME LOGIC ═══ */
+function startGame(){
+    if(ST.ti){clearInterval(ST.ti);}
+    const{fc,ac}=genCards();
+    ST=freshState();
+    ST.fc=fc; ST.ac=ac; ST.phase='draw';
+    if(C.winType==='time') ST.tr=C.timeLimit;
+    // Close how-to-play on game start
+    $('htpBox').classList.remove('open');
+    show('G');
+    render();
+    updGame();
+    if(C.winType==='time') startTmr();
+}
+
+function render(){
+    const fg=$('fg'); fg.innerHTML='';
+    ST.fc.forEach((c,i)=>fg.appendChild(mkCard(c,'fact',i)));
+    const ag=$('ag'); ag.innerHTML='';
+    ST.ac.forEach((c,i)=>ag.appendChild(mkCard(c,'ans',i)));
+
+    $('pn1').textContent=C.players===1?t('player'):(t('player')+' '+N(1));
+    $('pn2').textContent=t('player')+' '+N(2);
+    $('pb2').classList.toggle('hid',C.players===1);
+    $('bk2w').classList.toggle('hid',C.players===1);
+    $('tmr').classList.toggle('hid',C.winType!=='time');
+
+    const baskW=lang==='fa'?' '+t('bask'):'\'s '+t('bask');
+    $('bkt1').textContent=(C.players===1?t('player'):(t('player')+' '+N(1)))+baskW;
+    $('bkt2').textContent=t('player')+' '+N(2)+baskW;
+    $('bkp1').innerHTML=''; $('bkp2').innerHTML='';
+    $('gbar-info').textContent=t('gbarInfo').replace(/__T__/g,N(C.target));
+    clrTray();
+}
+
+function reRenderCards(){
+    // Update card face text with current language numerals
+    ST.fc.forEach((c,i)=>{
+        const el=gEl('fact',i);
+        if(el){ const f=el.querySelector('.cff'); if(f) f.textContent=`${N(c.a)} × ${N(c.b)}`; }
+    });
+    ST.ac.forEach((c,i)=>{
+        const el=gEl('ans',i);
+        if(el){ const f=el.querySelector('.cff'); if(f) f.textContent=N(c.value); }
+    });
+    // Update player names, baskets, scores, game bar
+    $('pn1').textContent=C.players===1?t('player'):(t('player')+' '+N(1));
+    $('pn2').textContent=t('player')+' '+N(2);
+    const baskW=lang==='fa'?' '+t('bask'):'\'s '+t('bask');
+    $('bkt1').textContent=(C.players===1?t('player'):(t('player')+' '+N(1)))+baskW;
+    $('bkt2').textContent=t('player')+' '+N(2)+baskW;
+    $('gbar-info').textContent=t('gbarInfo').replace(/__T__/g,N(C.target));
+    updScores();
+    updBaskets();
+}
+
+function mkCard(c,type,idx){
+    const el=document.createElement('div');
+    el.className=`crd ${type}`;
+    if(c.flipped) el.classList.add('flip');
+    if(c.collected) el.classList.add('gone');
+    const inner=document.createElement('div'); inner.className='ci';
+    const back=document.createElement('div'); back.className='cf cb';
+    const front=document.createElement('div'); front.className='cf cff';
+    if(type==='fact'){
+        front.textContent=`${N(c.a)} × ${N(c.b)}`;
+        el.onclick=()=>onFact(idx);
+    } else {
+        front.textContent=N(c.value);
+        el.onclick=()=>onAns(idx);
+    }
+    inner.append(back,front); el.appendChild(inner);
+    return el;
+}
+
+function gEl(type,idx){ return $(type==='fact'?'fg':'ag').children[idx]; }
+
+/* ─────────────────────────────────
+   CLASSIC MODE: reveal Fact → find Answer
+   ───────────────────────────────── */
+function onFact(idx){
+    if(C.mode==='classic'){
+        // CLASSIC: this is the draw phase — reveal a fact
+        if(ST.phase!=='draw') return;
+        const c=ST.fc[idx]; if(c.collected) return;
+        ST.phase='busy'; ST.selF=idx;
+
+        if(!c.flipped){ c.flipped=true; gEl('fact',idx).classList.add('flip'); }
+        $('tf').textContent=`${N(c.a)} × ${N(c.b)}`; $('tf').classList.add('f');
+        gEl('fact',idx).classList.add('sel');
+
+        setTimeout(()=>{
+            if(c.eligible){
+                gEl('fact',idx).classList.add('elig');
+                const k=C.rule==='pure'?'eligFact':'eligFactM';
+                showMsg(t(k).replace(/__T__/g,N(C.target)),'g');
+                ST.phase='match';
+            } else {
+                gEl('fact',idx).classList.add('nelig');
+                const k=C.rule==='pure'?'nelig':'neligM';
+                showMsg(t(k).replace(/__T__/g,N(C.target)),'b');
+                setTimeout(()=>{
+                    c.flipped=false;
+                    gEl('fact',idx).classList.remove('sel','elig','nelig','flip');
+                    clrTray(); ST.selF=null; endTurn();
+                },1200);
+            }
+        },450);
+    } else {
+        // REVERSE: facts are visible — this is the match phase
+        if(ST.phase!=='match') return;
+        const fc=ST.fc[idx]; if(fc.collected) return;
+        ST.phase='busy';
+        ST.selF=idx;
+        gEl('fact',idx).classList.add('sel');
+        $('tf').textContent=`${N(fc.a)} × ${N(fc.b)}`; $('tf').classList.add('f');
+
+        setTimeout(()=>{
+            const ansCard=ST.ac[ST.selA];
+            const productMatch = fc.p === ansCard.value;
+            const eligible = fc.eligible;
+
+            if(productMatch && eligible){
+                // Correct!
+                showMsg(t('ok'),'g');
+                gEl('fact',idx).classList.add('cok');
+                gEl('ans',ST.selA).classList.add('cok');
+                setTimeout(()=>{
+                    fc.collected=true; ansCard.collected=true;
+                    gEl('fact',idx).classList.add('cel');
+                    gEl('ans',ST.selA).classList.add('cel');
+                    const pi=ST.cp-1;
+                    ST.sc[pi]++; ST.pairs[pi].push({a:fc.a,b:fc.b,p:fc.p});
+                    setTimeout(()=>{
+                        gEl('fact',idx).classList.add('gone');
+                        gEl('ans',ST.selA).classList.add('gone');
+                        updScores(); updBaskets(); clrTray(); clean();
+                        if(chkWin()||chkNoEl()) return;
+                        if(C.streak){ showMsg(t('bonus'),'i'); setTimeout(()=>{ST.phase='draw';showDraw();},800); }
+                        else endTurn();
+                    },400);
+                },450);
+            } else if(!eligible){
+                // Right product but not eligible
+                showMsg(t('notEligFact').replace(/__T__/g,N(C.target)),'b');
+                gEl('fact',idx).classList.add('cbad','shk');
+                setTimeout(()=>{
+                    gEl('fact',idx).classList.remove('sel','cbad','shk','cok');
+                    // Return answer card
+                    ansCard.flipped=false;
+                    gEl('ans',ST.selA).classList.remove('sel','flip','cok');
+                    clrTray(); clean(); endTurn();
+                },1400);
+            } else {
+                // Wrong product
+                const m=t('wrongFact').replace(/__A__/g,N(fc.a)).replace(/__B__/g,N(fc.b))
+                    .replace(/__P__/g,N(fc.p)).replace(/__V__/g,N(ansCard.value));
+                showMsg(m,'b');
+                gEl('fact',idx).classList.add('cbad','shk');
+                setTimeout(()=>{
+                    gEl('fact',idx).classList.remove('sel','cbad','shk','cok');
+                    ansCard.flipped=false;
+                    gEl('ans',ST.selA).classList.remove('sel','flip','cok');
+                    clrTray(); clean(); endTurn();
+                },1400);
+            }
+        },400);
+    }
+}
+
+function onAns(idx){
+    if(C.mode==='classic'){
+        // CLASSIC: answers are visible — this is the match phase
+        if(ST.phase!=='match') return;
+        const ac=ST.ac[idx]; if(ac.collected) return;
+        ST.phase='busy'; ST.selA=idx;
+        gEl('ans',idx).classList.add('sel');
+        $('ta').textContent=N(ac.value); $('ta').classList.add('f');
+
+        setTimeout(()=>{
+            const fc=ST.fc[ST.selF];
+            if(ac.value===fc.p){
+                showMsg(t('ok'),'g');
+                gEl('ans',idx).classList.add('cok');
+                gEl('fact',ST.selF).classList.add('cok');
+                setTimeout(()=>{
+                    fc.collected=true; ac.collected=true;
+                    gEl('fact',ST.selF).classList.add('cel');
+                    gEl('ans',idx).classList.add('cel');
+                    const pi=ST.cp-1;
+                    ST.sc[pi]++; ST.pairs[pi].push({a:fc.a,b:fc.b,p:fc.p});
+                    setTimeout(()=>{
+                        gEl('fact',ST.selF).classList.add('gone');
+                        gEl('ans',idx).classList.add('gone');
+                        updScores(); updBaskets(); clrTray(); clean();
+                        if(chkWin()||chkNoEl()) return;
+                        if(C.streak){ showMsg(t('bonus'),'i'); setTimeout(()=>{ST.phase='draw';showDraw();},800); }
+                        else endTurn();
+                    },400);
+                },450);
+            } else {
+                const fc2=ST.fc[ST.selF];
+                const m=t('wrongAns').replace(/__A__/g,N(fc2.a)).replace(/__B__/g,N(fc2.b))
+                    .replace(/__P__/g,N(fc2.p)).replace(/__W__/g,N(ac.value));
+                showMsg(m,'b');
+                gEl('ans',idx).classList.add('cbad','shk');
+                gEl('fact',ST.selF).classList.add('shk');
+                setTimeout(()=>{
+                    gEl('fact',ST.selF).classList.remove('sel','elig','cok','shk');
+                    gEl('ans',idx).classList.remove('sel','cok','cbad','shk');
+                    ST.fc[ST.selF].flipped=false;
+                    gEl('fact',ST.selF).classList.remove('flip');
+                    clrTray(); clean(); endTurn();
+                },1400);
+            }
+        },400);
+    } else {
+        // REVERSE: this is the draw phase — reveal an answer card
+        if(ST.phase!=='draw') return;
+        const ac=ST.ac[idx]; if(ac.collected) return;
+        ST.phase='busy'; ST.selA=idx;
+
+        if(!ac.flipped){ ac.flipped=true; gEl('ans',idx).classList.add('flip'); }
+        $('ta').textContent=N(ac.value); $('ta').classList.add('f');
+        gEl('ans',idx).classList.add('sel');
+
+        setTimeout(()=>{
+            // Check: is there any eligible uncollected fact with this product?
+            const hasMatch=ST.fc.some(f=>!f.collected && f.eligible && f.p===ac.value);
+            if(hasMatch){
+                showMsg(t('revealedAns').replace(/__V__/g,N(ac.value)),'g');
+                ST.phase='match';
+            } else {
+                showMsg(t('noMatch'),'b');
+                gEl('ans',idx).classList.add('nomatch');
+                setTimeout(()=>{
+                    ac.flipped=false;
+                    gEl('ans',idx).classList.remove('sel','flip','nomatch');
+                    clrTray(); ST.selA=null; endTurn();
+                },1200);
+            }
+        },450);
+    }
+}
+
+function clean(){ ST.selF=null; ST.selA=null; }
+
+function endTurn(){
+    if(C.players===2) ST.cp=ST.cp===1?2:1;
+    updGame();
+    setTimeout(()=>{ST.phase='draw'; showDraw();},500);
+}
+
+function showDraw(){
+    if(C.mode==='classic') showMsg(t('pickFact'),'n');
+    else showMsg(t('pickAns'),'n');
+}
+
+function chkWin(){
+    if(C.winType==='pairs'){
+        for(let i=0;i<C.players;i++){
+            if(ST.sc[i]>=C.targetPairs){endGm();return true;}
+        }
+    }
+    return false;
+}
+
+function chkNoEl(){
+    // Check if any playable pair remains
+    const remFacts=ST.fc.filter(c=>c.eligible&&!c.collected);
+    const remAns=ST.ac.filter(c=>!c.collected);
+    let ok=false;
+    for(const f of remFacts){ if(remAns.some(a=>a.value===f.p)){ok=true;break;} }
+    if(!ok){showMsg(t('noEl'),'i');setTimeout(()=>endGm(),1500);return true;}
+    return false;
+}
+
+/* Timer */
+function startTmr(){
+    updTmrD();
+    ST.ti=setInterval(()=>{
+        ST.tr--;updTmrD();
+        if(ST.tr<=0){clearInterval(ST.ti);ST.ti=null;endGm();}
+    },1000);
+}
+function updTmrD(){
+    const e=$('tmr');
+    const m=Math.floor(ST.tr/60),s=ST.tr%60;
+    e.textContent=`⏱ ${N(m)}:${s<10?'0':''}${N(s)}`;
+    e.classList.toggle('low',ST.tr<=15);
+}
+
+/* End game */
+function endGm(){
+    ST.phase='over';
+    if(ST.ti){clearInterval(ST.ti);ST.ti=null;}
+    show('O');
+    const s1=ST.sc[0],s2=ST.sc[1];
+    const wt=$('wt');
+    if(C.players===1){
+        const w=C.winType==='pairs'?s1>=C.targetPairs:true;
+        wt.textContent=t(w?'soloW':'soloL');
+        wt.style.color=w?'var(--success)':'var(--red)';
+    } else {
+        if(s1>s2){ wt.textContent=t('wins').replace(/__N__/g,t('player')+' '+N(1)); wt.style.color='var(--p1)'; }
+        else if(s2>s1){ wt.textContent=t('wins').replace(/__N__/g,t('player')+' '+N(2)); wt.style.color='var(--p2)'; }
+        else { wt.textContent=t('draw'); wt.style.color='var(--text)'; }
+    }
+    let h=`<div class="fsb p1"><div class="fn">${C.players===1?t('player'):(t('player')+' '+N(1))}</div>
+        <div class="fv">${N(s1)}</div><div class="fc">${t('pr')}</div></div>`;
+    if(C.players===2) h+=`<div class="fsb p2"><div class="fn">${t('player')+' '+N(2)}</div>
+        <div class="fv">${N(s2)}</div><div class="fc">${t('pr')}</div></div>`;
+    $('fsc').innerHTML=h;
+}
+
+function back(){
+    ST.phase='setup';
+    if(ST.ti){clearInterval(ST.ti);ST.ti=null;}
+    show('S');
+}
+
+/* ═══ UI HELPERS ═══ */
+function show(id){
+    document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+    $(id).classList.add('on');
+}
+function showMsg(txt,cls){const e=$('msg');e.textContent=txt;e.className='msg '+cls;}
+function clrTray(){
+    $('tf').innerHTML='<span class="ts-ph">—</span>'; $('tf').classList.remove('f');
+    $('ta').innerHTML='<span class="ts-ph">—</span>'; $('ta').classList.remove('f');
+}
+function updGame(){
+    $('pb1').classList.toggle('cur',ST.cp===1);
+    $('pb2').classList.toggle('cur',ST.cp===2);
+    updScores();
+    if(C.players===2){
+        showMsg(t('turn').replace(/__N__/g,t('player')+' '+N(ST.cp)),'n');
+    } else showDraw();
+}
+function updScores(){
+    $('ps1').textContent=N(ST.sc[0]);
+    $('ps2').textContent=N(ST.sc[1]);
+}
+function updBaskets(){
+    for(let p=0;p<2;p++){
+        $(`bkp${p+1}`).innerHTML=ST.pairs[p].map(pr=>
+            `<span class="bk-c">${N(pr.a)}×${N(pr.b)}=${N(pr.p)}</span>`
+        ).join('');
+    }
+}
+
+applyT();
+</script>
+</body>
+</html>
