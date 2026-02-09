@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slice by Slice: Areas and Volumes | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Three.js for 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding-top: 60px;
+        }
+        
+        /* Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: var(--interactive);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Preset pills */
+        .preset-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preset-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Controls */
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .control-row label {
+            font-weight: 500;
+            min-width: 120px;
+        }
+        
+        .control-row input[type="range"] {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .control-row .value-display {
+            background: var(--interactive);
+            padding: 0.3rem 0.75rem;
+            border-radius: 6px;
+            font-family: 'Monaco', monospace;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        /* Canvas containers */
+        .canvas-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        
+        #areaCanvas {
+            width: 100%;
+            height: 400px;
+            display: block;
+        }
+        
+        #volumeCanvas {
+            width: 100%;
+            height: 500px;
+            display: block;
+            cursor: grab;
+        }
+        
+        #volumeCanvas:active {
+            cursor: grabbing;
+        }
+        
+        /* Formula display */
+        .formula-box {
+            background: var(--interactive);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .formula-box .formula-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .formula-box .formula-content {
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        /* Info boxes */
+        .info-box {
+            background: var(--interactive);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        /* Slice info panel */
+        .slice-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .slice-info-item {
+            background: var(--interactive);
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .slice-info-item .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .slice-info-item .value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--interactive);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Introduction cards */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .concept-card {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .concept-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card .formula {
+            background: var(--interactive);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs {
+                gap: 0.25rem;
+            }
+            
+            .tab-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-row label {
+                min-width: auto;
+            }
+        }
+        
+        /* Axis selection */
+        .axis-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .axis-option {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .axis-option:hover {
+            background: var(--interactive);
+        }
+        
+        .axis-option.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* 3D instructions */
+        .instructions {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--interactive) 0%, white 100%);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        
+        /* Toggle switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <svg width="28" height="28" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="var(--primary)"/>
+                <text x="50" y="62" text-anchor="middle" fill="white" font-size="32" font-weight="bold">M</text>
+            </svg>
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="intro">📐 Introduction</button>
+            <button class="tab-btn" data-tab="area">📊 Area Explorer</button>
+            <button class="tab-btn" data-tab="volume">🎯 Volume Explorer</button>
+        </div>
+        
+        <!-- Tab 1: Introduction -->
+        <div id="intro" class="tab-content active">
+            <div class="hero">
+                <h1>Slice by Slice</h1>
+                <p class="subtitle">Understanding Areas and Volumes Through Infinitesimal Pieces</p>
+            </div>
+            
+            <div class="card">
+                <h2>The Core Idea</h2>
+                <p>Every integral is a sum of infinitesimal pieces. The shape of each piece determines the formula.</p>
+                
+                <div class="info-box">
+                    <strong>The question is always:</strong> What are we adding up, and what is the shape of each piece?
+                </div>
+            </div>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <div class="icon">📏</div>
+                    <h3>Rectangle → Area</h3>
+                    <p>A thin vertical strip with height <span id="introHeight"></span> and width <span id="introDx1"></span></p>
+                    <div class="formula" id="introAreaFormula"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">💿</div>
+                    <h3>Disk → Volume</h3>
+                    <p>A thin circular slice with radius <span id="introRadius"></span> and thickness <span id="introDx2"></span></p>
+                    <div class="formula" id="introDiskFormula"></div>
+                </div>
+                
+                <div class="concept-card">
+                    <div class="icon">🍩</div>
+                    <h3>Washer → Volume</h3>
+                    <p>A disk with a hole: outer radius <span id="introOuterR"></span>, inner radius <span id="introInnerR"></span></p>
+                    <div class="formula" id="introWasherFormula"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>From Slice to Integral</h2>
+                <div id="introProcess"></div>
+                <div class="info-box" style="margin-top: 1rem;">
+                    <strong>The formula comes from the geometry of the slice.</strong> Once you know the shape of your infinitesimal piece, the integral writes itself.
+                </div>
+            </div>
+            
+            <div class="card" style="text-align: center;">
+                <h2>Ready to Explore?</h2>
+                <p style="margin-bottom: 1rem;">Start with areas in 2D, then move to volumes in 3D.</p>
+                <div class="btn-group" style="justify-content: center;">
+                    <button class="btn btn-primary" onclick="switchTab('area')">Explore Areas →</button>
+                    <button class="btn btn-secondary" onclick="switchTab('volume')">Explore Volumes →</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 2: Area Explorer -->
+        <div id="area" class="tab-content">
+            <div class="card">
+                <h2>Area Explorer</h2>
+                <p>Watch rectangles accumulate to fill a region. Each rectangle has area <span id="areaSliceFormula"></span>.</p>
+                
+                <h3 style="margin-top: 1rem;">Select a Region</h3>
+                <div class="preset-container" id="areaPresets">
+                    <button class="preset-pill active" data-preset="sqrt">y = √x on [0, 4]</button>
+                    <button class="preset-pill" data-preset="x2">y = x² on [0, 2]</button>
+                    <button class="preset-pill" data-preset="sin">y = sin(x) on [0, π]</button>
+                    <button class="preset-pill" data-preset="between1">Between y = x and y = x²</button>
+                    <button class="preset-pill" data-preset="between2">Between y = x² and y = 2x</button>
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <canvas id="areaCanvas"></canvas>
+            </div>
+            
+            <div class="card">
+                <div class="control-row">
+                    <label>Slice Position (x):</label>
+                    <input type="range" id="areaSlider" min="0" max="100" value="50">
+                    <span class="value-display" id="areaXValue">x = 1.00</span>
+                </div>
+                
+                <div class="control-row">
+                    <label>Number of Slices:</label>
+                    <input type="range" id="areaNSlider" min="5" max="100" value="20">
+                    <span class="value-display" id="areaNValue">n = 20</span>
+                </div>
+                
+                <div class="toggle-container" style="margin-top: 0.5rem;">
+                    <span>Show single slice</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="areaShowAll" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Show all slices</span>
+                </div>
+                
+                <div class="slice-info" id="areaSliceInfo">
+                    <div class="slice-info-item">
+                        <div class="label">Height</div>
+                        <div class="value" id="areaHeight">f(x) = 1.00</div>
+                    </div>
+                    <div class="slice-info-item">
+                        <div class="label">Width</div>
+                        <div class="value" id="areaWidth">dx = 0.20</div>
+                    </div>
+                    <div class="slice-info-item">
+                        <div class="label">Slice Area</div>
+                        <div class="value" id="areaSliceArea">dA = 0.20</div>
+                    </div>
+                </div>
+                
+                <div class="formula-box">
+                    <div class="formula-title">The Integral</div>
+                    <div class="formula-content" id="areaIntegral"></div>
+                </div>
+                
+                <div class="formula-box" style="margin-top: 1rem; background: #fff3cd; border-color: #f59e0b;">
+                    <div class="formula-title" style="color: #92400e;">Numerical Results</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+                        <div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Riemann Sum (n slices):</div>
+                            <div style="font-size: 1.2rem; font-weight: 600;" id="areaRiemannSum">≈ 0.000</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Exact Value:</div>
+                            <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary);" id="areaExactValue">= 0.000</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 3: Volume Explorer -->
+        <div id="volume" class="tab-content">
+            <div class="card">
+                <h2>Volume Explorer — Disk/Washer Method</h2>
+                <p>Rotate a region about an axis and explore the resulting solid slice by slice.</p>
+                
+                <h3 style="margin-top: 1rem;">Select a Region</h3>
+                <div class="preset-container" id="volumePresets">
+                    <button class="preset-pill active" data-preset="sqrt">y = √x on [0, 4]</button>
+                    <button class="preset-pill" data-preset="x2">y = x² on [0, 2]</button>
+                    <button class="preset-pill" data-preset="sin">y = sin(x) on [0, π]</button>
+                    <button class="preset-pill" data-preset="between">Between y = x and y = x²</button>
+                    <button class="preset-pill" data-preset="line">y = 2 - x on [0, 2]</button>
+                </div>
+                
+                <h3 style="margin-top: 1rem;">Axis of Rotation</h3>
+                <div class="axis-options" id="axisOptions">
+                    <button class="axis-option active" data-axis="x">x-axis (y = 0)</button>
+                    <button class="axis-option" data-axis="y-1">y = −1</button>
+                    <button class="axis-option" data-axis="y1">y = 1 (for x² only)</button>
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <p class="instructions">🖱️ Drag to rotate • Scroll to zoom</p>
+                <canvas id="volumeCanvas"></canvas>
+            </div>
+            
+            <div class="card">
+                <div class="control-row">
+                    <label>Slice Position:</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                    <span class="value-display" id="volumeXValue">x = 2.00</span>
+                </div>
+                
+                <div class="control-row">
+                    <label>Number of Slices:</label>
+                    <input type="range" id="volumeNSlider" min="5" max="50" value="15">
+                    <span class="value-display" id="volumeNValue">n = 15</span>
+                </div>
+                
+                <div class="control-row">
+                    <label>Show Solid:</label>
+                    <input type="range" id="solidOpacity" min="0" max="100" value="30">
+                    <span class="value-display" id="opacityValue">30%</span>
+                </div>
+                
+                <div class="toggle-container">
+                    <span>Show single slice</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="volumeShowAll">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Show accumulated slices</span>
+                </div>
+                
+                <div class="slice-info" id="volumeSliceInfo">
+                    <div class="slice-info-item">
+                        <div class="label">Outer Radius (R)</div>
+                        <div class="value" id="volumeOuterR">R = 2.00</div>
+                    </div>
+                    <div class="slice-info-item">
+                        <div class="label">Inner Radius (r)</div>
+                        <div class="value" id="volumeInnerR">r = 0</div>
+                    </div>
+                    <div class="slice-info-item">
+                        <div class="label">Thickness</div>
+                        <div class="value" id="volumeThickness">dx</div>
+                    </div>
+                    <div class="slice-info-item">
+                        <div class="label">Slice Volume</div>
+                        <div class="value" id="volumeSliceVol">dV = π·R²·dx</div>
+                    </div>
+                </div>
+                
+                <div class="formula-box">
+                    <div class="formula-title">The Integral</div>
+                    <div class="formula-content" id="volumeIntegral"></div>
+                </div>
+                
+                <div class="formula-box" style="margin-top: 1rem; background: #fff3cd; border-color: #f59e0b;">
+                    <div class="formula-title" style="color: #92400e;">Numerical Results</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+                        <div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Riemann Sum (n slices):</div>
+                            <div style="font-size: 1.2rem; font-weight: 600;" id="volumeRiemannSum">≈ 0.000</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Exact Value:</div>
+                            <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary);" id="volumeExactValue">= 0.000</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // TAB SWITCHING
+        // ============================================
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'area') {
+                initAreaCanvas();
+                drawArea();
+            } else if (tabId === 'volume') {
+                initVolumeScene();
+            }
+        }
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        
+        // ============================================
+        // MATH RENDERING HELPER
+        // ============================================
+        function renderMath(element, latex) {
+            if (typeof element === 'string') {
+                element = document.getElementById(element);
+            }
+            if (element) {
+                katex.render(latex, element, { throwOnError: false, displayMode: false });
+            }
+        }
+        
+        function renderMathDisplay(element, latex) {
+            if (typeof element === 'string') {
+                element = document.getElementById(element);
+            }
+            if (element) {
+                katex.render(latex, element, { throwOnError: false, displayMode: true });
+            }
+        }
+        
+        // ============================================
+        // INTRODUCTION TAB
+        // ============================================
+        function initIntro() {
+            renderMath('introHeight', 'f(x)');
+            renderMath('introDx1', 'dx');
+            renderMath('introRadius', 'r = f(x)');
+            renderMath('introDx2', 'dx');
+            renderMath('introOuterR', 'R');
+            renderMath('introInnerR', 'r');
+            renderMath('introAreaFormula', 'dA = f(x) \\cdot dx');
+            renderMath('introDiskFormula', 'dV = \\pi r^2 \\cdot dx');
+            renderMath('introWasherFormula', 'dV = \\pi(R^2 - r^2) \\cdot dx');
+            
+            const processHTML = `
+                <p style="margin-bottom: 1rem;">The process is always the same:</p>
+                <ol style="margin-left: 1.5rem; line-height: 1.8;">
+                    <li><strong>Identify the slice:</strong> What shape is each infinitesimal piece?</li>
+                    <li><strong>Find the dimensions:</strong> Express radius, height, etc. in terms of <em>x</em> (or <em>y</em>)</li>
+                    <li><strong>Write dA or dV:</strong> The infinitesimal area or volume of one slice</li>
+                    <li><strong>Integrate:</strong> Sum all slices from <em>a</em> to <em>b</em></li>
+                </ol>
+            `;
+            document.getElementById('introProcess').innerHTML = processHTML;
+        }
+        
+        // ============================================
+        // AREA EXPLORER
+        // ============================================
+        let areaCanvas, areaCtx;
+        let areaPreset = 'sqrt';
+        
+        const areaPresets = {
+            sqrt: {
+                f: x => Math.sqrt(Math.max(0, x)),
+                g: null,
+                a: 0, b: 4,
+                label: 'y = \\sqrt{x}',
+                fLabel: '\\sqrt{x}',
+                integral: '\\int_0^4 \\sqrt{x} \\, dx = \\frac{16}{3}',
+                exactValue: 16/3  // [2x^(3/2)/3] from 0 to 4 = 16/3
+            },
+            x2: {
+                f: x => x * x,
+                g: null,
+                a: 0, b: 2,
+                label: 'y = x^2',
+                fLabel: 'x^2',
+                integral: '\\int_0^2 x^2 \\, dx = \\frac{8}{3}',
+                exactValue: 8/3  // [x³/3] from 0 to 2 = 8/3
+            },
+            sin: {
+                f: x => Math.sin(x),
+                g: null,
+                a: 0, b: Math.PI,
+                label: 'y = \\sin(x)',
+                fLabel: '\\sin(x)',
+                integral: '\\int_0^{\\pi} \\sin(x) \\, dx = 2',
+                exactValue: 2  // [-cos(x)] from 0 to π = 2
+            },
+            between1: {
+                f: x => x,
+                g: x => x * x,
+                a: 0, b: 1,
+                label: 'y = x \\text{ and } y = x^2',
+                fLabel: 'x - x^2',
+                integral: '\\int_0^1 (x - x^2) \\, dx = \\frac{1}{6}',
+                exactValue: 1/6  // [x²/2 - x³/3] from 0 to 1 = 1/2 - 1/3 = 1/6
+            },
+            between2: {
+                f: x => 2 * x,
+                g: x => x * x,
+                a: 0, b: 2,
+                label: 'y = 2x \\text{ and } y = x^2',
+                fLabel: '2x - x^2',
+                integral: '\\int_0^2 (2x - x^2) \\, dx = \\frac{4}{3}',
+                exactValue: 4/3  // [x² - x³/3] from 0 to 2 = 4 - 8/3 = 4/3
+            }
+        };
+        
+        function initAreaCanvas() {
+            areaCanvas = document.getElementById('areaCanvas');
+            areaCtx = areaCanvas.getContext('2d');
+            
+            // Set actual size
+            const rect = areaCanvas.getBoundingClientRect();
+            areaCanvas.width = rect.width * window.devicePixelRatio;
+            areaCanvas.height = rect.height * window.devicePixelRatio;
+            areaCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        
+        function drawArea() {
+            if (!areaCtx) return;
+            
+            const preset = areaPresets[areaPreset];
+            const rect = areaCanvas.getBoundingClientRect();
+            const W = rect.width;
+            const H = rect.height;
+            
+            areaCtx.clearRect(0, 0, W, H);
+            
+            // Coordinate system
+            const margin = 50;
+            const plotW = W - 2 * margin;
+            const plotH = H - 2 * margin;
+            
+            // Find y range
+            let yMin = 0, yMax = 0;
+            for (let x = preset.a; x <= preset.b; x += 0.01) {
+                const y1 = preset.f(x);
+                const y2 = preset.g ? preset.g(x) : 0;
+                yMax = Math.max(yMax, y1, y2);
+                yMin = Math.min(yMin, y1, y2);
+            }
+            yMax *= 1.1;
+            if (yMin > 0) yMin = 0;
+            
+            const xScale = plotW / (preset.b - preset.a);
+            const yScale = plotH / (yMax - yMin);
+            
+            const toCanvasX = x => margin + (x - preset.a) * xScale;
+            const toCanvasY = y => H - margin - (y - yMin) * yScale;
+            
+            // Draw grid
+            areaCtx.strokeStyle = '#e0e0e0';
+            areaCtx.lineWidth = 1;
+            for (let x = Math.ceil(preset.a); x <= preset.b; x++) {
+                areaCtx.beginPath();
+                areaCtx.moveTo(toCanvasX(x), margin);
+                areaCtx.lineTo(toCanvasX(x), H - margin);
+                areaCtx.stroke();
+            }
+            for (let y = Math.ceil(yMin); y <= yMax; y++) {
+                areaCtx.beginPath();
+                areaCtx.moveTo(margin, toCanvasY(y));
+                areaCtx.lineTo(W - margin, toCanvasY(y));
+                areaCtx.stroke();
+            }
+            
+            // Draw axes
+            areaCtx.strokeStyle = '#333';
+            areaCtx.lineWidth = 2;
+            areaCtx.beginPath();
+            areaCtx.moveTo(margin, toCanvasY(0));
+            areaCtx.lineTo(W - margin, toCanvasY(0));
+            areaCtx.stroke();
+            areaCtx.beginPath();
+            areaCtx.moveTo(toCanvasX(preset.a > 0 ? preset.a : 0), margin);
+            areaCtx.lineTo(toCanvasX(preset.a > 0 ? preset.a : 0), H - margin);
+            areaCtx.stroke();
+            
+            // Get slider values
+            const sliderVal = document.getElementById('areaSlider').value / 100;
+            const xPos = preset.a + sliderVal * (preset.b - preset.a);
+            const nSlices = parseInt(document.getElementById('areaNSlider').value);
+            const showAll = document.getElementById('areaShowAll').checked;
+            const dx = (preset.b - preset.a) / nSlices;
+            
+            // Calculate Riemann sum
+            let riemannSum = 0;
+            
+            // Draw rectangles
+            if (showAll) {
+                for (let i = 0; i < nSlices; i++) {
+                    const x = preset.a + i * dx;
+                    const midX = x + dx/2;
+                    const top = preset.f(midX);
+                    const bottom = preset.g ? preset.g(midX) : 0;
+                    const height = top - bottom;
+                    
+                    riemannSum += height * dx;
+                    
+                    areaCtx.fillStyle = 'rgba(16, 185, 129, 0.3)';
+                    areaCtx.strokeStyle = 'rgba(15, 118, 110, 0.5)';
+                    areaCtx.lineWidth = 1;
+                    
+                    areaCtx.fillRect(toCanvasX(x), toCanvasY(top), dx * xScale, height * yScale);
+                    areaCtx.strokeRect(toCanvasX(x), toCanvasY(top), dx * xScale, height * yScale);
+                }
+            } else {
+                // Calculate Riemann sum even if not showing all
+                for (let i = 0; i < nSlices; i++) {
+                    const x = preset.a + i * dx;
+                    const midX = x + dx/2;
+                    const top = preset.f(midX);
+                    const bottom = preset.g ? preset.g(midX) : 0;
+                    const height = top - bottom;
+                    riemannSum += height * dx;
+                }
+            }
+            
+            // Draw highlighted slice
+            const highlightTop = preset.f(xPos);
+            const highlightBottom = preset.g ? preset.g(xPos) : 0;
+            const highlightHeight = highlightTop - highlightBottom;
+            
+            areaCtx.fillStyle = 'rgba(245, 158, 11, 0.6)';
+            areaCtx.strokeStyle = '#f59e0b';
+            areaCtx.lineWidth = 2;
+            areaCtx.fillRect(toCanvasX(xPos - dx/2), toCanvasY(highlightTop), dx * xScale, highlightHeight * yScale);
+            areaCtx.strokeRect(toCanvasX(xPos - dx/2), toCanvasY(highlightTop), dx * xScale, highlightHeight * yScale);
+            
+            // Draw curves
+            areaCtx.strokeStyle = '#0f766e';
+            areaCtx.lineWidth = 3;
+            areaCtx.beginPath();
+            for (let x = preset.a; x <= preset.b; x += 0.01) {
+                const y = preset.f(x);
+                if (x === preset.a) {
+                    areaCtx.moveTo(toCanvasX(x), toCanvasY(y));
+                } else {
+                    areaCtx.lineTo(toCanvasX(x), toCanvasY(y));
+                }
+            }
+            areaCtx.stroke();
+            
+            if (preset.g) {
+                areaCtx.strokeStyle = '#c62828';
+                areaCtx.beginPath();
+                for (let x = preset.a; x <= preset.b; x += 0.01) {
+                    const y = preset.g(x);
+                    if (x === preset.a) {
+                        areaCtx.moveTo(toCanvasX(x), toCanvasY(y));
+                    } else {
+                        areaCtx.lineTo(toCanvasX(x), toCanvasY(y));
+                    }
+                }
+                areaCtx.stroke();
+            }
+            
+            // Draw dimension labels on highlighted slice
+            areaCtx.fillStyle = '#f59e0b';
+            areaCtx.font = 'bold 14px sans-serif';
+            areaCtx.textAlign = 'center';
+            
+            // Height label
+            const midY = (highlightTop + highlightBottom) / 2;
+            areaCtx.fillText('h', toCanvasX(xPos) + 20, toCanvasY(midY));
+            
+            // Width label
+            areaCtx.fillText('dx', toCanvasX(xPos), toCanvasY(highlightBottom) + 20);
+            
+            // Update info displays
+            document.getElementById('areaXValue').textContent = `x = ${xPos.toFixed(2)}`;
+            document.getElementById('areaNValue').textContent = `n = ${nSlices}`;
+            document.getElementById('areaHeight').textContent = `h = ${highlightHeight.toFixed(3)}`;
+            document.getElementById('areaWidth').textContent = `dx = ${dx.toFixed(3)}`;
+            document.getElementById('areaSliceArea').textContent = `dA = ${(highlightHeight * dx).toFixed(4)}`;
+            
+            // Update numerical results
+            document.getElementById('areaRiemannSum').textContent = `≈ ${riemannSum.toFixed(4)}`;
+            document.getElementById('areaExactValue').textContent = `= ${preset.exactValue.toFixed(4)}`;
+            
+            renderMath('areaSliceFormula', `dA = (${preset.fLabel}) \\cdot dx`);
+            renderMathDisplay('areaIntegral', preset.integral);
+        }
+        
+        // Area event listeners
+        document.getElementById('areaSlider').addEventListener('input', drawArea);
+        document.getElementById('areaNSlider').addEventListener('input', drawArea);
+        document.getElementById('areaShowAll').addEventListener('change', drawArea);
+        
+        document.getElementById('areaPresets').addEventListener('click', (e) => {
+            if (e.target.classList.contains('preset-pill')) {
+                document.querySelectorAll('#areaPresets .preset-pill').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                areaPreset = e.target.dataset.preset;
+                drawArea();
+            }
+        });
+        
+        // ============================================
+        // VOLUME EXPLORER (Three.js)
+        // ============================================
+        let scene, camera, renderer;
+        let solidMesh, sliceMesh, slicesMeshes = [];
+        let curveLineObj, axisLineObj;
+        let volumePreset = 'sqrt';
+        let rotationAxis = 'x';
+        let axisOffset = 0;
+        
+        const volumePresets = {
+            sqrt: {
+                f: x => Math.sqrt(Math.max(0, x)),
+                g: null,
+                a: 0, b: 4,
+                label: 'y = \\sqrt{x}',
+                rLabel: '\\sqrt{x}',
+                exactVolume: (axis, offset) => {
+                    if (offset === 0) return Math.PI * 8; // ∫₀⁴ πx dx = π[x²/2]₀⁴ = 8π
+                    if (offset === -1) return Math.PI * (8 + 4 + 32/3); // More complex
+                    return null;
+                },
+                getIntegral: (axis, offset) => {
+                    if (axis === 'x' && offset === 0) return '\\int_0^4 \\pi (\\sqrt{x})^2 \\, dx = \\int_0^4 \\pi x \\, dx = 8\\pi';
+                    if (axis === 'x' && offset === -1) return '\\int_0^4 \\pi (\\sqrt{x} + 1)^2 \\, dx';
+                    return '\\int_0^4 \\pi r^2 \\, dx';
+                }
+            },
+            x2: {
+                f: x => x * x,
+                g: null,
+                a: 0, b: 2,
+                label: 'y = x^2',
+                rLabel: 'x^2',
+                exactVolume: (axis, offset) => {
+                    if (offset === 0) return Math.PI * 32 / 5; // ∫₀² πx⁴ dx = π[x⁵/5]₀² = 32π/5
+                    if (offset === 1) return Math.PI * (2 - 4/3 + 32/5); // Adjusted
+                    return null;
+                },
+                getIntegral: (axis, offset) => {
+                    if (axis === 'x' && offset === 0) return '\\int_0^2 \\pi (x^2)^2 \\, dx = \\int_0^2 \\pi x^4 \\, dx = \\frac{32\\pi}{5}';
+                    if (axis === 'x' && offset === 1) return '\\int_0^1 \\pi (1 - x^2)^2 \\, dx';
+                    return '\\int_0^2 \\pi r^2 \\, dx';
+                }
+            },
+            sin: {
+                f: x => Math.sin(x),
+                g: null,
+                a: 0, b: Math.PI,
+                label: 'y = \\sin(x)',
+                rLabel: '\\sin(x)',
+                exactVolume: (axis, offset) => {
+                    if (offset === 0) return Math.PI * Math.PI / 2; // ∫₀^π π sin²x dx = π²/2
+                    return null;
+                },
+                getIntegral: (axis, offset) => {
+                    if (axis === 'x' && offset === 0) return '\\int_0^{\\pi} \\pi \\sin^2(x) \\, dx = \\frac{\\pi^2}{2}';
+                    return '\\int_0^{\\pi} \\pi r^2 \\, dx';
+                }
+            },
+            between: {
+                f: x => x,
+                g: x => x * x,
+                a: 0, b: 1,
+                label: 'y = x \\text{ and } y = x^2',
+                rLabel: 'x \\text{ and } x^2',
+                exactVolume: (axis, offset) => {
+                    if (offset === 0) return Math.PI * (1/3 - 1/5); // ∫₀¹ π(x² - x⁴) dx = π(1/3 - 1/5) = 2π/15
+                    return null;
+                },
+                getIntegral: (axis, offset) => {
+                    if (axis === 'x' && offset === 0) return '\\int_0^1 \\pi (x^2 - x^4) \\, dx = \\frac{2\\pi}{15}';
+                    return '\\int_0^1 \\pi (R^2 - r^2) \\, dx';
+                }
+            },
+            line: {
+                f: x => Math.max(0, 2 - x),
+                g: null,
+                a: 0, b: 2,
+                label: 'y = 2 - x',
+                rLabel: '2 - x',
+                exactVolume: (axis, offset) => {
+                    if (offset === 0) return Math.PI * 8 / 3; // ∫₀² π(2-x)² dx = 8π/3
+                    return null;
+                },
+                getIntegral: (axis, offset) => {
+                    if (axis === 'x' && offset === 0) return '\\int_0^2 \\pi (2-x)^2 \\, dx = \\frac{8\\pi}{3}';
+                    return '\\int_0^2 \\pi r^2 \\, dx';
+                }
+            }
+        };
+        
+        function initVolumeScene() {
+            const canvas = document.getElementById('volumeCanvas');
+            const rect = canvas.getBoundingClientRect();
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf7faf9);
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(45, rect.width / rect.height, 0.1, 1000);
+            camera.position.set(6, 4, 6);
+            camera.lookAt(2, 0, 0);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(rect.width, rect.height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 10);
+            scene.add(directionalLight);
+            
+            const backLight = new THREE.DirectionalLight(0xffffff, 0.4);
+            backLight.position.set(-5, -5, -5);
+            scene.add(backLight);
+            
+            // Axes helper
+            const axesHelper = new THREE.AxesHelper(5);
+            scene.add(axesHelper);
+            
+            // Add axis labels
+            addAxisLabels();
+            
+            // Orbit controls (manual implementation)
+            setupOrbitControls(canvas);
+            
+            // Build initial solid
+            buildVolumeSolid();
+            
+            // Animation loop
+            animate();
+        }
+        
+        function addAxisLabels() {
+            // We'll use sprites for labels - simplified for now
+        }
+        
+        // Simple orbit controls
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let spherical = { theta: Math.PI / 4, phi: Math.PI / 3, radius: 10 };
+        let lookAtPoint = new THREE.Vector3(2, 0, 0);
+        
+        function setupOrbitControls(canvas) {
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+                
+                spherical.theta -= deltaX * 0.01;
+                spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi - deltaY * 0.01));
+                
+                updateCameraPosition();
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+            
+            canvas.addEventListener('mouseup', () => { isDragging = false; });
+            canvas.addEventListener('mouseleave', () => { isDragging = false; });
+            
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                spherical.radius = Math.max(5, Math.min(30, spherical.radius + e.deltaY * 0.01));
+                updateCameraPosition();
+            });
+            
+            // Touch support
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isDragging = true;
+                    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                if (!isDragging || e.touches.length !== 1) return;
+                e.preventDefault();
+                
+                const deltaX = e.touches[0].clientX - previousMousePosition.x;
+                const deltaY = e.touches[0].clientY - previousMousePosition.y;
+                
+                spherical.theta -= deltaX * 0.01;
+                spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi - deltaY * 0.01));
+                
+                updateCameraPosition();
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            });
+            
+            canvas.addEventListener('touchend', () => { isDragging = false; });
+            
+            updateCameraPosition();
+        }
+        
+        function updateCameraPosition() {
+            const preset = volumePresets[volumePreset];
+            const centerX = (preset.a + preset.b) / 2;
+            lookAtPoint.set(centerX, 0, 0);
+            
+            camera.position.x = lookAtPoint.x + spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
+            camera.position.y = lookAtPoint.y + spherical.radius * Math.cos(spherical.phi);
+            camera.position.z = lookAtPoint.z + spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
+            camera.lookAt(lookAtPoint);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        
+        function buildVolumeSolid() {
+            // Clear existing meshes
+            if (solidMesh) {
+                scene.remove(solidMesh);
+                solidMesh.geometry.dispose();
+                solidMesh.material.dispose();
+            }
+            if (curveLineObj) scene.remove(curveLineObj);
+            if (axisLineObj) scene.remove(axisLineObj);
+            slicesMeshes.forEach(m => {
+                scene.remove(m);
+                m.geometry.dispose();
+                m.material.dispose();
+            });
+            slicesMeshes = [];
+            if (sliceMesh) {
+                scene.remove(sliceMesh);
+                sliceMesh.geometry.dispose();
+                sliceMesh.material.dispose();
+                sliceMesh = null;
+            }
+            
+            const preset = volumePresets[volumePreset];
+            const opacity = parseInt(document.getElementById('solidOpacity').value) / 100;
+            
+            // Create the solid of revolution using LatheGeometry
+            // LatheGeometry rotates around Y axis, so we need to set up points correctly
+            // then rotate the whole thing to align with X axis
+            
+            const points = [];
+            const segments = 100;
+            
+            // For LatheGeometry: points are (radius, height) where height is along Y axis
+            // We want the solid along X axis, so we'll rotate later
+            
+            // Create profile curve
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                const x = preset.a + t * (preset.b - preset.a);
+                const r = Math.abs(preset.f(x) - axisOffset);
+                // LatheGeometry: Vector2(radius, y_position)
+                // We'll use y_position to represent x, then rotate
+                points.push(new THREE.Vector2(r, x));
+            }
+            
+            // Add closing points to create solid (not just surface)
+            // Close at the end
+            if (!preset.g) {
+                const endR = Math.abs(axisOffset);
+                points.push(new THREE.Vector2(endR, preset.b));
+                points.push(new THREE.Vector2(endR, preset.a));
+            }
+            
+            const geometry = new THREE.LatheGeometry(points, 64);
+            
+            // Rotate to align with X axis: LatheGeometry is around Y, we want around X
+            // Rotate -90° around Z to map Y->X
+            geometry.rotateZ(-Math.PI / 2);
+            
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x10b981,
+                transparent: true,
+                opacity: opacity,
+                side: THREE.DoubleSide,
+                depthWrite: false
+            });
+            
+            solidMesh = new THREE.Mesh(geometry, material);
+            scene.add(solidMesh);
+            
+            // Add wireframe
+            const wireGeo = new THREE.WireframeGeometry(geometry);
+            const wireMat = new THREE.LineBasicMaterial({ 
+                color: 0x0f766e, 
+                transparent: true, 
+                opacity: Math.min(0.5, opacity + 0.2) 
+            });
+            const wireframe = new THREE.LineSegments(wireGeo, wireMat);
+            solidMesh.add(wireframe);
+            
+            // Draw the 2D profile curve on the XY plane (z=0)
+            const curvePoints = [];
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                const x = preset.a + t * (preset.b - preset.a);
+                const y = preset.f(x) - axisOffset;
+                curvePoints.push(new THREE.Vector3(x, y, 0));
+            }
+            const curveGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+            const curveMaterial = new THREE.LineBasicMaterial({ color: 0x0f766e, linewidth: 2 });
+            curveLineObj = new THREE.Line(curveGeometry, curveMaterial);
+            scene.add(curveLineObj);
+            
+            // If there's a second curve (washer case)
+            if (preset.g) {
+                const curve2Points = [];
+                for (let i = 0; i <= segments; i++) {
+                    const t = i / segments;
+                    const x = preset.a + t * (preset.b - preset.a);
+                    const y = preset.g(x) - axisOffset;
+                    curve2Points.push(new THREE.Vector3(x, y, 0));
+                }
+                const curve2Geometry = new THREE.BufferGeometry().setFromPoints(curve2Points);
+                const curve2Material = new THREE.LineBasicMaterial({ color: 0xc62828, linewidth: 2 });
+                const curve2Line = new THREE.Line(curve2Geometry, curve2Material);
+                scene.add(curve2Line);
+            }
+            
+            // Draw axis of rotation
+            const axisPoints = [
+                new THREE.Vector3(preset.a - 0.5, -axisOffset, 0),
+                new THREE.Vector3(preset.b + 0.5, -axisOffset, 0)
+            ];
+            const axisGeometry = new THREE.BufferGeometry().setFromPoints(axisPoints);
+            const axisMaterial = new THREE.LineBasicMaterial({ color: 0x333333, linewidth: 2 });
+            axisLineObj = new THREE.Line(axisGeometry, axisMaterial);
+            scene.add(axisLineObj);
+            
+            // Update camera to look at center of solid
+            updateCameraPosition();
+            
+            // Update slice
+            updateVolumeSlice();
+        }
+        
+        function updateVolumeSlice() {
+            // Remove existing slices
+            if (sliceMesh) {
+                scene.remove(sliceMesh);
+                sliceMesh.geometry.dispose();
+                sliceMesh.material.dispose();
+                sliceMesh = null;
+            }
+            slicesMeshes.forEach(m => {
+                scene.remove(m);
+                m.geometry.dispose();
+                m.material.dispose();
+            });
+            slicesMeshes = [];
+            
+            const preset = volumePresets[volumePreset];
+            const sliderVal = document.getElementById('volumeSlider').value / 100;
+            const xPos = preset.a + sliderVal * (preset.b - preset.a);
+            const showAll = document.getElementById('volumeShowAll').checked;
+            const nSlices = parseInt(document.getElementById('volumeNSlider').value);
+            
+            const dx = (preset.b - preset.a) / nSlices;
+            
+            // Calculate Riemann sum
+            let riemannSum = 0;
+            
+            if (showAll) {
+                // Show accumulated slices up to current position
+                for (let i = 0; i < nSlices; i++) {
+                    const x = preset.a + i * dx;
+                    if (x + dx/2 > xPos) break;
+                    
+                    const sliceData = createSlice(x + dx/2, dx, 0x10b981, 0.5);
+                    if (sliceData.mesh) {
+                        scene.add(sliceData.mesh);
+                        slicesMeshes.push(sliceData.mesh);
+                    }
+                    riemannSum += sliceData.volume;
+                }
+            } else {
+                // Calculate full Riemann sum even if not showing all slices
+                for (let i = 0; i < nSlices; i++) {
+                    const x = preset.a + i * dx;
+                    const outerR = Math.abs(preset.f(x + dx/2) - axisOffset);
+                    let innerR = 0;
+                    if (preset.g) {
+                        innerR = Math.abs(preset.g(x + dx/2) - axisOffset);
+                    }
+                    const R = Math.max(outerR, innerR);
+                    const r = Math.min(outerR, innerR);
+                    riemannSum += Math.PI * (R * R - r * r) * dx;
+                }
+            }
+            
+            // Create highlighted slice at current position
+            const highlightData = createSlice(xPos, dx, 0xf59e0b, 0.9);
+            if (highlightData.mesh) {
+                sliceMesh = highlightData.mesh;
+                scene.add(sliceMesh);
+            }
+            
+            // Update info displays
+            const outerR = Math.abs(preset.f(xPos) - axisOffset);
+            let innerR = 0;
+            if (preset.g) {
+                innerR = Math.abs(preset.g(xPos) - axisOffset);
+            }
+            const R = Math.max(outerR, innerR);
+            const r = Math.min(outerR, innerR);
+            
+            document.getElementById('volumeXValue').textContent = `x = ${xPos.toFixed(2)}`;
+            document.getElementById('volumeNValue').textContent = `n = ${nSlices}`;
+            document.getElementById('volumeOuterR').textContent = `R = ${R.toFixed(3)}`;
+            document.getElementById('volumeInnerR').textContent = r > 0.001 ? `r = ${r.toFixed(3)}` : `r = 0 (disk)`;
+            document.getElementById('volumeThickness').textContent = `dx = ${dx.toFixed(3)}`;
+            
+            const sliceVol = Math.PI * (R * R - r * r) * dx;
+            document.getElementById('volumeSliceVol').textContent = `dV ≈ ${sliceVol.toFixed(4)}`;
+            
+            // Update numerical results
+            document.getElementById('volumeRiemannSum').textContent = `≈ ${riemannSum.toFixed(4)}`;
+            
+            const exactVol = preset.exactVolume(rotationAxis, axisOffset);
+            if (exactVol !== null) {
+                document.getElementById('volumeExactValue').textContent = `= ${exactVol.toFixed(4)}`;
+            } else {
+                document.getElementById('volumeExactValue').textContent = `(compute manually)`;
+            }
+            
+            // Update integral formula
+            renderMathDisplay('volumeIntegral', preset.getIntegral(rotationAxis, axisOffset));
+        }
+        
+        function createSlice(xCenter, dx, color, opacity) {
+            const preset = volumePresets[volumePreset];
+            
+            // Get radius at this x position
+            const outerR = Math.abs(preset.f(xCenter) - axisOffset);
+            let innerR = 0;
+            
+            if (preset.g) {
+                innerR = Math.abs(preset.g(xCenter) - axisOffset);
+            }
+            
+            // Ensure outer > inner
+            const R = Math.max(outerR, innerR);
+            const r = Math.min(outerR, innerR);
+            
+            if (R < 0.01) return { mesh: null, volume: 0 };
+            
+            const volume = Math.PI * (R * R - r * r) * dx;
+            
+            // Create disk/washer geometry
+            // Use RingGeometry for the face, then extrude
+            let geometry;
+            
+            if (r > 0.01) {
+                // Washer - use ring geometry
+                const shape = new THREE.Shape();
+                shape.absarc(0, 0, R, 0, Math.PI * 2, false);
+                const hole = new THREE.Path();
+                hole.absarc(0, 0, r, 0, Math.PI * 2, true);
+                shape.holes.push(hole);
+                
+                const extrudeSettings = { steps: 1, depth: dx, bevelEnabled: false };
+                geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            } else {
+                // Simple disk - use cylinder
+                geometry = new THREE.CylinderGeometry(R, R, dx, 32);
+                geometry.rotateZ(Math.PI / 2); // Align with X axis
+            }
+            
+            // Position the slice
+            // For extruded geometry, it extrudes along Z, so rotate and translate
+            if (r > 0.01) {
+                geometry.rotateY(Math.PI / 2); // Make extrusion along X
+                geometry.translate(xCenter - dx/2, 0, 0);
+            } else {
+                geometry.translate(xCenter, 0, 0);
+            }
+            
+            const material = new THREE.MeshPhongMaterial({
+                color: color,
+                transparent: true,
+                opacity: opacity,
+                side: THREE.DoubleSide
+            });
+            
+            const mesh = new THREE.Mesh(geometry, material);
+            
+            // Add edge highlighting
+            const edges = new THREE.EdgesGeometry(geometry);
+            const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, opacity: 0.5, transparent: true });
+            const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+            mesh.add(edgeLines);
+            
+            return { mesh, volume };
+        }
+        
+        // Volume event listeners
+        document.getElementById('volumeSlider').addEventListener('input', updateVolumeSlice);
+        document.getElementById('volumeNSlider').addEventListener('input', updateVolumeSlice);
+        document.getElementById('volumeShowAll').addEventListener('change', updateVolumeSlice);
+        document.getElementById('solidOpacity').addEventListener('input', () => {
+            document.getElementById('opacityValue').textContent = document.getElementById('solidOpacity').value + '%';
+            buildVolumeSolid();
+        });
+        
+        document.getElementById('volumePresets').addEventListener('click', (e) => {
+            if (e.target.classList.contains('preset-pill')) {
+                document.querySelectorAll('#volumePresets .preset-pill').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                volumePreset = e.target.dataset.preset;
+                
+                // Update axis options based on preset
+                updateAxisOptions();
+                buildVolumeSolid();
+            }
+        });
+        
+        document.getElementById('axisOptions').addEventListener('click', (e) => {
+            if (e.target.classList.contains('axis-option')) {
+                document.querySelectorAll('#axisOptions .axis-option').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const axis = e.target.dataset.axis;
+                if (axis === 'x') {
+                    rotationAxis = 'x';
+                    axisOffset = 0;
+                } else if (axis === 'y-1') {
+                    rotationAxis = 'x';
+                    axisOffset = -1;
+                } else if (axis === 'y1') {
+                    rotationAxis = 'x';
+                    axisOffset = 1;
+                }
+                
+                buildVolumeSolid();
+            }
+        });
+        
+        function updateAxisOptions() {
+            const container = document.getElementById('axisOptions');
+            container.innerHTML = `
+                <button class="axis-option active" data-axis="x">x-axis (y = 0)</button>
+                <button class="axis-option" data-axis="y-1">y = −1</button>
+            `;
+            
+            if (volumePreset === 'x2') {
+                container.innerHTML += `<button class="axis-option" data-axis="y1">y = 1</button>`;
+            }
+            
+            rotationAxis = 'x';
+            axisOffset = 0;
+        }
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        window.addEventListener('load', () => {
+            initIntro();
+            renderMath('areaSliceFormula', 'dA = f(x) \\cdot dx');
+        });
+        
+        window.addEventListener('resize', () => {
+            if (document.getElementById('area').classList.contains('active')) {
+                initAreaCanvas();
+                drawArea();
+            }
+            if (document.getElementById('volume').classList.contains('active') && renderer) {
+                const canvas = document.getElementById('volumeCanvas');
+                const rect = canvas.getBoundingClientRect();
+                camera.aspect = rect.width / rect.height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(rect.width, rect.height);
+            }
+        });
+    </script>
+</body>
+</html>
