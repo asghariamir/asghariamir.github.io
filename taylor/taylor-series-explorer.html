@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taylor Series Explorer | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <!-- Math.js for symbolic computation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
+    
+    <!-- Plotly for plotting -->
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        /* Centered Navigation */
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* Centered Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: var(--interactive);
+            color: var(--primary);
+        }
+        
+        /* Tab content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .card p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(135deg, var(--interactive) 0%, white 100%);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Concept cards grid */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .concept-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .concept-card .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        /* Key formula box */
+        .formula-box {
+            background: var(--interactive);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .formula-box .formula {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        
+        /* Preset pills */
+        .preset-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .preset-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .preset-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Controls */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        
+        .control-group input[type="text"],
+        .control-group input[type="number"] {
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .control-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .control-group input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+        
+        /* Plot container */
+        .plot-container {
+            width: 100%;
+            height: 400px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Info display */
+        .info-display {
+            background: var(--interactive);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+        }
+        
+        .info-display .label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        /* Series display */
+        .series-display {
+            background: var(--interactive);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .series-display h4 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        
+        .series-formula {
+            font-size: 1.1rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+        
+        /* Error bound section */
+        .error-bound-section {
+            background: #fff8e6;
+            border: 2px solid var(--accent-amber);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .error-bound-section h4 {
+            color: #b45309;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Key insights */
+        .insights-box {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .insights-box h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .insight-item {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            background: var(--interactive);
+            border-radius: 8px;
+        }
+        
+        .insight-item .icon {
+            font-size: 1.25rem;
+        }
+        
+        .insight-item p {
+            margin: 0;
+            color: var(--text-primary);
+        }
+        
+        /* Navigation buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .nav-btn.secondary:hover {
+            background: var(--interactive);
+        }
+        
+        /* Comparison table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        
+        .comparison-table th {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .comparison-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: var(--interactive);
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                justify-content: flex-start;
+            }
+            
+            .tab-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+            
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .plot-container {
+                height: 300px;
+            }
+            
+            input, button {
+                font-size: 16px;
+                min-height: 44px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Centered Mathswell Navigation -->
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    
+    <div class="container">
+        <!-- Centered Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="intro">📚 Introduction</button>
+            <button class="tab-btn" data-tab="explorer">🔬 Explorer</button>
+            <button class="tab-btn" data-tab="error">📊 Error Analysis</button>
+        </div>
+        
+        <!-- ========== INTRODUCTION TAB ========== -->
+        <div id="intro" class="tab-content active">
+            <div class="hero">
+                <h1>Taylor Series Explorer</h1>
+                <p>Discover how any smooth function can be approximated by a polynomial — the foundation of numerical methods.</p>
+            </div>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <div class="icon">🎯</div>
+                    <h3>The Big Idea</h3>
+                    <p>Near a chosen point, even complex functions like $e^x$ and $\sin x$ behave like simple polynomials.</p>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">📐</div>
+                    <h3>Why Polynomials?</h3>
+                    <p>Polynomials are easy to compute — just addition and multiplication. No transcendental functions needed!</p>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">🔢</div>
+                    <h3>More Terms = Better</h3>
+                    <p>Each additional term captures more of the function's behaviour, reducing the approximation error.</p>
+                </div>
+            </div>
+            
+            <div class="formula-box">
+                <h3>The Taylor Series Formula</h3>
+                <div class="formula">
+                    $$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \frac{f'''(a)}{3!}(x-a)^3 + \cdots$$
+                </div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">When $a = 0$, this is called a <strong>Maclaurin series</strong>.</p>
+            </div>
+            
+            <div class="card">
+                <h3>Key Series to Know</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Maclaurin Series</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>$e^x$</td>
+                            <td>$1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} + \cdots$</td>
+                        </tr>
+                        <tr>
+                            <td>$\sin x$</td>
+                            <td>$x - \frac{x^3}{3!} + \frac{x^5}{5!} - \frac{x^7}{7!} + \cdots$</td>
+                        </tr>
+                        <tr>
+                            <td>$\cos x$</td>
+                            <td>$1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \frac{x^6}{6!} + \cdots$</td>
+                        </tr>
+                        <tr>
+                            <td>$\ln(1+x)$</td>
+                            <td>$x - \frac{x^2}{2} + \frac{x^3}{3} - \frac{x^4}{4} + \cdots$</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="insights-box">
+                <h3>💡 Ways to Think About Taylor Series</h3>
+                <div class="insight-item">
+                    <span class="icon">🎨</span>
+                    <p><strong>Matching derivatives:</strong> The polynomial is designed so its derivatives match the function's derivatives at the centre point.</p>
+                </div>
+                <div class="insight-item">
+                    <span class="icon">🔍</span>
+                    <p><strong>Local approximation:</strong> The approximation is best near the centre and gets worse as you move away.</p>
+                </div>
+                <div class="insight-item">
+                    <span class="icon">⚡</span>
+                    <p><strong>Foundation of methods:</strong> Euler's method, Newton's method, and integration rules all come from truncating Taylor series!</p>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="switchToTab('explorer')">Try the Explorer →</button>
+            </div>
+        </div>
+        
+        <!-- ========== EXPLORER TAB ========== -->
+        <div id="explorer" class="tab-content">
+            <div class="card">
+                <h2>Taylor Polynomial Explorer</h2>
+                <p>See how the Taylor polynomial approximates the function. Adjust the degree and watch the approximation improve!</p>
+            </div>
+            
+            <div class="preset-container">
+                <span class="preset-label">Choose a function:</span>
+                <div class="preset-pills">
+                    <button class="preset-pill active" data-func="exp(x)" data-range="-3,3" data-center="0">$e^x$</button>
+                    <button class="preset-pill" data-func="sin(x)" data-range="-8,8" data-center="0">$\sin x$</button>
+                    <button class="preset-pill" data-func="cos(x)" data-range="-8,8" data-center="0">$\cos x$</button>
+                    <button class="preset-pill" data-func="ln(1+x)" data-range="-0.9,4" data-center="0">$\ln(1+x)$</button>
+                    <button class="preset-pill" data-func="1/(1-x)" data-range="-2,0.9" data-center="0">$\frac{1}{1-x}$</button>
+                </div>
+            </div>
+            
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="func-input">Or enter your own $f(x)$:</label>
+                    <input type="text" id="func-input" value="exp(x)" placeholder="e.g., sin(x), exp(x)">
+                </div>
+                <div class="control-group">
+                    <label for="center-input">Centre point $a$:</label>
+                    <input type="number" id="center-input" value="0" step="0.5">
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="control-group">
+                    <label>Polynomial degree $n$: <span id="degree-value" class="slider-value">5</span></label>
+                    <input type="range" id="degree-slider" min="0" max="15" value="5">
+                </div>
+            </div>
+            
+            <div id="explorer-plot" class="plot-container"></div>
+            
+            <div class="series-display">
+                <h4>📝 Taylor Polynomial $P_n(x)$</h4>
+                <div id="polynomial-display" class="series-formula"></div>
+            </div>
+            
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="plot-min">Plot range min:</label>
+                    <input type="number" id="plot-min" value="-3" step="0.5">
+                </div>
+                <div class="control-group">
+                    <label for="plot-max">Plot range max:</label>
+                    <input type="number" id="plot-max" value="3" step="0.5">
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn secondary" onclick="switchToTab('intro')">← Back to Intro</button>
+                <button class="nav-btn" onclick="switchToTab('error')">See Error Analysis →</button>
+            </div>
+        </div>
+        
+        <!-- ========== ERROR ANALYSIS TAB ========== -->
+        <div id="error" class="tab-content">
+            <div class="card">
+                <h2>Error Analysis</h2>
+                <p>The error is the difference between the true function and the Taylor polynomial: $|f(x) - P_n(x)|$</p>
+            </div>
+            
+            <div id="error-plot" class="plot-container"></div>
+            
+            <div class="error-bound-section">
+                <h4>⚠️ Error Bound (Remainder Term)</h4>
+                <p>Taylor's theorem tells us the error is bounded by:</p>
+                <div class="formula-box" style="background: white; border-color: var(--accent-amber);">
+                    $$|R_n(x)| \le \frac{M}{(n+1)!}|x-a|^{n+1}$$
+                </div>
+                <p>where $M = \max|f^{(n+1)}(x)|$ on the interval between $a$ and $x$.</p>
+                <div id="error-bound-display" class="info-display" style="margin-top: 1rem; background: white;"></div>
+            </div>
+            
+            <div class="card">
+                <h3>📊 Error at Specific Points</h3>
+                <table class="comparison-table" id="error-table">
+                    <thead>
+                        <tr>
+                            <th>$x$</th>
+                            <th>$f(x)$</th>
+                            <th>$P_n(x)$</th>
+                            <th>Error</th>
+                        </tr>
+                    </thead>
+                    <tbody id="error-table-body">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="insights-box">
+                <h3>💡 Key Observations</h3>
+                <div class="insight-item">
+                    <span class="icon">📍</span>
+                    <p><strong>Error is zero at the centre:</strong> At $x = a$, the polynomial equals the function exactly.</p>
+                </div>
+                <div class="insight-item">
+                    <span class="icon">📈</span>
+                    <p><strong>Error grows with distance:</strong> The further from the centre, the larger the error (proportional to $|x-a|^{n+1}$).</p>
+                </div>
+                <div class="insight-item">
+                    <span class="icon">🎯</span>
+                    <p><strong>Higher degree = smaller error:</strong> Adding more terms dramatically reduces the error near the centre.</p>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn secondary" onclick="switchToTab('explorer')">← Back to Explorer</button>
+                <button class="nav-btn secondary" onclick="resetAll()">🔄 Reset All</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== STATE ====================
+        const state = {
+            funcString: 'exp(x)',
+            compiledFunc: null,
+            derivatives: [],
+            degree: 5,
+            center: 0,
+            plotRange: [-3, 3]
+        };
+        
+        const MAX_DERIVATIVES = 20;
+        
+        // ==================== DOM REFS ====================
+        const funcInput = document.getElementById('func-input');
+        const centerInput = document.getElementById('center-input');
+        const degreeSlider = document.getElementById('degree-slider');
+        const degreeValue = document.getElementById('degree-value');
+        const plotMin = document.getElementById('plot-min');
+        const plotMax = document.getElementById('plot-max');
+        const polynomialDisplay = document.getElementById('polynomial-display');
+        const errorBoundDisplay = document.getElementById('error-bound-display');
+        const errorTableBody = document.getElementById('error-table-body');
+        
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchToTab(btn.dataset.tab);
+                });
+            });
+            
+            // Preset pills
+            document.querySelectorAll('.preset-pill').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    
+                    const func = pill.dataset.func;
+                    const range = pill.dataset.range.split(',').map(Number);
+                    const center = parseFloat(pill.dataset.center);
+                    
+                    funcInput.value = func;
+                    plotMin.value = range[0];
+                    plotMax.value = range[1];
+                    centerInput.value = center;
+                    
+                    handleFunctionChange();
+                });
+            });
+            
+            // Control listeners
+            funcInput.addEventListener('change', handleFunctionChange);
+            centerInput.addEventListener('change', handleControlsChange);
+            degreeSlider.addEventListener('input', handleControlsChange);
+            plotMin.addEventListener('change', handleControlsChange);
+            plotMax.addEventListener('change', handleControlsChange);
+            
+            // Initial render
+            handleFunctionChange();
+            
+            // Render KaTeX
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        });
+        
+        // ==================== TAB SWITCHING ====================
+        function switchToTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            // Re-render plots when switching tabs
+            if (tabId === 'explorer' || tabId === 'error') {
+                setTimeout(update, 100);
+            }
+        }
+        
+        // ==================== FUNCTION HANDLING ====================
+        function handleFunctionChange() {
+            state.funcString = funcInput.value;
+            
+            try {
+                state.compiledFunc = math.compile(state.funcString);
+                state.derivatives = [state.compiledFunc];
+                
+                let currentDerivative = state.funcString;
+                for (let i = 1; i <= MAX_DERIVATIVES; i++) {
+                    try {
+                        currentDerivative = math.derivative(currentDerivative, 'x');
+                        state.derivatives.push(currentDerivative.compile());
+                    } catch {
+                        state.derivatives.push(null);
+                    }
+                }
+                
+                funcInput.style.borderColor = '';
+                handleControlsChange();
+            } catch (e) {
+                funcInput.style.borderColor = 'var(--accent-red)';
+                console.error('Function parse error:', e);
+            }
+        }
+        
+        function handleControlsChange() {
+            state.degree = parseInt(degreeSlider.value);
+            degreeValue.textContent = state.degree;
+            state.center = parseFloat(centerInput.value);
+            state.plotRange = [parseFloat(plotMin.value), parseFloat(plotMax.value)];
+            update();
+        }
+        
+        // ==================== MATH UTILITIES ====================
+        function factorial(n) {
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) result *= i;
+            return result;
+        }
+        
+        function getTaylorCoefficients() {
+            const coeffs = [];
+            for (let n = 0; n <= state.degree; n++) {
+                try {
+                    if (state.derivatives[n]) {
+                        const derivVal = state.derivatives[n].evaluate({ x: state.center });
+                        coeffs.push(derivVal / factorial(n));
+                    } else {
+                        coeffs.push(0);
+                    }
+                } catch {
+                    coeffs.push(0);
+                }
+            }
+            return coeffs;
+        }
+        
+        function evaluateTaylor(x, coeffs) {
+            let result = 0;
+            const dx = x - state.center;
+            for (let n = 0; n < coeffs.length; n++) {
+                result += coeffs[n] * Math.pow(dx, n);
+            }
+            return result;
+        }
+        
+        function formatPolynomial(coeffs) {
+            const terms = [];
+            const a = state.center;
+            
+            for (let n = 0; n < coeffs.length; n++) {
+                const c = coeffs[n];
+                if (Math.abs(c) < 1e-10) continue;
+                
+                let term = '';
+                const cFormatted = Math.abs(c) < 0.0001 || Math.abs(c) >= 10000 
+                    ? c.toExponential(2) 
+                    : c.toFixed(4).replace(/\.?0+$/, '');
+                
+                if (n === 0) {
+                    term = cFormatted;
+                } else {
+                    const xTerm = a === 0 ? 'x' : `(x - ${a})`;
+                    const power = n === 1 ? xTerm : `${xTerm}^{${n}}`;
+                    term = `${cFormatted} \\cdot ${power}`;
+                }
+                
+                terms.push(term);
+            }
+            
+            if (terms.length === 0) return '0';
+            
+            let result = terms[0];
+            for (let i = 1; i < terms.length; i++) {
+                if (terms[i].startsWith('-')) {
+                    result += ' ' + terms[i];
+                } else {
+                    result += ' + ' + terms[i];
+                }
+            }
+            
+            return result;
+        }
+        
+        // ==================== PLOTTING ====================
+        function update() {
+            if (!state.compiledFunc) return;
+            
+            const coeffs = getTaylorCoefficients();
+            
+            // Update polynomial display
+            const polyStr = formatPolynomial(coeffs);
+            polynomialDisplay.innerHTML = `$$P_{${state.degree}}(x) = ${polyStr}$$`;
+            renderMathInElement(polynomialDisplay, {
+                delimiters: [{left: '$$', right: '$$', display: true}]
+            });
+            
+            // Generate plot data
+            const xValues = [];
+            const yOriginal = [];
+            const yTaylor = [];
+            const yError = [];
+            
+            const numPoints = 400;
+            const step = (state.plotRange[1] - state.plotRange[0]) / numPoints;
+            
+            for (let x = state.plotRange[0]; x <= state.plotRange[1]; x += step) {
+                xValues.push(x);
+                try {
+                    const fVal = state.compiledFunc.evaluate({ x: x });
+                    const pVal = evaluateTaylor(x, coeffs);
+                    
+                    if (isFinite(fVal) && isFinite(pVal)) {
+                        yOriginal.push(fVal);
+                        yTaylor.push(pVal);
+                        yError.push(Math.max(1e-16, Math.abs(fVal - pVal)));
+                    } else {
+                        yOriginal.push(null);
+                        yTaylor.push(null);
+                        yError.push(null);
+                    }
+                } catch {
+                    yOriginal.push(null);
+                    yTaylor.push(null);
+                    yError.push(null);
+                }
+            }
+            
+            // Plot layout
+            const layout = {
+                margin: { l: 50, r: 30, t: 40, b: 50 },
+                xaxis: { 
+                    title: 'x',
+                    gridcolor: '#e0e0e0',
+                    range: state.plotRange
+                },
+                yaxis: { 
+                    gridcolor: '#e0e0e0'
+                },
+                legend: { 
+                    x: 0.02, 
+                    y: 0.98,
+                    bgcolor: 'rgba(255,255,255,0.9)'
+                },
+                plot_bgcolor: 'white',
+                paper_bgcolor: 'white'
+            };
+            
+            const config = { responsive: true, displaylogo: false };
+            
+            // Explorer plot
+            if (document.getElementById('explorer-plot')) {
+                Plotly.newPlot('explorer-plot', [
+                    {
+                        x: xValues,
+                        y: yOriginal,
+                        mode: 'lines',
+                        name: 'f(x)',
+                        line: { color: '#9ca3af', width: 3 }
+                    },
+                    {
+                        x: xValues,
+                        y: yTaylor,
+                        mode: 'lines',
+                        name: `P<sub>${state.degree}</sub>(x)`,
+                        line: { color: '#0f766e', width: 3 }
+                    },
+                    {
+                        x: [state.center],
+                        y: [state.compiledFunc.evaluate({ x: state.center })],
+                        mode: 'markers',
+                        name: 'Centre',
+                        marker: { color: '#f59e0b', size: 12, symbol: 'diamond' }
+                    }
+                ], {
+                    ...layout,
+                    title: { text: 'Function vs Taylor Polynomial', font: { color: '#0f766e' } }
+                }, config);
+            }
+            
+            // Error plot
+            if (document.getElementById('error-plot')) {
+                Plotly.newPlot('error-plot', [
+                    {
+                        x: xValues,
+                        y: yError,
+                        mode: 'lines',
+                        name: '|f(x) - P<sub>n</sub>(x)|',
+                        line: { color: '#c62828', width: 2 },
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(198, 40, 40, 0.1)'
+                    }
+                ], {
+                    ...layout,
+                    title: { text: 'Approximation Error (log scale)', font: { color: '#0f766e' } },
+                    yaxis: { 
+                        type: 'log',
+                        title: 'Error',
+                        gridcolor: '#e0e0e0'
+                    }
+                }, config);
+            }
+            
+            // Update error table
+            updateErrorTable(coeffs);
+            
+            // Update error bound display
+            updateErrorBound();
+        }
+        
+        function updateErrorTable(coeffs) {
+            const points = [
+                state.center - 1,
+                state.center - 0.5,
+                state.center,
+                state.center + 0.5,
+                state.center + 1
+            ].filter(x => x >= state.plotRange[0] && x <= state.plotRange[1]);
+            
+            let html = '';
+            for (const x of points) {
+                try {
+                    const fVal = state.compiledFunc.evaluate({ x: x });
+                    const pVal = evaluateTaylor(x, coeffs);
+                    const error = Math.abs(fVal - pVal);
+                    
+                    if (isFinite(fVal) && isFinite(pVal)) {
+                        html += `<tr>
+                            <td>${x.toFixed(2)}</td>
+                            <td>${fVal.toFixed(6)}</td>
+                            <td>${pVal.toFixed(6)}</td>
+                            <td>${error < 0.000001 ? error.toExponential(2) : error.toFixed(6)}</td>
+                        </tr>`;
+                    }
+                } catch {}
+            }
+            
+            errorTableBody.innerHTML = html;
+        }
+        
+        function updateErrorBound() {
+            const n = state.degree;
+            const a = state.center;
+            
+            // For common functions, provide specific bounds
+            let boundInfo = '';
+            const func = state.funcString.toLowerCase();
+            
+            if (func === 'exp(x)') {
+                const M = Math.exp(Math.max(Math.abs(state.plotRange[0]), Math.abs(state.plotRange[1])));
+                boundInfo = `<span class="label">For $e^x$:</span>
+                    All derivatives are $e^x$, so $M \\le e^{${Math.max(...state.plotRange).toFixed(1)}} \\approx ${M.toFixed(2)}$<br>
+                    Error bound at $x = ${a + 1}$: $\\dfrac{${M.toFixed(2)}}{${n+1}!} \\cdot |${a + 1} - ${a}|^{${n+1}} \\approx ${(M / factorial(n+1)).toExponential(2)}$`;
+            } else if (func === 'sin(x)' || func === 'cos(x)') {
+                boundInfo = `<span class="label">For $\\${func}$:</span>
+                    All derivatives have $|f^{(k)}(x)| \\le 1$, so $M = 1$<br>
+                    Error bound at $x = ${a + 1}$: $\\dfrac{1}{${n+1}!} \\cdot |${a + 1} - ${a}|^{${n+1}} = \\dfrac{1}{${factorial(n+1)}} \\approx ${(1 / factorial(n+1)).toExponential(2)}$`;
+            } else {
+                boundInfo = `<span class="label">General bound:</span>
+                    $|R_{${n}}(x)| \\le \\dfrac{M}{${n+1}!}|x - ${a}|^{${n+1}}$<br>
+                    where $M = \\max|f^{(${n+1})}(x)|$ on the interval.`;
+            }
+            
+            errorBoundDisplay.innerHTML = boundInfo;
+            renderMathInElement(errorBoundDisplay, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        }
+        
+        // ==================== UTILITIES ====================
+        function resetAll() {
+            document.querySelector('.preset-pill').click();
+            degreeSlider.value = 5;
+            handleControlsChange();
+        }
+    </script>
+</body>
+</html>
