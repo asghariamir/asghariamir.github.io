@@ -22,7 +22,7 @@
         .tab-content{display:none;animation:fadeIn 0.3s ease;}.tab-content.active{display:block;}
         @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
         .hero{text-align:center;margin-bottom:2rem;}.hero h1{font-size:2rem;color:var(--primary);margin-bottom:0.5rem;}.hero p{color:var(--text-muted);font-size:1.05rem;max-width:700px;margin:0 auto;line-height:1.6;}
-        .concept-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-bottom:2rem;}
+        .concept-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-bottom:2rem;}
         .concept-card{background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);border-left:4px solid var(--primary);}
         .concept-card h3{color:var(--primary);margin-bottom:0.5rem;}.concept-card p{color:var(--text-muted);font-size:0.95rem;line-height:1.5;}
         .math-block{margin:0.75rem 0;text-align:center;}
@@ -62,7 +62,7 @@
         .challenge-section h3{color:var(--primary);margin-bottom:0.75rem;}
         .hint-btn{padding:0.5rem 1rem;border-radius:8px;border:2px solid var(--primary);background:white;color:var(--primary);cursor:pointer;font-size:0.85rem;transition:all 0.2s;margin:0.25rem;}.hint-btn:hover{background:var(--interactive);}
         .hint-response{background:var(--interactive);border-radius:8px;padding:1rem;margin-top:0.75rem;display:none;line-height:1.6;}.hint-response.visible{display:block;}
-        @media(max-width:768px){.controls-grid{grid-template-columns:1fr;}.hero h1{font-size:1.5rem;}input,button,select{font-size:16px;min-height:44px;}}
+        @media(max-width:768px){.controls-grid{grid-template-columns:1fr;}.concept-cards{grid-template-columns:1fr;}.hero h1{font-size:1.5rem;}input,button,select{font-size:16px;min-height:44px;}}
     </style>
 </head>
 <body>
