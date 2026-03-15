@@ -1,1 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tent Map Explorer | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        :root { --primary:#0f766e; --primary-light:#10b981; --background:#f7faf9; --interactive:#e6fffb; --text-primary:#212121; --text-muted:#4b5563; --accent-amber:#f59e0b; --accent-red:#c62828; --success:#10b981; }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--background);color:var(--text-primary);padding-top:60px;}
+        .mathswell-nav{position:fixed;top:0;left:0;right:0;background:white;border-bottom:2px solid var(--primary);padding:0.75rem 1rem;z-index:1000;display:flex;justify-content:center;align-items:center;}
+        .mw-link{display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:var(--primary);font-weight:600;letter-spacing:1px;}
+        .container{max-width:1000px;margin:1.5rem auto;padding:0 1rem;}
+        .tabs{display:flex;gap:0.5rem;justify-content:center;background:white;padding:0.5rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);margin-bottom:2rem;flex-wrap:wrap;}
+        .tab-btn{padding:0.75rem 1.5rem;border:none;background:transparent;color:var(--text-muted);cursor:pointer;border-radius:8px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:0.5rem;font-size:0.95rem;}
+        .tab-btn.active{background:var(--primary);color:white;}
+        .tab-btn:hover:not(.active){background:var(--interactive);color:var(--primary);}
+        .tab-content{display:none;animation:fadeIn 0.3s ease;}
+        .tab-content.active{display:block;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
+        .hero{text-align:center;margin-bottom:2rem;}
+        .hero h1{font-size:2rem;color:var(--primary);margin-bottom:0.5rem;}
+        .hero p{color:var(--text-muted);font-size:1.05rem;max-width:700px;margin:0 auto;line-height:1.6;}
+        .concept-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-bottom:2rem;}
+        .concept-card{background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);border-left:4px solid var(--primary);}
+        .concept-card h3{color:var(--primary);margin-bottom:0.5rem;}
+        .concept-card p{color:var(--text-muted);font-size:0.95rem;line-height:1.5;}
+        .math-block{margin:0.75rem 0;text-align:center;}
+        .insight-box{background:var(--interactive);border:1px solid var(--primary);border-radius:10px;padding:1.25rem;margin:1.5rem 0;}
+        .insight-box h3{color:var(--primary);margin-bottom:0.5rem;}
+        .insight-box p{color:var(--text-muted);line-height:1.5;}
+        .cta-row{display:flex;gap:1rem;justify-content:center;margin:2rem 0;}
+        .nav-btn{background:var(--primary);color:white;padding:0.75rem 1.5rem;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.95rem;}
+        .nav-btn:hover{background:#0e6b63;}
+
+        .presets{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-bottom:1.5rem;}
+        .preset-pill{padding:0.4rem 1rem;border-radius:999px;background:white;border:2px solid var(--primary);color:var(--primary);cursor:pointer;transition:all 0.2s;font-size:0.85rem;font-weight:500;}
+        .preset-pill:hover{background:var(--interactive);transform:translateY(-2px);}
+        .preset-pill.active{background:var(--primary);color:white;}
+
+        .controls-panel{background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;}
+        .controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+        .control-group{display:flex;flex-direction:column;gap:0.25rem;}
+        .control-group label{font-size:0.85rem;font-weight:600;color:var(--text-muted);}
+        .control-row{display:flex;align-items:center;gap:0.5rem;}
+        .control-row input[type="range"]{flex:1;accent-color:var(--primary);}
+        .control-row input[type="number"]{width:80px;padding:0.35rem 0.5rem;border:1px solid #d1d5db;border-radius:6px;font-size:0.9rem;text-align:center;}
+        input[type="number"]:focus{outline:none;border-color:var(--primary);}
+
+        .btn-row{display:flex;gap:0.75rem;margin-top:1rem;justify-content:center;flex-wrap:wrap;}
+        .action-btn{padding:0.6rem 1.25rem;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.9rem;}
+        .action-btn.primary{background:var(--primary);color:white;}
+        .action-btn.primary:hover{background:#0e6b63;}
+        .action-btn.secondary{background:white;color:var(--primary);border:2px solid var(--primary);}
+        .action-btn.secondary:hover{background:var(--interactive);}
+
+        .canvas-wrapper{background:white;border-radius:12px;padding:1rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+        canvas{max-width:100%;display:block;margin:0 auto;}
+
+        .info-display{background:var(--interactive);border:1px solid var(--primary);border-radius:8px;padding:0.75rem 1rem;font-family:'Monaco',monospace;font-size:0.85rem;text-align:center;margin-top:0.75rem;}
+
+        .periodic-points-box{background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-top:1.5rem;}
+        .periodic-points-box h3{color:var(--primary);margin-bottom:0.5rem;}
+        .pp-table{width:100%;border-collapse:collapse;font-size:0.85rem;margin-top:0.5rem;}
+        .pp-table th{background:var(--primary);color:white;padding:0.5rem;text-align:center;}
+        .pp-table td{padding:0.4rem;text-align:center;border-bottom:1px solid #e5e7eb;}
+        .pp-table tr:hover{background:var(--interactive);}
+
+        .orbit-table-wrapper{margin-top:1rem;overflow-x:auto;}
+        .orbit-table{width:100%;border-collapse:collapse;font-size:0.85rem;font-family:'Monaco',monospace;}
+        .orbit-table th{background:var(--primary);color:white;padding:0.5rem;}
+        .orbit-table td{padding:0.4rem;text-align:center;border-bottom:1px solid #e5e7eb;}
+
+        .view-toggles{display:flex;gap:0.5rem;justify-content:center;margin-bottom:1rem;}
+        .view-toggle{padding:0.5rem 1rem;border:2px solid var(--primary);border-radius:8px;background:white;color:var(--primary);cursor:pointer;font-size:0.85rem;font-weight:500;transition:all 0.2s;}
+        .view-toggle.active{background:var(--primary);color:white;}
+
+        .ai-disclosure-banner{background:var(--interactive);border:2px solid var(--primary);border-radius:12px;padding:1rem;margin-bottom:1.5rem;}
+        .challenge-section{background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;}
+        .challenge-section h3{color:var(--primary);margin-bottom:0.75rem;}
+        .hint-btn{padding:0.5rem 1rem;border-radius:8px;border:2px solid var(--primary);background:white;color:var(--primary);cursor:pointer;font-size:0.85rem;transition:all 0.2s;margin:0.25rem;}
+        .hint-btn:hover{background:var(--interactive);}
+        .mathpal-response{background:var(--interactive);border-radius:8px;padding:1rem;margin-top:0.75rem;display:none;line-height:1.6;}
+        .mathpal-response.visible{display:block;}
+        .robot-eye{animation:robot-blink 5s infinite;}
+        @keyframes robot-blink{0%,90%,100%{opacity:1;}95%{opacity:0.1;}}
+
+        @media(max-width:768px){.controls-grid{grid-template-columns:1fr;}.hero h1{font-size:1.5rem;}input,button,select{font-size:16px;min-height:44px;}}
+    </style>
+</head>
+<body>
+
+<div class="mathswell-nav">
+    <a href="https://mathswell.com/" class="mw-link">
+        <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+        <span>MATHSWELL</span>
+    </a>
+</div>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="intro">Introduction</button>
+        <button class="tab-btn" data-tab="explorer">Explorer</button>
+        <button class="tab-btn" data-tab="challenge">Guided Practice</button>
+    </div>
+
+    <!-- ============ TAB 1: Introduction ============ -->
+    <div id="intro" class="tab-content active">
+        <div class="hero">
+            <h1>The Tent Map</h1>
+            <p>A piecewise linear map where every calculation is exact —
+               the simplest gateway to chaos.</p>
+        </div>
+
+        <div class="concept-cards" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="concept-card">
+                <h3>The Map</h3>
+                <div class="math-block" id="math-tent"></div>
+                <p>The parameter <span class="k-inline" data-tex="s"></span> controls the slope of both branches.
+                   When <span class="k-inline" data-tex="s = 2"></span>, the tent reaches height 1 at its peak.
+                   Use the Explorer to see what happens for different values of <span class="k-inline" data-tex="s"></span>.</p>
+            </div>
+
+            <div class="concept-card">
+                <h3>Why "Tent"?</h3>
+                <p>The graph rises linearly to a peak at <span class="k-inline" data-tex="x = \tfrac{1}{2}"></span>
+                   then falls back symmetrically — shaped like a tent.
+                   Unlike the smooth parabola of the logistic map, this has a sharp corner at the peak.</p>
+            </div>
+        </div>
+
+        <div class="concept-cards" style="grid-template-columns: 1fr;">
+            <div class="concept-card">
+                <h3>Key Properties</h3>
+                <p>The derivative <span class="k-inline" data-tex="|T_s'(x)| = s"></span> everywhere
+                   (except at the peak). This means every periodic orbit of period
+                   <span class="k-inline" data-tex="p"></span> has multiplier
+                   <span class="k-inline" data-tex="s^p"></span>. When
+                   <span class="k-inline" data-tex="s > 1"></span>, <em>all</em> periodic orbits are unstable —
+                   the piecewise linearity makes this immediate, no calculation needed.</p>
+            </div>
+        </div>
+
+        <div class="cta-row">
+            <button class="nav-btn" onclick="switchTab('explorer')">Try the Explorer →</button>
+        </div>
+    </div>
+
+    <!-- ============ TAB 2: Explorer ============ -->
+    <div id="explorer" class="tab-content">
+        <h2 style="text-align:center;color:var(--primary);margin-bottom:1rem;">Tent Map Explorer</h2>
+
+        <div class="presets">
+            <button class="preset-pill" onclick="loadTentPreset(2, 0.1, 'Full tent')">Full tent: s = 2</button>
+            <button class="preset-pill" onclick="loadTentPreset(0.8, 0.5, 'Stable')">Stable: s = 0.8</button>
+            <button class="preset-pill" onclick="loadTentPreset(1.5, 0.3, 'Unstable FP')">s = 1.5</button>
+            <button class="preset-pill" onclick="loadTentPreset(2, 0.101, 'SDIC')">SDIC: x₀ = 0.101</button>
+        </div>
+
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label>Slope s: <strong id="s-display">2</strong></label>
+                    <div class="control-row">
+                        <input type="range" id="s-slider" min="0.1" max="2" step="0.01" value="2">
+                        <input type="number" id="s-input" step="0.01" value="2" min="0.1" max="2">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>x₀: <strong id="x0-display">0.1</strong></label>
+                    <div class="control-row">
+                        <input type="range" id="x0-slider" min="0" max="1" step="0.001" value="0.1">
+                        <input type="number" id="x0-input" step="0.001" value="0.1" min="0" max="1">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Iterations: <strong id="iter-display">20</strong></label>
+                    <div class="control-row">
+                        <input type="range" id="iter-slider" min="5" max="100" step="1" value="20">
+                        <input type="number" id="iter-input" step="1" value="20" min="5" max="200">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Second orbit (x₀'):</label>
+                    <div class="control-row">
+                        <input type="checkbox" id="show-second" style="width:20px;height:20px;" onchange="render()">
+                        <input type="number" id="x0b-input" step="0.001" value="0.101" min="0" max="1" style="width:80px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="action-btn primary" onclick="render()">Compute</button>
+                <button class="action-btn secondary" onclick="downloadTent()">Download</button>
+            </div>
+        </div>
+
+        <!-- View toggles -->
+        <div class="view-toggles">
+            <button class="view-toggle active" data-view="both" onclick="setView('both',this)">Graph + Cobweb</button>
+            <button class="view-toggle" data-view="orbit" onclick="setView('orbit',this)">Orbit Plot</button>
+            <button class="view-toggle" data-view="cobweb" onclick="setView('cobweb',this)">Cobweb Only</button>
+        </div>
+
+        <div class="canvas-wrapper">
+            <canvas id="tent-canvas" width="960" height="500"></canvas>
+        </div>
+
+        <div class="info-display" id="tent-info">
+            s = 2 | x* = 2/3 ≈ 0.6667 | |T'(x*)| = 2 (unstable) | All periodic orbits unstable
+        </div>
+
+        <!-- Periodic points panel -->
+        <div class="periodic-points-box">
+            <h3>Fixed & Periodic Points</h3>
+            <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:0.5rem;">
+                Algebraically computed for the current slope parameter s.
+            </p>
+            <table class="pp-table" id="pp-table">
+                <thead><tr><th>Period</th><th>Points</th><th>Multiplier</th><th>|Multiplier|</th><th>Stable?</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Orbit table -->
+        <div style="margin-top:1rem;">
+            <button class="action-btn secondary" onclick="toggleOrbitTable()" style="font-size:0.85rem;">Show/Hide Orbit Table</button>
+        </div>
+        <div class="orbit-table-wrapper" id="orbit-table-wrap" style="display:none;">
+            <table class="orbit-table" id="tent-orbit-table">
+                <thead><tr><th>n</th><th>xₙ</th><th>xₙ (2nd)</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============ TAB 3: Challenge ============ -->
+    <div id="challenge" class="tab-content">
+        <div class="challenge-section">
+            <h3>Challenge 1: Compute by Hand</h3>
+            <p style="margin-bottom:0.75rem;">With s = 2 and x₀ = 0.1, compute the first 5 iterates by hand.
+               At each step, decide which branch applies (is xₙ ≤ ½ or > ½?), then apply the formula. Check your answers on the Explorer.</p>
+            <div>
+                <button class="hint-btn" onclick="showHint('ch1')">💡 Check</button>
+            </div>
+            <div class="mathpal-response" id="ch1">
+                x₀ = 0.1 (left branch): x₁ = 2(0.1) = 0.2. x₁ = 0.2 (left): x₂ = 0.4. x₂ = 0.4 (left): x₃ = 0.8. x₃ = 0.8 (right): x₄ = 2(1−0.8) = 0.4. x₄ = 0.4 (left): x₅ = 0.8. The orbit settles into the pattern 0.4 → 0.8 → 0.4 → ... — a 2-cycle!
+            </div>
+        </div>
+
+        <div class="challenge-section">
+            <h3>Challenge 2: Find the Fixed Points</h3>
+            <p style="margin-bottom:0.75rem;">Solve f(x) = x on each branch of the tent map. How many fixed points does T₂ have?</p>
+            <div>
+                <button class="hint-btn" onclick="showHint('ch2a')">💭 Nudge</button>
+                <button class="hint-btn" onclick="showHint('ch2b')">💡 Solution</button>
+            </div>
+            <div class="mathpal-response" id="ch2a">
+                
+                Left branch: 2x = x gives x = 0. Right branch: 2(1−x) = x gives... try solving for x!
+            </div>
+            <div class="mathpal-response" id="ch2b">
+                
+                Right branch: 2 − 2x = x → 3x = 2 → x = 2/3. Check: T₂(2/3) = 2(1 − 2/3) = 2/3 ✓. Both fixed points (0 and 2/3) are unstable since |T₂'| = 2 > 1 everywhere. Check the periodic points table on the Explorer!
+            </div>
+        </div>
+
+        <div class="challenge-section">
+            <h3>Challenge 3: Sensitive Dependence</h3>
+            <p style="margin-bottom:0.75rem;">Compare orbits from x₀ = 0.1 and x₀ = 0.101.
+               Enable the second orbit on the Explorer. After how many steps do they diverge?</p>
+            <div>
+                <button class="hint-btn" onclick="showHint('ch3')">💡 Why This Happens</button>
+            </div>
+            <div class="mathpal-response" id="ch3">
+                
+                Since |T₂'| = 2 everywhere, the distance between two orbits doubles every step: |xₙ − yₙ| ≈ 2ⁿ|x₀ − y₀|.
+                Starting 0.001 apart, after about 10 steps the separation is 0.001 × 2¹⁰ ≈ 1 — they're completely different!
+                This is <em>sensitive dependence on initial conditions</em>: the hallmark of chaos.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+function switchTab(id) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-tab="${id}"]`).classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+// KaTeX
+function renderMath() {
+    const m = {
+        'math-tent': { tex: 'T_s(x) = \\begin{cases} sx & \\text{if } 0 \\leq x \\leq \\tfrac{1}{2} \\\\ s(1-x) & \\text{if } \\tfrac{1}{2} < x \\leq 1 \\end{cases}', display: true }
+    };
+    for (const [id, {tex, display}] of Object.entries(m)) {
+        const el = document.getElementById(id);
+        if (el) try { katex.render(tex, el, { throwOnError: false, displayMode: display }); } catch(e) {}
+    }
+    document.querySelectorAll('.k-inline').forEach(el => {
+        const tex = el.getAttribute('data-tex');
+        if (tex) try { katex.render(tex, el, { throwOnError: false }); } catch(e) {}
+    });
+}
+
+// Controls
+function syncC(sId, iId, dId) {
+    const s = document.getElementById(sId), i = document.getElementById(iId), d = dId ? document.getElementById(dId) : null;
+    s.addEventListener('input', () => { i.value = s.value; if(d) d.textContent = s.value; });
+    i.addEventListener('change', () => { s.value = i.value; if(d) d.textContent = i.value; });
+}
+syncC('s-slider','s-input','s-display');
+syncC('x0-slider','x0-input','x0-display');
+syncC('iter-slider','iter-input','iter-display');
+
+let currentView = 'both';
+function setView(v, el) {
+    currentView = v;
+    document.querySelectorAll('.view-toggle').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    render();
+}
+
+// Tent map function
+function tent(s, x) {
+    return x <= 0.5 ? s * x : s * (1 - x);
+}
+
+function computeTentOrbit(s, x0, N) {
+    const xs = [x0];
+    for (let i = 0; i < N; i++) xs.push(tent(s, xs[xs.length - 1]));
+    return xs;
+}
+
+// Presets
+function loadTentPreset(s, x0, name) {
+    document.getElementById('s-slider').value = s; document.getElementById('s-input').value = s; document.getElementById('s-display').textContent = s;
+    document.getElementById('x0-slider').value = x0; document.getElementById('x0-input').value = x0; document.getElementById('x0-display').textContent = x0;
+    document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    render();
+}
+
+// Main render
+function render() {
+    const s = parseFloat(document.getElementById('s-input').value);
+    const x0 = parseFloat(document.getElementById('x0-input').value);
+    const N = parseInt(document.getElementById('iter-input').value);
+    const showSecond = document.getElementById('show-second').checked;
+    const x0b = parseFloat(document.getElementById('x0b-input').value);
+
+    const orb1 = computeTentOrbit(s, x0, N);
+    const orb2 = showSecond ? computeTentOrbit(s, x0b, N) : null;
+
+    const canvas = document.getElementById('tent-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    if (currentView === 'both') {
+        drawCobwebHalf(ctx, 0, 0, W/2, H, s, orb1, orb2);
+        drawOrbitHalf(ctx, W/2, 0, W/2, H, orb1, orb2, N);
+    } else if (currentView === 'cobweb') {
+        drawCobwebHalf(ctx, 0, 0, W, H, s, orb1, orb2);
+    } else {
+        drawOrbitHalf(ctx, 0, 0, W, H, orb1, orb2, N);
+    }
+
+    updateTentInfo(s);
+    updatePeriodicPoints(s);
+    updateOrbitTable(orb1, orb2, N);
+}
+
+function drawCobwebHalf(ctx, ox, oy, w, h, s, orb1, orb2) {
+    const pad = { l: 50, r: 15, t: 15, b: 40 };
+    const pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    const sz = Math.min(pw, ph);
+
+    function toX(v) { return ox + pad.l + v * sz; }
+    function toY(v) { return oy + pad.t + sz - v * sz; }
+
+    // Axes
+    ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(toX(0), toY(1.1)); ctx.lineTo(toX(0), toY(0)); ctx.lineTo(toX(1.05), toY(0)); ctx.stroke();
+
+    // y = x
+    ctx.strokeStyle = '#aaa'; ctx.setLineDash([4,4]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(toX(0), toY(0)); ctx.lineTo(toX(1), toY(1)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Tent map
+    ctx.strokeStyle = '#0f766e'; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(toX(0), toY(0));
+    ctx.lineTo(toX(0.5), toY(Math.min(s * 0.5, 1.05)));
+    ctx.lineTo(toX(1), toY(0));
+    ctx.stroke();
+
+    // Cobweb orbit 1
+    drawCobwebPath(ctx, toX, toY, orb1, '#0f766e', 1.5);
+    if (orb2) drawCobwebPath(ctx, toX, toY, orb2, '#e74c3c', 1.2);
+
+    // Fixed points
+    const fp1 = 0;
+    const fp2 = s > 1 ? s / (s + 1) : -1;
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath(); ctx.arc(toX(fp1), toY(fp1), 5, 0, 2*Math.PI); ctx.fill();
+    if (fp2 > 0 && fp2 <= 1) {
+        ctx.beginPath(); ctx.arc(toX(fp2), toY(fp2), 5, 0, 2*Math.PI); ctx.fill();
+    }
+
+    // Labels
+    ctx.fillStyle = '#888'; ctx.font = '11px -apple-system,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('x', ox + pad.l + sz/2, oy + pad.t + sz + 25);
+    ctx.fillText('0', toX(0), toY(0) + 15);
+    ctx.fillText('0.5', toX(0.5), toY(0) + 15);
+    ctx.fillText('1', toX(1), toY(0) + 15);
+}
+
+function drawCobwebPath(ctx, toX, toY, orb, color, lw) {
+    ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.globalAlpha = 0.7;
+    ctx.beginPath();
+    let x = orb[0];
+    ctx.moveTo(toX(x), toY(0));
+    for (let i = 0; i < orb.length - 1; i++) {
+        const y = orb[i + 1];
+        ctx.lineTo(toX(x), toY(y));
+        ctx.lineTo(toX(y), toY(y));
+        x = y;
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+}
+
+function drawOrbitHalf(ctx, ox, oy, w, h, orb1, orb2, N) {
+    const pad = { l: 55, r: 15, t: 15, b: 40 };
+    const pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+
+    let yMax = 0;
+    orb1.forEach(v => { if (v > yMax) yMax = v; });
+    if (orb2) orb2.forEach(v => { if (v > yMax) yMax = v; });
+    yMax = Math.max(yMax * 1.05, 0.1);
+
+    function toX(n) { return ox + pad.l + (n / N) * pw; }
+    function toY(v) { return oy + pad.t + ph - (v / yMax) * ph; }
+
+    // Axes
+    ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(ox + pad.l, oy + pad.t); ctx.lineTo(ox + pad.l, oy + pad.t + ph); ctx.lineTo(ox + pad.l + pw, oy + pad.t + ph); ctx.stroke();
+
+    // Grid
+    ctx.fillStyle = '#888'; ctx.font = '11px -apple-system,sans-serif'; ctx.textAlign = 'center';
+    const xStep = Math.max(1, Math.ceil(N / 8));
+    for (let i = 0; i <= N; i += xStep) {
+        ctx.fillText(i, toX(i), oy + pad.t + ph + 16);
+        ctx.strokeStyle = '#eee'; ctx.beginPath(); ctx.moveTo(toX(i), oy+pad.t); ctx.lineTo(toX(i), oy+pad.t+ph); ctx.stroke();
+    }
+    ctx.fillText('n', ox + pad.l + pw/2, oy + h - 5);
+
+    // Orbit 1
+    ctx.strokeStyle = '#0f766e'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    orb1.forEach((v, i) => { const x = toX(i), y = toY(v); i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y); });
+    ctx.stroke();
+    ctx.fillStyle = '#0f766e';
+    orb1.forEach((v, i) => { ctx.beginPath(); ctx.arc(toX(i), toY(v), 3, 0, 2*Math.PI); ctx.fill(); });
+
+    // Orbit 2
+    if (orb2) {
+        ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        orb2.forEach((v, i) => { const x = toX(i), y = toY(v); i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y); });
+        ctx.stroke();
+        ctx.fillStyle = '#e74c3c';
+        orb2.forEach((v, i) => { ctx.beginPath(); ctx.arc(toX(i), toY(v), 3, 0, 2*Math.PI); ctx.fill(); });
+    }
+}
+
+function updateTentInfo(s) {
+    const fp = s > 1 ? (s/(s+1)).toFixed(4) : '0 only';
+    const stab = s < 1 ? 'stable' : 'unstable';
+    const allUnstable = s > 1 ? 'All periodic orbits unstable' : 'Fixed point stable';
+    document.getElementById('tent-info').textContent =
+        `s = ${s} | x* = ${fp} | |T'| = ${s} (${stab}) | ${allUnstable}`;
+}
+
+function updatePeriodicPoints(s) {
+    const tbody = document.querySelector('#pp-table tbody');
+    tbody.innerHTML = '';
+
+    // Fixed points
+    const fps = [0];
+    if (s > 1) fps.push(s / (s + 1));
+    addPPRow(tbody, 1, fps, s, Math.pow(s, 1));
+
+    // 2-cycle points (for s=2)
+    if (s > 1) {
+        // Solve T²(x) = x, exclude fixed points
+        // For s=2: 2/5 and 4/5
+        const twoCyclePoints = find2Cycle(s);
+        if (twoCyclePoints.length > 0) {
+            addPPRow(tbody, 2, twoCyclePoints, s, Math.pow(s, 2));
+        }
+    }
+
+    // 3-cycle points (for s=2)
+    if (Math.abs(s - 2) < 0.001) {
+        const threeCyclePoints = [2/9, 4/9, 8/9, 2/7, 4/7, 6/7];
+        addPPRow(tbody, 3, threeCyclePoints, s, Math.pow(s, 3));
+    }
+}
+
+function find2Cycle(s) {
+    // For general s, the 2-cycle of the tent map:
+    // Case 2: x in [1/4, 1/2], T²(x) = s(1-sx) = x → x = s/(s²+1) if in range
+    // Case 3: x in [1/2, 3/4], T²(x) = s(s*x-s+1) = x → similar
+    const points = [];
+
+    // For s = 2 specifically:
+    if (Math.abs(s - 2) < 0.01) {
+        points.push(2/5, 4/5);
+    } else if (s > 1) {
+        // General: 2-cycle points are s/(s²+1) and s²/(s²+1)
+        const p = s / (s*s + 1);
+        const q = s*s / (s*s + 1);
+        // Verify they're actual 2-cycle (not fixed) points
+        if (Math.abs(tent(s, p) - q) < 1e-10 && Math.abs(tent(s, q) - p) < 1e-10) {
+            if (Math.abs(p - 0) > 1e-10 && Math.abs(p - s/(s+1)) > 1e-10) {
+                points.push(p, q);
+            }
+        }
+    }
+    return points;
+}
+
+function addPPRow(tbody, period, points, s, multiplier) {
+    const tr = document.createElement('tr');
+    const ptStr = points.map(p => {
+        // Try to show as fraction for s=2
+        if (Math.abs(s - 2) < 0.001) {
+            const frac = toFraction(p);
+            return frac || p.toFixed(4);
+        }
+        return p.toFixed(4);
+    }).join(', ');
+
+    const stable = Math.abs(multiplier) < 1;
+    tr.innerHTML = `<td style="font-weight:600;">${period}</td>
+        <td style="font-family:Monaco,monospace;font-size:0.8rem;">${ptStr}</td>
+        <td>${multiplier > 0 ? '+' : ''}${multiplier.toFixed(2)}</td>
+        <td>${Math.abs(multiplier).toFixed(2)}</td>
+        <td style="color:${stable ? 'var(--success)' : 'var(--accent-red)'}; font-weight:600;">${stable ? 'Yes' : 'No'}</td>`;
+    tbody.appendChild(tr);
+}
+
+function toFraction(x) {
+    const fracs = {0:'0', '0.6667':'2/3', '0.4000':'2/5', '0.8000':'4/5',
+        '0.2222':'2/9', '0.4444':'4/9', '0.8889':'8/9', '0.2857':'2/7', '0.5714':'4/7', '0.8571':'6/7'};
+    const key = x.toFixed(4);
+    return fracs[key] || null;
+}
+
+function updateOrbitTable(orb1, orb2, N) {
+    const tbody = document.querySelector('#tent-orbit-table tbody');
+    const showSecond = document.getElementById('show-second').checked;
+    tbody.innerHTML = '';
+    for (let n = 0; n <= N && n < orb1.length; n++) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="font-weight:600;">${n}</td>
+            <td>${orb1[n].toPrecision(10)}</td>
+            ${showSecond && orb2 ? `<td>${orb2[n].toPrecision(10)}</td>` : '<td>—</td>'}`;
+        tbody.appendChild(tr);
+    }
+}
+
+function toggleOrbitTable() {
+    const w = document.getElementById('orbit-table-wrap');
+    w.style.display = w.style.display === 'none' ? 'block' : 'none';
+}
+
+function downloadTent() {
+    const canvas = document.getElementById('tent-canvas');
+    const link = document.createElement('a');
+    link.download = 'tent_map.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+function showHint(id) { document.getElementById(id).classList.toggle('visible'); }
+
+// Init
+window.addEventListener('DOMContentLoaded', () => {
+    renderMath();
+    render();
+});
+</script>
+</body>
+</html>
