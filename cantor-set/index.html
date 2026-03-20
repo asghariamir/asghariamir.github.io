@@ -1,1165 +1,557 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
-    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cantor Set Explorer - Interactive Fractal Lab</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
-
+    <title>Cantor Set Explorer | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <style>
-        :root {
-            --primary: #0f766e;
-            --primary-light: #14b8a6;
-            --primary-dark: #0a5a53;
-            --accent: #f97316;
-            --bg-main: #fafafa;
-            --bg-white: #ffffff;
-            --card-border: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #4b5563;
-            --text-muted: #6b7280;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
+        :root{--primary:#0f766e;--primary-light:#10b981;--background:#f7faf9;--interactive:#e6fffb;--text-primary:#212121;--text-muted:#4b5563;--accent-amber:#f59e0b;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--background);color:var(--text-primary);padding-top:60px;}
+        .mathswell-nav{position:fixed;top:0;left:0;right:0;background:white;border-bottom:2px solid var(--primary);padding:0.75rem 1rem;z-index:1000;display:flex;justify-content:center;align-items:center;}
+        .mw-link{display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:var(--primary);font-weight:600;letter-spacing:1px;}
+        .container{max-width:1000px;margin:1.5rem auto;padding:0 1rem;}
+        .tabs{display:flex;gap:0.5rem;justify-content:center;background:white;padding:0.5rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);margin-bottom:1.5rem;flex-wrap:wrap;}
+        .tab-btn{padding:0.75rem 1.5rem;border:none;background:transparent;color:var(--text-muted);cursor:pointer;border-radius:8px;font-weight:500;transition:all 0.2s;font-size:0.95rem;}
+        .tab-btn.active{background:var(--primary);color:white;}
+        .tab-btn:hover:not(.active){background:var(--interactive);color:var(--primary);}
+        .tab-content{display:none;animation:fadeIn 0.3s ease;}.tab-content.active{display:block;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-        /* Basic Structure & Typography */
-        *, *::before, *::after { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-        }
+        .hero{text-align:center;margin-bottom:2rem;}.hero h1{font-size:2rem;color:var(--primary);margin-bottom:0.5rem;}.hero p{color:var(--text-muted);font-size:1.05rem;max-width:700px;margin:0 auto;line-height:1.6;}
+        .concept-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-bottom:2rem;}
+        .concept-card{background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);border-left:4px solid var(--primary);}
+        .concept-card h3{color:var(--primary);margin-bottom:0.5rem;}.concept-card p{color:var(--text-muted);font-size:0.95rem;line-height:1.5;}
+        .math-block{margin:0.75rem 0;text-align:center;}
+        .insight-box{background:var(--interactive);border:1px solid var(--primary);border-radius:10px;padding:1.25rem;margin:1.5rem 0;}.insight-box h3{color:var(--primary);margin-bottom:0.5rem;}.insight-box p{color:var(--text-muted);line-height:1.5;}
+        .cta-row{display:flex;gap:1rem;justify-content:center;margin:2rem 0;flex-wrap:wrap;}
+        .nav-btn{background:var(--primary);color:white;padding:0.75rem 1.5rem;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.95rem;}.nav-btn:hover{background:#0e6b63;}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-        }
+        /* Cantor visual */
+        .cantor-stages{background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:2rem;}
+        .cantor-stage{display:flex;align-items:center;margin-bottom:0.5rem;}
+        .cantor-label{width:60px;font-size:0.8rem;color:var(--text-muted);font-weight:600;flex-shrink:0;}
+        .cantor-bar{flex:1;display:flex;height:16px;border-radius:2px;overflow:hidden;}
+        .cantor-seg{background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:1px;}
+        .cantor-gap{background:transparent;}
 
-        .container {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            background-color: var(--bg-white);
-            box-shadow: var(--shadow-lg);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        /* Mathswell Badge */
-        .mathswell-nav {
-            display: flex;
-            justify-content: center;
-            margin: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .mathswell-nav .mw-link {
-            display: inline-flex;
-            align-items: center;
-            gap: .45rem;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--primary);
-            padding: .3rem .7rem;
-            border-radius: 999px;
-            background: rgba(255,255,255,.9);
-            box-shadow: 0 1px 4px rgba(0,0,0,.08);
-            transition: all 0.3s ease;
-        }
-        
-        .mathswell-nav .mw-link:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        /* Headers */
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        h2 {
-            color: var(--primary);
-            border-bottom: 1px solid var(--card-border);
-            padding-bottom: 0.5rem;
-            margin: 0 1.5rem 1rem;
-            font-size: 1.75rem;
-        }
+        /* Explorer */
+        .controls-panel{background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.25rem;}
+        .controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+        .control-group{display:flex;flex-direction:column;gap:0.2rem;}.control-group label{font-size:0.85rem;font-weight:600;color:var(--text-muted);}
+        .control-row{display:flex;align-items:center;gap:0.5rem;}.control-row input[type="range"]{flex:1;accent-color:var(--primary);}
+        .btn-row{display:flex;gap:0.75rem;margin-top:0.75rem;justify-content:center;flex-wrap:wrap;}
+        .action-btn{padding:0.6rem 1.25rem;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.9rem;}
+        .action-btn.primary{background:var(--primary);color:white;}.action-btn.primary:hover{background:#0e6b63;}
+        .action-btn.secondary{background:white;color:var(--primary);border:2px solid var(--primary);}.action-btn.secondary:hover{background:var(--interactive);}
+        .canvas-wrapper{background:white;border-radius:12px;padding:0.75rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+        canvas{max-width:100%;display:block;margin:0 auto;}
+        .info-display{background:var(--interactive);border:1px solid var(--primary);border-radius:8px;padding:0.6rem 1rem;font-family:'Monaco',monospace;font-size:0.85rem;text-align:center;margin-top:0.75rem;}
 
-        h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin: 1.5rem 0 0.75rem;
-        }
-        
-        p.intro {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            max-width: 100%;
-            margin: 0 1.5rem 1.5rem;
-            line-height: 1.6;
-        }
+        /* Table */
+        .data-table-wrap{margin-top:1rem;overflow-x:auto;max-height:300px;overflow-y:auto;}
+        .data-table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+        .data-table th{background:var(--primary);color:white;padding:0.5rem;text-align:center;position:sticky;top:0;}
+        .data-table td{padding:0.4rem;text-align:center;border-bottom:1px solid #e5e7eb;}
+        .data-table tr:hover{background:var(--interactive);}
 
-        .intro-text {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            text-align: center;
-            padding: 0 1.5rem;
-        }
+        /* Dimension lab */
+        .box-overlay-info{display:flex;justify-content:center;gap:2rem;margin:0.75rem 0;flex-wrap:wrap;}
+        .box-stat{background:var(--interactive);border:1px solid var(--primary);border-radius:8px;padding:0.5rem 1rem;font-weight:600;color:var(--primary);font-size:0.95rem;}
+        .results-box{background:var(--interactive);border:2px solid var(--primary);border-radius:12px;padding:1.25rem;text-align:center;margin-top:1rem;}
+        .results-box .dim-value{font-size:1.3rem;font-weight:700;color:var(--primary);}
+        .results-box .theory{color:var(--text-muted);font-size:0.9rem;margin-top:0.25rem;}
+        .results-box .error{color:var(--accent-amber);font-weight:600;margin-top:0.25rem;}
 
-        .description {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-            padding: 0 1.5rem;
-        }
-        
-        /* Tabs */
-        .tabs {
-            display: flex;
-            background-color: var(--bg-main);
-            border-bottom: 2px solid var(--card-border);
-        }
-
-        .tab-button {
-            padding: 14px 20px;
-            cursor: pointer;
-            border: none;
-            background-color: transparent;
-            font-size: 1rem;
-            color: var(--text-muted);
-            position: relative;
-            transition: color 0.3s;
-            font-weight: 500;
-        }
-
-        .tab-button:hover {
-            color: var(--text-secondary);
-        }
-
-        .tab-button.active {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .tab-button.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--primary);
-        }
-        
-        .section { 
-            display: none; 
-        }
-        
-        .section.active { 
-            display: block; 
-            padding: 0; 
-        }
-
-        .section#introduction {
-            padding: 2rem 1.5rem;
-        }
-
-        /* Controls */
-        .controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin: 0 1.5rem 1.5rem;
-        }
-
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        
-        button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        button:hover {
-            background-color: var(--primary-light);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .danger-button {
-            background-color: #dc2626;
-        }
-        
-        .danger-button:hover {
-            background-color: #ef4444;
-        }
-
-        .secondary-button {
-            background-color: #6b7280;
-            font-size: 0.85rem;
-            padding: 8px 12px;
-        }
-
-        .secondary-button:hover {
-            background-color: #4b5563;
-        }
-
-        button:disabled {
-            background-color: #d1d5db;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        button:disabled:hover {
-            background-color: #d1d5db;
-            transform: none;
-        }
-
-        input[type="range"] {
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        /* Canvases & Tables */
-        canvas {
-            border: 1px solid var(--card-border);
-            border-radius: 6px;
-            display: block;
-            margin: 0 1.5rem 1.5rem;
-            width: calc(100% - 3rem);
-            height: auto;
-            background: white;
-            position: relative;
-        }
-
-        #expCanvas { 
-            height: 100px;
-            cursor: grab;
-        }
-        
-        #expCanvas:active {
-            cursor: grabbing;
-        }
-        
-        #boxCanvas { height: 80px; }
-        #chartCv { height: 300px; }
-        
-        table {
-            width: calc(100% - 3rem);
-            border-collapse: collapse;
-            margin: 1.5rem;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-        }
-
-        th, td {
-            text-align: left;
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--card-border);
-        }
-        
-        th {
-            background-color: var(--bg-main);
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: var(--bg-main);
-        }
-
-        tr.highlight-row td {
-            animation: highlightFade 1s ease-out;
-        }
-
-        @keyframes highlightFade {
-            0% { background-color: rgba(20, 184, 166, 0.3); }
-            100% { background-color: transparent; }
-        }
-        
-        .math-display {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.1rem;
-            background: var(--bg-main);
-            padding: 8px;
-            border-radius: 4px;
-            text-align: center;
-        }
-        
-        #slopeTxt {
-            text-align: center;
-            margin: 1rem 1.5rem;
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-
-        /* New: Zoom and coordinate display */
-        .canvas-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 0 1.5rem 0.5rem;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .zoom-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .coord-display {
-            font-family: 'Courier New', monospace;
-            color: var(--text-secondary);
-        }
-
-        /* Box dimension section */
-        .box-controls-section {
-            background: var(--bg-main);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 0 1.5rem 1.5rem;
-        }
-
-        .box-controls-section h3 {
-            font-size: 1.1rem;
-            color: var(--primary);
-            margin: 0 0 1rem 0;
-        }
-
-        .box-controls-section p {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .current-value-display {
-            background: white;
-            border: 1px solid var(--primary-light);
-            border-radius: 6px;
-            padding: 1rem;
-            margin: 1rem 0;
-            text-align: center;
-        }
-
-        .current-value-display .value {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin: 1.5rem 0;
-        }
-
-        /* Results section */
-        .results-section {
-            background: var(--bg-main);
-            border: 2px solid var(--primary-light);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1.5rem;
-            text-align: center;
-        }
-
-        .results-section h3 {
-            margin: 0 0 1rem 0;
-            color: var(--primary);
-        }
-
-        .dimension-result {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .theory-comparison {
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .error-display {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* Introduction specific styles */
-        .cantor-visual {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin: 2rem 1.5rem;
-            padding: 2rem;
-            background: var(--bg-main);
-            border-radius: 8px;
-            border: 1px solid var(--card-border);
-        }
-
-        .cantor-row {
-            display: flex;
-            height: 20px;
-            gap: 0;
-            opacity: 0;
-            animation: fadeInRow 0.5s ease-out forwards;
-        }
-
-        .cantor-row:nth-child(1) { animation-delay: 0.1s; }
-        .cantor-row:nth-child(2) { animation-delay: 0.3s; }
-        .cantor-row:nth-child(3) { animation-delay: 0.5s; }
-        .cantor-row:nth-child(4) { animation-delay: 0.7s; }
-        .cantor-row:nth-child(5) { animation-delay: 0.9s; }
-
-        @keyframes fadeInRow {
-            to { opacity: 1; }
-        }
-
-        .cantor-segment {
-            background: linear-gradient(90deg, var(--primary), var(--primary-light));
-            border-radius: 2px;
-        }
-
-        .cantor-gap {
-            background: transparent;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 1.5rem;
-        }
-
-        .feature-card {
-            background: var(--bg-main);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary-light);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: white;
-        }
-
-        .feature-card h3 {
-            margin: 0 0 0.5rem 0;
-        }
-
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        /* Keyboard shortcuts hint */
-        .shortcuts-hint {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-align: center;
-            margin: 0 1.5rem 1rem;
-            padding: 0.5rem;
-            background: var(--bg-main);
-            border-radius: 4px;
-        }
+        @media(max-width:768px){.controls-grid{grid-template-columns:1fr;}.concept-cards{grid-template-columns:1fr;}.hero h1{font-size:1.5rem;}input,button,select{font-size:16px;min-height:44px;}}
     </style>
 </head>
 <body>
+<div class="mathswell-nav"><a href="/" class="mw-link"><img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'"><span>MATHSWELL</span></a></div>
 <div class="container">
-    <!-- Mathswell brand badge -->
-    <div class="mathswell-nav">
-        <a href="/" class="mw-link">
-            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" style="display:block">
-            <span>MATHSWELL</span>
-        </a>
-    </div>
-
     <div class="tabs">
-        <button id="tabIntro" class="tab-button active">Introduction</button>
-        <button id="tabExp" class="tab-button">Set Explorer</button>
-        <button id="tabDim" class="tab-button">Box Dimension</button>
+        <button class="tab-btn active" data-tab="intro">Introduction</button>
+        <button class="tab-btn" data-tab="explorer">Explorer</button>
+        <button class="tab-btn" data-tab="dimension">Box Dimension Lab</button>
     </div>
 
-    <!-- Introduction Section -->
-    <section id="introduction" class="section active">
-        <h1>The Cantor Set</h1>
-        <p class="intro-text">
-            Discover one of mathematics' most elegant fractals — an infinite set that contains uncountably many points yet has zero length. The Cantor set reveals the surprising nature of infinity and serves as a gateway to understanding fractional dimensions.
-        </p>
+    <!-- ============ INTRO ============ -->
+    <div id="intro" class="tab-content active">
+        <div class="hero"><h1>The Cantor Set</h1><p>Start with a line. Remove the middle third. Repeat forever. What remains is uncountably infinite yet has zero length — a fractal of dimension log 2 / log 3 ≈ 0.631.</p></div>
 
-        <div class="cantor-visual">
-            <div class="cantor-row">
-                <div class="cantor-segment" style="flex: 1;"></div>
+        <!-- Correct Cantor stages visual -->
+        <div class="cantor-stages" id="cantor-visual"></div>
+
+        <div class="concept-cards">
+            <div class="concept-card">
+                <h3>🔁 The Construction</h3>
+                <p>Start with [0, 1]. Remove the open middle third (1/3, 2/3). From each remaining segment, remove its middle third. Repeat infinitely. The Cantor set is what remains.</p>
             </div>
-            <div class="cantor-row">
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 1;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-            </div>
-            <div class="cantor-row">
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 1;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 3;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 1;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-            </div>
-            <div class="cantor-row">
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 2;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 9;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 2;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 9;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 2;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-            </div>
-            <div class="cantor-row">
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 8;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 27;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 8;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 27;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 8;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 27;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
-                <div class="cantor-gap" style="flex: 8;"></div>
-                <div class="cantor-segment" style="flex: 1;"></div>
+            <div class="concept-card">
+                <h3>📊 Paradoxical Properties</h3>
+                <p>After <span class="k" data-tex="n"></span> stages: <span class="k" data-tex="2^n"></span> segments, total length <span class="k" data-tex="(2/3)^n \to 0"></span>. Yet the set contains uncountably many points — as many as the entire real line.</p>
             </div>
         </div>
 
-        <h3 style="padding: 0 1.5rem;">How It's Constructed</h3>
-        <p class="description">
-            The Cantor set emerges from a simple iterative process: Start with the unit interval [0,1], remove the middle third (1/3, 2/3), then remove the middle third of each remaining segment, and continue infinitely. What remains is a remarkable mathematical object — uncountably infinite yet measure zero.
-        </p>
-
-        <div class="feature-grid">
-            <a href="#" class="feature-card" onclick="switchTab('tabExp'); return false;">
-                <div class="feature-icon">🔬</div>
-                <h3>Set Explorer</h3>
-                <p>Visualize the iterative construction process. Zoom in to explore the self-similar structure at any scale, and watch how the total length approaches zero while the number of segments grows exponentially.</p>
-            </a>
-            <a href="#" class="feature-card" onclick="switchTab('tabDim'); return false;">
-                <div class="feature-icon">📐</div>
-                <h3>Box Dimension Lab</h3>
-                <p>Calculate the fractal dimension using the box-counting method. Discover that the Cantor set has dimension log(2)/log(3) ≈ 0.631 — neither zero-dimensional like points nor one-dimensional like lines.</p>
-            </a>
-        </div>
-    </section>
-
-    <section id="explorer" class="section">
-        <h2>Cantor Set Explorer</h2>
-        <p class="intro">Move the <strong>Depth</strong> slider to generate stages of the Cantor set. Use the mouse-wheel to zoom and drag to pan. Watch the total length shrink as <em>(2/3)<sup>n</sup></em>.</p>
-
-        <div class="canvas-info">
-            <div class="zoom-info">
-                <span id="zoomLevel">Zoom: 1.0×</span>
-                <button id="resetZoom" class="secondary-button">Reset View</button>
+        <div class="concept-cards" style="grid-template-columns:1fr;">
+            <div class="concept-card">
+                <h3>📐 Self-Similarity Dimension</h3>
+                <p>The Cantor set is made of <span class="k" data-tex="N = 2"></span> copies of itself, each scaled by <span class="k" data-tex="r = 1/3"></span>. The self-similarity dimension is:</p>
+                <div class="math-block" id="math-dim"></div>
+                <p>Not 0 (like a collection of isolated points) and not 1 (like a line segment) — something in between.</p>
             </div>
-            <span id="coordDisplay" class="coord-display"></span>
         </div>
 
-        <canvas id="expCanvas"></canvas>
-
-        <div class="controls">
-            <div class="control-group">
-                <label for="depthRange">Depth</label>
-                <input id="depthRange" type="range" min="0" max="9" step="1" value="5">
-                <span id="depthVal" class="math-display">5</span>
-            </div>
-            <button id="animBtn">Animate</button>
+        <div class="cta-row">
+            <button class="nav-btn" onclick="switchTab('explorer')">Explore the Set →</button>
+            <button class="nav-btn" onclick="switchTab('dimension')" style="background:#10b981;">Measure Its Dimension →</button>
         </div>
+    </div>
 
-        <div class="shortcuts-hint">
-            Keyboard: ← → arrows for depth | Spacebar for animate | R to reset zoom
-        </div>
-
-        <table id="lenTable">
-            <thead><tr><th>Depth n</th><th>Segments 2<sup>n</sup></th><th>Total length (2/3)<sup>n</sup></th></tr></thead>
-            <tbody></tbody>
-        </table>
-    </section>
-
-    <section id="dimension" class="section">
-        <h2>Box-Counting Dimension Lab</h2>
-        <p class="intro">Partition the unit interval into boxes of length <em>1/3<sup>k</sup></em> and count how many boxes intersect the Cantor set. Then plot <em>log&nbsp;N(s)</em> vs&nbsp;<em>log&nbsp;(1/s)</em> to estimate the fractal dimension.</p>
-
-        <canvas id="boxCanvas"></canvas>
-
-        <div class="box-controls-section">
-            <h3>Step 1: Collect Data Points</h3>
-            <p>Choose different values of k (from 1 to 9) to see how box size affects the count. Each value of k creates one data point for your analysis.</p>
-            
-            <div class="controls" style="margin: 1rem 0;">
+    <!-- ============ EXPLORER ============ -->
+    <div id="explorer" class="tab-content">
+        <h2 style="text-align:center;color:var(--primary);margin-bottom:0.75rem;">Cantor Set Explorer</h2>
+        <div class="controls-panel">
+            <div class="controls-grid">
                 <div class="control-group">
-                    <label for="kRange">k =</label>
-                    <input id="kRange" type="range" min="1" max="9" step="1" value="4">
-                    <span id="kVal" class="math-display">4</span>
+                    <label>Depth: <strong id="depth-disp">5</strong></label>
+                    <div class="control-row">
+                        <input type="range" id="depth-sl" min="0" max="12" step="1" value="5">
+                    </div>
+                </div>
+                <div class="control-group" style="justify-content:center;">
+                    <div class="btn-row" style="margin:0;">
+                        <button class="action-btn primary" id="anim-btn" onclick="toggleAnim()">▶ Animate</button>
+                        <button class="action-btn secondary" onclick="resetZoom()">Reset Zoom</button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="current-value-display">
-                <div>Box size: <span id="sDisp" class="math-display">s = 1/3<sup>4</sup> ≈ 0.0123</span></div>
-                <div class="value">Current: <span id="nDisp">N(s) = 20</span> boxes intersect the Cantor set</div>
+        <div class="canvas-wrapper">
+            <canvas id="exp-canvas" width="960" height="120"></canvas>
+        </div>
+        <div style="font-size:0.8rem;color:var(--text-muted);text-align:center;margin-top:0.3rem;">Scroll to zoom · Drag to pan</div>
+
+        <div class="info-display" id="exp-info">Depth 5: 32 segments, total length ≈ 0.1317</div>
+
+        <!-- Length table -->
+        <div class="data-table-wrap" style="margin-top:1rem;">
+            <table class="data-table" id="len-table">
+                <thead><tr><th>Depth n</th><th>Segments 2ⁿ</th><th>Total length (2/3)ⁿ</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============ BOX DIMENSION LAB ============ -->
+    <div id="dimension" class="tab-content">
+        <h2 style="text-align:center;color:var(--primary);margin-bottom:0.5rem;">Box-Counting Dimension Lab</h2>
+        <p style="text-align:center;color:var(--text-muted);margin-bottom:1rem;">Cover the Cantor set with boxes of size <span class="k" data-tex="s = 1/3^k"></span>. Count how many contain part of the set. The slope of the log–log plot gives the dimension.</p>
+
+        <div class="controls-panel">
+            <div class="control-group">
+                <label>Box scale k: <strong id="k-disp">3</strong></label>
+                <div class="control-row">
+                    <input type="range" id="k-sl" min="1" max="9" step="1" value="3">
+                </div>
             </div>
-
-            <div style="text-align: center;">
-                <button id="addRow" style="font-size: 1rem; padding: 12px 24px;">Add to Table</button>
-            </div>
-            
-            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 1rem;">
-                Tip: Try collecting data for k = 1, 2, 3... up to 9 for best results
-            </p>
         </div>
 
-        <table id="dataTbl">
-            <thead><tr><th>k</th><th>s = 1/3<sup>k</sup></th><th>N(s)</th></tr></thead>
-            <tbody></tbody>
-        </table>
-
-        <div class="button-group">
-            <button id="plotBtn">Plot Log-Log Graph</button>
-            <button id="fitBtn">Fit Line & Calculate Dimension</button>
-            <button id="resetTbl" class="secondary-button">Reset Table</button>
+        <div class="canvas-wrapper">
+            <canvas id="box-canvas" width="960" height="100"></canvas>
         </div>
 
-        <canvas id="chartCv" style="display: none;"></canvas>
-        <p id="slopeTxt"></p>
-        
-        <div id="resultsSection" class="results-section" style="display: none;">
-            <h3>Fractal Dimension Results</h3>
-            <div id="estimatedDim" class="dimension-result"></div>
-            <div class="theory-comparison">Theoretical dimension: log(2)/log(3) ≈ 0.6309</div>
-            <div id="errorDisplay" class="error-display"></div>
-            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 1rem;">
-                The slope of the log-log plot gives us the fractal dimension, revealing that the Cantor set is neither 0-dimensional (like points) nor 1-dimensional (like lines).
-            </p>
+        <div class="box-overlay-info">
+            <div class="box-stat" id="box-s">s = 1/27 ≈ 0.0370</div>
+            <div class="box-stat" id="box-n">N(s) = 8 boxes</div>
         </div>
-    </section>
+
+        <div class="btn-row">
+            <button class="action-btn primary" onclick="addDataPoint()">Add to Table</button>
+            <button class="action-btn primary" onclick="plotLogLog()">Plot Log–Log</button>
+            <button class="action-btn primary" onclick="fitLine()">Fit Line</button>
+            <button class="action-btn secondary" onclick="resetDimLab()">Reset</button>
+        </div>
+
+        <div class="data-table-wrap">
+            <table class="data-table" id="dim-table">
+                <thead><tr><th>k</th><th>s = 1/3ᵏ</th><th>N(s)</th><th>log(1/s)</th><th>log N(s)</th></tr></thead>
+                <tbody id="dim-tbody"></tbody>
+            </table>
+        </div>
+
+        <div class="canvas-wrapper" style="margin-top:1rem;">
+            <canvas id="loglog-canvas" width="960" height="400" style="display:none;"></canvas>
+        </div>
+
+        <div class="results-box" id="results-box" style="display:none;">
+            <div class="dim-value" id="dim-result"></div>
+            <div class="theory">Theoretical: log(2)/log(3) ≈ 0.6309</div>
+            <div class="error" id="dim-error"></div>
+        </div>
+    </div>
 </div>
+
 <script>
-    /********************** Utility functions  **********************/
-    function cantorSegments(depth) {
-        let seg = [[0, 1]];
-        for (let d = 0; d < depth; d++) {
-            const next = [];
-            seg.forEach(([a, b]) => {
-                const t = (b - a) / 3;
-                next.push([a, a + t], [b - t, b]);
-            });
-            seg = next;
-        }
-        return seg;
+// ========== Tabs ==========
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>switchTab(btn.dataset.tab));});
+function switchTab(id){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`[data-tab="${id}"]`).classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+// ========== KaTeX ==========
+function renderMath(){
+    const blocks={'math-dim':{tex:'d_s = \\frac{\\log 2}{\\log 3} \\approx 0.631',display:true}};
+    for(const[id,{tex,display}]of Object.entries(blocks)){const el=document.getElementById(id);if(el)try{katex.render(tex,el,{throwOnError:false,displayMode:display});}catch(e){}}
+    document.querySelectorAll('.k').forEach(el=>{const tex=el.getAttribute('data-tex');if(tex)try{katex.render(tex,el,{throwOnError:false});}catch(e){}});
+}
+
+// ========== Cantor set core ==========
+function cantorSegments(depth){
+    let seg=[[0,1]];
+    for(let d=0;d<depth;d++){
+        const next=[];
+        seg.forEach(([a,b])=>{const t=(b-a)/3;next.push([a,a+t],[b-t,b]);});
+        seg=next;
     }
+    return seg;
+}
 
-    /********************** Explorer logic  **********************/
-    const expCv = document.getElementById('expCanvas');
-    const expCtx = expCv.getContext('2d');
-    const depthRange = document.getElementById('depthRange');
-    const depthVal = document.getElementById('depthVal');
-    const lenBody = document.querySelector('#lenTable tbody');
-    const zoomLevel = document.getElementById('zoomLevel');
-    const coordDisplay = document.getElementById('coordDisplay');
+// ========== Intro visual ==========
+function buildIntroVisual(){
+    const container=document.getElementById('cantor-visual');
+    container.innerHTML='';
+    for(let n=0;n<=5;n++){
+        const row=document.createElement('div');
+        row.className='cantor-stage';
+        const label=document.createElement('div');
+        label.className='cantor-label';
+        label.textContent=`n = ${n}`;
+        row.appendChild(label);
 
-    let viewStart = 0, viewEnd = 1; // visible window [0,1]
-    let animHandle = null, animDir = 1;
-    const ANIM_SPEED = 700; // Fixed animation speed
+        const bar=document.createElement('div');
+        bar.className='cantor-bar';
 
-    function getZoomFactor() {
-        return 1 / (viewEnd - viewStart);
-    }
-
-    function updateZoomDisplay() {
-        const zoom = getZoomFactor();
-        zoomLevel.textContent = `Zoom: ${zoom.toFixed(1)}×`;
-    }
-
-    function px(x) { return (x - viewStart) / (viewEnd - viewStart) * expCv.width; }
-    
-    function drawExplorer() {
-        if (expCv.width === 0 || expCv.offsetParent === null) return;
-        const n = +depthRange.value;
-        const dpr = window.devicePixelRatio || 1;
-
-        expCtx.save();
-        expCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        expCtx.clearRect(0, 0, expCv.width, expCv.height);
-        expCtx.fillStyle = '#ffffff';
-        expCtx.fillRect(0, 0, expCv.width, expCv.height);
-        
-        // Create gradient for Cantor set
-        const canvasWidth = expCv.width / dpr;
-        const canvasHeight = expCv.height / dpr;
-        const gradient = expCtx.createLinearGradient(0, 0, canvasWidth, 0);
-        gradient.addColorStop(0, '#0f766e');
-        gradient.addColorStop(0.5, '#14b8a6');
-        gradient.addColorStop(1, '#0f766e');
-        expCtx.fillStyle = gradient;
-
-        cantorSegments(n).forEach(([a, b]) => {
-            const L = Math.max(a, viewStart), R = Math.min(b, viewEnd);
-            if (L >= R) return;
-            const startPx = (L - viewStart) / (viewEnd - viewStart) * canvasWidth;
-            const widthPx = (R - L) / (viewEnd - viewStart) * canvasWidth;
-            expCtx.fillRect(startPx, 0, widthPx, canvasHeight);
-        });
-        expCtx.restore();
-        updateZoomDisplay();
-    }
-
-    function refreshLenTable() {
-        const n = +depthRange.value;
-        lenBody.innerHTML = '';
-        for (let i = 0; i <= 9; i++) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${i}</td><td>${2 ** i}</td><td>(2/3)<sup>${i}</sup> ≈ ${((2/3)**i).toFixed(4)}</td>`;
-            tr.style.display = (i <= n) ? 'table-row' : 'none';
-            lenBody.appendChild(tr);
-        }
-    }
-    
-    function refreshExplorer() {
-        depthVal.textContent = depthRange.value;
-        drawExplorer();
-        refreshLenTable();
-    }
-
-    depthRange.oninput = () => { stopAnim(); refreshExplorer(); };
-    
-    function startAnim() {
-        animHandle = setInterval(() => {
-            let d = +depthRange.value;
-            if (d >= +depthRange.max) animDir = -1;
-            if (d <= +depthRange.min) animDir = 1;
-            depthRange.value = d + animDir;
-            refreshExplorer();
-        }, ANIM_SPEED);
-        document.getElementById('animBtn').textContent = 'Stop';
-        document.getElementById('animBtn').classList.add('danger-button');
-    }
-    
-    function stopAnim() {
-        clearInterval(animHandle); 
-        animHandle = null;
-        document.getElementById('animBtn').textContent = 'Animate';
-        document.getElementById('animBtn').classList.remove('danger-button');
-    }
-    
-    document.getElementById('animBtn').onclick = () => animHandle ? stopAnim() : startAnim();
-
-    // Zoom functionality
-    function zoom(factor, center = 0.5) {
-        const span = (viewEnd - viewStart) * factor;
-        const mid = viewStart + (viewEnd - viewStart) * center;
-        viewStart = mid - span / 2;
-        viewEnd = mid + span / 2;
-        if (viewStart < 0) { viewEnd -= viewStart; viewStart = 0; }
-        if (viewEnd > 1) { viewStart -= viewEnd - 1; viewEnd = 1; }
-        drawExplorer();
-    }
-
-    function resetZoom() {
-        viewStart = 0;
-        viewEnd = 1;
-        drawExplorer();
-    }
-
-    document.getElementById('resetZoom').onclick = resetZoom;
-
-    // Mouse coordinate display
-    expCv.addEventListener('mousemove', (e) => {
-        const rect = expCv.getBoundingClientRect();
-        const x = e.offsetX / rect.width;
-        const coord = viewStart + x * (viewEnd - viewStart);
-        coordDisplay.textContent = `x = ${coord.toFixed(6)}`;
-    });
-
-    expCv.addEventListener('mouseleave', () => {
-        coordDisplay.textContent = '';
-    });
-
-    expCv.addEventListener('wheel', e => { 
-        e.preventDefault(); 
-        const rect = expCv.getBoundingClientRect();
-        zoom(e.deltaY < 0 ? 0.8 : 1.25, e.offsetX / rect.width); 
-    }, { passive: false });
-    
-    let dragging = false, lastX = 0;
-    expCv.onmousedown = e => { dragging = true; lastX = e.clientX; expCv.style.cursor = 'grabbing'; };
-    window.onmousemove = e => {
-        if (!dragging) return;
-        const dx = e.clientX - lastX; lastX = e.clientX;
-        const span = viewEnd - viewStart;
-        const shift = -dx / expCv.getBoundingClientRect().width * span;
-        viewStart += shift; viewEnd += shift;
-        if (viewStart < 0) { viewEnd -= viewStart; viewStart = 0; }
-        if (viewEnd > 1) { viewStart -= viewEnd - 1; viewEnd = 1; }
-        drawExplorer();
-    };
-    window.onmouseup = () => { dragging = false; expCv.style.cursor = 'grab'; };
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        if (document.getElementById('explorer').classList.contains('active')) {
-            if (e.key === 'ArrowLeft' && depthRange.value > depthRange.min) {
-                depthRange.value = +depthRange.value - 1;
-                stopAnim();
-                refreshExplorer();
-            } else if (e.key === 'ArrowRight' && depthRange.value < depthRange.max) {
-                depthRange.value = +depthRange.value + 1;
-                stopAnim();
-                refreshExplorer();
-            } else if (e.key === ' ') {
-                e.preventDefault();
-                document.getElementById('animBtn').click();
-            } else if (e.key.toLowerCase() === 'r') {
-                resetZoom();
-            }
-        }
-    });
-
-    /********************** Box-dimension logic  **********************/
-    const kRange = document.getElementById('kRange');
-    const kVal = document.getElementById('kVal');
-    const sDisp = document.getElementById('sDisp');
-    const nDisp = document.getElementById('nDisp');
-    const boxCv = document.getElementById('boxCanvas');
-    const boxCtx = boxCv.getContext('2d');
-    const dataBody = document.querySelector('#dataTbl tbody');
-    const slopeTxt = document.getElementById('slopeTxt');
-    const resultsSection = document.getElementById('resultsSection');
-    const estimatedDim = document.getElementById('estimatedDim');
-    const errorDisplay = document.getElementById('errorDisplay');
-    const chartCanvas = document.getElementById('chartCv');
-    let chart = null;
-
-    const THEORETICAL_DIM = Math.log(2) / Math.log(3);
-
-    function countBoxes(k) {
-        const s = 1 / 3 ** k;
-        const seg = cantorSegments(9); // Use max depth for accuracy
-        const boxes = Math.round(1 / s);
-        let occupied = 0;
-        
-        for (let i = 0; i < boxes; i++) {
-            const boxStart = i * s, boxEnd = (i + 1) * s;
-            const hit = seg.some(([segStart, segEnd]) => !(segEnd <= boxStart || segStart >= boxEnd));
-            if (hit) occupied++;
-        }
-        
-        return occupied;
-    }
-
-    function updateBoxInfo() {
-        const k = +kRange.value;
-        kVal.textContent = k;
-        const s = 1 / 3 ** k;
-        sDisp.innerHTML = `s = 1/3<sup>${k}</sup> ≈ ${s.toPrecision(4)}`;
-        const seg = cantorSegments(9);
-        const boxes = Math.round(1 / s);
-        let occupied = 0;
-
-        if (boxCv.width > 0 && boxCv.offsetParent !== null) {
-            const dpr = window.devicePixelRatio || 1;
-            const canvasWidth = boxCv.width / dpr;
-            const canvasHeight = boxCv.height / dpr;
-
-            boxCtx.save();
-            boxCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            boxCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-            // Draw white background
-            boxCtx.fillStyle = '#ffffff';
-            boxCtx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-            // 1. Draw the underlying Cantor Set with stronger color
-            boxCtx.fillStyle = 'rgba(15, 118, 110, 0.8)';
-            seg.forEach(([a, b]) => {
-                boxCtx.fillRect(a * canvasWidth, canvasHeight * 0.25, (b-a) * canvasWidth, canvasHeight * 0.5);
-            });
-
-            // 2. Overlay the grid
-            for (let i = 0; i < boxes; i++) {
-                const boxStart = i * s, boxEnd = (i + 1) * s;
-                const hit = seg.some(([segStart, segEnd]) => !(segEnd <= boxStart || segStart >= boxEnd));
-                if (hit) occupied++;
-                
-                const xPos = i / boxes * canvasWidth;
-                const w = canvasWidth / boxes;
-
-                if (hit) {
-                    boxCtx.fillStyle = 'rgba(249, 115, 22, 0.25)';
-                    boxCtx.fillRect(xPos, 0, w, canvasHeight);
+        if(n===0){
+            const seg=document.createElement('div');
+            seg.className='cantor-seg';
+            seg.style.flex='1';
+            bar.appendChild(seg);
+        } else {
+            // Use 3^n as the common denominator
+            const denom=Math.pow(3,n);
+            const segs=cantorSegments(n);
+            let pos=0;
+            segs.forEach(([a,b])=>{
+                const start=Math.round(a*denom);
+                const end=Math.round(b*denom);
+                // Gap before this segment
+                if(start>pos){
+                    const gap=document.createElement('div');
+                    gap.className='cantor-gap';
+                    gap.style.flex=String(start-pos);
+                    bar.appendChild(gap);
                 }
-                boxCtx.strokeStyle = '#d1d5db';
-                boxCtx.lineWidth = 0.5;
-                boxCtx.strokeRect(xPos, 0, w, canvasHeight);
+                // The segment itself
+                const seg=document.createElement('div');
+                seg.className='cantor-seg';
+                seg.style.flex=String(end-start);
+                bar.appendChild(seg);
+                pos=end;
+            });
+            // Trailing gap if any
+            if(pos<denom){
+                const gap=document.createElement('div');
+                gap.className='cantor-gap';
+                gap.style.flex=String(denom-pos);
+                bar.appendChild(gap);
             }
-            boxCtx.restore();
         }
-        nDisp.innerHTML = `N(s) = ${occupied}`;
-        return { s, occupied };
+        row.appendChild(bar);
+        container.appendChild(row);
     }
+}
 
-    kRange.oninput = updateBoxInfo;
+// ========== Explorer ==========
+const expCanvas=document.getElementById('exp-canvas');
+const expCtx=expCanvas.getContext('2d');
+let viewStart=0, viewEnd=1;
+let animHandle=null, animDir=1;
 
-    function addDataRow(k, highlight = false) {
-        // Check if this k value already exists
-        const existingRows = [...dataBody.children];
-        const exists = existingRows.some(row => +row.children[0].textContent === k);
-        if (exists) {
-            alert(`Data point for k = ${k} already exists in the table`);
-            return;
-        }
+function drawExplorer(){
+    const W=expCanvas.width, H=expCanvas.height;
+    const n=parseInt(document.getElementById('depth-sl').value);
+    expCtx.clearRect(0,0,W,H);
+    expCtx.fillStyle='#f7faf9';
+    expCtx.fillRect(0,0,W,H);
 
-        const occupied = countBoxes(k);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${k}</td><td>1/3<sup>${k}</sup></td><td>${occupied}</td>`;
-        if (highlight) {
-            tr.classList.add('highlight-row');
-        }
-        dataBody.appendChild(tr);
-    }
+    const segs=cantorSegments(n);
+    const grad=expCtx.createLinearGradient(0,0,W,0);
+    grad.addColorStop(0,'#0f766e');
+    grad.addColorStop(0.5,'#10b981');
+    grad.addColorStop(1,'#0f766e');
+    expCtx.fillStyle=grad;
 
-    document.getElementById('addRow').onclick = () => {
-        const k = +kRange.value;
-        addDataRow(k, true);
-    };
-
-    function plotChart() {
-        const rows = [...dataBody.children];
-        if (!rows.length) { 
-            alert('Please add some data points to the table first'); 
-            return; 
-        }
-        const pts = rows.map(r => {
-            const k = +r.children[0].textContent;
-            const s = 1 / 3 ** k;
-            const N = +r.children[2].textContent;
-            if (N === 0) return null;
-            return { x: Math.log(1 / s), y: Math.log(N) };
-        }).filter(p => p !== null);
-        
-        chartCanvas.style.display = 'block';
-        
-        if (chart) chart.destroy();
-        chart = new Chart(chartCanvas, {
-            type: 'scatter',
-            data: { datasets: [{ data: pts, backgroundColor: '#0f766e', pointRadius: 6 }] },
-            options: { 
-                scales: { 
-                    x: { title: { display: true, text: 'log(1/s)' } }, 
-                    y: { title: { display: true, text: 'log N(s)' } } 
-                }, 
-                plugins: { legend: { display: false } } 
-            }
-        });
-        slopeTxt.textContent = '';
-        resultsSection.style.display = 'none';
-    }
-
-    document.getElementById('plotBtn').onclick = plotChart;
-
-    document.getElementById('fitBtn').onclick = () => {
-        const rows = [...dataBody.children];
-        if (rows.length < 2) { 
-            alert('Need at least 2 data points to fit a line'); 
-            return; 
-        }
-        
-        // First plot if not already done
-        if (!chart) {
-            plotChart();
-        }
-        
-        const xs = [], ys = [];
-        rows.forEach(r => {
-            const k = +r.children[0].textContent;
-            const N = +r.children[2].textContent;
-            if (N > 0) {
-                 const s = 1 / 3 ** k;
-                 xs.push(Math.log(1 / s));
-                 ys.push(Math.log(N));
-            }
-        });
-        if (xs.length < 2) { 
-            alert('Need at least 2 valid points (where N(s) > 0)'); 
-            return; 
-        }
-        const n = xs.length;
-        const sumX = xs.reduce((a, b) => a + b, 0), sumY = ys.reduce((a, b) => a + b, 0);
-        const sumXY = xs.reduce((a, b, i) => a + b * ys[i], 0);
-        const sumX2 = xs.reduce((a, b) => a + b * b, 0);
-        const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-        const b = (sumY - m * sumX) / n;
-        
-        const minX = Math.min(...xs), maxX = Math.max(...xs);
-        chart.data.datasets[1] = { 
-            type: 'line', 
-            data: [{ x: minX, y: m * minX + b }, { x: maxX, y: m * maxX + b }], 
-            borderColor: '#f97316', 
-            borderDash: [6, 4], 
-            borderWidth: 2, 
-            pointRadius: 0 
-        };
-        chart.update();
-        
-        // Show results
-        resultsSection.style.display = 'block';
-        estimatedDim.textContent = `Estimated dimension: ${m.toFixed(4)}`;
-        
-        // Calculate error from theoretical
-        const error = Math.abs(m - THEORETICAL_DIM);
-        const percentError = (error / THEORETICAL_DIM * 100).toFixed(1);
-        errorDisplay.textContent = `Error: ${error.toFixed(4)} (${percentError}%)`;
-    };
-
-    document.getElementById('resetTbl').onclick = () => {
-        dataBody.innerHTML = '';
-        if (chart) { chart.destroy(); chart = null; }
-        slopeTxt.textContent = '';
-        chartCanvas.style.display = 'none';
-        resultsSection.style.display = 'none';
-    };
-
-    /********************** Tabs logic & Responsiveness  **********************/
-    function switchTab(id) {
-        document.querySelectorAll('.tabs button').forEach(btn => btn.classList.toggle('active', btn.id === id));
-        document.querySelectorAll('.section').forEach(sec => {
-            if (id === 'tabIntro') {
-                sec.classList.toggle('active', sec.id === 'introduction');
-            } else if (id === 'tabExp') {
-                sec.classList.toggle('active', sec.id === 'explorer');
-            } else if (id === 'tabDim') {
-                sec.classList.toggle('active', sec.id === 'dimension');
-            }
-        });
-        // Update URL hash
-        const hashes = { 'tabIntro': 'intro', 'tabExp': 'explorer', 'tabDim': 'dimension' };
-        window.location.hash = hashes[id];
-        // Resize canvas on tab switch to ensure correct dimensions
-        resizeCanvases();
-    }
-    
-    // Make switchTab globally available for onclick handlers
-    window.switchTab = switchTab;
-    
-    function resizeCanvases() {
-        [expCv, boxCv, chartCanvas].forEach(cv => {
-            if (cv.offsetParent !== null) { // Only resize visible canvases
-                const dpr = window.devicePixelRatio || 1;
-                const rect = cv.getBoundingClientRect();
-                cv.width = rect.width * dpr;
-                cv.height = rect.height * dpr;
-            }
-        });
-        // Redraw content after resize
-        refreshExplorer();
-        updateBoxInfo();
-        if (chart) chart.resize();
-    }
-    
-    window.addEventListener('DOMContentLoaded', function () {
-        // Set up tab handlers
-        document.getElementById('tabIntro').onclick = () => switchTab('tabIntro');
-        document.getElementById('tabExp').onclick = () => switchTab('tabExp');
-        document.getElementById('tabDim').onclick = () => switchTab('tabDim');
-        
-        // Check URL hash
-        const hash = window.location.hash.slice(1);
-        if (hash === 'explorer') switchTab('tabExp');
-        else if (hash === 'dimension') switchTab('tabDim');
-        
-        // Remove fixed canvas sizes from HTML to allow CSS to control them
-        [expCv, boxCv, chartCanvas].forEach(cv => {
-            cv.removeAttribute('width');
-            cv.removeAttribute('height');
-        });
-        
-        // Initial setup
-        resizeCanvases();
-        refreshExplorer();
-        updateBoxInfo();
-
-        window.addEventListener('resize', resizeCanvases);
+    const span=viewEnd-viewStart;
+    segs.forEach(([a,b])=>{
+        const L=Math.max(a,viewStart), R=Math.min(b,viewEnd);
+        if(L>=R) return;
+        const px=(L-viewStart)/span*W;
+        const pw=(R-L)/span*W;
+        expCtx.fillRect(px,0,Math.max(pw,0.5),H);
     });
+
+    // Axis ticks
+    expCtx.fillStyle='#888';
+    expCtx.font='10px -apple-system,sans-serif';
+    expCtx.textAlign='center';
+    for(let i=0;i<=10;i++){
+        const v=viewStart+span*i/10;
+        const x=i/10*W;
+        expCtx.fillText(v.toFixed(3),x,H-2);
+    }
+
+    // Info
+    const totalLen=Math.pow(2/3,n);
+    document.getElementById('exp-info').textContent=
+        `Depth ${n}: ${Math.pow(2,n)} segments, total length ≈ ${totalLen.toFixed(6)} | View: [${viewStart.toFixed(4)}, ${viewEnd.toFixed(4)}] | Zoom: ${(1/span).toFixed(1)}×`;
+
+    // Length table
+    const tbody=document.querySelector('#len-table tbody');
+    tbody.innerHTML='';
+    for(let i=0;i<=n;i++){
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${i}</td><td>${Math.pow(2,i)}</td><td>(2/3)<sup>${i}</sup> ≈ ${Math.pow(2/3,i).toFixed(6)}</td>`;
+        tbody.appendChild(tr);
+    }
+}
+
+document.getElementById('depth-sl').addEventListener('input',function(){
+    document.getElementById('depth-disp').textContent=this.value;
+    drawExplorer();
+});
+
+// Zoom & pan
+expCanvas.addEventListener('wheel',function(e){
+    e.preventDefault();
+    const rect=expCanvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)/rect.width;
+    const span=viewEnd-viewStart;
+    const center=viewStart+mx*span;
+    const factor=e.deltaY>0?1.3:0.7;
+    const newSpan=Math.min(1,Math.max(span*factor,1e-10));
+    viewStart=Math.max(0,center-mx*newSpan);
+    viewEnd=Math.min(1,viewStart+newSpan);
+    if(viewEnd>1){viewStart=1-newSpan;viewEnd=1;}
+    if(viewStart<0){viewStart=0;viewEnd=newSpan;}
+    drawExplorer();
+},{passive:false});
+
+let isDragging=false, dragStartX=0, dragViewStart=0;
+expCanvas.addEventListener('mousedown',function(e){isDragging=true;dragStartX=e.clientX;dragViewStart=viewStart;expCanvas.style.cursor='grabbing';});
+window.addEventListener('mousemove',function(e){
+    if(!isDragging)return;
+    const rect=expCanvas.getBoundingClientRect();
+    const dx=(e.clientX-dragStartX)/rect.width;
+    const span=viewEnd-viewStart;
+    let newStart=dragViewStart-dx*span;
+    if(newStart<0)newStart=0;
+    if(newStart+span>1)newStart=1-span;
+    viewStart=newStart;viewEnd=newStart+span;
+    drawExplorer();
+});
+window.addEventListener('mouseup',function(){isDragging=false;expCanvas.style.cursor='grab';});
+expCanvas.style.cursor='grab';
+
+function resetZoom(){viewStart=0;viewEnd=1;drawExplorer();}
+
+function toggleAnim(){
+    if(animHandle){clearInterval(animHandle);animHandle=null;document.getElementById('anim-btn').textContent='▶ Animate';return;}
+    animDir=1;
+    animHandle=setInterval(()=>{
+        const sl=document.getElementById('depth-sl');
+        let d=parseInt(sl.value);
+        if(d>=parseInt(sl.max))animDir=-1;
+        if(d<=parseInt(sl.min))animDir=1;
+        sl.value=d+animDir;
+        document.getElementById('depth-disp').textContent=sl.value;
+        drawExplorer();
+    },600);
+    document.getElementById('anim-btn').textContent='⏹ Stop';
+}
+
+// ========== Box Dimension Lab ==========
+const boxCanvas=document.getElementById('box-canvas');
+const boxCtx=boxCanvas.getContext('2d');
+
+function drawBoxOverlay(){
+    const k=parseInt(document.getElementById('k-sl').value);
+    const s=Math.pow(1/3,k);
+    const nBoxes=Math.pow(3,k);
+    const W=boxCanvas.width, H=boxCanvas.height;
+    boxCtx.clearRect(0,0,W,H);
+    boxCtx.fillStyle='#f7faf9';
+    boxCtx.fillRect(0,0,W,H);
+
+    const segs=cantorSegments(9); // high-res Cantor set
+
+    // Draw Cantor set
+    boxCtx.fillStyle='rgba(15,118,110,0.8)';
+    segs.forEach(([a,b])=>{
+        boxCtx.fillRect(a*W, H*0.25, (b-a)*W, H*0.5);
+    });
+
+    // Draw boxes and count
+    let occupied=0;
+    for(let i=0;i<nBoxes;i++){
+        const boxStart=i*s, boxEnd=(i+1)*s;
+        const hit=segs.some(([sa,sb])=>!(sb<=boxStart||sa>=boxEnd));
+        if(hit){
+            occupied++;
+            boxCtx.fillStyle='rgba(249,158,11,0.2)';
+            boxCtx.fillRect(i/nBoxes*W,0,W/nBoxes,H);
+        }
+        boxCtx.strokeStyle='#d1d5db';
+        boxCtx.lineWidth=0.5;
+        boxCtx.strokeRect(i/nBoxes*W,0,W/nBoxes,H);
+    }
+
+    document.getElementById('box-s').textContent=`s = 1/${nBoxes} ≈ ${s.toPrecision(4)}`;
+    document.getElementById('box-n').textContent=`N(s) = ${occupied} boxes`;
+    document.getElementById('k-disp').textContent=k;
+    return {k,s,occupied};
+}
+
+document.getElementById('k-sl').addEventListener('input',drawBoxOverlay);
+
+// Data collection
+let dimData=[];
+
+function addDataPoint(){
+    const {k,s,occupied}=drawBoxOverlay();
+    if(dimData.some(d=>d.k===k)){alert(`k = ${k} already in table`);return;}
+    dimData.push({k,s,N:occupied});
+    dimData.sort((a,b)=>a.k-b.k);
+    refreshDimTable();
+}
+
+function refreshDimTable(){
+    const tbody=document.getElementById('dim-tbody');
+    tbody.innerHTML='';
+    dimData.forEach(d=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${d.k}</td><td>1/3<sup>${d.k}</sup></td><td>${d.N}</td><td>${Math.log(1/d.s).toFixed(4)}</td><td>${Math.log(d.N).toFixed(4)}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+function plotLogLog(){
+    if(dimData.length<2){alert('Add at least 2 data points');return;}
+    const canvas=document.getElementById('loglog-canvas');
+    canvas.style.display='block';
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width, H=canvas.height;
+    const pad={l:60,r:20,t:20,b:45};
+    const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+    ctx.clearRect(0,0,W,H);
+
+    const pts=dimData.map(d=>({x:Math.log(1/d.s),y:Math.log(d.N)}));
+    const xMin=0, xMax=Math.max(...pts.map(p=>p.x))*1.1;
+    const yMin=0, yMax=Math.max(...pts.map(p=>p.y))*1.1;
+
+    // Axes
+    ctx.strokeStyle='#ccc';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,H-pad.b);ctx.lineTo(W-pad.r,H-pad.b);ctx.stroke();
+
+    ctx.fillStyle='#888';ctx.font='11px -apple-system,sans-serif';
+    ctx.textAlign='center';
+    for(let i=0;i<=5;i++){
+        const v=xMin+(xMax-xMin)*i/5;
+        ctx.fillText(v.toFixed(1),pad.l+i/5*pw,H-pad.b+15);
+        ctx.strokeStyle='#eee';ctx.beginPath();ctx.moveTo(pad.l+i/5*pw,pad.t);ctx.lineTo(pad.l+i/5*pw,H-pad.b);ctx.stroke();
+    }
+    ctx.fillText('log(1/s)',pad.l+pw/2,H-5);
+
+    ctx.textAlign='right';
+    for(let i=0;i<=5;i++){
+        const v=yMin+(yMax-yMin)*i/5;
+        const y=H-pad.b-(v-yMin)/(yMax-yMin)*ph;
+        ctx.fillStyle='#888';ctx.fillText(v.toFixed(1),pad.l-6,y+4);
+        ctx.strokeStyle='#eee';ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    }
+
+    // Points
+    ctx.fillStyle='#0f766e';
+    pts.forEach(p=>{
+        const px=pad.l+(p.x-xMin)/(xMax-xMin)*pw;
+        const py=H-pad.b-(p.y-yMin)/(yMax-yMin)*ph;
+        ctx.beginPath();ctx.arc(px,py,5,0,2*Math.PI);ctx.fill();
+    });
+
+    document.getElementById('results-box').style.display='none';
+}
+
+function fitLine(){
+    if(dimData.length<2){alert('Add at least 2 data points');return;}
+    plotLogLog();
+
+    const canvas=document.getElementById('loglog-canvas');
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width, H=canvas.height;
+    const pad={l:60,r:20,t:20,b:45};
+    const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+
+    const xs=dimData.map(d=>Math.log(1/d.s));
+    const ys=dimData.map(d=>Math.log(d.N));
+    const n=xs.length;
+    const sumX=xs.reduce((a,b)=>a+b,0), sumY=ys.reduce((a,b)=>a+b,0);
+    const sumXY=xs.reduce((a,b,i)=>a+b*ys[i],0);
+    const sumX2=xs.reduce((a,b)=>a+b*b,0);
+    const m=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
+    const b2=(sumY-m*sumX)/n;
+
+    const xMin=0, xMax=Math.max(...xs)*1.1;
+    const yMin=0, yMax=Math.max(...ys)*1.1;
+
+    // Draw fitted line
+    ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+    const x1=0, y1=b2;
+    const x2=xMax, y2=m*xMax+b2;
+    ctx.beginPath();
+    ctx.moveTo(pad.l+(x1-xMin)/(xMax-xMin)*pw, H-pad.b-(y1-yMin)/(yMax-yMin)*ph);
+    ctx.lineTo(pad.l+(x2-xMin)/(xMax-xMin)*pw, H-pad.b-(y2-yMin)/(yMax-yMin)*ph);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Label
+    ctx.fillStyle='#f59e0b';ctx.font='bold 13px -apple-system,sans-serif';ctx.textAlign='left';
+    ctx.fillText(`slope = ${m.toFixed(4)}`,pad.l+pw*0.05,pad.t+20);
+
+    // Results
+    const theoretical=Math.log(2)/Math.log(3);
+    const err=Math.abs(m-theoretical);
+    document.getElementById('dim-result').textContent=`Estimated dimension: ${m.toFixed(4)}`;
+    document.getElementById('dim-error').textContent=`Error from theoretical: ${err.toFixed(4)} (${(err/theoretical*100).toFixed(1)}%)`;
+    document.getElementById('results-box').style.display='block';
+}
+
+function resetDimLab(){
+    dimData=[];
+    refreshDimTable();
+    document.getElementById('loglog-canvas').style.display='none';
+    document.getElementById('results-box').style.display='none';
+}
+
+// ========== Init ==========
+window.addEventListener('DOMContentLoaded',()=>{
+    renderMath();
+    buildIntroVisual();
+    drawExplorer();
+    drawBoxOverlay();
+});
 </script>
 </body>
 </html>
