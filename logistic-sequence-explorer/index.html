@@ -66,13 +66,12 @@
     </style>
 </head>
 <body>
-<div class="mathswell-nav"><a href="https://mathswell.com" class="mw-link"><img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'"><span>MATHSWELL</span></a></div>
+<div class="mathswell-nav"><a href="/" class="mw-link"><img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'"><span>MATHSWELL</span></a></div>
 <div class="container">
     <div class="tabs">
         <button class="tab-btn active" data-tab="intro">Introduction</button>
         <button class="tab-btn" data-tab="explorer">Explorer</button>
         <button class="tab-btn" data-tab="bifurcation">Bifurcation</button>
-        <button class="tab-btn" data-tab="challenge">Guided Practice</button>
     </div>
 
     <!-- INTRO -->
@@ -127,27 +126,48 @@
     <!-- BIFURCATION -->
     <div id="bifurcation" class="tab-content">
         <h2 style="text-align:center;color:var(--primary);margin-bottom:0.5rem;">Bifurcation Diagram</h2>
-        <p style="text-align:center;color:var(--text-muted);margin-bottom:1rem;">Long-term behaviour for all values of <em>a</em> at once (<span class="k" data-tex="b=1"></span>). Click on the diagram to explore that <em>a</em> value.</p>
+        <p style="text-align:center;color:var(--text-muted);margin-bottom:1rem;">Drag the slider to sweep through <em>a</em> and watch the dynamics change. Annotations appear at critical values.</p>
+
+        <!-- Zoom presets -->
+        <div class="presets" style="margin-bottom:0.75rem;">
+            <button class="preset-pill active" onclick="bifZoom(0,4,this)">Full View (a = 0 to 4)</button>
+            <button class="preset-pill" onclick="bifZoom(2.8,4,this)">Period Doubling (a = 2.8 to 4)</button>
+            <button class="preset-pill" onclick="bifZoom(3.82,3.86,this)">Period-3 Window</button>
+            <button class="preset-pill" onclick="bifZoom(3.845,3.857,this)">Period-3 Cascade</button>
+        </div>
+
         <div class="controls-panel">
             <div class="controls-grid">
                 <div class="control-group"><label>Resolution: <strong id="bif-res-disp">800</strong></label><div class="control-row"><input type="range" id="bif-res" min="200" max="2000" step="100" value="800"></div></div>
                 <div class="control-group"><label>Transient: <strong id="bif-trans-disp">300</strong></label><div class="control-row"><input type="range" id="bif-trans" min="100" max="1000" step="50" value="300"></div></div>
-                <div class="control-group"><label>Plot points: <strong id="bif-plot-disp">100</strong></label><div class="control-row"><input type="range" id="bif-plot" min="20" max="300" step="10" value="100"></div></div>
-                <div class="control-group"><label>Range of a:</label><div class="control-row"><input type="number" id="bif-amin" value="0" step="0.1" min="0" max="4" style="width:65px;"><span style="color:var(--text-muted);">to</span><input type="number" id="bif-amax" value="4" step="0.1" min="0" max="4" style="width:65px;"></div></div>
             </div>
             <div class="btn-row"><button class="action-btn primary" id="bif-btn" onclick="generateBif()">Generate Diagram</button><button class="action-btn secondary" onclick="downloadBif()">Download</button></div>
         </div>
+
         <div class="bif-progress"><div class="bif-progress-fill" id="bif-progress"></div></div>
-        <div class="canvas-wrapper"><canvas id="bif-canvas" width="960" height="560"></canvas></div>
+
+        <!-- The interactive slider for a -->
+        <div style="background:white;border-radius:12px;padding:0.75rem 1rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:0.5rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <label style="font-size:0.85rem;font-weight:600;color:var(--text-muted);white-space:nowrap;">Sweep a:</label>
+                <input type="range" id="bif-a-sweep" min="0" max="4" step="0.001" value="2.8" style="flex:1;accent-color:var(--primary);">
+                <strong id="bif-a-val" style="color:var(--primary);font-size:1.1rem;min-width:50px;text-align:right;">2.800</strong>
+            </div>
+        </div>
+
+        <!-- Annotation banner -->
+        <div id="bif-annotation" style="text-align:center;min-height:2.2rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.4rem 1rem;border-radius:8px;margin-bottom:0.5rem;background:transparent;transition:background 0.3s;">
+            <span id="bif-ann-text" style="font-weight:600;font-size:0.95rem;color:var(--primary);"></span>
+        </div>
+
+        <div class="canvas-wrapper" style="position:relative;">
+            <canvas id="bif-canvas" width="960" height="560"></canvas>
+            <canvas id="bif-overlay" width="960" height="560" style="position:absolute;top:0.75rem;left:0.75rem;pointer-events:none;"></canvas>
+        </div>
+
+        <div style="font-size:0.8rem;color:var(--text-muted);text-align:center;margin-top:0.5rem;">Click on the diagram to jump to that <em>a</em> value in the Explorer.</div>
     </div>
 
-    <!-- GUIDED PRACTICE -->
-    <div id="challenge" class="tab-content">
-        <div class="challenge-section"><h3>1. Why Does the Population Die Out?</h3><p style="margin-bottom:0.75rem;">Set a = b = 0.5, try x₀ = 0.1, 0.3, 0.9. All orbits decay to zero.</p><div><button class="hint-btn" onclick="toggleHint('h1a')">💭 Why?</button><button class="hint-btn" onclick="toggleHint('h1b')">💡 Error viewpoint</button></div><div class="hint-response" id="h1a">When a &lt; 1, no positive fixed point exists — only x* = 0, which is stable since |f'(0)| = a = 0.5 &lt; 1.</div><div class="hint-response" id="h1b">The error recurrence gives <span class="k" data-tex="e_{n+1} \approx 0.5\,e_n"></span>, so <span class="k" data-tex="|e_n| \approx (0.5)^n |e_0| \to 0"></span>. Same contraction ratio as Session 1's Chaos Game!</div></div>
-        <div class="challenge-section"><h3>2. Stable Fixed Point vs Period Doubling</h3><p style="margin-bottom:0.75rem;">Compare a = 2.8 (stable) with a = 3.25 (2-cycle), both with b = 1.</p><div><button class="hint-btn" onclick="toggleHint('h2a')">💭 Compute f'(x*)</button><button class="hint-btn" onclick="toggleHint('h2b')">💡 The transition</button></div><div class="hint-response" id="h2a">At a = 2.8: f'(x*) = 2 − 2.8 = −0.8. Since |−0.8| &lt; 1, the fixed point is stable. At a = 3.25: f'(x*) = −1.25, so |−1.25| &gt; 1 — unstable. Switch to cobweb view to see the difference.</div><div class="hint-response" id="h2b">The bifurcation happens at a = 3 exactly, where |f'(x*)| = 1. Below 3: spiral inward. Above 3: the fixed point repels, and a stable 2-cycle catches the orbit. The Bifurcation tab shows this as the first fork.</div></div>
-        <div class="challenge-section"><h3>3. Sensitive Dependence</h3><p style="margin-bottom:0.75rem;">Set a = 3.8, b = 1. Add two orbits: x₀ = 0.1 and x₀ = 0.1001. After how many steps do they diverge?</p><div><button class="hint-btn" onclick="toggleHint('h3')">💡 What this means</button></div><div class="hint-response" id="h3">In the chaotic regime, all periodic orbits are unstable. Nearby starting points separate exponentially — this is sensitive dependence on initial conditions, the hallmark of chaos. The bifurcation diagram shows periodic windows inside the chaos: islands of order in a sea of complexity.</div></div>
-        <div class="challenge-section"><h3>4. The Role of b</h3><p style="margin-bottom:0.75rem;">Compare a = 1.5, b = 0.5 with a = 1.5, b = 1. Both converge — but to different values. Why?</p><div><button class="hint-btn" onclick="toggleHint('h4')">💡 What b controls</button></div><div class="hint-response" id="h4">The fixed point is x* = (a−1)/(ab). With a = 1.5, b = 0.5: x* = 0.5/0.75 = 2/3. With a = 1.5, b = 1: x* = 0.5/1.5 = 1/3. The parameter b rescales the carrying capacity — it changes where the fixed point sits, but the stability (f'(x*) = 2 − a = 0.5) is the same in both cases.</div></div>
-    </div>
 </div>
 
 <script>
@@ -163,12 +183,181 @@ function buildChips(){const c=document.getElementById('orbit-inputs');c.innerHTM
 
 function syncC(sId,iId,dId){const s=document.getElementById(sId),inp=document.getElementById(iId),d=document.getElementById(dId);s.addEventListener('input',()=>{inp.value=s.value;d.textContent=s.value;});inp.addEventListener('change',()=>{s.value=inp.value;d.textContent=inp.value;});}
 syncC('a-sl','a-in','a-disp');syncC('b-sl','b-in','b-disp');syncC('n-sl','n-in','n-disp');
-['bif-res','bif-trans','bif-plot'].forEach(id=>{const el=document.getElementById(id),disp=document.getElementById(id+'-disp');el.addEventListener('input',()=>{disp.textContent=el.value;});});
-
 function setView(v,el){currentView=v;document.querySelectorAll('.view-toggle').forEach(b=>b.classList.remove('active'));el.classList.add('active');render();}
 
 function fMap(a,b,x){return a*x*(1-b*x);}
 function computeOrbit(a,b,x0,N){const xs=[x0];for(let i=0;i<N;i++)xs.push(fMap(a,b,xs[xs.length-1]));return xs;}
+
+['bif-res','bif-trans'].forEach(id=>{const el=document.getElementById(id),disp=document.getElementById(id+'-disp');el.addEventListener('input',()=>{disp.textContent=el.value;});});
+
+// ========== Bifurcation state ==========
+let bifAMin=0, bifAMax=4;
+const bifPad={l:55,r:15,t:15,b:40};
+
+// Critical a values and their annotations
+const mainEvents=[
+    {a:1, text:'a = 1: Positive fixed point appears', color:'#0f766e'},
+    {a:3, text:'a = 3: Fixed point loses stability → 2-cycle', color:'#c62828'},
+    {a:3.449, text:'a ≈ 3.449: 2-cycle → 4-cycle', color:'#e65100'},
+    {a:3.544, text:'a ≈ 3.544: 4-cycle → 8-cycle', color:'#f57f17'},
+    {a:3.5699, text:'a ≈ 3.5699: Onset of chaos (Feigenbaum point)', color:'#c62828'},
+    {a:3.83, text:'a ≈ 3.83: Period-3 window — order from chaos!', color:'#1565c0'},
+];
+const p3Events=[
+    {a:3.83, text:'a ≈ 3.83: Stable 3-cycle appears', color:'#0f766e'},
+    {a:3.841, text:'a ≈ 3.841: 3-cycle → 6-cycle', color:'#c62828'},
+    {a:3.8495, text:'a ≈ 3.8495: 6-cycle → 12-cycle', color:'#e65100'},
+    {a:3.8508, text:'a ≈ 3.8508: Period-3 cascade reaches chaos', color:'#c62828'},
+    {a:3.857, text:'a ≈ 3.857: Fully chaotic (period-3 window closed)', color:'#7b1fa2'},
+];
+
+function getEvents(){
+    // Use period-3 events when zoomed into that window
+    if(bifAMin >= 3.8 && bifAMax <= 3.87) return p3Events;
+    return mainEvents;
+}
+
+function bifZoom(amin,amax,el){
+    bifAMin=amin; bifAMax=amax;
+    document.getElementById('bif-a-sweep').min=amin;
+    document.getElementById('bif-a-sweep').max=amax;
+    document.getElementById('bif-a-sweep').step= (amax-amin)<0.1 ? '0.0001' : '0.001';
+    document.getElementById('bif-a-sweep').value=amin;
+    document.getElementById('bif-a-val').textContent=amin.toFixed(3);
+    document.querySelectorAll('#bifurcation .preset-pill').forEach(p=>p.classList.remove('active'));
+    if(el)el.classList.add('active');
+    generateBif();
+}
+
+function generateBif(){
+    const btn=document.getElementById('bif-btn');btn.textContent='Generating...';btn.disabled=true;
+    const resA=parseInt(document.getElementById('bif-res').value);
+    const transient=parseInt(document.getElementById('bif-trans').value);
+    const plotN=100;
+    const canvas=document.getElementById('bif-canvas'),ctx=canvas.getContext('2d');
+    const W=canvas.width,H=canvas.height;
+    const pad=bifPad, pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+    ctx.clearRect(0,0,W,H);
+
+    // Axes
+    ctx.strokeStyle='#ccc';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,H-pad.b);ctx.lineTo(W-pad.r,H-pad.b);ctx.stroke();
+    ctx.fillStyle='#888';ctx.font='11px -apple-system,sans-serif';ctx.textAlign='center';
+    const nTicks = (bifAMax-bifAMin) < 0.2 ? 5 : 8;
+    for(let i=0;i<=nTicks;i++){
+        const a=bifAMin+(bifAMax-bifAMin)*i/nTicks;
+        const decimals = (bifAMax-bifAMin)<1 ? 3 : 1;
+        ctx.fillText(a.toFixed(decimals),pad.l+(i/nTicks)*pw,H-pad.b+15);
+    }
+    ctx.fillText('a',pad.l+pw/2,H-5);
+    ctx.textAlign='right';
+    for(let i=0;i<=5;i++){const v=i/5;ctx.fillText(v.toFixed(1),pad.l-6,H-pad.b-v*ph+4);}
+
+    // Draw critical value markers as subtle vertical lines
+    const events=getEvents();
+    events.forEach(ev=>{
+        if(ev.a>=bifAMin && ev.a<=bifAMax){
+            const px=pad.l+((ev.a-bifAMin)/(bifAMax-bifAMin))*pw;
+            ctx.strokeStyle='rgba(200,200,200,0.4)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+            ctx.beginPath();ctx.moveTo(px,pad.t);ctx.lineTo(px,H-pad.b);ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    });
+
+    // Render bifurcation points
+    let col=0;const progress=document.getElementById('bif-progress'),batch=20;
+    function step(){
+        const end=Math.min(col+batch,resA);
+        ctx.fillStyle='rgba(15,118,110,0.15)';
+        for(let c=col;c<end;c++){
+            const a=bifAMin+(bifAMax-bifAMin)*c/(resA-1);
+            let x=0.5;
+            for(let i=0;i<transient;i++) x=a*x*(1-x);
+            for(let i=0;i<plotN;i++){
+                x=a*x*(1-x);
+                ctx.fillRect(pad.l+((a-bifAMin)/(bifAMax-bifAMin))*pw, H-pad.b-x*ph, 1.5, 1.5);
+            }
+        }
+        col=end;
+        progress.style.width=(col/resA*100)+'%';
+        if(col<resA){
+            requestAnimationFrame(step);
+        } else {
+            progress.style.width='0%';
+            btn.textContent='Generate Diagram';btn.disabled=false;
+            drawBifOverlay();
+        }
+    }
+    requestAnimationFrame(step);
+}
+
+// ========== Sweep overlay ==========
+function drawBifOverlay(){
+    const overlay=document.getElementById('bif-overlay');
+    const ctx=overlay.getContext('2d');
+    const W=overlay.width, H=overlay.height;
+    const pad=bifPad, pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+    ctx.clearRect(0,0,W,H);
+
+    const a=parseFloat(document.getElementById('bif-a-sweep').value);
+    if(a<bifAMin || a>bifAMax) return;
+
+    const px=pad.l+((a-bifAMin)/(bifAMax-bifAMin))*pw;
+
+    // Red vertical line
+    ctx.strokeStyle='rgba(198,40,40,0.85)';
+    ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(px,pad.t);ctx.lineTo(px,H-pad.b);ctx.stroke();
+
+    // Small triangle marker at top
+    ctx.fillStyle='#c62828';
+    ctx.beginPath();ctx.moveTo(px,pad.t);ctx.lineTo(px-6,pad.t-8);ctx.lineTo(px+6,pad.t-8);ctx.closePath();ctx.fill();
+
+    // Check for nearby critical event
+    const events=getEvents();
+    const threshold=(bifAMax-bifAMin)*0.012; // proximity threshold
+    let closest=null, closestDist=Infinity;
+    events.forEach(ev=>{
+        const d=Math.abs(a-ev.a);
+        if(d<threshold && d<closestDist){closest=ev;closestDist=d;}
+    });
+
+    const annEl=document.getElementById('bif-annotation');
+    const annText=document.getElementById('bif-ann-text');
+    if(closest){
+        annText.textContent=closest.text;
+        annText.style.color=closest.color;
+        annEl.style.background='#fef3c7';
+
+        // Highlight line thicker at critical value
+        ctx.strokeStyle=closest.color;
+        ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(px,pad.t);ctx.lineTo(px,H-pad.b);ctx.stroke();
+    } else {
+        annText.textContent=`a = ${a.toFixed(4)}`;
+        annText.style.color='var(--primary)';
+        annEl.style.background='transparent';
+    }
+}
+
+// Sweep slider event
+document.getElementById('bif-a-sweep').addEventListener('input',function(){
+    document.getElementById('bif-a-val').textContent=parseFloat(this.value).toFixed(this.step<0.001?4:3);
+    drawBifOverlay();
+});
+
+// Click on diagram to jump to explorer (updated for dynamic range)
+document.getElementById('bif-canvas').addEventListener('click',e=>{
+    const canvas=document.getElementById('bif-canvas'),rect=canvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)/rect.width*canvas.width;
+    const pad=bifPad,pw=canvas.width-pad.l-pad.r;
+    const a=bifAMin+((mx-pad.l)/pw)*(bifAMax-bifAMin);
+    if(a>=0&&a<=4){
+        document.getElementById('a-sl').value=a.toFixed(3);document.getElementById('a-in').value=a.toFixed(3);document.getElementById('a-disp').textContent=a.toFixed(3);
+        document.getElementById('b-sl').value=1;document.getElementById('b-in').value=1;document.getElementById('b-disp').textContent=1;
+        switchTab('explorer');render();
+    }
+});
 
 function loadPreset(a,b,x0arr,n,el){document.getElementById('a-sl').value=a;document.getElementById('a-in').value=a;document.getElementById('a-disp').textContent=a;document.getElementById('b-sl').value=b;document.getElementById('b-in').value=b;document.getElementById('b-disp').textContent=b;document.getElementById('n-sl').value=n;document.getElementById('n-in').value=n;document.getElementById('n-disp').textContent=n;orbits=[...x0arr];buildChips();document.querySelectorAll('.preset-pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');render();}
 
@@ -210,24 +399,6 @@ function drawCobwebPlot(ctx,ox,oy,w,h,allOrbs,a,b){
 
 function updateTable(allOrbs,N){const thead=document.querySelector('#orbit-table thead tr'),tbody=document.querySelector('#orbit-table tbody');thead.innerHTML='<th>n</th>';orbits.forEach((x0,i)=>{const th=document.createElement('th');th.textContent=`x₀ = ${x0}`;thead.appendChild(th);});tbody.innerHTML='';for(let n=0;n<=N;n++){const tr=document.createElement('tr');const td0=document.createElement('td');td0.textContent=n;td0.style.fontWeight='600';tr.appendChild(td0);allOrbs.forEach(orb=>{const td=document.createElement('td');const v=orb[n];td.textContent=v!==undefined?(Math.abs(v)<1e-15?'≈ 0':v.toPrecision(10)):'';tr.appendChild(td);});tbody.appendChild(tr);}}
 function toggleTable(){const w=document.getElementById('table-wrap');w.style.display=w.style.display==='none'?'block':'none';}
-
-function generateBif(){
-    const btn=document.getElementById('bif-btn');btn.textContent='Generating...';btn.disabled=true;
-    const resA=parseInt(document.getElementById('bif-res').value),transient=parseInt(document.getElementById('bif-trans').value),plotN=parseInt(document.getElementById('bif-plot').value);
-    const aMin=parseFloat(document.getElementById('bif-amin').value),aMax=parseFloat(document.getElementById('bif-amax').value);
-    const canvas=document.getElementById('bif-canvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
-    const pad={l:55,r:15,t:15,b:40},pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
-    ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle='#ccc';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,H-pad.b);ctx.lineTo(W-pad.r,H-pad.b);ctx.stroke();
-    ctx.fillStyle='#888';ctx.font='11px -apple-system,sans-serif';ctx.textAlign='center';
-    for(let i=0;i<=8;i++){const a=aMin+(aMax-aMin)*i/8;ctx.fillText(a.toFixed(1),pad.l+(i/8)*pw,H-pad.b+15);}ctx.fillText('a',pad.l+pw/2,H-5);
-    ctx.textAlign='right';for(let i=0;i<=5;i++){const v=i/5;ctx.fillText(v.toFixed(1),pad.l-6,H-pad.b-v*ph+4);}
-    let col=0;const progress=document.getElementById('bif-progress'),batch=20;
-    function step(){const end=Math.min(col+batch,resA);ctx.fillStyle='rgba(15,118,110,0.15)';for(let c=col;c<end;c++){const a=aMin+(aMax-aMin)*c/(resA-1);let x=0.5;for(let i=0;i<transient;i++)x=a*x*(1-x);for(let i=0;i<plotN;i++){x=a*x*(1-x);ctx.fillRect(pad.l+((a-aMin)/(aMax-aMin))*pw,H-pad.b-x*ph,1.5,1.5);}}col=end;progress.style.width=(col/resA*100)+'%';if(col<resA)requestAnimationFrame(step);else{progress.style.width='0%';btn.textContent='Generate Diagram';btn.disabled=false;}}
-    requestAnimationFrame(step);
-}
-
-document.getElementById('bif-canvas').addEventListener('click',e=>{const canvas=document.getElementById('bif-canvas'),rect=canvas.getBoundingClientRect();const mx=(e.clientX-rect.left)/rect.width*canvas.width;const pad={l:55,r:15},pw=canvas.width-pad.l-pad.r;const aMin=parseFloat(document.getElementById('bif-amin').value),aMax=parseFloat(document.getElementById('bif-amax').value);const a=aMin+((mx-pad.l)/pw)*(aMax-aMin);if(a>=0&&a<=4){document.getElementById('a-sl').value=a.toFixed(3);document.getElementById('a-in').value=a.toFixed(3);document.getElementById('a-disp').textContent=a.toFixed(3);document.getElementById('b-sl').value=1;document.getElementById('b-in').value=1;document.getElementById('b-disp').textContent=1;switchTab('explorer');render();}});
 
 function downloadPlot(){const c=document.getElementById('plot-canvas'),a=document.getElementById('a-in').value,b=document.getElementById('b-in').value,l=document.createElement('a');l.download=`population_model_a${a}_b${b}.png`;l.href=c.toDataURL('image/png');l.click();}
 function downloadBif(){const c=document.getElementById('bif-canvas'),l=document.createElement('a');l.download='bifurcation_diagram.png';l.href=c.toDataURL('image/png');l.click();}
