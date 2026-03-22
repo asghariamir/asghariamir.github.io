@@ -1,1 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Julia & Mandelbrot Explorer | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        :root{--primary:#0f766e;--primary-light:#10b981;--background:#f7faf9;--interactive:#e6fffb;--text-primary:#212121;--text-muted:#4b5563;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--background);color:var(--text-primary);padding-top:60px;}
+        .mathswell-nav{position:fixed;top:0;left:0;right:0;background:white;border-bottom:2px solid var(--primary);padding:0.75rem 1rem;z-index:1000;display:flex;justify-content:center;align-items:center;}
+        .mw-link{display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:var(--primary);font-weight:600;letter-spacing:1px;}
+        .container{max-width:1000px;margin:1.5rem auto;padding:0 1rem;}
+        .tabs{display:flex;gap:0.5rem;justify-content:center;background:white;padding:0.5rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);margin-bottom:1.5rem;flex-wrap:wrap;}
+        .tab-btn{padding:0.75rem 1.5rem;border:none;background:transparent;color:var(--text-muted);cursor:pointer;border-radius:8px;font-weight:500;transition:all 0.2s;font-size:0.95rem;}
+        .tab-btn.active{background:var(--primary);color:white;}.tab-btn:hover:not(.active){background:var(--interactive);color:var(--primary);}
+        .tab-content{display:none;animation:fadeIn 0.3s ease;}.tab-content.active{display:block;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+        .hero{text-align:center;margin-bottom:2rem;}.hero h1{font-size:2rem;color:var(--primary);margin-bottom:0.5rem;}.hero p{color:var(--text-muted);font-size:1.05rem;max-width:700px;margin:0 auto;line-height:1.6;}
+        .concept-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-bottom:2rem;}
+        .concept-card{background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);border-left:4px solid var(--primary);}.concept-card h3{color:var(--primary);margin-bottom:0.5rem;}.concept-card p{color:var(--text-muted);font-size:0.95rem;line-height:1.5;}
+        .math-block{margin:0.75rem 0;text-align:center;overflow-x:auto;}
+        .insight-box{background:var(--interactive);border:1px solid var(--primary);border-radius:10px;padding:1.25rem;margin:1.5rem 0;}.insight-box h3{color:var(--primary);margin-bottom:0.5rem;}.insight-box p{color:var(--text-muted);line-height:1.5;}
+        .cta-row{display:flex;gap:1rem;justify-content:center;margin:2rem 0;flex-wrap:wrap;}
+        .nav-btn{background:var(--primary);color:white;padding:0.75rem 1.5rem;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.95rem;}.nav-btn:hover{background:#0e6b63;}
+        .presets{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-bottom:1.25rem;}
+        .preset-pill{padding:0.4rem 1rem;border-radius:999px;background:white;border:2px solid var(--primary);color:var(--primary);cursor:pointer;transition:all 0.2s;font-size:0.85rem;font-weight:500;}.preset-pill:hover{background:var(--interactive);transform:translateY(-2px);}.preset-pill.active{background:var(--primary);color:white;}
+        .controls-panel{background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.25rem;}
+        .controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+        .control-group{display:flex;flex-direction:column;gap:0.2rem;}.control-group label{font-size:0.85rem;font-weight:600;color:var(--text-muted);}
+        .control-row{display:flex;align-items:center;gap:0.5rem;}.control-row input[type="range"]{flex:1;accent-color:var(--primary);}
+        .control-row input[type="number"]{width:80px;padding:0.3rem 0.4rem;border:1px solid #d1d5db;border-radius:6px;font-size:0.9rem;text-align:center;}
+        input[type="number"]:focus{outline:none;border-color:var(--primary);}
+        .btn-row{display:flex;gap:0.75rem;margin-top:0.75rem;justify-content:center;flex-wrap:wrap;}
+        .action-btn{padding:0.6rem 1.25rem;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.9rem;}
+        .action-btn.primary{background:var(--primary);color:white;}.action-btn.primary:hover{background:#0e6b63;}
+        .action-btn.secondary{background:white;color:var(--primary);border:2px solid var(--primary);}.action-btn.secondary:hover{background:var(--interactive);}
+        .canvas-container{display:flex;flex-direction:column;align-items:center;gap:0.75rem;}
+        #julia-canvas,#mandel-canvas{border:2px solid var(--primary);border-radius:8px;max-width:100%;cursor:crosshair;image-rendering:pixelated;}
+        .colorbar-container{display:flex;align-items:center;gap:0.5rem;width:500px;max-width:100%;}
+        .colorbar-cv{border-radius:4px;border:1px solid #d1d5db;}
+        .info-display{background:var(--interactive);border:1px solid var(--primary);border-radius:8px;padding:0.6rem 1rem;font-family:'Monaco',monospace;font-size:0.85rem;text-align:center;margin-top:0.75rem;max-width:550px;margin-left:auto;margin-right:auto;}
+        .progress-bar{width:500px;max-width:100%;height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden;}
+        .progress-fill{height:100%;background:var(--primary);transition:width 0.1s;width:0%;}
+        .zoom-info{font-size:0.8rem;color:var(--text-muted);text-align:center;margin-top:0.25rem;}
+        .color-scheme-row{display:flex;gap:0.5rem;align-items:center;margin-top:0.75rem;justify-content:center;flex-wrap:wrap;}
+        .color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.2s;}.color-swatch.active{border-color:var(--primary);transform:scale(1.15);}
+        @media(max-width:768px){.controls-grid{grid-template-columns:1fr;}.concept-cards{grid-template-columns:1fr;}.hero h1{font-size:1.5rem;}input,button,select{font-size:16px;min-height:44px;}.colorbar-container{width:100%;}}
+    </style>
+</head>
+<body>
+<div class="mathswell-nav"><a href="/" class="mw-link"><img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'"><span>MATHSWELL</span></a></div>
+<div class="container">
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="intro">Introduction</button>
+        <button class="tab-btn" data-tab="explorer">Julia Set Explorer</button>
+        <button class="tab-btn" data-tab="mandelbrot">Mandelbrot Set</button>
+    </div>
 
+    <!-- INTRO -->
+    <div id="intro" class="tab-content active">
+        <div class="hero"><h1>Julia Sets & the Mandelbrot Set</h1><p>When we iterate a simple rule on complex numbers, the boundary between orbits that stay bounded and those that escape to infinity forms breathtaking fractal structures.</p></div>
+        <div class="concept-cards">
+            <div class="concept-card"><h3>The Iteration Rule</h3><div class="math-block" id="math-iter"></div><p>Pick a starting point <span class="k" data-tex="z_0"></span> in the complex plane. Apply the rule repeatedly. The parameter <span class="k" data-tex="c"></span> is a fixed complex number that shapes the Julia set.</p></div>
+            <div class="concept-card"><h3>Escape Criterion</h3><p>If <span class="k" data-tex="|z_n| > 2"></span> at any step, the orbit escapes to infinity. Points that <em>never</em> escape form the <strong>filled Julia set</strong>.</p></div>
+            <div class="concept-card"><h3>Escape Iteration</h3><p>The <em>escape iteration</em> is the first step <span class="k" data-tex="n"></span> where <span class="k" data-tex="|z_n| > 2"></span>. Low values mean quick escape; high values mean the point lingers near the boundary — the most interesting region.</p></div>
+            <div class="concept-card"><h3>The Mandelbrot Set</h3><p>Fix <span class="k" data-tex="z_0 = 0"></span> and ask: for which <span class="k" data-tex="c"></span> does the orbit stay bounded? The answer is the Mandelbrot set <span class="k" data-tex="M"></span>. If <span class="k" data-tex="c \in M"></span>, the Julia set is connected; otherwise it is dust.</p></div>
+        </div>
+        <div class="insight-box"><h3>Why Does This Create Fractals?</h3><p>The map <span class="k" data-tex="z \mapsto z^2 + c"></span> is nonlinear — small changes in <span class="k" data-tex="z_0"></span> can lead to dramatically different fates. The boundary between bounded and escaping orbits is infinitely complex, with the same structure at every scale. This is sensitive dependence, now in two dimensions.</p></div>
+        <div class="cta-row"><button class="nav-btn" onclick="switchTab('explorer')">Explore Julia Sets →</button><button class="nav-btn" onclick="switchTab('mandelbrot')" style="background:#10b981;">See the Mandelbrot Set →</button></div>
+    </div>
+
+    <!-- JULIA EXPLORER -->
+    <div id="explorer" class="tab-content">
+        <h2 style="text-align:center;color:var(--primary);margin-bottom:1rem;">Julia Set Explorer</h2>
+        <div class="presets">
+            <button class="preset-pill" onclick="loadPreset(-1,0,200,this)">Basilica: c = −1</button>
+            <button class="preset-pill" onclick="loadPreset(0,1,200,this)">Dendrite: c = i</button>
+            <button class="preset-pill" onclick="loadPreset(-0.123,0.745,200,this)">Douady Rabbit</button>
+            <button class="preset-pill" onclick="loadPreset(-0.8,0.156,200,this)">Spiral</button>
+            <button class="preset-pill" onclick="loadPreset(-0.4,0.6,200,this)">Dragon</button>
+            <button class="preset-pill" onclick="loadPreset(0.285,0.01,300,this)">Swirl</button>
+        </div>
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="control-group"><label>Real part of c</label><div class="control-row"><input type="range" id="c-real-sl" min="-2" max="2" step="0.001" value="-1"><input type="number" id="c-real-in" step="0.001" value="-1"></div></div>
+                <div class="control-group"><label>Imaginary part of c</label><div class="control-row"><input type="range" id="c-imag-sl" min="-2" max="2" step="0.001" value="0"><input type="number" id="c-imag-in" step="0.001" value="0"></div></div>
+                <div class="control-group"><label>Max iterations: <strong id="nmax-disp">200</strong></label><div class="control-row"><input type="range" id="nmax-sl" min="10" max="1000" step="10" value="200"><input type="number" id="nmax-in" min="10" max="2000" step="10" value="200"></div></div>
+                <div class="control-group"><label>Resolution: <strong id="res-disp">500 × 500</strong></label><div class="control-row"><input type="range" id="res-sl" min="100" max="800" step="50" value="500"></div></div>
+            </div>
+            <div class="color-scheme-row">
+                <span style="font-size:0.85rem;font-weight:600;color:var(--text-muted);">Colour:</span>
+                <div class="color-swatch active" style="background:linear-gradient(135deg,#0f766e,#10b981,#f59e0b);" onclick="setScheme('teal',this)"></div>
+                <div class="color-swatch" style="background:linear-gradient(135deg,#1a1a2e,#e94560,#f59e0b);" onclick="setScheme('fire',this)"></div>
+                <div class="color-swatch" style="background:linear-gradient(135deg,#0a1628,#1e3a5f,#6dd5ed);" onclick="setScheme('ocean',this)"></div>
+                <div class="color-swatch" style="background:linear-gradient(135deg,#000,#888,#fff);" onclick="setScheme('gray',this)"></div>
+                <div class="color-swatch" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);" onclick="setScheme('rainbow',this)"></div>
+            </div>
+            <div class="btn-row">
+                <button class="action-btn primary" id="j-btn" onclick="genJulia()">Generate Julia Set</button>
+                <button class="action-btn secondary" onclick="jView={xMin:-1.5,xMax:1.5,yMin:-1.5,yMax:1.5};genJulia()">Reset Zoom</button>
+                <button class="action-btn secondary" onclick="dlCanvas('julia-canvas','julia')">Download</button>
+            </div>
+        </div>
+        <div class="canvas-container">
+            <div class="progress-bar"><div class="progress-fill" id="j-prog"></div></div>
+            <canvas id="julia-canvas" width="500" height="500"></canvas>
+            <div class="colorbar-container"><span style="font-size:0.75rem;color:var(--text-muted);">0</span><canvas id="j-cbar" class="colorbar-cv" width="400" height="20" style="flex:1;"></canvas><span style="font-size:0.75rem;color:var(--text-muted);" id="j-cbar-max">200</span></div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Escape iteration (black = bounded, in the filled Julia set)</div>
+            <div class="info-display" id="j-info">c = −1 + 0i | nMax = 200 | 500 × 500</div>
+            <div class="zoom-info" id="j-hover">Click to zoom 2× · Drag to select region · Scroll to zoom</div>
+        </div>
+    </div>
+
+    <!-- MANDELBROT -->
+    <div id="mandelbrot" class="tab-content">
+        <h2 style="text-align:center;color:var(--primary);margin-bottom:0.5rem;">The Mandelbrot Set</h2>
+        <p style="text-align:center;color:var(--text-muted);margin-bottom:1rem;">Each point <span class="k" data-tex="c"></span> corresponds to a Julia set. Black = <span class="k" data-tex="c \in M"></span> (connected Julia set). <strong>Click any point to see its Julia set.</strong></p>
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="control-group"><label>Max iterations: <strong id="m-nmax-disp">200</strong></label><div class="control-row"><input type="range" id="m-nmax" min="50" max="1000" step="50" value="200"></div></div>
+                <div class="control-group"><label>Resolution: <strong id="m-res-disp">600</strong></label><div class="control-row"><input type="range" id="m-res" min="200" max="800" step="50" value="600"></div></div>
+            </div>
+            <div class="btn-row">
+                <button class="action-btn primary" id="m-btn" onclick="genMandel()">Generate Mandelbrot Set</button>
+                <button class="action-btn secondary" onclick="mView={xMin:-2.2,xMax:0.8,yMin:-1.5,yMax:1.5};genMandel()">Reset Zoom</button>
+                <button class="action-btn secondary" onclick="dlCanvas('mandel-canvas','mandelbrot')">Download</button>
+            </div>
+        </div>
+        <div class="canvas-container">
+            <div class="progress-bar"><div class="progress-fill" id="m-prog"></div></div>
+            <canvas id="mandel-canvas" width="600" height="600"></canvas>
+            <div class="colorbar-container"><span style="font-size:0.75rem;color:var(--text-muted);">0</span><canvas id="m-cbar" class="colorbar-cv" width="400" height="20" style="flex:1;"></canvas><span style="font-size:0.75rem;color:var(--text-muted);" id="m-cbar-max">200</span></div>
+            <div class="info-display" id="m-info">Click on the Mandelbrot set to explore the Julia set at that c value</div>
+            <div class="zoom-info" id="m-hover">Scroll to zoom · Click to see Julia set at that c</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(b=>{b.addEventListener('click',()=>switchTab(b.dataset.tab));});
+function switchTab(id){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`[data-tab="${id}"]`).classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+// KaTeX
+function renderMath(){
+    const el=document.getElementById('math-iter');
+    if(el)try{katex.render('z_{n+1} = z_n^2 + c',el,{throwOnError:false,displayMode:true});}catch(e){}
+    document.querySelectorAll('.k').forEach(el=>{const t=el.getAttribute('data-tex');if(t)try{katex.render(t,el,{throwOnError:false});}catch(e){}});
+}
+
+// Colors
+let scheme='teal';
+const schemes={
+    teal:t=>{if(t===1)return[0,0,0];return hsl2rgb(0.45+0.15*t,0.8,0.15+0.65*Math.sqrt(t));},
+    fire:t=>{if(t===1)return[0,0,0];return[Math.min(255,512*t|0),Math.min(255,512*Math.max(0,t-0.4)|0),Math.min(255,200*Math.max(0,0.3-t)|0)];},
+    ocean:t=>{if(t===1)return[0,0,0];return hsl2rgb(0.55+0.12*Math.sin(t*Math.PI*3),0.7+0.3*t,0.1+0.7*t);},
+    gray:t=>{if(t===1)return[0,0,0];const v=255*Math.sqrt(t)|0;return[v,v,v];},
+    rainbow:t=>{if(t===1)return[0,0,0];return hsl2rgb(t,0.85,0.5);}
+};
+function hsl2rgb(h,s,l){let r,g,b;if(!s){r=g=b=l;}else{const f=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<.5)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q;r=f(p,q,h+1/3);g=f(p,q,h);b=f(p,q,h-1/3);}return[r*255+.5|0,g*255+.5|0,b*255+.5|0];}
+function setScheme(s,el){scheme=s;document.querySelectorAll('.color-swatch').forEach(x=>x.classList.remove('active'));el.classList.add('active');drawCbar('j-cbar');drawCbar('m-cbar');genJulia();}
+function drawCbar(id){const cv=document.getElementById(id);if(!cv)return;const cx=cv.getContext('2d'),w=cv.width,h=cv.height,im=cx.createImageData(w,h),fn=schemes[scheme];for(let x=0;x<w;x++){const[r,g,b]=fn(x/w);for(let y=0;y<h;y++){const i=(y*w+x)*4;im.data[i]=r;im.data[i+1]=g;im.data[i+2]=b;im.data[i+3]=255;}}cx.putImageData(im,0,0);}
+
+// Controls sync
+function sync(sId,iId,dId){const s=document.getElementById(sId),i=document.getElementById(iId),d=dId?document.getElementById(dId):null;s.addEventListener('input',()=>{i.value=s.value;if(d)d.textContent=s.value;});i.addEventListener('change',()=>{s.value=i.value;if(d)d.textContent=i.value;});}
+sync('c-real-sl','c-real-in');sync('c-imag-sl','c-imag-in');sync('nmax-sl','nmax-in','nmax-disp');
+document.getElementById('res-sl').addEventListener('input',function(){document.getElementById('res-disp').textContent=this.value+' × '+this.value;});
+document.getElementById('m-nmax').addEventListener('input',function(){document.getElementById('m-nmax-disp').textContent=this.value;});
+document.getElementById('m-res').addEventListener('input',function(){document.getElementById('m-res-disp').textContent=this.value;});
+
+function loadPreset(cR,cI,nm,el){
+    document.getElementById('c-real-sl').value=cR;document.getElementById('c-real-in').value=cR;
+    document.getElementById('c-imag-sl').value=cI;document.getElementById('c-imag-in').value=cI;
+    document.getElementById('nmax-sl').value=nm;document.getElementById('nmax-in').value=nm;document.getElementById('nmax-disp').textContent=nm;
+    document.querySelectorAll('.preset-pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');
+    jView={xMin:-1.5,xMax:1.5,yMin:-1.5,yMax:1.5};genJulia();
+}
+
+// ===== Julia =====
+let jView={xMin:-1.5,xMax:1.5,yMin:-1.5,yMax:1.5},jBusy=false;
+function genJulia(){
+    if(jBusy)return;jBusy=true;
+    const btn=document.getElementById('j-btn');btn.textContent='Rendering...';btn.disabled=true;
+    const cR=parseFloat(document.getElementById('c-real-in').value)||0,cI=parseFloat(document.getElementById('c-imag-in').value)||0;
+    const nMax=parseInt(document.getElementById('nmax-in').value)||200,res=parseInt(document.getElementById('res-sl').value)||500;
+    const cv=document.getElementById('julia-canvas');cv.width=res;cv.height=res;
+    const ctx=cv.getContext('2d'),im=ctx.createImageData(res,res);
+    const{xMin,xMax,yMin,yMax}=jView,dx=(xMax-xMin)/res,dy=(yMax-yMin)/res,fn=schemes[scheme],prog=document.getElementById('j-prog');
+    let row=0;
+    function step(){const end=Math.min(row+10,res);for(let py=row;py<end;py++)for(let px=0;px<res;px++){let zr=xMin+px*dx,zi=yMax-py*dy,it=0;while(it<nMax&&zr*zr+zi*zi<=4){const t=zr*zr-zi*zi+cR;zi=2*zr*zi+cI;zr=t;it++;}const[r,g,b]=fn(it===nMax?1:it/nMax),i=(py*res+px)*4;im.data[i]=r;im.data[i+1]=g;im.data[i+2]=b;im.data[i+3]=255;}
+    row=end;prog.style.width=(row/res*100)+'%';if(row<res)requestAnimationFrame(step);else{ctx.putImageData(im,0,0);prog.style.width='0%';jBusy=false;btn.textContent='Generate Julia Set';btn.disabled=false;const s=cI>=0?'+':'−';document.getElementById('j-info').textContent=`c = ${cR} ${s} ${Math.abs(cI)}i  |  nMax = ${nMax}  |  ${res} × ${res}`;document.getElementById('j-cbar-max').textContent=nMax;drawCbar('j-cbar');}}
+    requestAnimationFrame(step);
+}
+
+// Julia zoom
+const jCv=document.getElementById('julia-canvas');let jZs=null,jDrag=false;
+jCv.addEventListener('mousedown',e=>{const r=jCv.getBoundingClientRect();jZs={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};jDrag=true;});
+jCv.addEventListener('mouseup',e=>{if(!jDrag||!jZs)return;jDrag=false;const r=jCv.getBoundingClientRect(),ze={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};const ddx=Math.abs(ze.x-jZs.x),ddy=Math.abs(ze.y-jZs.y);const{xMin,xMax,yMin,yMax}=jView;if(ddx<.02&&ddy<.02){const cx=xMin+jZs.x*(xMax-xMin),cy=yMax-jZs.y*(yMax-yMin),w=(xMax-xMin)/4,h=(yMax-yMin)/4;jView={xMin:cx-w,xMax:cx+w,yMin:cy-h,yMax:cy+h};}else{const x1=Math.min(jZs.x,ze.x),x2=Math.max(jZs.x,ze.x),y1=Math.min(jZs.y,ze.y),y2=Math.max(jZs.y,ze.y);jView={xMin:xMin+x1*(xMax-xMin),xMax:xMin+x2*(xMax-xMin),yMin:yMax-y2*(yMax-yMin),yMax:yMax-y1*(yMax-yMin)};}genJulia();jZs=null;});
+jCv.addEventListener('wheel',e=>{e.preventDefault();const r=jCv.getBoundingClientRect(),mx=(e.clientX-r.left)/r.width,my=(e.clientY-r.top)/r.height;const{xMin,xMax,yMin,yMax}=jView,cx=xMin+mx*(xMax-xMin),cy=yMax-my*(yMax-yMin),f=e.deltaY>0?1.3:.7,w=(xMax-xMin)*f/2,h=(yMax-yMin)*f/2;jView={xMin:cx-w,xMax:cx+w,yMin:cy-h,yMax:cy+h};genJulia();},{passive:false});
+jCv.addEventListener('mousemove',e=>{if(jDrag)return;const r=jCv.getBoundingClientRect(),mx=(e.clientX-r.left)/r.width,my=(e.clientY-r.top)/r.height;const{xMin,xMax,yMin,yMax}=jView,x=xMin+mx*(xMax-xMin),y=yMax-my*(yMax-yMin);document.getElementById('j-hover').textContent=`z₀ = ${x.toFixed(4)} ${y>=0?'+':'−'} ${Math.abs(y).toFixed(4)}i  |  Click to zoom · Scroll to zoom`;});
+
+// ===== Mandelbrot =====
+let mView={xMin:-2.2,xMax:0.8,yMin:-1.5,yMax:1.5},mBusy=false;
+function genMandel(){
+    if(mBusy)return;mBusy=true;
+    const btn=document.getElementById('m-btn');btn.textContent='Rendering...';btn.disabled=true;
+    const nMax=parseInt(document.getElementById('m-nmax').value)||200,res=parseInt(document.getElementById('m-res').value)||600;
+    const cv=document.getElementById('mandel-canvas');cv.width=res;cv.height=res;
+    const ctx=cv.getContext('2d'),im=ctx.createImageData(res,res);
+    const{xMin,xMax,yMin,yMax}=mView,dx=(xMax-xMin)/res,dy=(yMax-yMin)/res,fn=schemes[scheme],prog=document.getElementById('m-prog');
+    let row=0;
+    function step(){const end=Math.min(row+10,res);for(let py=row;py<end;py++)for(let px=0;px<res;px++){const cR=xMin+px*dx,cI=yMax-py*dy;let zr=0,zi=0,it=0;while(it<nMax&&zr*zr+zi*zi<=4){const t=zr*zr-zi*zi+cR;zi=2*zr*zi+cI;zr=t;it++;}const[r,g,b]=fn(it===nMax?1:it/nMax),i=(py*res+px)*4;im.data[i]=r;im.data[i+1]=g;im.data[i+2]=b;im.data[i+3]=255;}
+    row=end;prog.style.width=(row/res*100)+'%';if(row<res)requestAnimationFrame(step);else{ctx.putImageData(im,0,0);prog.style.width='0%';mBusy=false;btn.textContent='Generate Mandelbrot Set';btn.disabled=false;document.getElementById('m-cbar-max').textContent=nMax;drawCbar('m-cbar');}}
+    requestAnimationFrame(step);
+}
+
+// Mandelbrot zoom + click-to-Julia
+const mCv=document.getElementById('mandel-canvas');
+mCv.addEventListener('wheel',e=>{e.preventDefault();const r=mCv.getBoundingClientRect(),mx=(e.clientX-r.left)/r.width,my=(e.clientY-r.top)/r.height;const{xMin,xMax,yMin,yMax}=mView,cx=xMin+mx*(xMax-xMin),cy=yMax-my*(yMax-yMin),f=e.deltaY>0?1.3:.7,w=(xMax-xMin)*f/2,h=(yMax-yMin)*f/2;mView={xMin:cx-w,xMax:cx+w,yMin:cy-h,yMax:cy+h};genMandel();},{passive:false});
+mCv.addEventListener('click',e=>{const r=mCv.getBoundingClientRect(),mx=(e.clientX-r.left)/r.width,my=(e.clientY-r.top)/r.height;const{xMin,xMax,yMin,yMax}=mView,cR=xMin+mx*(xMax-xMin),cI=yMax-my*(yMax-yMin);document.getElementById('c-real-sl').value=cR.toFixed(3);document.getElementById('c-real-in').value=cR.toFixed(3);document.getElementById('c-imag-sl').value=cI.toFixed(3);document.getElementById('c-imag-in').value=cI.toFixed(3);jView={xMin:-1.5,xMax:1.5,yMin:-1.5,yMax:1.5};switchTab('explorer');genJulia();});
+mCv.addEventListener('mousemove',e=>{const r=mCv.getBoundingClientRect(),mx=(e.clientX-r.left)/r.width,my=(e.clientY-r.top)/r.height;const{xMin,xMax,yMin,yMax}=mView,x=xMin+mx*(xMax-xMin),y=yMax-my*(yMax-yMin);document.getElementById('m-hover').textContent=`c = ${x.toFixed(4)} ${y>=0?'+':'−'} ${Math.abs(y).toFixed(4)}i  |  Click for Julia set · Scroll to zoom`;document.getElementById('m-info').textContent=`c = ${x.toFixed(4)} ${y>=0?'+':'−'} ${Math.abs(y).toFixed(4)}i`;});
+
+function dlCanvas(id,name){const c=document.getElementById(id),l=document.createElement('a');l.download=name+'.png';l.href=c.toDataURL('image/png');l.click();}
+
+// Init
+window.addEventListener('DOMContentLoaded',()=>{renderMath();drawCbar('j-cbar');drawCbar('m-cbar');genJulia();genMandel();});
+</script>
+</body>
+</html>
