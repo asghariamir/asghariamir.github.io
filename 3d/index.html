@@ -1,1 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lines &amp; Planes in 3D | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }}
+    </script>
+    <style>
+        :root {
+            --primary: #0f766e; --primary-light: #10b981;
+            --background: #f7faf9; --interactive: #e6fffb;
+            --text-primary: #212121; --text-muted: #4b5563;
+            --accent-amber: #f59e0b; --accent-red: #c62828; --success: #10b981;
+            --point-P: #e65100; --point-Q: #1565c0; --point-R: #2e7d32;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: var(--background); color: var(--text-primary); padding-top: 60px; }
+        .mathswell-nav { position: fixed; top: 0; left: 0; right: 0; background: white; border-bottom: 2px solid var(--primary); padding: 0.75rem 1rem; z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .mw-link { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--primary); font-weight: 600; letter-spacing: 1px; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .tabs { display: flex; gap: 0.5rem; justify-content: center; background: white; padding: 0.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 2rem; flex-wrap: wrap; }
+        .tab-btn { padding: 0.75rem 1.5rem; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 8px; font-weight: 500; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-btn:hover:not(.active) { background: var(--interactive); color: var(--primary); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hero { text-align: center; margin-bottom: 2rem; }
+        .hero h1 { font-size: 1.8rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .hero p { color: var(--text-muted); font-size: 1.05rem; max-width: 700px; margin: 0 auto; line-height: 1.6; }
+        .card-group-title { font-size: 1.15rem; font-weight: 600; color: var(--primary); margin: 2rem 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .cards.full-width { grid-template-columns: 1fr; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-left: 4px solid var(--primary); }
+        .card h3 { color: var(--primary); margin-bottom: 0.5rem; font-size: 1rem; }
+        .card p, .card .math-block { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
+        .card .math-block { background: var(--interactive); padding: 0.6rem 0.8rem; border-radius: 6px; margin-top: 0.5rem; text-align: center; }
+        .card .emoji-icon { font-size: 1.4rem; margin-bottom: 0.5rem; display: block; }
+        .video-section { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin: 2rem 0; text-align: center; }
+        .video-section h3 { color: var(--primary); margin-bottom: 0.75rem; }
+        .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; }
+        .video-card { border: 2px solid var(--interactive); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+        .video-card .instagram-media { margin: 0 auto !important; max-width: 100% !important; min-width: 0 !important; }
+        .video-card.coming-soon { opacity: 0.6; border-style: dashed; }
+        .video-card h4 { color: var(--primary); font-size: 0.95rem; }
+        .video-card p { font-size: 0.85rem; color: var(--text-muted); }
+        .cta-row { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap; }
+        .nav-btn { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-size: 0.95rem; }
+        .nav-btn:hover { background: #0a5c56; transform: translateY(-1px); }
+        .nav-btn.outline { background: white; color: var(--primary); border: 2px solid var(--primary); }
+        .nav-btn.outline:hover { background: var(--interactive); }
+        .explorer-layout { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; }
+        .control-panel { background: white; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); max-height: 620px; overflow-y: auto; }
+        .control-panel h3 { color: var(--primary); font-size: 1rem; margin-bottom: 1rem; }
+        .canvas-wrapper { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); position: relative; min-height: 450px; }
+        .canvas-wrapper canvas { width: 100% !important; height: 100% !important; display: block; }
+        .control-group { margin-bottom: 1.25rem; }
+        .control-group .ctrl-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .control-group .ctrl-label .color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .vector-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; }
+        .vector-inputs input { width: 100%; padding: 0.5rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 16px; text-align: center; transition: border-color 0.2s; }
+        .vector-inputs input:focus { outline: none; border-color: var(--primary); }
+        .vector-inputs.color-P input { border-color: #ffccbc; } .vector-inputs.color-P input:focus { border-color: var(--point-P); }
+        .vector-inputs.color-Q input { border-color: #bbdefb; } .vector-inputs.color-Q input:focus { border-color: var(--point-Q); }
+        .vector-inputs.color-R input { border-color: #c8e6c9; } .vector-inputs.color-R input:focus { border-color: var(--point-R); }
+        .vector-labels { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+        .preset-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+        .preset-pill { padding: 0.35rem 0.8rem; border-radius: 999px; background: white; border: 2px solid var(--primary); color: var(--primary); cursor: pointer; transition: all 0.2s ease; font-size: 0.82rem; font-weight: 500; }
+        .preset-pill:hover { background: var(--interactive); transform: translateY(-1px); }
+        .preset-pill.active { background: var(--primary); color: white; }
+        .mode-selector { display: flex; gap: 0.35rem; margin-bottom: 1rem; }
+        .mode-btn { flex: 1; padding: 0.5rem 0.3rem; border: 2px solid var(--primary); background: white; color: var(--primary); border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600; text-align: center; transition: all 0.2s; }
+        .mode-btn.active { background: var(--primary); color: white; }
+        .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .btn-sm { padding: 0.4rem 0.8rem; border-radius: 6px; border: 2px solid var(--primary); background: white; color: var(--primary); cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: all 0.2s; }
+        .btn-sm:hover { background: var(--interactive); }
+        .btn-sm.filled { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-sm.filled:hover { background: #0a5c56; }
+        .equation-display { background: white; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-top: 1.5rem; }
+        .equation-display h3 { color: var(--primary); font-size: 1rem; margin-bottom: 1rem; }
+        .eq-forms { display: flex; flex-direction: column; gap: 0.75rem; }
+        .eq-card { background: var(--interactive); border: 1px solid var(--primary); border-radius: 8px; padding: 0.85rem; }
+        .eq-card .eq-label { font-size: 0.78rem; font-weight: 600; color: var(--primary); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .eq-card .eq-math { font-size: 1rem; text-align: center; padding: 0.3rem 0; overflow-x: auto; }
+        .canvas-info { position: absolute; bottom: 8px; left: 8px; right: 8px; background: rgba(255,255,255,0.9); border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 0.75rem; color: var(--text-muted); text-align: center; pointer-events: none; }
+        @media (max-width: 768px) {
+            .explorer-layout { grid-template-columns: 1fr; }
+            .canvas-wrapper { min-height: 350px; }
+            .video-grid { grid-template-columns: 1fr; }
+            .tabs { gap: 0.25rem; } .tab-btn { padding: 0.6rem 1rem; font-size: 0.85rem; }
+            .hero h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="intro">📐 Introduction</button>
+            <button class="tab-btn" data-tab="line-explorer">📏 Line Explorer</button>
+            <button class="tab-btn" data-tab="plane-explorer">🔲 Plane Explorer</button>
+        </div>
 
+        <!-- ===== INTRODUCTION ===== -->
+        <div id="intro" class="tab-content active">
+            <div class="hero">
+                <h1>Lines &amp; Planes in 3D</h1>
+                <p>Two fundamental objects in three-dimensional space — a line needs a point and a direction, a plane needs a point and a normal. Everything follows from these two ideas.</p>
+            </div>
+            <div class="card-group-title">📏 The Line: Point + Direction</div>
+            <div class="cards">
+                <div class="card"><span class="emoji-icon">📍</span><h3>The Core Idea</h3><p>Pick any point \(\mathbf{a}\) in space. Choose a direction \(\mathbf{d}\). Every point on the line is reached by starting at \(\mathbf{a}\) and walking some distance along \(\mathbf{d}\).</p><div class="math-block">$$\mathbf{r} = \mathbf{a} + t\,\mathbf{d}$$</div></div>
+                <div class="card"><span class="emoji-icon">💡</span><h3>The Parameter \(t\)</h3><p>When \(t = 0\), you are at \(\mathbf{a}\). When \(t = 1\), you have moved one full copy of \(\mathbf{d}\). Negative \(t\) means walking backwards. The line stretches infinitely in both directions.</p></div>
+            </div>
+            <div class="cards full-width">
+                <div class="card"><span class="emoji-icon">🔄</span><h3>Three Ways to Write the Equation of a Line</h3>
+                    <p><strong>Vector form:</strong> &ensp; \(\mathbf{r} = \mathbf{a} + t\,\mathbf{d}\)</p>
+                    <p style="margin-top:0.4rem"><strong>Parametric form:</strong> &ensp; \(x = a_1 + td_1\), &ensp; \(y = a_2 + td_2\), &ensp; \(z = a_3 + td_3\)</p>
+                    <p style="margin-top:0.4rem"><strong>Cartesian (symmetric) form:</strong> &ensp; \(\dfrac{x - a_1}{d_1} = \dfrac{y - a_2}{d_2} = \dfrac{z - a_3}{d_3}\)</p>
+                </div>
+            </div>
+            <div class="card-group-title">🔲 The Plane: Point + Normal</div>
+            <div class="cards">
+                <div class="card"><span class="emoji-icon">📍</span><h3>The Core Idea</h3><p>Pick a point \(\mathbf{a}\) on the plane. The normal \(\mathbf{n}\) points straight out of the surface. A point \(\mathbf{r}\) lies on the plane exactly when the vector from \(\mathbf{a}\) to \(\mathbf{r}\) is perpendicular to \(\mathbf{n}\).</p><div class="math-block">$$(\mathbf{r} - \mathbf{a}) \cdot \mathbf{n} = 0$$</div></div>
+                <div class="card"><span class="emoji-icon">✖️</span><h3>Finding the Normal from Three Points</h3><p>Given three points \(P, Q, R\), form two vectors in the plane: \(\overrightarrow{PQ}\) and \(\overrightarrow{PR}\). Their cross product gives a vector perpendicular to both — that is the normal.</p><div class="math-block">$$\mathbf{n} = \overrightarrow{PQ} \times \overrightarrow{PR}$$</div></div>
+            </div>
+            <div class="cards full-width">
+                <div class="card"><span class="emoji-icon">🔄</span><h3>Two Ways to Write the Equation of a Plane</h3>
+                    <p><strong>Vector form:</strong> &ensp; \(\mathbf{r} \cdot \mathbf{n} = \mathbf{a} \cdot \mathbf{n}\) &emsp; (equivalently, \(\mathbf{r} \cdot \mathbf{n} = d\) where \(d = \mathbf{a} \cdot \mathbf{n}\))</p>
+                    <p style="margin-top:0.4rem"><strong>Cartesian form:</strong> &ensp; \(n_1 x + n_2 y + n_3 z = d\) &emsp; where \(d = n_1 a_1 + n_2 a_2 + n_3 a_3\)</p>
+                </div>
+            </div>
+            <div class="video-section">
+                <h3>🎬 Watch the Derivations</h3>
+                <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:0.5rem;">Short Instagram reels walking through each equation step by step.</p>
+                <div class="video-grid">
+                    <div class="video-card" style="padding:0;overflow:hidden;">
+                        <h4 style="padding:1rem 1rem 0.5rem;">📏 Equation of a Line</h4>
+                        <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DWUkQkFjL3M/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:0;max-width:540px;min-width:280px;padding:0;width:100%;"><div style="padding:16px;"><a href="https://www.instagram.com/reel/DWUkQkFjL3M/?utm_source=ig_embed&amp;utm_campaign=loading" style="background:#FFFFFF;line-height:0;padding:0 0;text-align:center;text-decoration:none;width:100%;" target="_blank"><div style="display:flex;flex-direction:row;align-items:center;"><div style="background-color:#F4F4F4;border-radius:50%;flex-grow:0;height:40px;margin-right:14px;width:40px;"></div><div style="display:flex;flex-direction:column;flex-grow:1;justify-content:center;"><div style="background-color:#F4F4F4;border-radius:4px;flex-grow:0;height:14px;margin-bottom:6px;width:100px;"></div><div style="background-color:#F4F4F4;border-radius:4px;flex-grow:0;height:14px;width:60px;"></div></div></div><div style="padding:19% 0;"></div><div style="display:block;height:50px;margin:0 auto 12px;width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div><div style="padding-top:8px;"><div style="color:#3897f0;font-family:Arial,sans-serif;font-size:14px;font-style:normal;font-weight:550;line-height:18px;">View this post on Instagram</div></div><div style="padding:12.5% 0;"></div></a><p style="color:#c9c8cd;font-family:Arial,sans-serif;font-size:14px;line-height:17px;margin-bottom:0;margin-top:8px;overflow:hidden;padding:8px 0 7px;text-align:center;text-overflow:ellipsis;white-space:nowrap;"><a href="https://www.instagram.com/reel/DWUkQkFjL3M/?utm_source=ig_embed&amp;utm_campaign=loading" style="color:#c9c8cd;font-family:Arial,sans-serif;font-size:14px;font-style:normal;font-weight:normal;line-height:17px;text-decoration:none;" target="_blank">A post shared by @themathswell</a></p></div></blockquote>
+                    </div>
+                    <div class="video-card coming-soon"><h4>🔲 Equation of a Plane</h4><p>How the dot product condition gives the plane equation.</p><span style="color:var(--text-muted);font-size:0.85rem;font-style:italic;">🎥 Coming soon</span></div>
+                </div>
+            </div>
+            <script async src="//www.instagram.com/embed.js"></script>
+            <div class="cta-row">
+                <button class="nav-btn" onclick="switchTab('line-explorer')">Try Line Explorer →</button>
+                <button class="nav-btn outline" onclick="switchTab('plane-explorer')">Try Plane Explorer →</button>
+            </div>
+        </div>
+
+        <!-- ===== LINE EXPLORER ===== -->
+        <div id="line-explorer" class="tab-content">
+            <div class="preset-pills" id="line-presets"></div>
+            <div class="explorer-layout">
+                <div class="control-panel" id="line-panel">
+                    <h3>Line Parameters</h3>
+                    <div class="control-group">
+                        <div class="ctrl-label"><span class="color-dot" style="background:#f59e0b;"></span> Point <strong>a</strong></div>
+                        <div class="vector-labels"><span>x</span><span>y</span><span>z</span></div>
+                        <div class="vector-inputs"><input type="number" id="la1" value="1" step="0.5"><input type="number" id="la2" value="2" step="0.5"><input type="number" id="la3" value="1" step="0.5"></div>
+                    </div>
+                    <div class="control-group">
+                        <div class="ctrl-label"><span class="color-dot" style="background:#0f766e;"></span> Direction <strong>d</strong></div>
+                        <div class="vector-labels"><span>x</span><span>y</span><span>z</span></div>
+                        <div class="vector-inputs"><input type="number" id="ld1" value="2" step="0.5"><input type="number" id="ld2" value="1" step="0.5"><input type="number" id="ld3" value="-1" step="0.5"></div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn-sm filled" onclick="updateLine()">Update</button>
+                        <button class="btn-sm" onclick="resetLineCamera()">Reset View</button>
+                    </div>
+                </div>
+                <div class="canvas-wrapper"><canvas id="line-canvas"></canvas><div class="canvas-info">Click &amp; drag to rotate · Scroll to zoom</div></div>
+            </div>
+            <div class="equation-display"><h3>Equation Forms</h3><div class="eq-forms" id="line-eq-forms"></div></div>
+        </div>
+
+        <!-- ===== PLANE EXPLORER ===== -->
+        <div id="plane-explorer" class="tab-content">
+            <div class="preset-pills" id="plane-presets"></div>
+            <div class="explorer-layout">
+                <div class="control-panel" id="plane-controls">
+                    <h3>Plane Parameters</h3>
+                    <div class="mode-selector">
+                        <button class="mode-btn active" data-mode="point-normal" onclick="setPlaneMode('point-normal')">Point + Normal</button>
+                        <button class="mode-btn" data-mode="three-points" onclick="setPlaneMode('three-points')">Three Points</button>
+                    </div>
+                    <div id="mode-point-normal">
+                        <div class="control-group">
+                            <div class="ctrl-label"><span class="color-dot" style="background:#f59e0b;"></span> Point <strong>a</strong></div>
+                            <div class="vector-labels"><span>x</span><span>y</span><span>z</span></div>
+                            <div class="vector-inputs"><input type="number" id="pa1" value="1" step="0.5"><input type="number" id="pa2" value="0" step="0.5"><input type="number" id="pa3" value="0" step="0.5"></div>
+                        </div>
+                        <div class="control-group">
+                            <div class="ctrl-label"><span class="color-dot" style="background:#c62828;"></span> Normal <strong>n</strong></div>
+                            <div class="vector-labels"><span>x</span><span>y</span><span>z</span></div>
+                            <div class="vector-inputs"><input type="number" id="pn1" value="2" step="0.5"><input type="number" id="pn2" value="3" step="0.5"><input type="number" id="pn3" value="1" step="0.5"></div>
+                        </div>
+                    </div>
+                    <div id="mode-three-points" style="display:none;">
+                        <div class="control-group">
+                            <div class="ctrl-label"><span class="color-dot" style="background:var(--point-P);"></span> Point <strong>P</strong></div>
+                            <div class="vector-labels"><span>x</span><span>y</span><span>z</span></div>
+                            <div class="vector-inputs color-P"><input type="number" id="pp1" value="1" step="0.5"><input type="number" id="pp2" value="0" step="0.5"><input type="number" id="pp3" value="0" step="0.5"></div>
+                        </div>
+                        <div class="control-group">
+                            <div class="ctrl-label"><span class="color-dot" style="background:var(--point-Q);"></span> Point <strong>Q</strong></div>
+                            <div class="vector-labels"><span>x</span><span>y</span><span>z</span></div>
+                            <div class="vector-inputs color-Q"><input type="number" id="pq1" value="0" step="0.5"><input type="number" id="pq2" value="1" step="0.5"><input type="number" id="pq3" value="0" step="0.5"></div>
+                        </div>
+                        <div class="control-group">
+                            <div class="ctrl-label"><span class="color-dot" style="background:var(--point-R);"></span> Point <strong>R</strong></div>
+                            <div class="vector-labels"><span>x</span><span>y</span><span>z</span></div>
+                            <div class="vector-inputs color-R"><input type="number" id="pr1" value="0" step="0.5"><input type="number" id="pr2" value="0" step="0.5"><input type="number" id="pr3" value="1" step="0.5"></div>
+                        </div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn-sm filled" onclick="updatePlane()">Update</button>
+                        <button class="btn-sm" onclick="resetPlaneCamera()">Reset View</button>
+                    </div>
+                </div>
+                <div class="canvas-wrapper"><canvas id="plane-canvas"></canvas><div class="canvas-info">Click &amp; drag to rotate · Scroll to zoom</div></div>
+            </div>
+            <div id="cross-product-display" class="eq-card" style="margin-top:1rem; display:none;"><div class="eq-label">Computed Normal</div><div class="eq-math" id="computed-normal"></div></div>
+            <div class="equation-display"><h3>Equation Forms</h3><div class="eq-forms" id="plane-eq-forms"></div></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        function fmtNum(v) {
+            if (Number.isInteger(v)) return String(v);
+            const r = Math.round(v * 1000) / 1000;
+            return Number.isInteger(r) ? String(r) : r.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+        }
+        function signedTerm(val, varName, first = false) {
+            const v = fmtNum(val);
+            if (first) return val === 1 ? varName : val === -1 ? `-${varName}` : `${v}${varName}`;
+            if (val > 0) return val === 1 ? `+ ${varName}` : `+ ${v}${varName}`;
+            if (val < 0) return val === -1 ? `- ${varName}` : `- ${fmtNum(-val)}${varName}`;
+            return '';
+        }
+
+        function createScene(canvas, opts = {}) {
+            const { showAxes = true, showGrid = true } = opts;
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setClearColor(0xf7faf9);
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 200);
+            camera.position.set(6, 5, 8);
+            const controls = new OrbitControls(camera, canvas);
+            controls.enableDamping = true; controls.dampingFactor = 0.08;
+            controls.minDistance = 3; controls.maxDistance = 40;
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(5, 10, 7); scene.add(dl);
+
+            if (showGrid) scene.add(new THREE.GridHelper(12, 12, 0xcccccc, 0xe5e7eb));
+            if (showAxes) {
+                const axLen = 6;
+                [{d:[1,0,0],c:0xc62828},{d:[0,1,0],c:0x2e7d32},{d:[0,0,1],c:0x1565c0}].forEach(ax => {
+                    const dir = new THREE.Vector3(...ax.d);
+                    scene.add(new THREE.ArrowHelper(dir, new THREE.Vector3(0,0,0), axLen, ax.c, 0.2, 0.12));
+                    const pts = [new THREE.Vector3(0,0,0), dir.clone().multiplyScalar(-axLen*0.5)];
+                    const g = new THREE.BufferGeometry().setFromPoints(pts);
+                    const m = new THREE.LineDashedMaterial({color:ax.c, dashSize:0.15, gapSize:0.1, opacity:0.4, transparent:true});
+                    const ln = new THREE.Line(g, m); ln.computeLineDistances(); scene.add(ln);
+                });
+                scene.add(new THREE.Mesh(new THREE.SphereGeometry(0.08,16,16), new THREE.MeshBasicMaterial({color:0x212121})));
+            }
+
+            function resize() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                const w = rect.width, h = Math.max(rect.height, 400);
+                renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+            }
+            window.addEventListener('resize', resize); resize();
+            const dynamicGroup = new THREE.Group(); scene.add(dynamicGroup);
+            (function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); })();
+            return { scene, camera, controls, renderer, dynamicGroup, resize };
+        }
+
+        function makeArrow(from, dir, color, len) {
+            return new THREE.ArrowHelper(dir.clone().normalize(), from, len || dir.length(), color, 0.25, 0.15);
+        }
+        function makePoint(pos, color, r=0.15) {
+            const m = new THREE.Mesh(new THREE.SphereGeometry(r,16,16), new THREE.MeshStandardMaterial({color}));
+            m.position.copy(pos); return m;
+        }
+
+        // ===== LINE EXPLORER =====
+        let lineScene;
+        const linePresets = [
+            {name:'Simple', a:[1,2,1], d:[2,1,-1]},
+            {name:'Along x-axis', a:[0,0,0], d:[1,0,0]},
+            {name:'Diagonal', a:[0,0,0], d:[1,1,1]},
+            {name:'Through (1,0,3)', a:[1,0,3], d:[-1,2,1]},
+        ];
+
+        function initLineExplorer() {
+            lineScene = createScene(document.getElementById('line-canvas'), {showAxes:true, showGrid:true});
+            const c = document.getElementById('line-presets');
+            linePresets.forEach((p,i) => {
+                const b = document.createElement('button'); b.className = 'preset-pill'+(i===0?' active':''); b.textContent = p.name;
+                b.onclick = () => {
+                    c.querySelectorAll('.preset-pill').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+                    ['la1','la2','la3'].forEach((id,j)=>document.getElementById(id).value=p.a[j]);
+                    ['ld1','ld2','ld3'].forEach((id,j)=>document.getElementById(id).value=p.d[j]);
+                    updateLine();
+                };
+                c.appendChild(b);
+            });
+            updateLine();
+        }
+
+        window.updateLine = function() {
+            const a = [+document.getElementById('la1').value,+document.getElementById('la2').value,+document.getElementById('la3').value];
+            const d = [+document.getElementById('ld1').value,+document.getElementById('ld2').value,+document.getElementById('ld3').value];
+            const g = lineScene.dynamicGroup;
+            while(g.children.length) g.remove(g.children[0]);
+            const aV = new THREE.Vector3(...a), dV = new THREE.Vector3(...d);
+            if(dV.length()<0.001) return;
+
+            const tR = 8;
+            const p1 = aV.clone().add(dV.clone().multiplyScalar(-tR/dV.length()));
+            const p2 = aV.clone().add(dV.clone().multiplyScalar(tR/dV.length()));
+            g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([p1,p2]), new THREE.LineBasicMaterial({color:0x0f766e})));
+            g.add(makePoint(aV, 0xf59e0b));
+            g.add(makeArrow(aV, dV, 0x0f766e, dV.length()));
+            if(aV.length()>0.01) g.add(makeArrow(new THREE.Vector3(0,0,0), aV, 0xf59e0b, aV.length()));
+
+            // Equations
+            const forms = document.getElementById('line-eq-forms');
+            const vecStr = `\\mathbf{r} = \\begin{pmatrix}${a[0]}\\\\${a[1]}\\\\${a[2]}\\end{pmatrix} + t\\begin{pmatrix}${d[0]}\\\\${d[1]}\\\\${d[2]}\\end{pmatrix}`;
+            const paramStr = `x = ${fmtNum(a[0])} ${d[0]>=0?'+':'-'} ${fmtNum(Math.abs(d[0]))}t,\\quad y = ${fmtNum(a[1])} ${d[1]>=0?'+':'-'} ${fmtNum(Math.abs(d[1]))}t,\\quad z = ${fmtNum(a[2])} ${d[2]>=0?'+':'-'} ${fmtNum(Math.abs(d[2]))}t`;
+            let cp = []; ['x','y','z'].forEach((v,i)=>{ if(Math.abs(d[i])>0.0001) cp.push(`\\frac{${v} - ${fmtNum(a[i])}}{${fmtNum(d[i])}}`); });
+            const cartStr = cp.length>=2 ? cp.join(' = ') : '\\text{(direction has zero components — use parametric form)}';
+            forms.innerHTML = `<div class="eq-card"><div class="eq-label">Vector Form</div><div class="eq-math" id="eq-lv"></div></div><div class="eq-card"><div class="eq-label">Parametric Form</div><div class="eq-math" id="eq-lp"></div></div><div class="eq-card"><div class="eq-label">Cartesian (Symmetric) Form</div><div class="eq-math" id="eq-lc"></div></div>`;
+            katex.render(vecStr, document.getElementById('eq-lv'), {displayMode:true, throwOnError:false});
+            katex.render(paramStr, document.getElementById('eq-lp'), {displayMode:true, throwOnError:false});
+            katex.render(cartStr, document.getElementById('eq-lc'), {displayMode:true, throwOnError:false});
+        };
+        window.resetLineCamera = function() { lineScene.camera.position.set(6,5,8); lineScene.controls.target.set(0,0,0); lineScene.controls.update(); };
+
+        // ===== PLANE EXPLORER =====
+        let planeScene, planeMode = 'point-normal';
+        const planePresets = [
+            {name:'x + y + z = 1', mode:'three-points', P:[1,0,0], Q:[0,1,0], R:[0,0,1]},
+            {name:'Horizontal (z = 2)', mode:'point-normal', a:[0,0,2], n:[0,0,1]},
+            {name:'2x + 3y + z = 2', mode:'point-normal', a:[1,0,0], n:[2,3,1]},
+        ];
+
+        function initPlaneExplorer() {
+            planeScene = createScene(document.getElementById('plane-canvas'), {showAxes:false, showGrid:true});
+            const c = document.getElementById('plane-presets');
+            planePresets.forEach((p,i) => {
+                const b = document.createElement('button'); b.className='preset-pill'+(i===0?' active':''); b.textContent=p.name;
+                b.onclick = () => {
+                    c.querySelectorAll('.preset-pill').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+                    setPlaneMode(p.mode);
+                    if(p.mode==='point-normal') {
+                        ['pa1','pa2','pa3'].forEach((id,j)=>document.getElementById(id).value=p.a[j]);
+                        ['pn1','pn2','pn3'].forEach((id,j)=>document.getElementById(id).value=p.n[j]);
+                    } else {
+                        ['pp1','pp2','pp3'].forEach((id,j)=>document.getElementById(id).value=p.P[j]);
+                        ['pq1','pq2','pq3'].forEach((id,j)=>document.getElementById(id).value=p.Q[j]);
+                        ['pr1','pr2','pr3'].forEach((id,j)=>document.getElementById(id).value=p.R[j]);
+                    }
+                    updatePlane();
+                };
+                c.appendChild(b);
+            });
+            c.querySelector('.preset-pill').click();
+        }
+
+        window.setPlaneMode = function(mode) {
+            planeMode = mode;
+            document.getElementById('mode-point-normal').style.display = mode==='point-normal'?'block':'none';
+            document.getElementById('mode-three-points').style.display = mode==='three-points'?'block':'none';
+            document.getElementById('cross-product-display').style.display = mode==='three-points'?'block':'none';
+            document.querySelectorAll('#plane-controls .mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+        };
+
+        function cross(u,v) { return [u[1]*v[2]-u[2]*v[1], u[2]*v[0]-u[0]*v[2], u[0]*v[1]-u[1]*v[0]]; }
+
+        window.updatePlane = function() {
+            let point, normal;
+            if(planeMode==='point-normal') {
+                point = [+document.getElementById('pa1').value,+document.getElementById('pa2').value,+document.getElementById('pa3').value];
+                normal = [+document.getElementById('pn1').value,+document.getElementById('pn2').value,+document.getElementById('pn3').value];
+            } else {
+                const P=[+document.getElementById('pp1').value,+document.getElementById('pp2').value,+document.getElementById('pp3').value];
+                const Q=[+document.getElementById('pq1').value,+document.getElementById('pq2').value,+document.getElementById('pq3').value];
+                const R=[+document.getElementById('pr1').value,+document.getElementById('pr2').value,+document.getElementById('pr3').value];
+                const PQ=[Q[0]-P[0],Q[1]-P[1],Q[2]-P[2]], PR=[R[0]-P[0],R[1]-P[1],R[2]-P[2]];
+                normal = cross(PQ,PR); point = P;
+                const nStr = `\\overrightarrow{PQ} \\times \\overrightarrow{PR} = \\begin{pmatrix}${fmtNum(PQ[0])}\\\\${fmtNum(PQ[1])}\\\\${fmtNum(PQ[2])}\\end{pmatrix} \\times \\begin{pmatrix}${fmtNum(PR[0])}\\\\${fmtNum(PR[1])}\\\\${fmtNum(PR[2])}\\end{pmatrix} = \\begin{pmatrix}${fmtNum(normal[0])}\\\\${fmtNum(normal[1])}\\\\${fmtNum(normal[2])}\\end{pmatrix}`;
+                katex.render(nStr, document.getElementById('computed-normal'), {displayMode:true, throwOnError:false});
+            }
+            const nLen = Math.sqrt(normal[0]**2+normal[1]**2+normal[2]**2);
+            if(nLen<0.001) return;
+            const g = planeScene.dynamicGroup;
+            while(g.children.length) g.remove(g.children[0]);
+
+            const aV = new THREE.Vector3(...point);
+            const nV = new THREE.Vector3(...normal);
+            const nUnit = nV.clone().normalize();
+
+            if(planeMode==='three-points') {
+                const Q=[+document.getElementById('pq1').value,+document.getElementById('pq2').value,+document.getElementById('pq3').value];
+                const R=[+document.getElementById('pr1').value,+document.getElementById('pr2').value,+document.getElementById('pr3').value];
+                const pV=aV, qV=new THREE.Vector3(...Q), rV=new THREE.Vector3(...R);
+
+                // 1. Light extended plane (using PlaneGeometry oriented by normal)
+                const plSz = 6;
+                const plGeom = new THREE.PlaneGeometry(plSz*2, plSz*2);
+                const plMat = new THREE.MeshStandardMaterial({color:0x0f766e, transparent:true, opacity:0.1, side:THREE.DoubleSide, depthWrite:false});
+                const plMesh = new THREE.Mesh(plGeom, plMat);
+                const centroid = new THREE.Vector3().addVectors(pV,qV).add(rV).divideScalar(3);
+                plMesh.position.copy(centroid);
+                plMesh.quaternion.copy(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1), nUnit));
+                g.add(plMesh);
+
+                // 2. Dark filled triangle
+                const darkTriGeom = new THREE.BufferGeometry();
+                darkTriGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
+                    ...pV.toArray(), ...qV.toArray(), ...rV.toArray()
+                ]),3));
+                darkTriGeom.computeVertexNormals();
+                g.add(new THREE.Mesh(darkTriGeom, new THREE.MeshStandardMaterial({color:0x0f766e, transparent:true, opacity:0.4, side:THREE.DoubleSide, depthWrite:false})));
+
+                // 3. Triangle edges
+                [[pV,qV],[qV,rV],[rV,pV]].forEach(([a,b])=>{
+                    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([a,b]), new THREE.LineBasicMaterial({color:0x0f766e})));
+                });
+
+                // 4. Color-coded points (matching input box colors)
+                g.add(makePoint(pV, 0xe65100, 0.18)); // P orange
+                g.add(makePoint(qV, 0x1565c0, 0.18)); // Q blue
+                g.add(makePoint(rV, 0x2e7d32, 0.18)); // R green
+
+                // 5. Normal arrow from centroid
+                g.add(makeArrow(centroid, nUnit, 0xc62828, 2));
+
+            } else {
+                // Point + Normal: clean — just plane, point, normal
+                const sz = 7;
+                const plGeom = new THREE.PlaneGeometry(sz*2, sz*2);
+                const plMat = new THREE.MeshStandardMaterial({color:0x0f766e, transparent:true, opacity:0.15, side:THREE.DoubleSide, depthWrite:false});
+                const plMesh = new THREE.Mesh(plGeom, plMat);
+                plMesh.position.copy(aV);
+                plMesh.quaternion.copy(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1), nUnit));
+                g.add(plMesh);
+
+                // Subtle wireframe
+                const wGeom = new THREE.PlaneGeometry(sz*2,sz*2,8,8);
+                const wMesh = new THREE.Mesh(wGeom, new THREE.MeshBasicMaterial({color:0x0f766e,wireframe:true,transparent:true,opacity:0.06}));
+                wMesh.position.copy(aV); wMesh.quaternion.copy(plMesh.quaternion);
+                g.add(wMesh);
+
+                g.add(makePoint(aV, 0xf59e0b, 0.17));
+                g.add(makeArrow(aV, nUnit, 0xc62828, 2.5));
+            }
+
+            // Equations
+            const d = normal[0]*point[0]+normal[1]*point[1]+normal[2]*point[2];
+            const forms = document.getElementById('plane-eq-forms');
+            const dotStr = `(\\mathbf{r} - \\mathbf{a}) \\cdot \\mathbf{n} = 0 \\quad\\Longrightarrow\\quad \\left(\\begin{pmatrix}x\\\\y\\\\z\\end{pmatrix} - \\begin{pmatrix}${fmtNum(point[0])}\\\\${fmtNum(point[1])}\\\\${fmtNum(point[2])}\\end{pmatrix}\\right) \\cdot \\begin{pmatrix}${fmtNum(normal[0])}\\\\${fmtNum(normal[1])}\\\\${fmtNum(normal[2])}\\end{pmatrix} = 0`;
+            const vecStr = `\\mathbf{r} \\cdot \\begin{pmatrix}${fmtNum(normal[0])}\\\\${fmtNum(normal[1])}\\\\${fmtNum(normal[2])}\\end{pmatrix} = ${fmtNum(d)}`;
+            let terms=[]; ['x','y','z'].forEach((v,i)=>{ if(Math.abs(normal[i])>0.0001) terms.push(signedTerm(normal[i],v,terms.length===0)); });
+            const cartStr = terms.join(' ')+` = ${fmtNum(d)}`;
+            forms.innerHTML = `<div class="eq-card"><div class="eq-label">Dot Product Form</div><div class="eq-math" id="eq-pd"></div></div><div class="eq-card"><div class="eq-label">Vector Form</div><div class="eq-math" id="eq-pv"></div></div><div class="eq-card"><div class="eq-label">Cartesian Form</div><div class="eq-math" id="eq-pc"></div></div>`;
+            katex.render(dotStr, document.getElementById('eq-pd'), {displayMode:true, throwOnError:false});
+            katex.render(vecStr, document.getElementById('eq-pv'), {displayMode:true, throwOnError:false});
+            katex.render(cartStr, document.getElementById('eq-pc'), {displayMode:true, throwOnError:false});
+        };
+        window.resetPlaneCamera = function() { planeScene.camera.position.set(6,5,8); planeScene.controls.target.set(0,0,0); planeScene.controls.update(); };
+
+        // ===== TAB SWITCHING =====
+        let lineInited=false, planeInited=false;
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));
+            document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id===tabId));
+            if(tabId==='line-explorer'&&!lineInited){lineInited=true;initLineExplorer();}
+            if(tabId==='plane-explorer'&&!planeInited){planeInited=true;initPlaneExplorer();}
+            setTimeout(()=>{if(lineScene)lineScene.resize();if(planeScene)planeScene.resize();},50);
+        };
+        document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
+
+        renderMathInElement(document.getElementById('intro'), {
+            delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}], throwOnError:false
+        });
+
+        ['la1','la2','la3','ld1','ld2','ld3'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{if(lineInited)updateLine();}));
+        ['pa1','pa2','pa3','pn1','pn2','pn3','pp1','pp2','pp3','pq1','pq2','pq3','pr1','pr2','pr3'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{if(planeInited)updatePlane();}));
+    </script>
+</body>
+</html>
