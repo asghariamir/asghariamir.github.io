@@ -1,1 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Dust Board"/>
+<meta name="theme-color" content="#1a0e05"/>
+<title>Dust Board</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#1a0e05;overflow:hidden;
+  -webkit-user-select:none;user-select:none;touch-action:none}
 
+#cv{position:fixed;inset:0;width:100vw;height:100vh;display:block;
+  touch-action:none;cursor:crosshair}
+#cv.erase{cursor:cell}
+
+/* ── toolbar ─────────────────────────────────────────── */
+#tb{
+  position:fixed;bottom:max(16px,env(safe-area-inset-bottom,16px));
+  left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:8px;
+  background:rgba(10,5,1,0.88);
+  border:1px solid rgba(107,58,15,0.6);
+  border-radius:50px;padding:8px 16px;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 4px 30px rgba(0,0,0,0.7);
+  z-index:50;transition:opacity .3s,transform .3s;
+}
+#tb.hide{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(20px)}
+.sp{width:1px;height:22px;background:rgba(107,58,15,.45);flex-shrink:0}
+button{cursor:pointer;border:none;background:transparent;
+  font-family:inherit;-webkit-tap-highlight-color:transparent;
+  transition:all .18s;outline:none}
+.tb{width:34px;height:34px;border-radius:50%;
+  border:1.5px solid rgba(80,48,12,.55)!important;
+  color:#7A5820;font-size:16px;
+  display:flex;align-items:center;justify-content:center}
+.tb.on{background:#7A4A10;border-color:#D4A017!important;color:#FFD966}
+.sb{width:30px;height:30px;border-radius:50%;
+  border:1.5px solid transparent!important;
+  display:flex;align-items:center;justify-content:center}
+.sb.on{background:rgba(100,54,12,.55);border-color:#D4A017!important}
+.dot{border-radius:50%;background:#B08040;flex-shrink:0;pointer-events:none}
+
+/* record button */
+#rb{display:flex;align-items:center;gap:6px;
+  background:rgba(36,0,0,.65);
+  border:1.5px solid rgba(110,0,0,.7)!important;
+  border-radius:22px;color:#FF7070;
+  font-size:clamp(9px,1.3vw,12px);
+  padding:6px 13px;letter-spacing:.05em;white-space:nowrap}
+#rb .rd{width:8px;height:8px;border-radius:50%;background:#FF3030;flex-shrink:0}
+#rb.stop{background:rgba(80,0,0,.75);border-color:#FF3030!important;color:#FFD0D0}
+#rb.stop .rd{border-radius:2px;background:#FFD0D0}
+
+#lb{border:1.5px solid rgba(80,48,12,.5)!important;
+  border-radius:18px;padding:6px 9px;
+  color:#C4A060;font-size:11px;display:none;white-space:nowrap}
+#lb.vis{display:block}
+
+/* clear btn */
+#clr{border:1.5px solid rgba(80,48,12,.5)!important;
+  border-radius:18px;padding:6px 11px;
+  color:#8A6020;font-size:clamp(9px,1.3vw,12px);
+  letter-spacing:.06em;white-space:nowrap}
+
+/* toggle pill */
+#tog{position:fixed;bottom:max(3px,env(safe-area-inset-bottom,3px));
+  left:50%;transform:translateX(-50%);
+  width:40px;height:5px;border-radius:3px;
+  background:rgba(107,58,15,.35);z-index:49;cursor:pointer}
+
+/* rec badge */
+#ri{position:fixed;top:max(12px,env(safe-area-inset-top,12px));right:14px;
+  display:none;align-items:center;gap:5px;
+  background:rgba(60,0,0,.85);border-radius:18px;padding:4px 11px;
+  backdrop-filter:blur(8px);z-index:50}
+#ri.vis{display:flex}
+#rd{width:8px;height:8px;border-radius:50%;background:#FF3030;animation:bl 1s infinite}
+#rt{color:#FFB0B0;font-family:monospace;font-size:12px}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.1}}
+
+/* panel */
+#pn{position:fixed;bottom:76px;right:14px;z-index:100;
+  background:rgba(10,5,1,.97);border:1px solid #6B3A0F;
+  border-radius:12px;padding:13px 16px;min-width:230px;max-width:300px;
+  box-shadow:0 8px 40px rgba(0,0,0,.85);display:none;
+  font-family:Georgia,serif}
+#pn.vis{display:block}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ph b{color:#D4A017;font-size:11px;letter-spacing:.12em}
+#pc{color:#6B3A0F;font-size:15px;cursor:pointer;background:none;border:none}
+.ri{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  border-top:1px solid #180E02;padding-top:8px;margin-top:8px}
+.ri:first-child{border-top:none;padding-top:0;margin-top:0}
+.rn{color:#C4A060;font-size:10px;margin-bottom:1px}
+.rd2{color:#5A3A10;font-size:9px}
+a.sv{background:#160A01;border:1px solid #6B3A0F;border-radius:7px;
+  padding:5px 10px;color:#D4A017;font-size:10px;text-decoration:none;
+  white-space:nowrap;font-family:Georgia,serif;display:inline-block}
+
+/* overlay */
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
+  display:none;align-items:center;justify-content:center}
+#ov.vis{display:flex}
+#ob{background:rgba(10,5,1,.98);border:1px solid #6B3A0F;
+  border-radius:14px;padding:22px 26px;max-width:300px;text-align:center;
+  box-shadow:0 8px 40px rgba(0,0,0,.9);font-family:Georgia,serif}
+#ob h3{color:#D4A017;margin-bottom:10px;font-size:14px;letter-spacing:.1em}
+#ob p{color:#A07040;font-size:12px;line-height:1.7;margin-bottom:14px}
+#ob button{background:#2A1202;border:1px solid #8B5E1A;border-radius:18px;
+  color:#D4A017;padding:7px 18px;font-size:12px;cursor:pointer;
+  font-family:Georgia,serif}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="ri"><div id="rd"></div><span id="rt">00:00</span></div>
+
+<div id="tb">
+  <button class="tb on" id="wb" title="Write">✒</button>
+  <button class="tb"    id="eb" title="Erase">◌</button>
+  <div class="sp"></div>
+  <button class="sb on" data-s="0"><div class="dot" style="width:5px;height:5px"></div></button>
+  <button class="sb"    data-s="1"><div class="dot" style="width:10px;height:10px"></div></button>
+  <button class="sb"    data-s="2"><div class="dot" style="width:16px;height:16px"></div></button>
+  <button class="sb"    data-s="3"><div class="dot" style="width:23px;height:23px"></div></button>
+  <div class="sp"></div>
+  <button id="clr">Clear</button>
+  <div class="sp"></div>
+  <button id="rb"><div class="rd"></div><span id="rl">Record</span></button>
+  <button id="lb">📼 <span id="lc">0</span></button>
+</div>
+<div id="tog"></div>
+
+<div id="pn">
+  <div class="ph"><b>RECORDINGS</b><button id="pc">✕</button></div>
+  <div id="rl2"></div>
+</div>
+
+<div id="ov">
+  <div id="ob">
+    <h3 id="ot">Microphone</h3>
+    <p id="op">Allow microphone access so your voice is captured alongside the calculations.</p>
+    <button id="ook">OK</button>
+  </div>
+</div>
+
+<script>
+// ── canvas setup ───────────────────────────────────────────
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+function sand() {
+  const W = cv.width, H = cv.height;
+  const g = ctx.createRadialGradient(W*.5, H*.45, 20, W*.5, H*.5, Math.max(W,H)*.78);
+  g.addColorStop(0, '#D6B885');
+  g.addColorStop(.5, '#C8A86A');
+  g.addColorStop(1, '#B5945A');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  
+  const im = ctx.getImageData(0, 0, W, H), d = im.data;
+  for(let i=0; i<d.length; i+=4) {
+    const n = (Math.random() - .5) * 30;
+    d[i]   = Math.min(255, Math.max(0, d[i] + n));
+    d[i+1] = Math.min(255, Math.max(0, d[i+1] + n*.9));
+    d[i+2] = Math.min(255, Math.max(0, d[i+2] + n*.6));
+  }
+  ctx.putImageData(im, 0, 0);
+  
+  const v = ctx.createRadialGradient(W*.5, H*.5, H*.22, W*.5, H*.5, Math.max(W,H)*.78);
+  v.addColorStop(0, 'rgba(0,0,0,0)');
+  v.addColorStop(1, 'rgba(45,18,0,.32)');
+  ctx.fillStyle = v;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function rsz() {
+  const tmp = document.createElement('canvas');
+  tmp.width = cv.width; 
+  tmp.height = cv.height;
+  tmp.getContext('2d').drawImage(cv, 0, 0);
+  cv.width = window.innerWidth; 
+  cv.height = window.innerHeight;
+  sand(); 
+  ctx.drawImage(tmp, 0, 0, cv.width, cv.height);
+}
+
+cv.width = window.innerWidth; 
+cv.height = window.innerHeight;
+sand();
+window.addEventListener('resize', rsz);
+
+// ── drawing logic ──────────────────────────────────────────
+const SZ = [3, 6, 10, 16];
+let tool = 'write', si = 0, dn = false, lx = 0, ly = 0;
+
+function gp(e) {
+  const rect = cv.getBoundingClientRect();
+  const scaleX = cv.width / rect.width;
+  const scaleY = cv.height / rect.height;
+  return {
+    x: (e.clientX - rect.left) * scaleX,
+    y: (e.clientY - rect.top) * scaleY
+  };
+}
+
+function mk(fx, fy, tx, ty) {
+  const er = tool === 'erase', sz = SZ[si];
+  const dist = Math.hypot(tx - fx, ty - fy), steps = Math.max(1, ~~(dist / 2));
+  
+  if (er) {
+    ctx.globalCompositeOperation = 'source-over';
+    for (let s = 0; s <= steps; s++) {
+      const t = s / steps, x = fx + (tx - fx) * t, y = fy + (ty - fy) * t, es = sz * 4.5;
+      for (let p = 0; p < 28; p++) {
+        const a = Math.random() * Math.PI * 2, r = Math.random() * es, n = (Math.random() - .5) * 32;
+        ctx.fillStyle = `rgba(${~~(194 + n)},${~~(166 + n * .9)},${~~(98 + n * .6)},.45)`;
+        ctx.beginPath(); ctx.arc(x + Math.cos(a) * r, y + Math.sin(a) * r, Math.random() * 2 + .4, 0, Math.PI * 2); ctx.fill();
+      }
+      const gr = ctx.createRadialGradient(x, y, 0, x, y, es);
+      gr.addColorStop(0, 'rgba(208,178,118,.65)'); 
+      gr.addColorStop(.6, 'rgba(198,166,104,.32)'); 
+      gr.addColorStop(1, 'rgba(182,150,88,0)');
+      ctx.fillStyle = gr; 
+      ctx.beginPath(); 
+      ctx.arc(x, y, es, 0, Math.PI * 2); 
+      ctx.fill();
+    }
+    return;
+  }
+  
+  for (let s = 0; s <= steps; s++) {
+    const t = s / steps, x = fx + (tx - fx) * t, y = fy + (ty - fy) * t;
+    
+    // Ridge
+    ctx.globalCompositeOperation = 'source-over';
+    const ridgeSize = sz * 1.6;
+    const ridgeGr = ctx.createRadialGradient(x, y, sz * 0.4, x, y, ridgeSize);
+    ridgeGr.addColorStop(0, 'rgba(240,210,150,0)');
+    ridgeGr.addColorStop(0.5, 'rgba(245,215,155,0.15)');
+    ridgeGr.addColorStop(1, 'rgba(240,210,150,0)');
+    ctx.fillStyle = ridgeGr;
+    ctx.beginPath(); ctx.arc(x, y, ridgeSize, 0, Math.PI * 2); ctx.fill();
+
+    // Trench
+    ctx.globalCompositeOperation = 'multiply';
+    const trenchGr = ctx.createRadialGradient(x, y, 0, x, y, sz);
+    trenchGr.addColorStop(0, 'rgba(50,25,10,0.85)');
+    trenchGr.addColorStop(0.5, 'rgba(75,40,15,0.5)');
+    trenchGr.addColorStop(1, 'rgba(100,60,20,0)');
+    ctx.fillStyle = trenchGr;
+    ctx.beginPath(); ctx.arc(x, y, sz, 0, Math.PI * 2); ctx.fill();
+    
+    // Granules
+    ctx.globalCompositeOperation = 'source-over';
+    for (let p = 0; p < 5; p++) {
+      const a = Math.random() * Math.PI * 2;
+      const d2 = sz + Math.random() * (sz * 0.9);
+      ctx.fillStyle = `rgba(245,215,150,${0.2 + Math.random() * 0.4})`;
+      ctx.beginPath(); ctx.arc(x + Math.cos(a) * d2, y + Math.sin(a) * d2, Math.random() * 1.2 + 0.3, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+}
+
+cv.addEventListener('pointerdown', e => {
+  if (e.pointerType === 'touch') return; 
+  e.preventDefault();
+  cv.setPointerCapture(e.pointerId);
+  dn = true;
+  const p = gp(e); 
+  lx = p.x; 
+  ly = p.y;
+  mk(lx, ly, lx, ly);
+});
+
+cv.addEventListener('pointermove', e => {
+  if (e.pointerType === 'touch' || !dn) return;
+  e.preventDefault();
+  const p = gp(e);
+  mk(lx, ly, p.x, p.y);
+  lx = p.x; 
+  ly = p.y;
+});
+
+cv.addEventListener('pointerup', e => {
+  if (e.pointerType === 'touch') return;
+  dn = false;
+});
+
+cv.addEventListener('pointercancel', e => {
+  if (e.pointerType === 'touch') return;
+  dn = false;
+});
+
+// ── toolbar interactions ────────────────────────────────────
+const wb = document.getElementById('wb'), eb = document.getElementById('eb');
+wb.onclick = () => { tool = 'write'; wb.classList.add('on'); eb.classList.remove('on'); cv.classList.remove('erase'); };
+eb.onclick = () => { tool = 'erase'; eb.classList.add('on'); wb.classList.remove('on'); cv.classList.add('erase'); };
+
+document.querySelectorAll('.sb').forEach(b => b.addEventListener('click', () => {
+  si = +b.dataset.s;
+  document.querySelectorAll('.sb').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+}));
+
+document.getElementById('clr').onclick = () => {
+  cv.style.transition = 'opacity .3s'; 
+  cv.style.opacity = '0';
+  setTimeout(() => { sand(); cv.style.opacity = '1'; setTimeout(() => cv.style.transition = '', 350) }, 300);
+};
+
+let tbVis = true;
+document.getElementById('tog').onclick = () => {
+  tbVis = !tbVis;
+  document.getElementById('tb').classList.toggle('hide', !tbVis);
+};
+
+// ── overlay helper ──────────────────────────────────────────
+function showOv(title, body) {
+  return new Promise(res => {
+    document.getElementById('ot').textContent = title;
+    document.getElementById('op').textContent = body;
+    const ov = document.getElementById('ov');
+    ov.classList.add('vis');
+    document.getElementById('ook').onclick = () => { ov.classList.remove('vis'); res() };
+  });
+}
+
+// ── recording ───────────────────────────────────────────────
+let mr = null, cks = [], rtimer = null, rsecs = 0, recs = [];
+const rbtn = document.getElementById('rb'), rlab = document.getElementById('rl');
+const ri = document.getElementById('ri'), rt = document.getElementById('rt');
+const lbtn = document.getElementById('lb'), lc = document.getElementById('lc');
+const pn = document.getElementById('pn'), rl2 = document.getElementById('rl2');
+
+function fmt(s) { return String(~~(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+function bestMime() {
+  const list = [
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+    'video/mp4;codecs=h264,aac',
+    'video/mp4',
+    'video/webm;codecs=vp9,opus',
+    'video/webm;codecs=vp8,opus',
+    'video/webm'
+  ];
+  return list.find(m => { try { return MediaRecorder.isTypeSupported(m); } catch { return false; } }) || '';
+}
+
+rbtn.addEventListener('click', async () => {
+  if (mr) { stopRec(); return; }
+  if (!sessionStorage.mic) {
+    sessionStorage.mic = 1;
+    await showOv('Microphone Access', 'The browser will ask for microphone permission. Please tap Allow so your voice is recorded alongside your calculations.');
+  }
+  startRec();
+});
+
+async function startRec() {
+  let stream;
+  try { 
+    stream = cv.captureStream(30); 
+  } catch(e) { 
+    await showOv('Not supported', 'canvas.captureStream() is not available in this browser. Try Chrome/Edge on desktop, or record natively on iPad.'); 
+    return; 
+  }
+
+  try {
+    const mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
+    mic.getAudioTracks().forEach(t => stream.addTrack(t));
+  } catch(e) {
+    console.warn('No mic:', e.message);
+  }
+
+  cks = [];
+  const mime = bestMime();
+  
+  try {
+    mr = new MediaRecorder(stream, mime ? { mimeType: mime } : {});
+  } catch(e) {
+    mr = new MediaRecorder(stream);
+  }
+
+  mr.ondataavailable = e => { if (e.data && e.data.size > 0) cks.push(e.data); };
+  mr.onstop = finalise;
+  mr.start(200);
+
+  rsecs = 0; 
+  rt.textContent = '00:00';
+  ri.classList.add('vis');
+  rbtn.classList.add('stop');
+  rlab.textContent = 'Stop · 00:00';
+  rtimer = setInterval(() => { rsecs++; const t = fmt(rsecs); rt.textContent = t; rlab.textContent = 'Stop · ' + t; }, 1000);
+}
+
+function stopRec() {
+  if (!mr) return;
+  mr.stop();
+  clearInterval(rtimer);
+  ri.classList.remove('vis');
+  rbtn.classList.remove('stop');
+  rlab.textContent = 'Record';
+}
+
+function finalise() {
+  const actualMime = mr.mimeType || bestMime() || 'video/webm';
+  const isMP4 = actualMime.toLowerCase().includes('mp4');
+  const blob = new Blob(cks, { type: actualMime });
+  const url = URL.createObjectURL(blob);
+  const ext = isMP4 ? 'mp4' : 'webm';
+  const now = new Date();
+  const name = `dustboard-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.${ext}`;
+  const kb = ~~(blob.size / 1024);
+  
+  recs.unshift({ url, name, dur: rsecs, kb, mime: actualMime });
+  mr = null;
+  renderRecs();
+  
+  lbtn.classList.add('vis');
+  lc.textContent = recs.length;
+  pn.classList.add('vis');
+}
+
+function renderRecs() {
+  rl2.innerHTML = '';
+  recs.forEach(r => {
+    const d = document.createElement('div');
+    d.className = 'ri';
+    d.innerHTML = `<div><div class="rn">${r.name}</div><div class="rd2">${fmt(r.dur)} · ${r.kb}KB · ${r.mime.split(';')[0]}</div></div><a class="sv" href="${r.url}" download="${r.name}">⬇ Save</a>`;
+    rl2.appendChild(d);
+  });
+}
+
+lbtn.onclick = () => pn.classList.toggle('vis');
+document.getElementById('pc').onclick = () => pn.classList.remove('vis');
+</script>
+</body>
+</html>
