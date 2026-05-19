@@ -189,41 +189,71 @@ window.addEventListener('resize',rsz);
 const SZ=[3,6,10,16];
 let tool='write',si=0,dn=false,lx=0,ly=0;
 
-function gp(e){const s=e.touches?e.touches[0]:e;return{x:s.clientX,y:s.clientY}}
+function gp(e) {
+  const s = e.touches ? e.touches[0] : e;
+  const rect = cv.getBoundingClientRect();
+  // Calculate the scale to account for Retina displays and CSS sizing
+  const scaleX = cv.width / rect.width;
+  const scaleY = cv.height / rect.height;
+  return {
+    x: (s.clientX - rect.left) * scaleX,
+    y: (s.clientY - rect.top) * scaleY
+  };
+}
 
-function mk(fx,fy,tx,ty){
-  const er=tool==='erase',sz=SZ[si];
-  const dist=Math.hypot(tx-fx,ty-fy),steps=Math.max(1,~~(dist/2));
-  if(er){
-    ctx.globalCompositeOperation='source-over';
-    for(let s=0;s<=steps;s++){
-      const t=s/steps,x=fx+(tx-fx)*t,y=fy+(ty-fy)*t,es=sz*4.5;
-      for(let p=0;p<28;p++){
-        const a=Math.random()*Math.PI*2,r=Math.random()*es,n=(Math.random()-.5)*32;
-        ctx.fillStyle=`rgba(${~~(194+n)},${~~(166+n*.9)},${~~(98+n*.6)},.45)`;
-        ctx.beginPath();ctx.arc(x+Math.cos(a)*r,y+Math.sin(a)*r,Math.random()*2+.4,0,Math.PI*2);ctx.fill();
+function mk(fx, fy, tx, ty) {
+  const er = tool === 'erase', sz = SZ[si];
+  const dist = Math.hypot(tx - fx, ty - fy), steps = Math.max(1, ~~(dist / 2));
+  
+  if (er) {
+    // ERASER: Simulates a flat wooden block smoothing the sand back out
+    ctx.globalCompositeOperation = 'source-over';
+    for (let s = 0; s <= steps; s++) {
+      const t = s / steps, x = fx + (tx - fx) * t, y = fy + (ty - fy) * t, es = sz * 4.5;
+      for (let p = 0; p < 28; p++) {
+        const a = Math.random() * Math.PI * 2, r = Math.random() * es, n = (Math.random() - .5) * 32;
+        ctx.fillStyle = `rgba(${~~(194 + n)},${~~(166 + n * .9)},${~~(98 + n * .6)},.45)`;
+        ctx.beginPath(); ctx.arc(x + Math.cos(a) * r, y + Math.sin(a) * r, Math.random() * 2 + .4, 0, Math.PI * 2); ctx.fill();
       }
-      const gr=ctx.createRadialGradient(x,y,0,x,y,es);
-      gr.addColorStop(0,'rgba(208,178,118,.65)');gr.addColorStop(.6,'rgba(198,166,104,.32)');gr.addColorStop(1,'rgba(182,150,88,0)');
-      ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,es,0,Math.PI*2);ctx.fill();
+      const gr = ctx.createRadialGradient(x, y, 0, x, y, es);
+      gr.addColorStop(0, 'rgba(208,178,118,.65)'); gr.addColorStop(.6, 'rgba(198,166,104,.32)'); gr.addColorStop(1, 'rgba(182,150,88,0)');
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, es, 0, Math.PI * 2); ctx.fill();
     }
     return;
   }
-  ctx.globalCompositeOperation='multiply';
-  for(let s=0;s<=steps;s++){
-    const t=s/steps,x=fx+(tx-fx)*t,y=fy+(ty-fy)*t;
-    const gr=ctx.createRadialGradient(x,y,0,x,y,sz);
-    gr.addColorStop(0,'rgba(50,24,6,.9)');gr.addColorStop(.4,'rgba(66,34,9,.54)');gr.addColorStop(1,'rgba(86,50,16,0)');
-    ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,sz,0,Math.PI*2);ctx.fill();
-    ctx.globalCompositeOperation='source-over';
-    for(let p=0;p<5;p++){
-      const a=Math.random()*Math.PI*2,d2=sz*(1+Math.random()*.9);
-      ctx.fillStyle=`rgba(232,202,142,${.13+Math.random()*.16})`;
-      ctx.beginPath();ctx.arc(x+Math.cos(a)*d2,y+Math.sin(a)*d2,Math.random()*1.4+.3,0,Math.PI*2);ctx.fill();
+  
+  // WRITING: Simulates a stylus trenching through sand
+  for (let s = 0; s <= steps; s++) {
+    const t = s / steps, x = fx + (tx - fx) * t, y = fy + (ty - fy) * t;
+    
+    // 1. The Ridge (Piled up sand catching the light on the outer edges)
+    ctx.globalCompositeOperation = 'source-over';
+    const ridgeSize = sz * 1.6;
+    const ridgeGr = ctx.createRadialGradient(x, y, sz * 0.4, x, y, ridgeSize);
+    ridgeGr.addColorStop(0, 'rgba(240,210,150,0)');
+    ridgeGr.addColorStop(0.5, 'rgba(245,215,155,0.15)'); // Highlight
+    ridgeGr.addColorStop(1, 'rgba(240,210,150,0)');
+    ctx.fillStyle = ridgeGr;
+    ctx.beginPath(); ctx.arc(x, y, ridgeSize, 0, Math.PI * 2); ctx.fill();
+
+    // 2. The Trench (Deep shadow where sand was removed)
+    ctx.globalCompositeOperation = 'multiply';
+    const trenchGr = ctx.createRadialGradient(x, y, 0, x, y, sz);
+    trenchGr.addColorStop(0, 'rgba(50,25,10,0.85)'); // Core shadow
+    trenchGr.addColorStop(0.5, 'rgba(75,40,15,0.5)');
+    trenchGr.addColorStop(1, 'rgba(100,60,20,0)');
+    ctx.fillStyle = trenchGr;
+    ctx.beginPath(); ctx.arc(x, y, sz, 0, Math.PI * 2); ctx.fill();
+    
+    // 3. Displaced Granules (Scattered sharp dots outside the trench)
+    ctx.globalCompositeOperation = 'source-over';
+    for (let p = 0; p < 5; p++) {
+      const a = Math.random() * Math.PI * 2;
+      const d2 = sz + Math.random() * (sz * 0.9); // Push outside the center
+      ctx.fillStyle = `rgba(245,215,150,${0.2 + Math.random() * 0.4})`;
+      ctx.beginPath(); ctx.arc(x + Math.cos(a) * d2, y + Math.sin(a) * d2, Math.random() * 1.2 + 0.3, 0, Math.PI * 2); ctx.fill();
     }
-    ctx.globalCompositeOperation='multiply';
   }
-  ctx.globalCompositeOperation='source-over';
 }
 
 cv.addEventListener('mousedown',e=>{dn=true;const p=gp(e);lx=p.x;ly=p.y;mk(lx,ly,lx,ly)});
