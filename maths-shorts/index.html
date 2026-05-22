@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maths Shorts | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #115e59;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --card-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            --card-hover-shadow: 0 8px 28px rgba(15,118,110,0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding-top: 60px;
+        }
+
+        /* ── Centered Mathswell Nav ── */
+        .mathswell-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .mw-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* ── Container ── */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            text-align: center;
+            padding: 2.5rem 1rem 1.5rem;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .hero-sub {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.6rem;
+        }
+        .hero-sub span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .mreachable-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.65rem;
+            background: white;
+            border: 1.5px solid var(--primary-light);
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .mreachable-badge:hover {
+            background: var(--interactive);
+            transform: translateY(-1px);
+        }
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 620px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ── Filter Pills ── */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            padding: 0.75rem 0 2rem;
+        }
+        .filter-pill {
+            padding: 0.45rem 1.1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .filter-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        .filter-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ── Video count ── */
+        .video-count {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── Card Grid ── */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding-bottom: 3rem;
+        }
+
+        /* ── Video Card ── */
+        .video-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-hover-shadow);
+        }
+        .video-card.hidden { display: none; }
+
+        /* Thumbnail */
+        .card-thumb {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9 / 12;
+            overflow: hidden;
+        }
+        .card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .video-card:hover .card-thumb img { transform: scale(1.04); }
+
+        /* Gradient placeholder */
+        .card-thumb-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        /* Play overlay */
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15,118,110,0);
+            transition: background 0.25s ease;
+        }
+        .video-card:hover .play-overlay { background: rgba(15,118,110,0.15); }
+        .play-btn {
+            width: 52px; height: 52px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.25s ease;
+        }
+        .video-card:hover .play-btn { opacity: 1; transform: scale(1.08); }
+        .play-btn svg { width: 22px; height: 22px; fill: var(--primary); margin-left: 3px; }
+
+        /* Source badge */
+        .source-badge {
+            position: absolute;
+            top: 10px; right: 10px;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(8px);
+        }
+        .source-badge.instagram { background: rgba(225,48,108,0.85); color: white; }
+        .source-badge.youtube   { background: rgba(255,0,0,0.85); color: white; }
+        .source-badge.video     { background: rgba(15,118,110,0.85); color: white; }
+
+        /* Series badge */
+        .series-badge {
+            position: absolute;
+            top: 10px; left: 10px;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: rgba(15,118,110,0.9);
+            color: white;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .series-dots {
+            display: flex;
+            gap: 3px;
+        }
+        .series-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+        }
+        .series-dot.filled { background: white; }
+
+        /* Card body */
+        .card-body { padding: 1rem 1.1rem 1.1rem; }
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+            line-height: 1.35;
+        }
+        .card-series-label {
+            font-size: 0.78rem;
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+        .card-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+        .card-tag {
+            font-size: 0.72rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            background: var(--interactive);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(12px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Modal header */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 1.25rem 1.25rem 0.5rem;
+        }
+        .modal-header-text { flex: 1; padding-right: 1rem; }
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .modal-series-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 1;
+            border-radius: 6px;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .modal-close:hover { background: var(--interactive); color: var(--primary); }
+
+        /* Modal embed */
+        .modal-embed { padding: 0 1.25rem; }
+        .modal-embed iframe,
+        .modal-embed video { width: 100%; border-radius: 8px; }
+        .modal-embed .instagram-embed { display: flex; justify-content: center; }
+
+        /* Series navigation in modal */
+        .series-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.25rem;
+            gap: 0.5rem;
+        }
+        .series-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 0.85rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: white;
+            color: var(--primary);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .series-nav-btn:hover {
+            background: var(--interactive);
+            transform: translateY(-1px);
+        }
+        .series-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+            transform: none;
+        }
+        .series-nav-btn:disabled:hover { background: white; }
+        .series-nav-btn svg { width: 14px; height: 14px; fill: currentColor; }
+        .series-progress {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .series-progress-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #d1d5db;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .series-progress-dot.active { background: var(--primary); transform: scale(1.25); }
+        .series-progress-dot:hover { background: var(--primary-light); }
+
+        /* Modal description & tags */
+        .modal-desc {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            padding: 0 1.25rem 0.75rem;
+        }
+        .modal-tag {
+            font-size: 0.78rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            background: var(--interactive);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* App link */
+        .modal-app-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin: 0 1.25rem 1.25rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .modal-app-link:hover { background: #0d6b64; }
+        .modal-app-link svg { width: 14px; height: 14px; fill: white; }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-muted);
+            display: none;
+        }
+        .empty-state.visible { display: block; }
+        .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.5rem; }
+            .hero p { font-size: 0.95rem; }
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 1rem;
+            }
+            .filter-pill { font-size: 0.82rem; padding: 0.4rem 0.9rem; }
+            .modal-content { max-width: 100%; border-radius: 12px; }
+        }
+        @media (max-width: 400px) {
+            .video-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Centered Mathswell Navigation -->
+<div class="mathswell-nav">
+    <a href="/" class="mw-link">
+        <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28"
+             onerror="this.style.display='none'">
+        <span>MATHSWELL</span>
+    </a>
+</div>
+
+<div class="container">
+
+    <!-- Hero -->
+    <div class="hero">
+        <h1>Maths Shorts</h1>
+        <div class="hero-sub">
+            <span>by</span>
+            <a href="https://www.instagram.com/mreachable?igsh=MWMzb2wzbzZqb3g1MA==" target="_blank" class="mreachable-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                M.Reachable
+            </a>
+        </div>
+        <p>Bite-sized videos that make mathematical ideas click. Browse by topic, or follow a series from start to finish.</p>
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="filters" id="filters">
+        <button class="filter-pill active" data-topic="all">All</button>
+    </div>
+
+    <!-- Video count -->
+    <div class="video-count" id="videoCount"></div>
+
+    <!-- Card Grid -->
+    <div class="video-grid" id="videoGrid"></div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState">
+        <div class="empty-state-icon">🔍</div>
+        <p>No videos match that filter yet.</p>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-header-text">
+                <div class="modal-title" id="modalTitle"></div>
+                <div class="modal-series-label" id="modalSeriesLabel"></div>
+            </div>
+            <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        <div class="modal-embed" id="modalEmbed"></div>
+        <div class="series-nav" id="seriesNav" style="display:none;">
+            <button class="series-nav-btn" id="seriesPrev">
+                <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                Previous
+            </button>
+            <div class="series-progress" id="seriesProgress"></div>
+            <button class="series-nav-btn" id="seriesNext">
+                Next
+                <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </button>
+        </div>
+        <div class="modal-desc" id="modalDesc"></div>
+        <div class="modal-tags" id="modalTags"></div>
+        <div id="modalAppLink"></div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// SERIES DEFINITIONS
+// ═══════════════════════════════════════════════════════════════
+// Define series here. Videos reference a series by its id.
+//
+const series = {
+    "vectors-planes-3d": {
+        name: "Vectors & Planes in 3D",
+        description: "A four-part series building from vector basics to the equation of a plane."
+    },
+    "trigonometry": {
+        name: "Trigonometry",
+        description: "Short videos exploring trigonometric functions, identities, and their geometry."
+    },
+    // Add more series as needed:
+    // "series-id": { name: "Series Name", description: "..." }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// VIDEO DATA
+// ═══════════════════════════════════════════════════════════════
+//
+// Each video object:
+// {
+//   title:       "Display title",
+//   description: "Short description",
+//   topics:      ["Topic1", "Topic2"],
+//   source:      "instagram" | "youtube" | "video",
+//   embedId:     "Instagram post ID" | "YouTube video ID" | "/path/to/file.mp4",
+//   thumbnail:   "/path/to/thumb.jpg"  (use actual screenshot — required for best results),
+//   emoji:       "📐"                  (fallback if no thumbnail yet),
+//   seriesId:    "series-id"           (optional — links to a series),
+//   seriesOrder: 1                     (position in the series, 1-based),
+//   appLink:     { url: "...", label: "..." }  (optional)
+// }
+//
+const videos = [
+    // ── Vectors & Planes in 3D series ──
+    {
+        title: "Finding a Vector with a Given Length",
+        description: "How to scale a vector so it has exactly the length you need — the unit vector method.",
+        topics: ["Vectors & Planes"],
+        source: "instagram",
+        embedId: "DWUA1J1DJ-P",
+        thumbnail: "/maths-shorts/thumbs/vector-given-length.jpg",
+        emoji: "📐",
+        seriesId: "vectors-planes-3d",
+        seriesOrder: 1,
+        appLink: { url: "https://mathswell.com/lines-and-planes/", label: "Lines & Planes Explorer" }
+    },
+    {
+        title: "Equation of a Line in 3D",
+        description: "How a point and a direction vector define a line in space — building the parametric equation.",
+        topics: ["Vectors & Planes"],
+        source: "instagram",
+        embedId: "DWUkQkFjL3M",
+        thumbnail: "/maths-shorts/thumbs/line-in-3d.jpg",
+        emoji: "📏",
+        seriesId: "vectors-planes-3d",
+        seriesOrder: 2,
+        appLink: { url: "https://mathswell.com/lines-and-planes/", label: "Lines & Planes Explorer" }
+    },
+    {
+        title: "Finding the Equation of a Plane",
+        description: "From a normal vector and a point to the equation of a plane — the geometric story behind the algebra.",
+        topics: ["Vectors & Planes"],
+        source: "instagram",
+        embedId: "DXFIQjhjDRh",
+        thumbnail: "/maths-shorts/thumbs/equation-of-plane.jpg",
+        emoji: "✈️",
+        seriesId: "vectors-planes-3d",
+        seriesOrder: 3,
+        appLink: { url: "https://mathswell.com/lines-and-planes/", label: "Lines & Planes Explorer" }
+    },
+    {
+        title: "Projection of a Vector",
+        description: "How to find the component of one vector in the direction of another — and what it means geometrically.",
+        topics: ["Vectors & Planes"],
+        source: "instagram",
+        embedId: "DXFFtIcDL2R",
+        thumbnail: "/maths-shorts/thumbs/vector-projection.jpg",
+        emoji: "🎯",
+        seriesId: "vectors-planes-3d",
+        seriesOrder: 4,
+        appLink: { url: "https://mathswell.com/lines-and-planes/", label: "Lines & Planes Explorer" }
+    },
+
+    // ── Trigonometry series (add videos as they're published) ──
+    // Uncomment and fill in embedId + thumbnail when ready:
+    /*
+    {
+        title: "TITLE",
+        description: "DESCRIPTION",
+        topics: ["Trigonometry"],
+        source: "instagram",
+        embedId: "REPLACE_WITH_POST_ID",
+        thumbnail: "/maths-shorts/thumbs/FILENAME.jpg",
+        emoji: "📐",
+        seriesId: "trigonometry",
+        seriesOrder: 1
+    },
+    */
+];
+
+// ═══════════════════════════════════════════════════════════════
+// Gradient palette for placeholder thumbs
+// ═══════════════════════════════════════════════════════════════
+const gradients = [
+    'linear-gradient(135deg, #0f766e 0%, #10b981 100%)',
+    'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+    'linear-gradient(135deg, #0d9488 0%, #2dd4bf 100%)',
+    'linear-gradient(135deg, #0f766e 0%, #059669 100%)',
+    'linear-gradient(135deg, #115e59 0%, #0f766e 100%)',
+];
+
+// ═══════════════════════════════════════════════════════════════
+// Helper: get all videos in a series, sorted
+// ═══════════════════════════════════════════════════════════════
+function getSeriesVideos(seriesId) {
+    return videos
+        .filter(v => v.seriesId === seriesId)
+        .sort((a, b) => a.seriesOrder - b.seriesOrder);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Build filter pills from data
+// ═══════════════════════════════════════════════════════════════
+const allTopics = [...new Set(videos.flatMap(v => v.topics))].sort();
+const filtersEl = document.getElementById('filters');
+allTopics.forEach(topic => {
+    const pill = document.createElement('button');
+    pill.className = 'filter-pill';
+    pill.dataset.topic = topic;
+    pill.textContent = topic;
+    filtersEl.appendChild(pill);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Render cards
+// ═══════════════════════════════════════════════════════════════
+const grid = document.getElementById('videoGrid');
+
+videos.forEach((video, i) => {
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.dataset.topics = JSON.stringify(video.topics);
+    card.dataset.index = i;
+
+    const gradient = gradients[i % gradients.length];
+
+    // Thumbnail: try real image, fall back to gradient + emoji
+    const thumbHTML = video.thumbnail
+        ? `<img src="${video.thumbnail}" alt="${video.title}" loading="lazy"
+                onerror="this.parentElement.innerHTML='<div class=\\'card-thumb-placeholder\\' style=\\'background:${gradient}\\'><span style=\\'filter:grayscale(0.2) brightness(1.1)\\'>${video.emoji || '🎬'}</span></div>' + this.parentElement.querySelector('.play-overlay').outerHTML + (this.parentElement.querySelector('.source-badge')?.outerHTML || '') + (this.parentElement.querySelector('.series-badge')?.outerHTML || '')">`
+        : `<div class="card-thumb-placeholder" style="background:${gradient}">
+               <span style="filter:grayscale(0.2) brightness(1.1)">${video.emoji || '🎬'}</span>
+           </div>`;
+
+    const sourceLabel = { instagram: 'Reel', youtube: 'YouTube', video: 'Video' }[video.source];
+
+    // Series badge with dots
+    let seriesBadgeHTML = '';
+    if (video.seriesId) {
+        const sv = getSeriesVideos(video.seriesId);
+        const dots = sv.map((_, idx) =>
+            `<div class="series-dot ${idx < video.seriesOrder ? 'filled' : ''}"></div>`
+        ).join('');
+        seriesBadgeHTML = `<div class="series-badge">${video.seriesOrder}/${sv.length} <div class="series-dots">${dots}</div></div>`;
+    }
+
+    // Series label text
+    let seriesLabelHTML = '';
+    if (video.seriesId && series[video.seriesId]) {
+        seriesLabelHTML = `<div class="card-series-label">${series[video.seriesId].name} · Part ${video.seriesOrder}</div>`;
+    }
+
+    card.innerHTML = `
+        <div class="card-thumb">
+            ${thumbHTML}
+            <div class="play-overlay">
+                <div class="play-btn">
+                    <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+                </div>
+            </div>
+            <span class="source-badge ${video.source}">${sourceLabel}</span>
+            ${seriesBadgeHTML}
+        </div>
+        <div class="card-body">
+            ${seriesLabelHTML}
+            <div class="card-title">${video.title}</div>
+            <div class="card-desc">${video.description}</div>
+            <div class="card-tags">
+                ${video.topics.map(t => `<span class="card-tag">${t}</span>`).join('')}
+            </div>
+        </div>
+    `;
+
+    card.addEventListener('click', () => openModal(i));
+    grid.appendChild(card);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Filtering
+// ═══════════════════════════════════════════════════════════════
+let activeTopic = 'all';
+
+filtersEl.addEventListener('click', (e) => {
+    const pill = e.target.closest('.filter-pill');
+    if (!pill) return;
+    activeTopic = pill.dataset.topic;
+    filtersEl.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    applyFilter();
+});
+
+function applyFilter() {
+    const cards = grid.querySelectorAll('.video-card');
+    let visible = 0;
+    cards.forEach(card => {
+        const topics = JSON.parse(card.dataset.topics);
+        const show = activeTopic === 'all' || topics.includes(activeTopic);
+        card.classList.toggle('hidden', !show);
+        if (show) visible++;
+    });
+    document.getElementById('videoCount').textContent =
+        visible === videos.length ? `${visible} videos` : `${visible} of ${videos.length} videos`;
+    document.getElementById('emptyState').classList.toggle('visible', visible === 0);
+}
+applyFilter();
+
+// ═══════════════════════════════════════════════════════════════
+// Modal
+// ═══════════════════════════════════════════════════════════════
+const modal = document.getElementById('modal');
+let currentVideoIndex = -1;
+
+function openModal(index) {
+    currentVideoIndex = index;
+    renderModal();
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function renderModal() {
+    const video = videos[currentVideoIndex];
+    document.getElementById('modalTitle').textContent = video.title;
+    document.getElementById('modalDesc').textContent = video.description;
+
+    // Series label
+    const seriesLabel = document.getElementById('modalSeriesLabel');
+    const seriesNav = document.getElementById('seriesNav');
+
+    if (video.seriesId && series[video.seriesId]) {
+        const sv = getSeriesVideos(video.seriesId);
+        seriesLabel.textContent = `${series[video.seriesId].name} · Part ${video.seriesOrder} of ${sv.length}`;
+        seriesLabel.style.display = 'block';
+
+        // Show series navigation
+        seriesNav.style.display = 'flex';
+
+        // Progress dots
+        const progressEl = document.getElementById('seriesProgress');
+        progressEl.innerHTML = sv.map((v, idx) => {
+            const globalIdx = videos.indexOf(v);
+            const isActive = globalIdx === currentVideoIndex;
+            return `<div class="series-progress-dot ${isActive ? 'active' : ''}"
+                         data-goto="${globalIdx}" title="${v.title}"></div>`;
+        }).join('');
+
+        // Dot click handlers
+        progressEl.querySelectorAll('.series-progress-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                const goto = parseInt(dot.dataset.goto);
+                if (goto !== currentVideoIndex) {
+                    currentVideoIndex = goto;
+                    renderModal();
+                }
+            });
+        });
+
+        // Prev/Next
+        const prevBtn = document.getElementById('seriesPrev');
+        const nextBtn = document.getElementById('seriesNext');
+        const currentPos = sv.findIndex(v => videos.indexOf(v) === currentVideoIndex);
+
+        prevBtn.disabled = currentPos <= 0;
+        nextBtn.disabled = currentPos >= sv.length - 1;
+
+        prevBtn.onclick = () => {
+            if (currentPos > 0) {
+                currentVideoIndex = videos.indexOf(sv[currentPos - 1]);
+                renderModal();
+            }
+        };
+        nextBtn.onclick = () => {
+            if (currentPos < sv.length - 1) {
+                currentVideoIndex = videos.indexOf(sv[currentPos + 1]);
+                renderModal();
+            }
+        };
+    } else {
+        seriesLabel.style.display = 'none';
+        seriesNav.style.display = 'none';
+    }
+
+    // Tags
+    document.getElementById('modalTags').innerHTML =
+        video.topics.map(t => `<span class="modal-tag">${t}</span>`).join('');
+
+    // Embed
+    const embedEl = document.getElementById('modalEmbed');
+    embedEl.innerHTML = buildEmbed(video);
+
+    // Trigger Instagram embed processing
+    if (video.source === 'instagram' && window.instgrm) {
+        setTimeout(() => window.instgrm.Embeds.process(), 100);
+    }
+
+    // App link
+    const linkEl = document.getElementById('modalAppLink');
+    if (video.appLink) {
+        linkEl.innerHTML = `
+            <a class="modal-app-link" href="${video.appLink.url}" target="_blank">
+                <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                Explore: ${video.appLink.label}
+            </a>`;
+    } else {
+        linkEl.innerHTML = '';
+    }
+}
+
+function buildEmbed(video) {
+    switch (video.source) {
+        case 'instagram':
+            return `<div class="instagram-embed">
+                <blockquote class="instagram-media"
+                    data-instgrm-permalink="https://www.instagram.com/reel/${video.embedId}/"
+                    data-instgrm-version="14"
+                    style="max-width:400px; width:100%; border-radius:8px;">
+                </blockquote>
+            </div>`;
+        case 'youtube':
+            return `<iframe
+                src="https://www.youtube.com/embed/${video.embedId}"
+                style="aspect-ratio:9/16; max-height:70vh;"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>`;
+        case 'video':
+            return `<video controls playsinline
+                style="aspect-ratio:9/16; max-height:70vh; background:#000;"
+                src="${video.embedId}"></video>`;
+        default:
+            return '<p style="padding:2rem;color:var(--text-muted);">Video unavailable</p>';
+    }
+}
+
+function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    const embedEl = document.getElementById('modalEmbed');
+    embedEl.querySelectorAll('video').forEach(v => v.pause());
+    embedEl.querySelectorAll('iframe').forEach(f => f.src = '');
+    embedEl.innerHTML = '';
+    currentVideoIndex = -1;
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('open')) return;
+    if (e.key === 'Escape') closeModal();
+    // Arrow keys for series navigation
+    if (e.key === 'ArrowLeft') document.getElementById('seriesPrev').click();
+    if (e.key === 'ArrowRight') document.getElementById('seriesNext').click();
+});
+</script>
+
+<!-- Instagram embed SDK -->
+<script async src="//www.instagram.com/embed.js"></script>
+
+</body>
+</html>
