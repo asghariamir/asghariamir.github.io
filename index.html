@@ -463,6 +463,118 @@
       transition-duration: 0.01ms !important;
     }
   }
+  /* Maths Shorts banner */
+  .shorts-banner {
+    max-width: 1200px;
+    margin: 2rem auto 0;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .shorts-banner a {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: linear-gradient(135deg, #e6fffb 0%, #ffffff 60%, rgba(245,158,11,0.06) 100%);
+    border: 2px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .shorts-banner a::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--brand), var(--brand-light), var(--accent));
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+
+  .shorts-banner a:hover::before { transform: translateX(0); }
+
+  .shorts-banner a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(15,118,110,0.12);
+    border-color: var(--brand-light);
+  }
+
+  .shorts-icon {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--brand), var(--brand-light));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .shorts-icon svg { width: 28px; height: 28px; fill: white; }
+
+  .shorts-text { flex: 1; min-width: 0; }
+
+  .shorts-text h3 {
+    margin: 0 0 0.2rem;
+    font-size: 1.1rem;
+    color: var(--brand);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .shorts-new-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, var(--brand), var(--brand-light));
+    color: white;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+  }
+
+  .shorts-text p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .shorts-arrow {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .shorts-banner a:hover .shorts-arrow {
+    background: var(--brand);
+    border-color: var(--brand);
+  }
+
+  .shorts-arrow svg { width: 16px; height: 16px; fill: var(--brand); transition: fill 0.3s ease; }
+  .shorts-banner a:hover .shorts-arrow svg { fill: white; }
+
+  @media (max-width: 640px) {
+    .shorts-banner a { padding: 1rem 1.1rem; gap: 1rem; }
+    .shorts-icon { width: 46px; height: 46px; border-radius: 12px; }
+    .shorts-icon svg { width: 22px; height: 22px; }
+    .shorts-text h3 { font-size: 1rem; }
+    .shorts-text p { font-size: 0.85rem; }
+  }
   </style>
 </head>
 <body>
@@ -472,14 +584,29 @@
     <span style="font-size:2.2rem;font-weight:700;color:#0f766e;">Mathswell</span>
   </div>
   <p>
-    Interactive maths learning apps for classrooms and independent study.
+    Interactive maths learning apps and bite-sized video shorts for classrooms and independent study.
     <strong>AI-powered</strong> tools that generate examples, guide practice, and support deeper exploration.
   </p>
 </header>
 
 <nav class="primary" aria-label="Primary">
+  <a href="/maths-shorts/">Maths Shorts</a>
   <a href="#contact">Amir Asghari</a>
 </nav>
+<div class="shorts-banner">
+  <a href="/maths-shorts/">
+    <div class="shorts-icon">
+      <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+    </div>
+    <div class="shorts-text">
+      <h3>Maths Shorts <span class="shorts-new-badge">New</span></h3>
+      <p>Short videos that make mathematical ideas click — organized by topic, with series you can follow from start to finish. A collaboration with M.Reachable.</p>
+    </div>
+    <div class="shorts-arrow">
+      <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </div>
+  </a>
+</div>
 
 <main id="apps">
   <section id="arithmetics-and-algebra">
