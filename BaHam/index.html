@@ -537,7 +537,8 @@ function render() {
   gb.textContent = c.groupBtn; gb.href = CONTENT.settings.googleGroupUrl;
   const ej = document.getElementById('emailJoinBtn');
   ej.textContent = c.emailJoinBtn; ej.href = 'mailto:' + CONTENT.settings.email;
-  setText('emailJoinNote', c.emailJoinNote);
+  const emEl = document.getElementById('emailJoinNote');
+  emEl.innerHTML = esc(c.emailJoinNote) + ' <strong dir="ltr" style="white-space:nowrap">' + esc(CONTENT.settings.email) + '</strong>';
   setText('channelsNote', c.channelsNote);
   const tb = document.getElementById('telegramBtn');
   tb.textContent = c.telegramBtn; tb.href = CONTENT.settings.telegramUrl;
