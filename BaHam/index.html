@@ -23,7 +23,7 @@
 <script type="application/json" id="baham-content">
 {
   "settings": {
-    "passphrase": "baham",
+    "passphrase": "baham4M",
     "googleGroupUrl": "https://groups.google.com/a/mathswell.com/g/baham",
     "email": "baham@mathswell.com",
     "telegramUrl": "https://t.me/+bUXApXrxu2MxZDc0",
@@ -43,10 +43,11 @@
     "groupBtn": "خواندن و پیوستن به گروه",
     "emailJoinBtn": "پیوستن با ایمیل",
     "emailJoinNote": "برای پیوستن یا فرستادن پرسش، کافی است به این نشانی ایمیل بزنید — بی‌نیاز از حساب گوگل.",
-    "channelsNote": "گفت‌وگوهای روزمرهٔ ما اینجا جریان دارد:",
+    "channelsNote": "گفت‌وگوهای روزمرهٔ ما در تلگرام جریان دارد:",
     "telegramBtn": "تلگرام",
+    "bleNote": "اگر دسترسی به تلگرام ممکن نبود، در بله می‌توانید با برخی از ادمین‌ها در تماس باشید:",
     "bleBtn": "بله",
-    "bookmarkNote": "این صفحه را نشان کنید (Bookmark) تا همیشه راه برگشت داشته باشید.",
+    "bookmarkNote": "",
     "questionTitle": "پرسشِ این ماه",
     "questionMonth": "خرداد ۱۴۰۵",
     "questionText": "وقتی کسر را آموزش می‌دهیم، دانش‌آموز کسر را یک «عدد» می‌بیند — چیزی که کنارِ اعداد صحیح روی محور می‌نشیند — یا فقط «چند جزء از یک کل»، دستورالعملی برای یک موقعیت؟ اگر از همان آغاز کسر را عددی برای «اندازه‌گرفتن» بدانیم، چه چیزی در تدریسِ ما تغییر می‌کند؟",
@@ -83,10 +84,11 @@
     "groupBtn": "Read & join the group",
     "emailJoinBtn": "Join by email",
     "emailJoinNote": "To join or send a question, just email this address — no Google account needed.",
-    "channelsNote": "Our day-to-day conversations happen here:",
+    "channelsNote": "Our day-to-day conversations are on Telegram:",
     "telegramBtn": "Telegram",
+    "bleNote": "If Telegram isn’t reachable, you can contact some of the admins on Bale:",
     "bleBtn": "Bale",
-    "bookmarkNote": "Bookmark this page so you always have a way back.",
+    "bookmarkNote": "",
     "questionTitle": "Question of the month",
     "questionMonth": "June 2026",
     "questionText": "When we teach fractions, does a student come to see a fraction as a **number** — something that sits on the number line beside the whole numbers — or only as 'so many parts of a whole', a recipe for a situation? If we treat a fraction as a number for **measuring** from the very start, what changes in our teaching?",
@@ -380,25 +382,10 @@ html[dir="ltr"] .summary-box { border-inline-start: 4px solid var(--primary); }
       <p class="channels-note" id="channelsNote"></p>
       <div class="home-btns">
         <a class="btn" id="telegramBtn" target="_blank" rel="noopener"></a>
-        <a class="btn" id="bleBtn" target="_blank" rel="noopener"></a>
       </div>
-      <p class="muted-note" id="bookmarkNote"></p>
-    </div>
-  </section>
-
-  <section class="reveal">
-    <div class="section-title" id="installTitle"></div>
-    <div class="card install-card">
-      <p id="installIntro"></p>
-      <div class="install-platforms">
-        <div class="install-col" id="installIos">
-          <h4 id="iosTitle"></h4>
-          <ol id="iosSteps"></ol>
-        </div>
-        <div class="install-col" id="installAndroid">
-          <h4 id="androidTitle"></h4>
-          <ol id="androidSteps"></ol>
-        </div>
+      <p class="muted-note" id="bleNote"></p>
+      <div class="home-btns">
+        <a class="btn btn-ghost" id="bleBtn" target="_blank" rel="noopener"></a>
       </div>
     </div>
   </section>
@@ -433,6 +420,24 @@ html[dir="ltr"] .summary-box { border-inline-start: 4px solid var(--primary); }
     <div class="card" id="readingList"></div>
   </section>
 
+  <section class="reveal">
+    <div class="section-title" id="installTitle"></div>
+    <div class="card install-card">
+      <p id="installIntro"></p>
+      <div class="install-platforms">
+        <div class="install-col" id="installIos">
+          <h4 id="iosTitle"></h4>
+          <ol id="iosSteps"></ol>
+        </div>
+        <div class="install-col" id="installAndroid">
+          <h4 id="androidTitle"></h4>
+          <ol id="androidSteps"></ol>
+        </div>
+      </div>
+      <p class="muted-note" id="bookmarkNote" style="margin-top:1.2rem"></p>
+    </div>
+  </section>
+
   <footer id="footer"></footer>
 </div>
 
@@ -447,7 +452,28 @@ html[dir="ltr"] .summary-box { border-inline-start: 4px solid var(--primary); }
       <button class="btn" id="saveBtn">💾 ذخیرهٔ صفحه (دانلود)</button>
       <button class="btn btn-ghost" id="cancelBtn">انصراف</button>
     </div>
-    <p class="tiny-note" id="deployNote"></p>
+    <details class="edit-group" style="margin-top:1.2rem">
+      <summary>چگونه منتشر کنیم؟ / How to publish</summary>
+      <div class="group-body">
+        <p style="font-weight:700;color:var(--primary);margin-bottom:0.3rem">فارسی</p>
+        <ol style="margin-inline-start:1.1rem;color:var(--text-muted);font-size:0.9rem;line-height:1.9">
+          <li>دکمهٔ «ذخیرهٔ صفحه» بالا را بزنید؛ فایل <code>index.html</code> تازه دانلود می‌شود.</li>
+          <li>به مخزن گیت‌هابِ سایت بروید (همان‌جا که <code>index.html</code> فعلی هست).</li>
+          <li>روی <strong>Add file ← Upload files</strong> بزنید و فایل تازه را بکشید و رها کنید (نامش باید همان <code>index.html</code> بماند تا جایگزین شود).</li>
+          <li>پایین صفحه، <strong>Commit changes</strong> را بزنید.</li>
+          <li>کمتر از یک دقیقه بعد، صفحه به‌روز می‌شود.</li>
+        </ol>
+        <p style="font-weight:700;color:var(--primary);margin:0.7rem 0 0.3rem">English</p>
+        <ol style="margin-inline-start:1.1rem;color:var(--text-muted);font-size:0.9rem;line-height:1.9" dir="ltr">
+          <li>Click “Save page” above; a fresh <code>index.html</code> downloads.</li>
+          <li>Go to the site’s GitHub repository (where the current <code>index.html</code> lives).</li>
+          <li>Click <strong>Add file → Upload files</strong> and drag the new file in (keep the name <code>index.html</code> so it replaces the old one).</li>
+          <li>At the bottom, click <strong>Commit changes</strong>.</li>
+          <li>In under a minute, the page updates.</li>
+        </ol>
+        <p class="tiny-note">فقط کسانی که به مخزن گیت‌هاب دسترسی دارند می‌توانند منتشر کنند؛ دیگران فایلِ دانلودشده را برای کسی که دسترسی دارد می‌فرستند. رمز ویرایش فقط جلوی ویرایشِ اتفاقی را می‌گیرد، نه امنیتِ واقعی. — Only people with GitHub repo access can publish; others can send the downloaded file to someone who has access. The passphrase only prevents accidental edits, it is not real security.</p>
+      </div>
+    </details>
   </div>
 </div>
 
@@ -542,9 +568,12 @@ function render() {
   setText('channelsNote', c.channelsNote);
   const tb = document.getElementById('telegramBtn');
   tb.textContent = c.telegramBtn; tb.href = CONTENT.settings.telegramUrl;
+  setText('bleNote', c.bleNote);
   const bl = document.getElementById('bleBtn');
   bl.textContent = c.bleBtn; bl.href = CONTENT.settings.bleUrl;
-  setText('bookmarkNote', c.bookmarkNote);
+  const bkEl = document.getElementById('bookmarkNote');
+  bkEl.textContent = c.bookmarkNote || '';
+  bkEl.style.display = c.bookmarkNote ? '' : 'none';
 
   // install-as-app help (fixed strings, language-aware, platform-aware)
   const ins = INSTALL_STRINGS[lang];
@@ -690,8 +719,9 @@ function langGroup(L, title) {
     ${fieldHTML('دکمهٔ گروه / Group button', `${L}.groupBtn`)}
     ${fieldHTML('دکمهٔ پیوستن با ایمیل / Email-join button', `${L}.emailJoinBtn`)}
     ${fieldHTML('یادداشت پیوستن با ایمیل / Email-join note', `${L}.emailJoinNote`, 'area')}
-    ${fieldHTML('یادداشت کانال‌ها / Channels note', `${L}.channelsNote`)}
+    ${fieldHTML('یادداشت تلگرام / Telegram note', `${L}.channelsNote`)}
     ${fieldHTML('دکمهٔ تلگرام / Telegram button', `${L}.telegramBtn`)}
+    ${fieldHTML('یادداشت بله / Bale note', `${L}.bleNote`)}
     ${fieldHTML('دکمهٔ بله / Bale button', `${L}.bleBtn`)}
     ${fieldHTML('یادداشت نشان‌کردن / Bookmark note', `${L}.bookmarkNote`)}
     <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border)">
@@ -793,11 +823,8 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   Object.assign(CONTENT, draft);
   render();
   document.getElementById('editOverlay').classList.remove('open');
-  alert('فایل index.html دانلود شد. آن را روی سایت بارگذاری کنید.\nindex.html downloaded — upload it to publish.');
+  alert('فایل index.html دانلود شد. برای انتشار، بخشِ «چگونه منتشر کنیم؟» را ببینید.\nindex.html downloaded — see “How to publish” to put it live.');
 });
-document.getElementById('deployNote').textContent =
-  'رمز فقط جلوی ویرایش اتفاقی را می‌گیرد و امنیت واقعی نیست. تغییرات وقتی منتشر می‌شوند که فایل دانلودشده روی سایت بارگذاری شود.';
-
 /* ---------- init ---------- */
 render();
 window.addEventListener('load', maybeAnimateCounters);
