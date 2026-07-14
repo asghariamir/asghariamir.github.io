@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Shape Student Are You? — Ian Stewart · WikiLetter</title>
+<meta name="description" content="Ian Stewart, in memory of David Tall, on path-dependent logic: how a student can follow every step of an argument faithfully and still arrive at a contradiction. A People and Mathematics publication.">
+
+<meta property="og:title" content="What Shape Student Are You? — Ian Stewart">
+<meta property="og:description" content="WikiLetter · People and Mathematics — آدم‌ها و ریاضیات. Written in memory of David Tall.">
+<meta property="og:image" content="../assets/logo.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX for crisp typeset mathematics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  /* breadcrumb sub-bar */
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 46px; line-height: 1.08; font-weight: 500; letter-spacing: -.02em; margin: 16px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+  .byline .meta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .byline .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; align-self: center; }
+
+  .dedication { font-style: italic; color: var(--muted); font-size: 16px; margin: 22px 0 0; }
+
+  /* in-memoriam ribbon — REMOVE if not wanted */
+  .memoriam { display: flex; align-items: center; gap: 12px; margin: 26px 0 0; padding: 14px 18px; background: var(--black); color: var(--paper); border-radius: 4px; }
+  .memoriam .mk { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 600; white-space: nowrap; }
+  .memoriam .mt { font-size: 15px; color: #E7DFD2; }
+
+  /* KaTeX inside RTL text — force each formula left-to-right and isolate it
+     from the bidi algorithm so exponents & coefficients keep their place.
+     General fix for every Persian article that contains mathematics. */
+  .katex { direction: ltr; unicode-bidi: isolate; }
+  .katex-display { direction: ltr; unicode-bidi: isolate; }
+
+  .byline .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); align-self: center; }
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 40px 0 14px; padding-top: 8px; }
+
+  /* principle callout */
+  .principle { border-inline-start: 3px solid var(--accent); background: #F4ECDC; padding: 18px 22px; margin: 26px 0; border-radius: 0 4px 4px 0; }
+  .principle .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-bottom: 7px; }
+  .principle .txt { font-size: 18px; line-height: 1.55; }
+
+  .pullquote { font-size: 26px; line-height: 1.32; font-weight: 500; letter-spacing: -.01em; color: var(--ink); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); padding: 20px 0; margin: 30px 0; }
+
+  .eq { text-align: center; margin: 22px 0; font-size: 20px; }
+  /* articulation gap marker */
+  .artic { font-family: "Newsreader", serif; font-size: 1.05em; }
+  .gap { color: var(--accent); font-weight: 700; padding: 0 .15em; }
+
+  /* contributor colophon (Option A) */
+  .colophon { margin-top: 46px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .colophon .who + .who { margin-top: 9px; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; }
+  .refs li { margin-bottom: 10px; }
+  .refs a { color: var(--accent); word-break: break-word; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 22px 32px; }
+    h1.title { font-size: 33px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .pullquote { font-size: 21px; }
+  }
+
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="WikiLetter" data-fa="ویکی‌نوشت"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#567D46;display:inline-block;flex:0 0 auto;"></span><span data-en="School maths · In memory of David Tall · September 2024" data-fa="ریاضیِ مدرسه · به یادِ دیوید تال · شهریور ۱۴۰۳"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="kicker">WikiLetter · In memory of David Tall</div>
+  <h1 class="title">What Shape Student Are You?</h1>
+  <p class="standfirst">A question David Tall and I once asked each other: if every step of a mathematical argument is logical, how can a student follow it faithfully and still end up confused — or simply wrong? An attempt to reconstruct an idea we worked out together and never published.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/ian-stewart-portrait.jpg" alt="Ian Stewart">
+    <span class="name">Ian Stewart</span>
+  </div>
+
+  <div class="memoriam">
+    <span class="mk">In memory</span>
+    <span class="mt">David Tall &middot; 1941&ndash;2024 &mdash; teacher, mathematician, friend and collaborator.</span>
+  </div>
+
+  <div class="body">
+    <p>Many years ago, the Maths Department at Warwick University produced an annual series of four booklets titled <em>Plan Your Degree Course</em>. As the title suggests, they were intended to help students choose which courses to study. The system then, as now, allowed students to take options from other departments, as well as maths courses. In the first two years there was a core of compulsory maths, plus extra maths options, and a specified percentage had to be in maths. But courses in physics, biology, business studies, psychology, even English literature, were permitted. One booklet described the general nature of the degree programme; the others listed options for years 1, 2, and 3.</p>
+
+    <p>One year, David Tall and I joined forces to produce the next edition, and David contributed a page headed &lsquo;What shape student are you?&rsquo;. I drew some cartoon diagrams to illustrate what he had in mind. You might be a student with a broad mathematical base in year 1, staying equally broad in years 2 and 3: if so, you were mainly a specialist mathematician. You might start out more narrow, doing only the core maths courses, but take a greater percentage of maths in later years as your level of interest increases. You might want to develop a single sideline, such as business studies. Or you might do the minimum of maths at all times and branch out like the tentacles of an octopus into several unrelated subjects.</p>
+
+    <p>This document opened my eyes to something that David made a major theme of in later years: students don&rsquo;t all think the same way. In one of his papers on maths education [3], he wrote: &lsquo;It may come as a surprise the first time one realizes that other people have radically different thinking processes. It first happened to the author when using pictures to help students visualize ideas in mathematical analysis, at a time when he did not question the implicit belief that such an approach was universally valid. Whilst writing a text book on complex analysis, a colleague in the next room was engaged on a similar enterprise, yet the latter&rsquo;s book had almost no pictures at all&hellip; To him a real number was an element of a complete ordered field (satisfying specific axioms) and a complex number was an ordered pair of real numbers. At the time the author sympathized with his philosophical viewpoint, but considered it the product of a sophisticated development that few students might share. It was not until later that the realization dawned that there were a number of students who genuinely preferred such a formal approach.&rsquo;</p>
+
+    <p>In particular, David emphasised that even a single individual can think in different ways in different contexts. One way is the formal definition of a concept; another is the informal image that we mainly work with. The human brain is not relentlessly logical, as formal mathematics should be. It makes sudden leaps, intuitive guesses; it spots patterns hidden in jumbled data and somehow leverages them into fresh insights. As we learn maths, be it at school or after thirty years of research, our &lsquo;concept image&rsquo;, as David called it, is constantly developing and changing. This evolutionary process need not always be coherent; confusion is often a path to subsequent understanding. As a result, David wrote, &lsquo;it is possible for conflicting views to be held in the mind of a given individual and to be evoked at different times without the individual being aware of the conflict until they are evoked simultaneously.&rsquo;</p>
+
+    <p>I was rereading his paper recently &mdash; I wanted to mention it in a popular maths book I was writing &mdash; and it reminded me that in one of my many discussions with David we came up with an idea that, as far as I know, was never published. He alludes to it obliquely in his paper [3]. It illuminates problems that can arise when teaching and learning mathematics at any level; it also offers insights into features of research mathematics and human disputes, from politics to theology. Our original notes on the topic, which were typed or handwritten, seem not to have survived, so I&rsquo;ll attempt to reconstruct the general idea here, as it applies to learning and teaching maths.</p>
+
+    <p>The question that got us started arose because both of us had, within a few years, taught Warwick University&rsquo;s &lsquo;Foundations&rsquo; course. This course, taught in the first term of Year 1, sets out the basic mathematical concepts and techniques on which all subsequent courses rest: logic, set theory, functions, axioms for the natural numbers, construction of negative integers, rationals, reals, and complex numbers. The viewpoint of the course was: from a formal standpoint, any valid mathematical deduction, be it a calculation or a proof, proceeds step by step, with each step following logically from previous ones. Of course, no one ever does that completely: we omit obvious steps, skip familiar ones, and generally try to focus on the bits that actually matter. But that&rsquo;s another story [2].</p>
+
+    <p>If it&rsquo;s all so tidy and logical, we asked each other, how can students follow what to them must have seemed a logical argument and end up with the wrong answer? Why, sometimes, do they end up confused, when two apparently sensible lines of thought end up contradicting each other? Why, for that matter, do they sometimes just feel confused, without being able to articulate why? Students can easily do this, especially those who are relying on memorising things instead of understanding them. And it&rsquo;s not just students who have such problems: errors in published research papers occasionally go unnoticed for years, despite peer review and close scrutiny by authors and readers.</p>
+
+    <p>The most puzzling mistakes of this kind occur when nobody notices that something doesn&rsquo;t make sense. Crucially, this need not (and generally does not) happen because they notice a logical error. It happens when later use of the erroneous answer contradicts something else that they&rsquo;ve previously come across. At this point, they&rsquo;re experiencing what David and I called &lsquo;path-dependent logic&rsquo;.</p>
+
+    <div class="principle">
+      <div class="lab">Path-dependent logic</div>
+      <div class="txt">Two different routes through a sequence of mathematical statements lead to conflicting conclusions. Either route seems to make sense; apparently each contains no errors; but they contradict each other.</div>
+    </div>
+
+    <p>As a very simple example, a student might assume in one calculation that \((x+y)^2 = x^2 + y^2\), yet correctly expand \((x+y)(x+y)\) in a different one. Here it&rsquo;s obvious that there&rsquo;s an error, but it&rsquo;s not obvious what caused it. The error might be a false analogy with multiplication, where \((xy)^2 = x^2 y^2\) &mdash; after all, addition and multiplication share many properties. It could be a false analogy with \(2(x+y) = 2x+2y\). Or they might not realise that \((x+y)(x+y) = (x+y)^2\). But in general, when the sequences of statements are longer, all you get is a vague feeling that &lsquo;something&rsquo;s wrong&rsquo;. And so it is, but that doesn&rsquo;t help you find out where.</p>
+
+    <p>In effect, path-dependent logic happens when we&rsquo;re working within a logically inconsistent system. It might be a confused concept image in a student&rsquo;s mind; it might be a &lsquo;proof by contradiction&rsquo; in which we consciously assume something we&rsquo;re aiming to prove is wrong; or it might be a set of assumptions that we&rsquo;ve never examined for inherent contradictions. Politicians can cheerfully praise some sector of society at one moment, and denigrate it at the next. Sometimes they&rsquo;re aware of the contradiction but find it convenient to win arguments by whatever means comes to hand. Sometimes they genuinely don&rsquo;t notice that what they said last week contradicts what they&rsquo;re saying today.</p>
+
+    <p>The problem when learning (and therefore teaching) maths is that these unnoticed conflicts cause endless confusion. Even when we realise that something doesn&rsquo;t make sense, it can be difficult to find the real source of the problem.</p>
+
+    <div class="pullquote">Whenever a student came to me saying &lsquo;I don&rsquo;t understand this&rsquo;, I generally replied &lsquo;No &mdash; you don&rsquo;t understand something earlier in the course, but think you do.&rsquo;</div>
+
+    <p>Then a kind of Sherlock Holmes investigation, or perhaps more like debugging a computer program, gets underway, to locate the source of misunderstanding. Eventually one logical path is seen to be flawed, while the other survives. Sometimes both paths are flawed and radical surgery is required.</p>
+
+    <p>We can get trapped by path-dependent logic because it is entirely possible to pursue long chains of deductions without making any errors. Everything looks fine, and appears to make sense. On another occasion, an equally error-free chain of logic might lead to the contrary conclusion. The contradiction can easily be overlooked until something rubs your nose in it. The person concerned is then in the awkward position of holding two contradictory views, while being unaware of this. They might continue making deductions, sometimes using one view and sometimes the other, and still not notice what&rsquo;s happening.</p>
+
+    <p>This problem applies equally to research mathematicians in pursuit of a new theorem, and to students trying to answer a question or understand a concept. It applies in daily life too: how often have you had a discussion with someone who keeps changing their position to suit the needs of the moment, while genuinely not realising that what they&rsquo;re saying now conflicts with what they said two minutes ago? The local logic is easy to verify and error-free; the global logic is flawed, but the contradiction is much harder to observe because the conflicting assumptions are widely separated.</p>
+
+    <p>David quotes Papert [1]: &lsquo;New knowledge often contradicts the old, and effective learning requires strategies to deal with such conflict. Sometimes the conflicting pieces of knowledge can be reconciled, sometimes one or the other must be abandoned, and sometimes the two can both be &ldquo;kept around&rdquo; if safely maintained in separate compartments.&rsquo; Sometimes these compartments are genuinely different: \((x+y)^2 = x^2 + y^2\) really is true for integers modulo 2, and more generally over any field of characteristic 2. Where the compartments are <em>not</em> genuinely different, though, I don&rsquo;t personally recommend the third method when learning maths, because it ignores the contradiction instead of sorting it out. But if, after serious effort and introspection, plus professional assistance, you can&rsquo;t locate the source of the contradiction, it&rsquo;s better to place the issue on the back burner and mark it &lsquo;sort out later&rsquo; rather than going round and round in circles and refusing to move on. Often thinking about later ideas sheds light on what went wrong, as our concept images are refined by experience. It might take years, but often the next sentence, the next page in the textbook, or the next lecture, makes the little light bulb go off.</p>
+
+    <p>I&rsquo;ll leave the last word to David [3]: &lsquo;The first task &hellip; is to sensitize the mathematician to the different types of mathematical mind that occur, operating in quite different ways, and to use this knowledge to highlight the different ways that the developing mind may need appropriate experiences to gain insight into&hellip; mathematical processes.&rsquo;</p>
+  </div>
+
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Author</div>
+        <div class="who">Ian Stewart</div>
+        <div class="aff">University of Warwick</div>
+      </div>
+      <div class="role">
+        <div class="lab">Translation (Persian)</div>
+        <div class="who">Sharareh Taghi-Dastjerdi</div>
+      </div>
+      <div class="role">
+        <div class="lab">In memory of</div>
+        <div class="who">David Tall</div>
+        <div class="aff">1941&ndash;2024 &middot; University of Warwick</div>
+      </div>
+      <div class="role">
+        <div class="lab">Commissioned by</div>
+        <div class="who">Amir Asghari</div>
+      </div>
+    </div>
+    <div class="origin">Written specially for <em>WikiLetter</em>, at the editor&rsquo;s request, in memory of David Tall. Received 26 September 2024.</div>
+  </div>
+
+  <div class="refs">
+    <h3>References</h3>
+    <ol>
+      <li>Seymour Papert (1980). <em>Mindstorms.</em> Basic Books, New York &amp; Harvester Press, Brighton.</li>
+      <li>Ian Stewart (1999). Secret narratives of mathematics, in <em>Mission to Abisko</em> (ed. J. Casti and A. Karlqvist), Perseus, Reading MA, 157&ndash;185.</li>
+      <li>David Tall (1991). The psychology of advanced mathematical thinking, in D. O. Tall (ed.), <em>Advanced Mathematical Thinking</em>, Mathematics Education Library 11, Springer, 3&ndash;21.</li>
+    </ol>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">ویکی‌نوشت · به یادِ دیوید تال</div>
+  <h1 class="title">چه نوع دانشجویی هستید؟</h1>
+  <p class="standfirst">پرسشی که روزی من و دیوید تال از یکدیگر پرسیدیم: اگر هر گامِ یک استدلالِ ریاضی منطقی باشد، چگونه ممکن است دانشجویی صادقانه آن را دنبال کند و باز هم به تناقض برسد؟</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/ian-stewart-portrait.jpg" alt="یان استوارت">
+    <span class="name">یان استوارت</span>
+  </div>
+
+  <div class="memoriam">
+    <span class="mk">به یاد</span>
+    <span class="mt">دیوید تال · ۱۹۴۱–۲۰۲۴ — معلم، ریاضی‌دان، دوست و همکار.</span>
+  </div>
+
+  <div class="body">
+    <p>سال‌ها پیش، گروه ریاضیِ دانشگاه واریک هر سال مجموعه‌ای متشکل از چهار دفترچه با عنوان «برای دورهٔ تحصیلی خود برنامه‌ریزی کنید» منتشر می‌کرد. همان‌طور که از عنوان آن برمی‌آید، هدف این دفترچه‌ها کمک به دانشجویان برای انتخاب درس‌هایی بود که می‌خواستند بگذرانند. در آن زمان، همانند امروز، دانشجویان می‌توانستند علاوه بر درس‌های ریاضی، واحدهایی را نیز از سایر گروه‌های آموزشی انتخاب کنند. در دو سال نخست، مجموعه‌ای از درس‌های اصلیِ اجباریِ ریاضی همراه با تعدادی درس اختیاریِ ریاضی وجود داشت و دانشجو موظف بود درصد مشخصی از واحدهای خود را در رشتهٔ ریاضی بگذراند. با این حال، انتخاب درس‌هایی از رشته‌هایی مانند فیزیک، زیست‌شناسی، مدیریت بازرگانی، روان‌شناسی و حتی ادبیات انگلیسی نیز مجاز بود. یکی از دفترچه‌ها ماهیت کلیِ برنامهٔ تحصیلی را معرفی می‌کرد و سه دفترچهٔ دیگر، فهرستی از درس‌های قابل انتخاب در سال‌های اول، دوم و سوم را ارائه می‌دادند.</p>
+
+    <p>در یکی از سال‌ها، من و دیوید تال برای تهیهٔ نسخهٔ جدید این مجموعه با یکدیگر همکاری کردیم. دیوید صفحه‌ای با عنوان «چه نوع دانشجویی هستید؟» نوشت. من نیز چند طرح کارتونی کشیدم تا نشان دهم او چه ایده‌ای در سر دارد. ممکن بود شما دانشجویی باشید که در سال اول، پایه‌ای وسیع در ریاضیات داشته و همین وسعت را در سال‌های دوم و سوم نیز حفظ می‌کند؛ در این صورت، شما عمدتاً یک ریاضیدانِ متخصص بودید. یا شاید با پایه‌ای محدودتر آغاز می‌کردید و فقط درس‌های اصلی را می‌گذراندید، اما با افزایش علاقه‌تان، در سال‌های بعد درصد بیشتری از واحدهای ریاضی را انتخاب می‌کردید. شاید هم می‌خواستید در کنار ریاضیات، تنها یک حوزهٔ فرعی مانند مدیریت بازرگانی را دنبال کنید. یا ممکن بود در تمام دوران تحصیل، حداقلِ واحدهای ریاضی را بگذرانید و مانند شاخک‌های یک هشت‌پا، به چندین رشتهٔ نامرتبطِ دیگر نیز انشعاب بیابید.</p>
+
+    <p>این نوشته چشم مرا به نکته‌ای گشود که دیوید بعدها آن را به یکی از محورهای اصلیِ پژوهش‌هایش تبدیل کرد: همهٔ دانشجویان به یک شیوه فکر نمی‌کنند. او در یکی از مقاله‌های خود [۳] دربارهٔ آموزش ریاضی نوشت: «اولین باری که انسان متوجه می‌شود دیگران فرایندهای فکریِ کاملاً متفاوتی دارند، ممکن است بسیار شگفت‌زده شود. این تجربه برای نویسنده زمانی رخ داد که در آنالیز ریاضی برای کمک به دانشجویان در تجسمِ ایده‌ها از تصاویر استفاده می‌کرد؛ در آن زمان، او این باور ضمنی را زیر سؤال نبرده بود که چنین رویکردی به‌طور جهان‌شمول معتبر است. هم‌زمان با نگارش کتابی دربارهٔ آنالیز مختلط، یکی از همکارانش در اتاق مجاور نیز مشغول نوشتن کتابی مشابه بود، اما کتاب او تقریباً هیچ تصویری نداشت… از دیدگاه او، یک عدد حقیقی عضوی از یک میدان مرتبِ کامل بود (که در اصولِ موضوعهٔ مشخصی صدق می‌کند) و یک عدد مختلط، زوجِ مرتبی از اعداد حقیقی محسوب می‌شد. در آن زمان، نویسنده با دیدگاه فلسفیِ او همدلی داشت، اما گمان می‌کرد این نگرش حاصلِ نوعی رشد فکریِ پیشرفته است که تعداد اندکی از دانشجویان با آن ارتباط برقرار می‌کنند. بعدها این واقعیت آشکار شد که گروهی از دانشجویان واقعاً این رویکردِ صوری را ترجیح می‌دهند.»</p>
+
+    <p>دیوید به‌ویژه تأکید می‌کرد که حتی یک فرد واحد نیز می‌تواند در موقعیت‌های مختلف، به شیوه‌های متفاوتی بیندیشد. یکی از این شیوه‌ها، تعریفِ صوریِ یک مفهوم است و دیگری، تصویرِ ذهنیِ غیررسمی‌ای که در عمل بیشتر با آن کار می‌کنیم. مغز انسان، برخلاف ریاضیاتِ صوری که باید چنین باشد، همواره منطقی عمل نمی‌کند. ذهن، ناگهان جهش می‌کند، حدس‌های شهودی می‌زند، الگوهای پنهان را در میان داده‌های پراکنده تشخیص می‌دهد و به نوعی آن‌ها را به بینش‌های تازه تبدیل می‌کند. هنگامی که ریاضی می‌آموزیم، چه در مدرسه و چه پس از سی سال پژوهش، آنچه دیوید «تصویرِ مفهومی» <span dir="ltr">(concept image)</span> می‌نامید، پیوسته در حال رشد و دگرگونی است. این فرایندِ تکاملی لزوماً همیشه منسجم نیست؛ سردرگمی، اغلب راهی به سوی فهمِ بعدی است. از همین رو، دیوید نوشت: «ممکن است یک فرد، هم‌زمان دیدگاه‌هایی متعارض را در ذهن خود داشته باشد و هر یک از آن‌ها در زمان‌های متفاوت برانگیخته شوند، بی‌آنکه خودِ فرد از این تعارض آگاه باشد؛ مگر آنکه هر دو دیدگاه به‌طور هم‌زمان فراخوانده شوند.»</p>
+
+    <p>چندی پیش دوباره مقالهٔ او را می‌خواندم — زیرا می‌خواستم در کتابی عمومی دربارهٔ ریاضیات که مشغول نگارشِ آن بودم به آن اشاره کنم — و این بازخوانی، ایده‌ای را که در یکی از بحث‌های فراوانم با دیوید به آن رسیده بودیم، برایم زنده کرد؛ ایده‌ای که تا آنجا که می‌دانم هرگز منتشر نشد. او در مقالهٔ خود [۳] به‌طور ضمنی به آن اشاره‌ای کرده است. این ایده، مشکلاتی را که ممکن است در آموزش و یادگیریِ ریاضیات در هر سطحی پدید آید روشن می‌کند؛ همچنین بینش‌هایی دربارهٔ ویژگی‌های پژوهشِ ریاضی و حتی منازعاتِ انسانی، از سیاست گرفته تا الهیات، ارائه می‌دهد. یادداشت‌های اولیهٔ ما دربارهٔ این موضوع که یا تایپ‌شده بودند یا دست‌نویس، ظاهراً از بین رفته‌اند. بنابراین، در اینجا می‌کوشم ایدهٔ کلی را، آن‌گونه که دربارهٔ یادگیری و آموزشِ ریاضی کاربرد دارد، بازسازی کنم.</p>
+
+    <p>پرسشی که آغازگرِ بحثِ ما بود، به این دلیل مطرح شد که هر دوی ما، ظرف چند سال، در دانشگاه واریک درسِ «مبانی» را تدریس کرده بودیم. این درس که در ترمِ نخستِ سال اول ارائه می‌شد، مفاهیم و روش‌های بنیادیِ ریاضیات را که همهٔ درس‌های بعدی بر آن‌ها استوارند بیان می‌کرد: منطق، نظریهٔ مجموعه‌ها، توابع، اصولِ موضوعهٔ اعداد طبیعی، ساختِ اعداد صحیحِ منفی، اعداد گویا، اعداد حقیقی و اعداد مختلط. دیدگاهِ حاکم بر این درس چنین بود: از منظرِ صوری، هر استدلالِ معتبرِ ریاضی، چه یک محاسبه باشد و چه یک برهان، گام‌به‌گام پیش می‌رود و هر گام به‌طور منطقی از گام‌های پیشین نتیجه می‌شود. البته، در عمل هیچ‌کس این روند را به‌طور کامل اجرا نمی‌کند: ما گام‌های بدیهی را حذف می‌کنیم، از مراحلِ آشنا می‌گذریم و معمولاً می‌کوشیم توجه خود را بر بخش‌هایی متمرکز کنیم که واقعاً اهمیت دارند. اما این، خود داستانِ دیگری است [۲].</p>
+
+    <p>از خود می‌پرسیدیم: اگر همه‌چیز تا این اندازه منظم و منطقی است، چگونه ممکن است دانشجویان استدلالی را که از نظرِ خودشان کاملاً منطقی به نظر می‌رسد دنبال کنند، اما در نهایت به پاسخِ نادرست برسند؟ چرا گاهی‌اوقات، هنگامی که دو رشته استدلالِ ظاهراً معقول به نتایجی متناقض می‌رسند، دچار سردرگمی می‌شوند؟ و اصلاً چرا گاهی احساسِ سردرگمی می‌کنند، بی‌آنکه بتوانند دلیلش را توضیح دهند؟ دانشجویان به‌سادگی ممکن است در چنین وضعیتی قرار گیرند، به‌ویژه آنهایی که به‌جای درکِ مفاهیم، بر حفظ‌کردنِ آن‌ها متکی باشند. البته این مشکل منحصر به دانشجویان نیست؛ گاهی اشتباهات در مقاله‌های پژوهشیِ منتشرشده، با وجودِ داوریِ همتایان و بررسیِ دقیقِ نویسندگان و خوانندگان، سال‌ها از چشم پنهان می‌ماند.</p>
+
+    <p>گیج‌کننده‌ترین خطاهای این نوع هنگامی رخ می‌دهند که هیچ‌کس متوجه نمی‌شود چیزی بی‌معنی رخ داده است. نکتهٔ مهم این است که این آگاهی لزوماً — و در واقع معمولاً — از یافتنِ یک خطای منطقی ناشی نمی‌شود. بلکه زمانی پدید می‌آید که استفادهٔ بعدی از پاسخِ نادرست، با مطلبِ دیگری که فرد پیش‌تر با آن روبه‌رو شده است، متناقض می‌شود. در چنین لحظه‌ای، فرد آن چیزی را تجربه می‌کند که من و دیوید آن را «منطقِ وابسته به مسیر» <span dir="ltr">(path-dependent logic)</span> نامیدیم.</p>
+
+    <div class="principle">
+      <div class="lab">منطقِ وابسته به مسیر</div>
+      <div class="txt">دو مسیرِ متفاوت در میانِ زنجیره‌ای از گزاره‌های ریاضی، به نتایجی متعارض می‌رسند. هر یک از این دو مسیر، به‌تنهایی درست به نظر می‌رسد؛ ظاهراً هیچ‌کدام خطایی ندارد، اما آن‌ها با یکدیگر در تناقض‌اند.</div>
+    </div>
+
+    <p>به‌عنوان مثالی بسیار ساده، فرض کنید دانشجویی در یک محاسبه چنین فرض کند که \(  (x+y)^2 = x^2 + y^2  \)، اما در محاسبه‌ای دیگر، عبارتِ \(  (x+y)(x+y)  \) را به‌درستی بسط دهد. در اینجا روشن است که خطایی رخ داده است، اما منشأ آن چندان روشن نیست. خطا شاید از یک قیاسِ نادرست با ضرب حاصل شده باشد، زیرا می‌دانیم \(  (xy)^2 = x^2 y^2  \) — به هر حال، جمع و ضرب ویژگی‌های مشترکِ بسیاری دارند — یا شاید از قیاسِ نادرست با رابطهٔ \(  2(x+y) = 2x + 2y  \) ناشی شده باشد. همچنین ممکن است اصلاً متوجه نباشد که \(  (x+y)(x+y) = (x+y)^2  \). اما به‌طور کلی، هنگامی که زنجیرهٔ گزاره‌ها طولانی‌تر باشد، تنها چیزی که به‌دست می‌آورید احساسی مبهم است مبنی بر اینکه «یک جای کار ایراد دارد» — و واقعاً نیز همین‌طور است؛ اما این احساس به‌تنهایی کمک نمی‌کند که بفهمید ایراد در کجای کار است.</p>
+
+    <p>در واقع، «منطقِ وابسته به مسیر» زمانی رخ می‌دهد که ما درونِ یک دستگاهِ منطقیِ ناسازگار کار می‌کنیم. این امر ممکن است ناشی از یک «تصویرِ مفهومیِ» آشفته در ذهنِ دانشجو باشد؛ یا ممکن است در جریانِ یک «برهانِ خلف» <span dir="ltr">(proof by contradiction)</span> پدید آید، جایی که آگاهانه فرض می‌کنیم گزاره‌ای که قصدِ اثباتش را داریم نادرست است؛ یا شاید از مجموعه‌ای از پیش‌فرض‌ها ناشی شود که هرگز آن‌ها را از نظرِ وجودِ تناقض‌های درونی بررسی نکرده‌ایم. سیاستمداران، برای مثال، ممکن است در یک لحظه با شور و حرارت از بخشی از جامعه تمجید کنند و در لحظه‌ای دیگر همان بخش را تحقیر کنند. گاهی خودشان از این تناقض آگاه‌اند، اما ترجیح می‌دهند با هر وسیله‌ای که دمِ دستشان باشد در بحث پیروز شوند. اما گاهی نیز واقعاً متوجه نمی‌شوند که آنچه امروز می‌گویند با سخنانِ هفتهٔ گذشته‌شان در تناقض است.</p>
+
+    <p>مشکل در زمانِ یادگیری (و در نتیجه، در آموزشِ) ریاضی این است که چنین تعارضاتِ نادیده‌گرفته‌شده‌ای سرچشمهٔ سردرگمی‌های بی‌پایان می‌شوند. حتی هنگامی که متوجه می‌شویم یک جای کار ایراد دارد، پیدا کردنِ منشأ واقعیِ مشکل ممکن است سخت باشد.</p>
+
+    <div class="pullquote">هرگاه دانشجویی نزد من می‌آمد و می‌گفت «این مطلب را نمی‌فهمم»، معمولاً پاسخ می‌دادم: «نه — تو چیزی را درست نفهمیده‌ای که پیش‌تر در این درس آمده و فکر می‌کنی آن را فهمیده‌ای.»</div>
+
+    <p>پس از آن، نوعی تحقیق به سبکِ شرلوک هولمز — یا شاید بیشتر شبیه فرایندِ اشکال‌زداییِ یک برنامهٔ رایانه‌ای — آغاز می‌شد تا سرچشمهٔ بدفهمی پیدا شود. سرانجام روشن می‌شد که یکی از دو مسیرِ منطقیِ استدلال ایراد داشته و مسیرِ دیگر برجای می‌مانَد. البته گاهی هر دو مسیر ایراد دارند و در این صورت، درمانی اساسی و ریشه‌ای لازم است.</p>
+
+    <p>ما ممکن است در دامِ «منطقِ وابسته به مسیر» گرفتار شویم، زیرا کاملاً ممکن است زنجیره‌های طولانی از استنتاج‌ها را بدونِ ارتکابِ حتی یک خطای منطقی دنبال کنیم. همه‌چیز درست به نظر می‌رسد و ظاهراً کاملاً بامعناست. اما در موقعیتی دیگر، زنجیره‌ای باز هم بی‌خطا از استدلال‌های منطقی ممکن است به نتیجه‌ای کاملاً مخالف برسد. این تناقض به‌آسانی می‌تواند از نظر دور بماند، تا زمانی که مستقیماً با آن روبه‌رو شوید. در آن هنگام، فرد در وضعیتِ ناخوشایندی قرار می‌گیرد که درمی‌یابد هم‌زمان دو باورِ متناقض را در ذهنِ خود نگه داشته، بی‌آنکه از این تناقض آگاه باشد. حتی ممکن است همچنان به استنتاج‌کردن ادامه دهد؛ گاهی بر اساسِ یکی و گاهی بر اساسِ دیگری، و باز هم متوجه نشود که دقیقاً چه اتفاقی در حال رخ دادن است.</p>
+
+    <p>این مشکل به همین میزان، هم دربارهٔ ریاضیدانانِ پژوهشگر، هنگامی که در پیِ اثباتِ قضیه‌ای جدید هستند، صدق می‌کند و هم دربارهٔ دانشجویانی که می‌کوشند به پرسشی پاسخ دهند یا مفهومی را درک کنند. این مسئله در زندگیِ روزمره نیز وجود دارد: چند بار پیش آمده است که با کسی بحث کنید که پیوسته موضعِ خود را متناسب با نیازِ لحظه تغییر می‌دهد، بی‌آنکه واقعاً متوجه باشد آنچه اکنون می‌گوید با سخنی که دو دقیقه پیش گفته در تعارض است؟ منطقِ موضعی <span dir="ltr">(local logic)</span> به‌سادگی قابلِ راستی‌آزمایی است و ظاهراً هیچ خطایی ندارد؛ اما منطقِ سراسری <span dir="ltr">(global logic)</span> دارای ایراد است. با این حال، تشخیصِ این تناقض بسیار دشوارتر است، زیرا فرض‌های متعارض فاصلهٔ دوری از یکدیگر دارند.</p>
+
+    <p>دیوید از پاپرت نقل می‌کند [۱]: «دانشِ جدید غالباً با دانشِ پیشین در تناقض است و یادگیریِ مؤثر مستلزمِ راهبردهایی برای رویارویی با چنین تعارض‌هایی است. گاهی می‌توان دو بخشِ متعارضِ دانش را با یکدیگر وفق داد؛ گاهی باید یکی یا دیگری را کنار گذاشت؛ و گاهی نیز می‌توان هر دو را ”نگه داشت“، مشروط به آنکه به‌طورِ امنی در محفظه‌های جداگانه نگهداری شوند.» گاهی این محفظه‌ها واقعاً از یکدیگر مستقل‌اند؛ برای مثال، رابطهٔ \(  (x+y)^2 = x^2 + y^2  \) برای اعدادِ صحیح به‌پیمانهٔ ۲، یا به‌طور کلی‌تر، در میدان‌هایی با مشخصهٔ ۲، درست است. اما اگر چنین تفاوتِ بنیادینی وجود نداشته باشد، شخصاً روشِ سوم را برای یادگیریِ ریاضیات توصیه نمی‌کنم؛ زیرا در این حالت، به‌جای حل کردنِ تناقض، صرفاً آن را نادیده می‌گیرد. با این حال، اگر پس از تلاشِ فراوان، تأملِ جدی و حتی کمک گرفتن از افرادِ حرفه‌ای، باز هم نتوانستید منشأ تناقض را پیدا کنید، بهتر است به‌جای آنکه دورِ خود بچرخید و از پیشروی امتناع کنید، آن مسئله را به‌طورِ موقت کنار بگذارید و به آن برچسبِ «بعداً بررسی شود» بزنید. بسیار پیش می‌آید که اندیشیدن به ایده‌های بعدی، بر آنچه اشتباه پیش رفته بود نور می‌افکند؛ زیرا با افزایشِ تجربه، «تصویرهای مفهومیِ» ما نیز پالایش می‌شوند. گاهی این امر سال‌ها طول می‌کشد، اما اغلب تنها جملهٔ بعدی، صفحهٔ بعدیِ کتاب یا جلسهٔ بعدیِ درس کافی است تا ناگهان آن جرقه در ذهن زده شود.</p>
+
+    <p>اجازه دهید سخنِ پایانی را با نقل‌قولی از دیوید [۳] به پایان برسانم: «نخستین وظیفه… آن است که ریاضیدان را نسبت به انواعِ گوناگونِ ذهن‌های ریاضی که به شیوه‌هایی کاملاً متفاوت عمل می‌کنند حساس کنیم و از این آگاهی برای برجسته‌کردنِ شیوه‌های متفاوتی بهره گیریم که ذهنِ در حالِ رشد ممکن است برای دستیابی به بینش نسبت به… فرایندهای ریاضی، به تجربه‌های مناسبی نیاز داشته باشد.»</p>
+  </div>
+
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">نویسنده</div>
+        <div class="who">یان استوارت</div>
+        <div class="aff">دانشگاه واریک</div>
+      </div>
+      <div class="role">
+        <div class="lab">مترجم</div>
+        <div class="who">شراره تقی‌دستجردی</div>
+      </div>
+      <div class="role">
+        <div class="lab">به یادِ</div>
+        <div class="who">دیوید تال</div>
+        <div class="aff">۱۹۴۱–۲۰۲۴ · دانشگاه واریک</div>
+      </div>
+      <div class="role">
+        <div class="lab">به‌سفارشِ</div>
+        <div class="who">امیر اصغری</div>
+      </div>
+    </div>
+    <div class="origin">ویژه‌ی «ویکی‌نوشت»، به‌درخواستِ سردبیر و به یادِ دیوید تال نوشته شده است. دریافت‌شده در ۲۶ سپتامبر ۲۰۲۴.</div>
+  </div>
+
+  <div class="refs">
+    <h3>منابع</h3>
+    <ol dir="ltr" style="text-align:start">
+      <li>Seymour Papert (1980). <em>Mindstorms.</em> Basic Books, New York &amp; Harvester Press, Brighton.</li>
+      <li>Ian Stewart (1999). Secret narratives of mathematics, in <em>Mission to Abisko</em> (ed. J. Casti and A. Karlqvist), Perseus, Reading MA, 157&ndash;185.</li>
+      <li>David Tall (1991). The psychology of advanced mathematical thinking, in D. O. Tall (ed.), <em>Advanced Mathematical Thinking</em>, Mathematics Education Library 11, Springer, 3&ndash;21.</li>
+    </ol>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  }
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+
+  // Render math once KaTeX is ready
+  function renderMath(){
+    if (!window.renderMathInElement) { setTimeout(renderMath, 60); return; }
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+  renderMath();
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

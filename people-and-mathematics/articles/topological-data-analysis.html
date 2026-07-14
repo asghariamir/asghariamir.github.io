@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When Topology Tames Data! — Mahdis Emami · Face to Face with Mathematics</title>
+<meta name="description" content="An introduction to topological data analysis: from the architecture of data to the discovery of hidden structures. By Mahdis Emami. With an interactive persistent-homology playground.">
+
+<meta property="og:title" content="When Topology Tames Data! — Mahdis Emami">
+<meta property="og:description" content="Face to Face with Mathematics · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/tda-thumb.png">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX for crisp typeset mathematics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>/* KaTeX inside RTL text — keep formulas LTR & bidi-isolated */
+.katex, .katex-display { direction: ltr; unicode-bidi: isolate; }
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+  .ltr { direction: ltr; unicode-bidi: isolate; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 46px; line-height: 1.08; font-weight: 500; letter-spacing: -.02em; margin: 16px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); align-self: center; }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+  .byline .meta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .byline .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; align-self: center; }
+
+  /* abstract + keywords */
+  .abstract { border: 1px solid var(--line); background: #F7F1E3; padding: 22px 26px; border-radius: 4px; margin-top: 30px; }
+  .abstract .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-bottom: 9px; }
+  .abstract .txt { font-size: 16.5px; line-height: 1.68; }
+  [dir="rtl"] .abstract .txt { line-height: 1.95; }
+  .keywords { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); margin-top: 14px; line-height: 1.6; }
+  .keywords .lab { color: var(--accent); font-weight: 600; }
+
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 40px 0 14px; padding-top: 8px; }
+
+  /* figures */
+  .figure { margin: 28px 0; }
+  .figure img { width: 100%; display: block; border: 1px solid #DBD0BA; border-radius: 3px; background: #fff; }
+  .figcap { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); margin-top: 9px; line-height: 1.55; }
+  .figcap .fno { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Interactive playground ---------- */
+  .playground { border: 1px solid var(--ink); border-radius: 4px; background: #F7F1E3; margin: 32px 0; overflow: hidden; direction: ltr; }
+  .pg-head { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .pg-title { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  .pg-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pg-presets button { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; font-weight: 500; border: 1px solid #D6C9AE; background: var(--paper); border-radius: 999px; padding: 6px 13px; cursor: pointer; color: var(--ink); }
+  .pg-presets button.on { background: var(--black); color: var(--paper); border-color: var(--black); }
+  .pg-cloud { display: block; width: 100%; cursor: crosshair; background: #FDFAF3; }
+  .pg-controls { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+  .pg-eps-label { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+  .pg-eps { flex: 1; min-width: 130px; accent-color: var(--accent); }
+  .pg-read { display: flex; gap: 18px; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .pg-read b { font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 700; margin-inline-start: 5px; }
+  .pg-bars { display: block; width: 100%; background: #FDFAF3; border-top: 1px solid var(--line); cursor: ew-resize; touch-action: none; }
+  .pg-hint { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); padding: 10px 16px 13px; line-height: 1.6; border-top: 1px solid var(--line); }
+  .pg-hint[dir="rtl"] { text-align: right; }
+
+  /* contributor colophon */
+  .colophon { margin-top: 46px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: 1fr; gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; direction: ltr; text-align: left; }
+  .refs li { margin-bottom: 10px; }
+  .refs a { color: var(--accent); word-break: break-word; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 22px 32px; }
+    h1.title { font-size: 33px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .pg-read { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="Face to Face with Mathematics" data-fa="رویارو با ریاضیات"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#B08A2E;display:inline-block;flex:0 0 auto;"></span><span data-en="Undergraduate maths · July 2026" data-fa="ریاضیِ کارشناسی · تیر ۱۴۰۵"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="kicker">Face to Face with Mathematics</div>
+  <h1 class="title">When Topology Tames Data!</h1>
+  <p class="standfirst">An introduction to topological data analysis: from the architecture of data to the discovery of hidden structures — what it means to take the <em>shape</em> of a dataset seriously.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/mahdis-emami.jpg" alt="Mahdis Emami">
+    <span class="name">Mahdis Emami</span>
+  </div>
+
+  <div class="abstract">
+    <div class="lab">Abstract</div>
+    <div class="txt">The rapid growth of complex data in science, medicine, and industry has made clear the need for frameworks that go beyond statistical summarization and predictive modeling to reveal the intrinsic structure of data itself. Topological Data Analysis (TDA) is one such approach. Drawing on geometric and topological concepts, it views data not merely as a table of features, but as a collection of points embedded in a structured space. The aim of this article is to provide a concise introduction to the role of TDA within the data analysis pipeline. To this end, the conventional data analysis workflow — from data collection and cleaning to modeling — is first revisited from the perspective of constructing an appropriate representation of data. Data are then interpreted as a point cloud in feature space, and the limitations of a purely Euclidean perspective are examined with reference to the manifold hypothesis. The discussion then turns to the role of metrization in transforming raw dissimilarities into a meaningful metric space and in laying the groundwork for topological analysis. Next, the central idea of TDA — particularly in the form of multiscale analysis and persistent homology — is briefly introduced. Finally, through a review of a case study on diabetes data, it is shown how the shape of data can help identify hidden subgroups and nonlinear patterns in medical datasets. The central argument of the article is that TDA is not a replacement for classical methods, but rather a complement to them: one that reveals a structural layer of data which, in many complex problems, is essential for sound interpretation and precise decision-making. It is crucial to emphasize that poor-quality data or an inappropriate model may lead to substantial losses for organizations and the industries concerned.</div>
+    <div class="keywords"><span class="lab">Keywords</span> &nbsp; Topological Data Analysis · Persistent Homology · Metric Space · Manifold · High-Dimensional Data · Medical Data</div>
+  </div>
+
+  <div class="body">
+    <h2 class="subhead">1. Introduction</h2>
+
+    <p>In many contemporary problems in data science, the central challenge is not merely the scarcity of data, but the complexity of its structure. Biological, medical, financial, behavioral, and industrial datasets typically exhibit characteristics such as high dimensionality, heterogeneity, noise, nonlinear relationships, and the presence of hidden subgroups. In such settings, representing data in tabular form and analyzing them using classical statistical tools or conventional machine learning algorithms — while still indispensable — is not always sufficient for understanding the intrinsic structure of the data. In many applications, what matters is not only the values of variables, but also the overall organization of samples within the data space: which points lie close to one another, what substructures are present in the dataset, whether ring-like or branching patterns can be observed, and whether these structures remain stable under noise.</p>
+
+    <p>Topological Data Analysis (TDA) has emerged in response to such questions. The central idea of this approach is to study data as a geometric-topological object — an object whose shape may carry information about the structure, connectedness, and multiscale organization of the data. From this perspective, TDA is not a competitor to machine learning or statistics, but rather a complementary layer in data analysis: a layer that seeks to uncover the stable structure of data either prior to modeling or alongside it.</p>
+
+    <p>This review article offers a concise account of the role of TDA within the data analysis pipeline. We begin by showing that the processes of data collection, cleaning, and exploratory analysis may be understood as steps in preparing a geometric representation of data. We then reinterpret data as a collection of points in feature space and, with reference to the manifold hypothesis, discuss the limitations of a purely linear perspective. Next, we examine the role of metrization in transforming data into a space amenable to topological study. Finally, we introduce the idea of multiscale analysis and persistent homology as one of the principal tools of TDA. The article concludes with a brief discussion of a diabetes case study, illustrating how this approach can be applied to the analysis of medical data.</p>
+
+    <h2 class="subhead">2. From the Data Pipeline to Its Geometric Representation</h2>
+
+    <p>In practice, data analysis is typically carried out as a multi-stage pipeline: data collection, cleaning and preprocessing, exploratory analysis, the selection of an appropriate representation, and finally modeling or insight extraction. These stages are often presented as a set of technical and independent steps; yet all of them may be understood within the framework of a more fundamental question: how can one construct, from raw data, a representation that preserves its underlying structure as faithfully as possible?</p>
+
+    <p>At the data collection stage, the types of variables, the quality of measurement, the data format, and the sampling procedure are determined — decisions that directly affect the eventual structure of the dataset. The cleaning stage is likewise not merely a matter of removing superficial errors, but an effort to transform the data into a comparable analytical substrate. The handling of missing values, the removal of unintended duplicates, the examination of outliers, and the validation of data types all determine whether a meaningful notion of distance and neighborhood can be defined on the data. Put differently, “clean” data, in this context, are data that can be embedded within a coherent analytical space.</p>
+
+    <p>Exploratory Data Analysis (EDA) is also more than a collection of plots and descriptive statistics; it constitutes the first step in identifying the structure of the data. At this stage, the analyst encounters clustering patterns, skewed distributions, nonlinear correlations, or the possible presence of latent subgroups. Such clues help determine the appropriate modeling framework for the data: is a Euclidean vector representation sufficient, or does the dataset require a more sophisticated representation?</p>
+
+    <p>From this perspective, the data analysis pipeline may be viewed as a process of constructing a suitable geometric representation of data — a representation that subsequently determines the choice of algorithm, metric, dimensionality reduction method, and even the possibility of entering the realm of topological analysis. In this sense, Topological Data Analysis is not a stage entirely separate from data analysis, but rather a natural continuation of the same process: the point at which the question of the shape of data enters the discussion explicitly.</p>
+
+    <h2 class="subhead">3. Data as a Point Cloud: From Vector Space to the Manifold Hypothesis</h2>
+
+    <p>In the simplest model, a tabular dataset in the form of a spreadsheet with \(n\) observations and \(p\) features may be regarded as a matrix (Figure 1), each row of which represents a vector in a \(p\)-dimensional space. Under this interpretation, the dataset as a whole becomes a collection of points in feature space — what is commonly referred to in data science as a point cloud. This geometric reinterpretation underlies a wide range of analytical methods: clustering, dimensionality reduction, anomaly detection, and even many machine learning models are built on the assumption that data can be studied as points in a vector space.</p>
+
+    <figure class="figure">
+      <img src="../assets/tda-fig1-en.jpg" alt="A spreadsheet of patients' health data in Microsoft Excel">
+      <figcaption class="figcap"><span class="fno">Figure 1.</span> An example of a spreadsheet in Microsoft Excel.</figcaption>
+    </figure>
+
+    <p>Yet this picture is not always sufficient. In many real-world problems, although data may appear to lie in a high-dimensional space, in practice they are organized around a low-dimensional and nonlinear structure. This idea is captured by the manifold hypothesis: real-world data are often concentrated on a low-dimensional substructure within feature space, rather than being distributed throughout the entire surrounding Euclidean space. For example, image, biological, or behavioral data may involve hundreds of features, while their effective degrees of freedom are far fewer. In such cases, a purely linear view of the data may obscure its true underlying structure.</p>
+
+    <p>More importantly, in many applications, the raw coordinates of the data are less informative than their neighborhood relations and relative organization. Two datasets may differ substantially in their numerical coordinates, yet display similar behavior in terms of connectedness, multiscale clustering, or the presence of structural paths and loops. It is precisely at this point that the language of topology becomes important: a language concerned not with local numerical values, but with the stable and qualitative structures of data.</p>
+
+    <p>Accordingly, viewing data as a point cloud is not merely a geometric metaphor; it serves as a bridge between the tabular representation of data and the analysis of its latent structure. This transition naturally leads to the next fundamental question: if data are regarded as a collection of points, how should proximity and similarity between those points be defined?</p>
+
+    <h2 class="subhead">4. What Does Topology Add to Data Architecture? From Dissimilarity to Metric Space</h2>
+
+    <p>A substantial part of data analysis rests on measuring similarity or difference between observations. Clustering, classification, similarity-based retrieval, anomaly detection, and many dimensionality reduction methods all rely, in one way or another, on the question: how close are two observations to one another? In a topological framework, this question is given a more precise formulation: what metric or neighborhood structure should be imposed on the data so that its underlying shape is preserved as faithfully as possible?</p>
+
+    <p>The answer begins with the notion of metrization. Here, metrization refers to endowing the data with a distance function or similarity measure capable of transforming raw dissimilarities among observations into a structure amenable to analysis. The importance of this step lies in the fact that many tools in TDA do not begin with the data table itself, but with a metric space derived from the data. Once a notion of distance has been defined on a set of observations, one may construct neighborhoods, connect nearby points, and investigate the topological structure that emerges from these connections.</p>
+
+    <p>In simple settings, Euclidean distance may be a natural choice. In many real-world datasets, however, such a choice is insufficient. Differences in feature scales, heterogeneity in variable types, the presence of categorical or temporal data, and even the nonlinear structure of the dataset may all render Euclidean distance an inadequate representation of true proximity between observations. For this reason, the choice of metric should be regarded as part of the conceptual modeling of data, rather than merely a computational decision.</p>
+
+    <p>At a richer level, if data are viewed as samples from an underlying smooth structure, one may invoke the idea of a Riemannian manifold and geodesic distances. Under this perspective, the distance between two points is not necessarily the shortest Euclidean path, but rather the shortest path along the structure of the data itself. Although in practical applications one cannot always assert with certainty the existence of a smooth manifold, this intuition plays an important role in manifold learning, nonlinear dimensionality reduction, and the geometric interpretation of data.</p>
+
+    <p>In this sense, the contribution of topology to data architecture may be summarized in a single statement: topology compels us, before anything else, to choose an appropriate language for proximity, neighborhood, and the global structure of data. This choice forms a bridge between raw data and the analysis of their stable structural properties.</p>
+
+    <h2 class="subhead">5. Topological Data Analysis: Idea, Tools, and Outputs</h2>
+
+    <p>Topological Data Analysis may be understood as a family of methods whose aim is to extract stable structural features from data. Its principal distinction from many conventional approaches lies in the fact that TDA, rather than focusing on a single fixed scale or a single model, examines data across multiple scales. This is important because many structural features of data — such as clusters, loops, or branches — become visible only over certain ranges of scale. If one were to choose only a single distance threshold for connecting points, the outcome of the analysis might depend entirely on that arbitrary choice.</p>
+
+    <p>The central idea is to construct, from a dataset and a chosen metric, a family of combinatorial or topological structures that become progressively richer as a scale parameter increases. At small scales, points are typically disconnected; as the scale grows, connected components emerge, loops appear, and these may later disappear at larger scales. Analyzing this process enables us to distinguish between transient features and those that persist across a wide range of scales.</p>
+
+    <p>One of the most important tools in this area is persistent homology. In this method, a sequence of simplicial complexes is constructed from the data and an underlying notion of distance, and the birth and death of topological features across different dimensions are then tracked. For example, in dimension zero one studies the number of connected components; in dimension one, loops or cyclic structures; and in higher dimensions, more intricate voids or cavities. The output of this analysis is typically represented in the form of a barcode or a persistence diagram. Features that appear only over a short range of scales are often attributed to noise, whereas persistent features may indicate genuine underlying structure in the data.</p>
+
+    <!-- ===== Interactive: persistent homology playground ===== -->
+    <div class="playground" data-pg data-pg-lang="en">
+      <div class="pg-head">
+        <span class="pg-title">Interactive · The shape of a point cloud</span>
+        <div class="pg-presets">
+          <button data-preset="circle" class="on">Circle</button>
+          <button data-preset="clusters">Two clusters</button>
+          <button data-preset="eight">Figure eight</button>
+          <button data-preset="random">Noise</button>
+          <button data-preset="clear">Clear</button>
+        </div>
+      </div>
+      <canvas class="pg-cloud"></canvas>
+      <div class="pg-controls">
+        <span class="pg-eps-label">the scale&nbsp;<span class="ltr">ε</span></span>
+        <input type="range" class="pg-eps" min="0" max="1000" value="300" aria-label="scale">
+        <div class="pg-read">
+          <span>pieces&nbsp;(β₀)<b data-b0>–</b></span>
+          <span>loops&nbsp;(β₁)<b data-b1>–</b></span>
+        </div>
+      </div>
+      <canvas class="pg-bars"></canvas>
+      <div class="pg-hint">Every point grows a disc of radius ε/2; points closer than ε are connected. Slide ε — or drag across the barcode — and watch pieces merge and loops appear and die. Long bars are the persistent features, the true shape of the data; short bars are noise. Click inside the cloud to add points of your own.</div>
+    </div>
+
+    <p>Alongside persistent homology, methods such as Mapper also belong to the TDA family. By constructing a graph-like representation of data, Mapper seeks to reveal clusters, branches, and transitions between different regions of the data space. The advantage of such tools lies in their ability to provide a structural picture of data even when the boundaries between groups are neither clear-cut nor linearly separable.</p>
+
+    <p>Taken together, TDA may be viewed as an approach for “seeing the shape of data.” It does not typically replace statistical methods or machine learning, but rather complements them — either by improving our understanding of data structure during the exploratory phase, or by serving as a source of structural features to be used alongside other methods. Its principal value lies precisely in this capacity: to uncover structures that may remain hidden in purely tabular representations or in linear models.</p>
+
+    <h2 class="subhead">6. Case Study: Diabetes Data and the Discovery of Hidden Subgroups</h2>
+
+    <p>The application of TDA to medical data is one of the domains in which the practical value of this approach becomes particularly evident. Diabetes-related data provide a suitable example. Each patient may be described by a set of clinical, laboratory, and sometimes genetic variables, yet the heterogeneity within the patient population is often so substantial that broad diagnostic labels do not necessarily offer an accurate picture of the true structure of the data. For this reason, the task is not merely to predict a label, but to identify subgroups that differ in disease progression, treatment response, or metabolic profile.</p>
+
+    <p>In a TDA-based framework, patients are viewed as points in feature space, and a neighborhood and connectivity structure is formed on the basis of similarity between them. An analysis of this structure may reveal that patient data are not reducible to a few simple, disjoint clusters; rather, they may contain a network of subgroups, branches, or clinical transitions. The importance of this observation lies in the fact that such structures are not always revealed by linear methods or standard clustering procedures (Figure 2).</p>
+
+    <figure class="figure">
+      <img src="../assets/tda-fig2.png" alt="A curved surface sampled by points, spanned by three principal-component axes">
+      <figcaption class="figcap"><span class="fno">Figure 2.</span> Classification of individuals according to diabetes type (central oval region: healthy individuals; left and right regions: Type&nbsp;1 and Type&nbsp;2 diabetes).</figcaption>
+    </figure>
+
+    <p>From the perspective of personalized medicine, this type of analysis may help identify more meaningful patient subpopulations — subpopulations that may exhibit distinct patterns in terms of risk, prognosis, or treatment response. In this sense, the diabetes case study is not merely a particular application of TDA, but an instance of the broader idea that the shape of data may itself carry clinically relevant information — information that, when analyzed appropriately, can contribute to a deeper understanding of disease heterogeneity and to more precise decision-making.</p>
+
+    <h2 class="subhead">7. Conclusion</h2>
+
+    <p>Topological Data Analysis represents an effort to add a structural layer to data analysis — a layer that regards data not merely as a collection of rows and columns, but as an object with geometric and topological organization. As this article has shown, the foundations for such a perspective are laid from the very earliest stages of the data analysis process — from data cleaning and exploratory analysis to the choice of representation and metric (Figure 3). Within this framework, clean data are data that can be situated in a meaningful metric or geometric space, and analyzed data are data whose shape and structure, and not merely their numerical values, have been understood.</p>
+
+    <figure class="figure">
+      <img src="../assets/tda-fig3-en.png" alt="Six stages of the data pipeline, from collection to insights">
+      <figcaption class="figcap"><span class="fno">Figure 3.</span> Stages in data refinement, from raw form to analytical form.</figcaption>
+    </figure>
+
+    <p>TDA becomes particularly valuable when dealing with high-dimensional, nonlinear, and heterogeneous data, where the principal patterns do not necessarily appear in raw coordinates or in linear models. Tools such as persistent homology and Mapper make it possible to reveal stable structures across multiple scales, thereby providing the analyst with a deeper picture of the internal organization of data. TDA should therefore be understood not as a replacement for classical methods, but as a complement to them — one that can significantly enrich the processes of understanding, interpretation, and even decision-making, especially in the context of complex datasets.</p>
+  </div>
+
+  <!-- ===== Contributor colophon ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Author</div>
+        <div class="who">Mahdis Emami</div>
+        <div class="aff">PhD student in Geometry &amp; Topology, University of Tehran · Data analyst and business-intelligence researcher</div>
+      </div>
+    </div>
+    <div class="origin">Written for <em>People and Mathematics</em> · Face to Face with Mathematics · July 2026. The interactive playground is the journal’s addition.</div>
+  </div>
+
+  <div class="refs">
+    <h3>References</h3>
+    <ol>
+      <li>Berwald, J., Gidea, M., &amp; Vejdemo-Johansson, M. (2014). Automatic recognition and tagging of topologically different regimes in dynamical systems. <em>Discontinuity, Nonlinearity and Complexity, 3</em>(4), 413–426.</li>
+      <li>Bennett, C. L., Hill, R. S., Hinshaw, G., Nolta, M. R., Odegard, N., Page, L., et al. (2003). First-year Wilkinson Microwave Anisotropy Probe (WMAP) observations: Foreground emission. <em>The Astrophysical Journal Supplement Series, 148</em>(1), 97–117. <a href="https://doi.org/10.1086/377253">doi.org/10.1086/377253</a></li>
+      <li>Bishop, R. L., &amp; Crittenden, R. J. (1964). <em>Geometry of manifolds.</em> Academic Press.</li>
+      <li>Blumberg, A. J., Gal, I., Mandell, M. A., &amp; Pancia, M. (2014). Robust statistics, hypothesis testing, and confidence intervals for persistent homology on metric measure spaces. <em>Foundations of Computational Mathematics, 14</em>(4), 745–789.</li>
+      <li>Biscio, C. A. N., &amp; Møller, J. (2016). The accumulated persistence function, a new useful functional summary statistic for topological data analysis, with a view to brain artery trees and spatial point process applications. <em>arXiv preprint</em> arXiv:1611.00630.</li>
+      <li>Carlsson, G., &amp; Vejdemo-Johansson, M. (2022). <em>Topological data analysis with applications.</em> Cambridge University Press. <a href="https://doi.org/10.1017/9781108975704">doi.org/10.1017/9781108975704</a></li>
+      <li>Edelsbrunner, H., &amp; Harer, J. L. (2010). <em>Computational topology: An introduction.</em> American Mathematical Society.</li>
+      <li>Oudot, S. (2015). <em>Persistence theory: From quiver representations to data analysis.</em> American Mathematical Society.</li>
+      <li>Zomorodian, A. (2005). <em>Topology for computing.</em> Cambridge University Press.</li>
+    </ol>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">رویارو با ریاضیات</div>
+  <h1 class="title">وقتی توپولوژی داده‌ها را رام می‌کند!</h1>
+  <p class="standfirst">درآمدی بر تحلیل داده‌ی توپولوژیک؛ از معماری داده تا کشف ساختارهای پنهان — جدی‌گرفتنِ «شکلِ» یک مجموعه‌داده یعنی چه.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/mahdis-emami.jpg" alt="مهدیس امامی">
+    <span class="name">مهدیس امامی</span>
+  </div>
+
+  <div class="abstract">
+    <div class="lab">چکیده</div>
+    <div class="txt">رشد روزافزون داده‌های پیچیده در علوم، پزشکی و صنعت، نیاز به چارچوب‌هایی را آشکار کرده که فراتر از خلاصه‌سازی آماری و مدل‌سازی پیش‌بینانه، بتوانند ساختار درونی داده را نیز نشان دهند. تحلیل داده‌ی توپولوژیک از این رویکردهاست که با تکیه بر مفاهیم هندسی و توپولوژیک، داده را نه صرفاً جدولی از ویژگی‌ها، بلکه مجموعه‌ای از نقاط در فضایی ساختارمند می‌بیند. هدف این مقاله، ارائه‌ی درآمدی فشرده بر جایگاه <span class="ltr">TDA</span> در چرخه‌ی تحلیل داده است. برای این منظور، نخست خط‌لوله‌ی متعارف تحلیل داده — از گردآوری و پاک‌سازی تا مدل‌سازی — از زاویه‌ی ساختن یک بازنمایی مناسب برای داده بازخوانی می‌شود. سپس داده به‌عنوان یک ابرنقطه در فضای ویژگی‌ها تفسیر، و محدودیت‌های نگاه صرفاً اقلیدسی با اشاره به فرضیه‌ی منیفولد بررسی می‌شود. در ادامه، نقش متری‌سازی در تبدیل نامشابهی‌های خام به فضایی متریک و معنادار، و زمینه‌سازی آن برای تحلیل توپولوژیک، توضیح داده می‌شود. پس از آن، ایده‌ی مرکزی <span class="ltr">TDA</span> — به‌ویژه در قالب تحلیل چندمقیاسی و همولوژی پایا — به‌اختصار معرفی می‌شود. سرانجام، با مروری بر مطالعه‌ای موردی در داده‌های دیابت، نشان داده می‌شود که چگونه شکل داده می‌تواند به شناسایی زیرگروه‌های پنهان و الگوهای غیرخطی در داده‌های پزشکی کمک کند. استدلال اصلی مقاله این است که <span class="ltr">TDA</span> جایگزین روش‌های کلاسیک نیست، بلکه مکمل آن‌هاست؛ مکملی که لایه‌ای ساختاری از داده را آشکار می‌کند که در بسیاری از مسائل پیچیده، برای تفسیر درست و تصمیم‌سازی دقیق ضروری است. این نکته بسیار حیاتی است که داده‌های ناسالم یا مدل نامناسب، می‌تواند به خسارات هنگفت برای سازمان‌ها و صنعت مربوطه منجر شود.</div>
+    <div class="keywords"><span class="lab">واژگان کلیدی</span> &nbsp; تحلیل داده‌ی توپولوژیک · همولوژی پایا · فضای متریک · منیفولد · داده‌های پُربعد · داده‌های پزشکی</div>
+  </div>
+
+  <div class="body">
+    <h2 class="subhead">۱. مقدمه</h2>
+
+    <p>در بسیاری از مسائل معاصر علم داده، چالش اصلی صرفاً کمبود داده نیست، بلکه پیچیدگی ساختار آن است. داده‌های زیستی، پزشکی، مالی، رفتاری و صنعتی معمولاً ویژگی‌هایی چون بُعد بالا، ناهمگنی، نویز، روابط غیرخطی و وجود زیرگروه‌های پنهان دارند. در چنین بستری، نمایش داده در قالب یک جدول و تحلیل آن با ابزارهای کلاسیک آماری یا الگوریتم‌های متعارف یادگیری ماشین، هرچند همچنان ضروری است، همیشه برای فهم ساختار درونی داده کافی نیست. در بسیاری از کاربردها، آنچه اهمیت دارد نه‌فقط مقدار متغیرها، بلکه سازمان کلی نمونه‌ها در فضای داده است: این‌که چه نقاطی به هم نزدیک‌اند، چه زیرساختارهایی در داده وجود دارد، آیا الگوهای حلقوی یا شاخه‌ای در آن دیده می‌شود، و آیا این ساختارها در برابر نویز پایدارند یا نه.</p>
+
+    <p>تحلیل داده‌ی توپولوژیک (<span class="ltr">TDA</span>) در پاسخ به چنین پرسش‌هایی شکل گرفته است. ایده‌ی محوری این رویکرد آن است که داده را همچون شیئی هندسی-توپولوژیک مطالعه کند؛ شیئی که «شکل» آن می‌تواند حامل اطلاعاتی درباره‌ی ساختار، همبندی و سازمان چندمقیاسی داده باشد. از این منظر، <span class="ltr">TDA</span> رقیب یادگیری ماشین یا آمار نیست، بلکه لایه‌ای مکمل در تحلیل داده به شمار می‌رود: لایه‌ای که می‌کوشد پیش از مدل‌سازی یا در کنار آن، ساختار پایدار داده را آشکار کند.</p>
+
+    <p>این مقاله‌ی مروری، با رویکردی فشرده، جایگاه <span class="ltr">TDA</span> را در خط‌لوله‌ی تحلیل داده توضیح می‌دهد. ابتدا نشان می‌دهیم که فرایند گردآوری، پاک‌سازی و تحلیل اکتشافی داده را می‌توان به‌منزله‌ی آماده‌سازی یک بازنمایی هندسی از داده فهمید. سپس داده را به‌عنوان مجموعه‌ای از نقاط در فضای ویژگی‌ها بازخوانی می‌کنیم و با اشاره به فرضیه‌ی منیفولد، از محدودیت‌های نگاه صرفاً خطی سخن می‌گوییم. در ادامه، نقش متری‌سازی در تبدیل داده به فضایی قابل‌مطالعه از منظر توپولوژیک بررسی می‌شود و سرانجام، ایده‌ی تحلیل چندمقیاسی و همولوژی پایا به‌عنوان یکی از ابزارهای اصلی <span class="ltr">TDA</span> معرفی خواهد شد. مقاله با اشاره‌ای کوتاه به مطالعه‌ی موردی داده‌های دیابت به پایان می‌رسد تا نشان دهد این رویکرد چگونه می‌تواند در تحلیل داده‌های پزشکی به کار آید.</p>
+
+    <h2 class="subhead">۲. از خط‌لوله‌ی داده تا بازنمایی هندسی آن</h2>
+
+    <p>تحلیل داده در عمل معمولاً به‌صورت یک خط‌لوله‌ی چندمرحله‌ای انجام می‌شود: گردآوری داده، پاک‌سازی و پیش‌پردازش، تحلیل اکتشافی، انتخاب بازنمایی مناسب و در نهایت مدل‌سازی یا استخراج بینش. این مراحل اغلب به‌صورت مجموعه‌ای از گام‌های فنی و مستقل ارائه می‌شوند، اما همه‌ی آن‌ها را می‌توان در چارچوب یک مسئله‌ی بنیادی‌تر فهمید: چگونه از داده‌ی خام، بازنمایی‌ای بسازیم که ساختار واقعی آن را تا حد امکان حفظ کند؟</p>
+
+    <p>در مرحله‌ی گردآوری، نوع متغیرها، کیفیت اندازه‌گیری، قالب داده و نحوه‌ی نمونه‌برداری تعیین می‌شود؛ تصمیم‌هایی که مستقیماً بر ساختار نهایی داده اثر می‌گذارند. مرحله‌ی پاک‌سازی نیز صرفاً حذف خطاهای ظاهری نیست، بلکه کوششی است برای تبدیل داده به بستری مقایسه‌پذیر: مدیریت داده‌های گمشده، حذف تکرارهای ناخواسته، بررسی نقاط پرت و اعتبارسنجی نوع داده‌ها، همگی تعیین می‌کنند که آیا می‌توان برای داده مفهومی معنادار از فاصله و همسایگی تعریف کرد یا نه. به‌بیان دیگر، داده‌ی «تمیز» در اینجا داده‌ای است که بتوان آن را در یک فضای تحلیلی سازگار قرار داد.</p>
+
+    <p>تحلیل اکتشافی داده (<span class="ltr">EDA</span>) نیز صرفاً مجموعه‌ای از نمودارها و آمارهای توصیفی نیست، بلکه نخستین گام در تشخیص ساختار داده است. در این مرحله، تحلیل‌گر با الگوهای خوشه‌ای، توزیع‌های نامتقارن، همبستگی‌های غیرخطی یا وجود زیرگروه‌های احتمالی روبه‌رو می‌شود؛ همین سرنخ‌ها تعیین می‌کنند که داده را باید در چه قالبی مدل کرد: آیا نمایش برداری اقلیدسی کافی است، یا داده به بازنمایی پیچیده‌تری نیاز دارد؟</p>
+
+    <p>از این منظر، خط‌لوله‌ی تحلیل داده را می‌توان فرایندی برای ساختن یک بازنمایی هندسی مناسب از داده دانست؛ بازنمایی‌ای که بعداً نوع الگوریتم، متریک، روش کاهش بُعد و حتی امکان ورود به تحلیل توپولوژیک را تعیین می‌کند. در نتیجه، <span class="ltr">TDA</span> مرحله‌ای کاملاً جدا از تحلیل داده نیست، بلکه ادامه‌ی طبیعی همین فرایند است؛ جایی که پرسش از شکل داده به‌طور صریح وارد صحنه می‌شود.</p>
+
+    <h2 class="subhead">۳. داده به‌مثابه‌ی ابرنقطه: از فضای برداری تا فرضیه‌ی منیفولد</h2>
+
+    <p>در ساده‌ترین مدل، یک مجموعه‌داده‌ی جدولی در قالب یک صفحه‌گسترده با \(n\) مشاهده و \(p\) ویژگی را می‌توان ماتریسی در نظر گرفت (شکل ۱) که هر سطر آن یک بردار در فضای \(p\)-بُعدی است. در این صورت، کل داده به مجموعه‌ای از نقاط در فضای ویژگی‌ها تبدیل می‌شود؛ چیزی که در زبان علم داده اغلب با عنوان ابرنقطه از آن یاد می‌شود. این بازخوانی هندسی، مبنای بسیاری از روش‌های تحلیلی است: خوشه‌بندی، کاهش بُعد، تشخیص ناهنجاری و حتی بسیاری از مدل‌های یادگیری ماشین، بر این پیش‌فرض بنا شده‌اند که داده را می‌توان به‌صورت نقاطی در یک فضای برداری مطالعه کرد.</p>
+
+    <figure class="figure">
+      <img src="../assets/tda-fig1-fa.png" alt="صفحه‌گسترده‌ای از داده‌های سلامت بیماران در اکسل">
+      <figcaption class="figcap"><span class="fno">شکل ۱.</span> نمونه‌ای از یک صفحه‌گسترده در نرم‌افزار اکسل.</figcaption>
+    </figure>
+
+    <p>اما این تصویر همیشه کافی نیست. در بسیاری از مسائل واقعی، داده اگرچه در ظاهر در فضایی پُربعد قرار دارد، در عمل حول ساختاری کم‌بعد و غیرخطی سازمان یافته است. این ایده در قالب فرضیه‌ی منیفولد بیان می‌شود: داده‌های واقعی غالباً روی یک زیرساختار کم‌بعد در فضای ویژگی‌ها متمرکزند، نه در سراسر فضای اقلیدسی پیرامون خود. برای مثال، داده‌های تصویری، زیستی یا رفتاری ممکن است صدها ویژگی داشته باشند، اما درجات آزادی مؤثرشان بسیار کمتر از این تعداد باشد. در چنین وضعی، نگاه صرفاً خطی به داده می‌تواند ساختار واقعی آن را پنهان کند.</p>
+
+    <p>نکته‌ی مهم‌تر آن است که در بسیاری از کاربردها، مختصات خام داده کم‌اهمیت‌تر از الگوی همسایگی و سازمان نسبی آن است. ممکن است دو مجموعه‌داده از نظر مختصات عددی بسیار متفاوت باشند، اما از حیث همبندی، خوشه‌بندی چندمقیاسی یا وجود مسیرها و حلقه‌های ساختاری، رفتاری مشابه نشان دهند. همین‌جاست که زبان توپولوژی اهمیت پیدا می‌کند: زبانی که به‌جای تمرکز بر مقادیر موضعی، بر ساختارهای پایدار و کیفی داده تمرکز دارد.</p>
+
+    <p>بنابراین، نگاه به داده به‌عنوان یک ابرنقطه صرفاً یک استعاره‌ی هندسی نیست، بلکه پلی است میان نمایش جدولی داده و تحلیل ساختارهای نهفته‌ی آن. این گذار، مقدمه‌ی ورود به پرسش مهم بعدی است: اگر داده را مجموعه‌ای از نقاط بدانیم، نزدیکی و شباهت میان این نقاط را چگونه باید تعریف کرد؟</p>
+
+    <h2 class="subhead">۴. توپولوژی چه چیزی به معماری داده اضافه می‌کند؟ از نامشابهی تا فضای متریک</h2>
+
+    <p>بخش مهمی از تحلیل داده بر سنجش شباهت یا تفاوت میان نمونه‌ها استوار است. خوشه‌بندی، طبقه‌بندی، بازیابی شباهت‌محور، تشخیص ناهنجاری و بسیاری از روش‌های کاهش بُعد، همگی به‌نوعی بر این پرسش تکیه دارند که «دو مشاهده تا چه اندازه به یکدیگر نزدیک‌اند؟». در رویکرد توپولوژیک، این پرسش صورت‌بندی دقیق‌تری می‌یابد: چه ساختار متریکی یا همسایگی‌ای باید بر داده تحمیل شود تا شکل واقعی آن تا حد امکان حفظ گردد؟</p>
+
+    <p>پاسخ به این پرسش با مفهوم متری‌سازی آغاز می‌شود. متری‌سازی در اینجا به معنای تجهیز داده به یک تابع فاصله یا سنجه‌ی شباهت است؛ سنجه‌ای که بتواند نامشابهی‌های خام میان نمونه‌ها را به ساختاری قابل‌مطالعه تبدیل کند. اهمیت این مرحله در آن است که بسیاری از ابزارهای <span class="ltr">TDA</span> نه از خودِ جدول داده، بلکه از یک فضای متریک حاصل از داده آغاز می‌کنند: به‌محض آنکه بتوان برای مجموعه‌ای از نمونه‌ها مفهوم فاصله تعریف کرد، می‌توان همسایگی‌ها را ساخت، نقاط نزدیک را به هم متصل کرد و از دل این اتصالات، ساختار توپولوژیک داده را بررسی نمود.</p>
+
+    <p>در مسائل ساده، فاصله‌ی اقلیدسی ممکن است انتخابی طبیعی باشد؛ اما در بسیاری از داده‌های واقعی، چنین انتخابی کافی نیست. تفاوت مقیاس ویژگی‌ها، ناهمگنی نوع متغیرها، وجود داده‌های دسته‌ای یا زمانی، و حتی ساختار غیرخطی داده، همگی می‌توانند موجب شوند فاصله‌ی اقلیدسی بازنمایی مناسبی از نزدیکی واقعی میان نمونه‌ها نباشد. از این رو، انتخاب متریک را باید بخشی از مدل‌سازی مفهومی داده دانست، نه صرفاً یک تصمیم محاسباتی.</p>
+
+    <p>در سطحی غنی‌تر، اگر داده را نمونه‌هایی از یک ساختار هموار در نظر بگیریم، می‌توان از ایده‌ی منیفولد ریمانی و فاصله‌های ژئودزیک نیز سخن گفت. در این تصویر، فاصله‌ی میان دو نقطه نه‌لزوماً کوتاه‌ترین مسیر اقلیدسی، بلکه کوتاه‌ترین مسیر روی خودِ ساختار داده است. هرچند در کاربردهای عملی همیشه نمی‌توان با قطعیت از وجود یک منیفولد هموار سخن گفت، این شهود نقش مهمی در روش‌های یادگیری منیفولد، کاهش بُعد غیرخطی و تفسیر هندسی داده دارد.</p>
+
+    <p>در نتیجه، سهم توپولوژی در معماری داده را می‌توان در یک جمله خلاصه کرد: توپولوژی ما را وامی‌دارد پیش از هر چیز، زبان مناسبی برای نزدیکی، همسایگی و ساختار کلی داده انتخاب کنیم. این انتخاب، پلی است میان داده‌ی خام و تحلیل ساختارهای پایدار آن.</p>
+
+    <h2 class="subhead">۵. تحلیل داده‌ی توپولوژیک: ایده، ابزار و خروجی</h2>
+
+    <p>تحلیل داده‌ی توپولوژیک را می‌توان مجموعه‌ای از روش‌ها دانست که هدفشان استخراج ویژگی‌های ساختاری پایدار از داده است. تفاوت اصلی این رویکرد با بسیاری از روش‌های متعارف در آن است که <span class="ltr">TDA</span>، به‌جای تمرکز صرف بر یک مقیاس ثابت یا یک مدل خاص، داده را در مقیاس‌های مختلف بررسی می‌کند. این نکته از آن‌رو اهمیت دارد که بسیاری از ساختارهای داده — مانند خوشه‌ها، حلقه‌ها یا شاخه‌ها — تنها در بازه‌ای از مقیاس‌ها آشکار می‌شوند؛ اگر تنها یک آستانه‌ی فاصله برای اتصال نقاط انتخاب شود، نتیجه‌ی تحلیل ممکن است کاملاً وابسته به همان انتخاب باشد.</p>
+
+    <p>ایده‌ی اصلی آن است که از روی یک مجموعه‌داده و با استفاده از متریک انتخاب‌شده، خانواده‌ای از ساختارهای ترکیبی یا توپولوژیک ساخته شود؛ ساختارهایی که با افزایش پارامتر مقیاس، به‌تدریج غنی‌تر می‌شوند. در مقیاس‌های کوچک، نقاط اغلب از هم جدا هستند؛ با بزرگ‌تر شدن مقیاس، مؤلفه‌های همبند شکل می‌گیرند، حلقه‌ها پدیدار می‌شوند و سپس ممکن است در مقیاس‌های بزرگ‌تر از میان بروند. تحلیل این فرایند به ما اجازه می‌دهد میان ویژگی‌های گذرا و ویژگی‌هایی که در طیف وسیعی از مقیاس‌ها پایدار می‌مانند، تمایز بگذاریم.</p>
+
+    <p>یکی از مهم‌ترین ابزارهای این حوزه، همولوژی پایا (<span class="ltr">persistent homology</span>) است. در این روش، با استفاده از داده و یک مفهوم فاصله، دنباله‌ای از کمپلکس‌های سیمپلیکی ساخته می‌شود و سپس تولد و مرگ ویژگی‌های توپولوژیک در ابعاد مختلف دنبال می‌شود. برای مثال، در بعد صفر، تعداد مؤلفه‌های همبند مطالعه می‌شود؛ در بعد یک، حلقه‌ها یا ساختارهای دوری؛ و در ابعاد بالاتر، حفره‌های پیچیده‌تر. خروجی این تحلیل معمولاً در قالب نمودار میله‌ای پایایی یا نمودار پایایی نمایش داده می‌شود. ویژگی‌هایی که تنها در بازه‌ای کوتاه از مقیاس‌ها ظاهر می‌شوند، اغلب به نویز نسبت داده می‌شوند، در حالی که ویژگی‌های پایا می‌توانند نشانه‌ای از ساختار واقعی داده باشند.</p>
+
+    <!-- ===== تعاملی: اسباب‌بازی همولوژی پایا ===== -->
+    <div class="playground" data-pg data-pg-lang="fa">
+      <div class="pg-head">
+        <span class="pg-title" dir="rtl">تعاملی · شکلِ یک ابرنقطه</span>
+        <div class="pg-presets">
+          <button data-preset="circle" class="on">دایره</button>
+          <button data-preset="clusters">دو خوشه</button>
+          <button data-preset="eight">هشتِ لاتین</button>
+          <button data-preset="random">پراکنده</button>
+          <button data-preset="clear">پاک کن</button>
+        </div>
+      </div>
+      <canvas class="pg-cloud"></canvas>
+      <div class="pg-controls">
+        <span class="pg-eps-label" dir="rtl">مقیاس&nbsp;<span class="ltr">ε</span></span>
+        <input type="range" class="pg-eps" min="0" max="1000" value="300" aria-label="مقیاس">
+        <div class="pg-read">
+          <span dir="rtl">تکه‌ها&nbsp;(β₀)<b data-b0>–</b></span>
+          <span dir="rtl">حلقه‌ها&nbsp;(β₁)<b data-b1>–</b></span>
+        </div>
+      </div>
+      <canvas class="pg-bars"></canvas>
+      <div class="pg-hint" dir="rtl">دور هر نقطه قرصی به شعاع ε/2 می‌روید؛ نقاطِ نزدیک‌تر از ε به هم وصل می‌شوند. ε را جابه‌جا کنید — یا روی نمودار میله‌ای بکشید — و ببینید تکه‌ها چگونه یکی می‌شوند و حلقه‌ها چگونه زاده می‌شوند و می‌میرند. میله‌های بلند همان ویژگی‌های پایا هستند، شکلِ واقعی داده؛ میله‌های کوتاه نویزند. برای افزودن نقطه‌های خودتان، داخل ابر کلیک کنید.</div>
+    </div>
+
+    <p>در کنار همولوژی پایا، روش‌هایی مانند <span class="ltr">Mapper</span> نیز در خانواده‌ی <span class="ltr">TDA</span> قرار می‌گیرند. <span class="ltr">Mapper</span> با ساختن نمایی گراف‌مانند از داده، می‌کوشد خوشه‌ها، شاخه‌ها و گذارهای میان نواحی مختلف فضای داده را آشکار کند. مزیت چنین ابزارهایی آن است که می‌توانند تصویری ساختاری از داده ارائه دهند، حتی زمانی که مرزهای میان گروه‌ها روشن و خطی نیست.</p>
+
+    <p>در مجموع، <span class="ltr">TDA</span> را باید رویکردی برای «دیدن شکل داده» دانست. این رویکرد معمولاً جایگزین روش‌های آماری یا یادگیری ماشین نمی‌شود، بلکه یا در مرحله‌ی تحلیل اکتشافی به فهم بهتر ساختار داده کمک می‌کند، یا به‌عنوان منبعی برای استخراج ویژگی‌های ساختاری در کنار سایر روش‌ها به کار می‌رود. ارزش اصلی آن نیز در همین توانایی نهفته است: آشکار کردن ساختارهایی که ممکن است در بازنمایی‌های صرفاً جدولی یا در مدل‌های خطی پنهان بمانند.</p>
+
+    <h2 class="subhead">۶. مطالعه‌ی موردی: داده‌های دیابت و کشف زیرگروه‌های پنهان</h2>
+
+    <p>کاربرد <span class="ltr">TDA</span> در داده‌های پزشکی یکی از زمینه‌هایی است که ارزش عملی این رویکرد را به‌خوبی نشان می‌دهد. داده‌های مرتبط با دیابت نمونه‌ی مناسبی از این وضعیت‌اند: هر بیمار با مجموعه‌ای از متغیرهای بالینی، آزمایشگاهی و گاه ژنتیکی توصیف می‌شود، اما ناهمگنی درون‌گروهی بیماران چنان بالاست که برچسب‌های کلی تشخیصی، لزوماً تصویر دقیقی از ساختار واقعی داده ارائه نمی‌دهند. از همین‌رو، مسئله تنها پیش‌بینی یک برچسب نیست، بلکه شناسایی زیرگروه‌هایی است که از نظر سیر بیماری، پاسخ به درمان یا الگوی متابولیکی با یکدیگر تفاوت دارند.</p>
+
+    <p>در رویکردی مبتنی بر <span class="ltr">TDA</span>، بیماران به‌عنوان نقاطی در فضای ویژگی‌ها دیده می‌شوند و بر اساس شباهت میان آن‌ها، ساختار همسایگی و اتصال شکل می‌گیرد. تحلیل این ساختار می‌تواند نشان دهد که داده‌ی بیماران لزوماً به چند خوشه‌ی ساده و مجزا فروکاستنی نیست، بلکه ممکن است شبکه‌ای از زیرگروه‌ها، شاخه‌ها یا گذارهای بالینی را در بر داشته باشد. اهمیت این نکته در آن است که چنین ساختارهایی همیشه با روش‌های خطی یا خوشه‌بندی‌های استاندارد آشکار نمی‌شوند (شکل ۲).</p>
+
+    <figure class="figure">
+      <img src="../assets/tda-fig2.png" alt="رویه‌ای خمیده با نقاطی روی آن، میان سه محور مؤلفه‌ی اصلی">
+      <figcaption class="figcap"><span class="fno">شکل ۲.</span> دسته‌بندی افراد بر اساس نوع بیماری دیابت (بخش تخم‌مرغی: سالم — سمت راست و چپ: دیابت نوع ۱ و نوع ۲).</figcaption>
+    </figure>
+
+    <p>از منظر پزشکی شخصی‌سازی‌شده، این نوع تحلیل می‌تواند به شناسایی زیرجمعیت‌های معنادارتری از بیماران کمک کند؛ زیرجمعیت‌هایی که شاید از نظر خطر، پیش‌آگهی یا پاسخ درمانی، الگوهای متفاوتی نشان دهند. به این معنا، مطالعه‌ی موردی دیابت تنها یک کاربرد خاص از <span class="ltr">TDA</span> نیست، بلکه نمونه‌ای از این ایده‌ی کلی‌تر است که شکل داده می‌تواند حامل اطلاعات بالینی باشد؛ اطلاعاتی که در صورت تحلیل مناسب، به فهم بهتر ناهمگنی بیماری و تصمیم‌گیری دقیق‌تر منجر خواهد شد.</p>
+
+    <h2 class="subhead">۷. جمع‌بندی</h2>
+
+    <p>تحلیل داده‌ی توپولوژیک تلاشی است برای افزودن یک لایه‌ی ساختاری به تحلیل داده؛ لایه‌ای که داده را نه فقط مجموعه‌ای از سطرها و ستون‌ها، بلکه شیئی با سازمان هندسی و توپولوژیک در نظر می‌گیرد. در این مقاله نشان داده شد که از همان مراحل نخست تحلیل داده — از پاک‌سازی و تحلیل اکتشافی گرفته تا انتخاب بازنمایی و متریک — زمینه برای چنین نگاهی فراهم می‌شود (شکل ۳). داده‌ی تمیز، در این چارچوب، داده‌ای است که بتوان آن را در یک فضای متریک یا هندسی معنادار قرار داد؛ و داده‌ی تحلیل‌شده، داده‌ای است که نه‌فقط مقادیرش، بلکه شکل و ساختار آن نیز فهم شده باشد.</p>
+
+    <figure class="figure">
+      <img src="../assets/tda-fig3-fa.png" alt="شش مرحله‌ی خط‌لوله‌ی داده، از گردآوری تا بینش">
+      <figcaption class="figcap"><span class="fno">شکل ۳.</span> مراحل پرورش داده، از شکل خام تا شکل تحلیلی.</figcaption>
+    </figure>
+
+    <p><span class="ltr">TDA</span> به‌ویژه در مواجهه با داده‌های با بعد بالا، غیرخطی و ناهمگن اهمیت می‌یابد؛ جایی که الگوهای اصلی داده لزوماً در مختصات خام یا در مدل‌های خطی ظاهر نمی‌شوند. ابزارهایی مانند همولوژی پایا و <span class="ltr">Mapper</span> این امکان را فراهم می‌کنند که ساختارهای پایدار داده در مقیاس‌های مختلف آشکار شوند و از این طریق، تحلیل‌گر تصویری عمیق‌تر از سازمان درونی داده به‌دست آورد. از این‌رو، <span class="ltr">TDA</span> را باید نه جایگزینی برای روش‌های کلاسیک، بلکه مکملی برای آن‌ها دانست؛ مکملی که به‌ویژه در داده‌های پیچیده، می‌تواند مسیر فهم، تفسیر و حتی تصمیم‌سازی را غنی‌تر کند.</p>
+  </div>
+
+  <!-- ===== کارنامه‌ی دست‌اندرکاران ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">نویسنده</div>
+        <div class="who">مهدیس امامی</div>
+        <div class="aff">دانشجوی دکتری هندسه/توپولوژی، دانشگاه تهران · تحلیلگر داده و محقق هوش تجاری</div>
+      </div>
+    </div>
+    <div class="origin">نوشته‌شده برای «آدم‌ها و ریاضیات» · رویارو با ریاضیات · تیر ۱۴۰۵. اسباب‌بازیِ تعاملی افزوده‌ی مجله است.</div>
+  </div>
+
+  <div class="refs">
+    <h3>مراجع</h3>
+    <ol>
+      <li>Berwald, J., Gidea, M., &amp; Vejdemo-Johansson, M. (2014). Automatic recognition and tagging of topologically different regimes in dynamical systems. <em>Discontinuity, Nonlinearity and Complexity, 3</em>(4), 413–426.</li>
+      <li>Bennett, C. L., Hill, R. S., Hinshaw, G., Nolta, M. R., Odegard, N., Page, L., et al. (2003). First-year Wilkinson Microwave Anisotropy Probe (WMAP) observations: Foreground emission. <em>The Astrophysical Journal Supplement Series, 148</em>(1), 97–117. <a href="https://doi.org/10.1086/377253">doi.org/10.1086/377253</a></li>
+      <li>Bishop, R. L., &amp; Crittenden, R. J. (1964). <em>Geometry of manifolds.</em> Academic Press.</li>
+      <li>Blumberg, A. J., Gal, I., Mandell, M. A., &amp; Pancia, M. (2014). Robust statistics, hypothesis testing, and confidence intervals for persistent homology on metric measure spaces. <em>Foundations of Computational Mathematics, 14</em>(4), 745–789.</li>
+      <li>Biscio, C. A. N., &amp; Møller, J. (2016). The accumulated persistence function, a new useful functional summary statistic for topological data analysis, with a view to brain artery trees and spatial point process applications. <em>arXiv preprint</em> arXiv:1611.00630.</li>
+      <li>Carlsson, G., &amp; Vejdemo-Johansson, M. (2022). <em>Topological data analysis with applications.</em> Cambridge University Press. <a href="https://doi.org/10.1017/9781108975704">doi.org/10.1017/9781108975704</a></li>
+      <li>Edelsbrunner, H., &amp; Harer, J. L. (2010). <em>Computational topology: An introduction.</em> American Mathematical Society.</li>
+      <li>Oudot, S. (2015). <em>Persistence theory: From quiver representations to data analysis.</em> American Mathematical Society.</li>
+      <li>Zomorodian, A. (2005). <em>Topology for computing.</em> Cambridge University Press.</li>
+    </ol>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+    if (window.PMPG) requestAnimationFrame(window.PMPG.refreshAll);
+  }
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+
+  // Render math once KaTeX is ready
+  function renderMath(){
+    if (!window.renderMathInElement) { setTimeout(renderMath, 60); return; }
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+  renderMath();
+</script>
+
+<!-- =====================================================================
+     The persistent-homology playground.
+     A Vietoris–Rips filtration is built on the visible point cloud and its
+     exact H0/H1 persistence barcodes are computed (union–find for H0,
+     GF(2) boundary-matrix reduction for H1). No libraries.
+     ===================================================================== -->
+<script>
+(function(){
+  'use strict';
+
+  var VW = 680, VH = 400;          // virtual canvas space (constant geometry)
+  var EPSMAX = 270;                // largest scale on the slider
+  var MAXPTS = 46;
+
+  function faDig(s){ return String(s).replace(/[0-9]/g, function(d){ return "۰۱۲۳۴۵۶۷۸۹"[+d]; }); }
+
+  function Playground(root){
+    var self = this;
+    this.root = root;
+    this.lang = root.getAttribute('data-pg-lang') || 'en';
+    this.cloud = root.querySelector('.pg-cloud');
+    this.bars = root.querySelector('.pg-bars');
+    this.slider = root.querySelector('.pg-eps');
+    this.b0el = root.querySelector('[data-b0]');
+    this.b1el = root.querySelector('[data-b1]');
+    this.pts = [];
+    this.eps = 80;
+    this.pers = { h0: [], h1: [] };
+    this.edges = [];
+    this.tris = [];
+    this.cw = 0;
+
+    root.querySelectorAll('[data-preset]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        root.querySelectorAll('[data-preset]').forEach(function(b){ b.classList.remove('on'); });
+        var p = btn.getAttribute('data-preset');
+        if (p !== 'clear') btn.classList.add('on');
+        self.preset(p);
+      });
+    });
+    this.slider.addEventListener('input', function(){
+      self.eps = (+self.slider.value / 1000) * EPSMAX;
+      self.draw();
+    });
+    this.cloud.addEventListener('pointerdown', function(ev){
+      if (self.pts.length >= MAXPTS) return;
+      var r = self.cloud.getBoundingClientRect();
+      self.pts.push([ (ev.clientX - r.left) / r.width * VW, (ev.clientY - r.top) / r.height * VH ]);
+      self.compute();
+      self.draw();
+    });
+    // drag on the barcode moves the scale line
+    var dragging = false;
+    function fromBar(ev){
+      var r = self.bars.getBoundingClientRect();
+      var x = (ev.clientX - r.left) / r.width * VW;
+      var t = (x - 14) / (VW - 46) * EPSMAX;
+      self.eps = Math.max(0, Math.min(EPSMAX, t));
+      self.slider.value = Math.round(self.eps / EPSMAX * 1000);
+      self.draw();
+    }
+    this.bars.addEventListener('pointerdown', function(ev){ dragging = true; self.bars.setPointerCapture(ev.pointerId); fromBar(ev); });
+    this.bars.addEventListener('pointermove', function(ev){ if (dragging) fromBar(ev); });
+    this.bars.addEventListener('pointerup', function(){ dragging = false; });
+
+    this.preset('circle');
+  }
+
+  /* ---------- point-cloud presets (in virtual coordinates) ---------- */
+  Playground.prototype.preset = function(kind){
+    var pts = [], i, a, r;
+    function g(){ return (Math.random() + Math.random() + Math.random()) / 3 - 0.5; } // ~gaussian
+    if (kind === 'circle'){
+      for (i = 0; i < 26; i++){
+        a = i / 26 * Math.PI * 2 + (Math.random() - 0.5) * 0.2;
+        r = 128 + (Math.random() - 0.5) * 30;
+        pts.push([340 + Math.cos(a) * r, 200 + Math.sin(a) * r]);
+      }
+    } else if (kind === 'clusters'){
+      for (i = 0; i < 13; i++) pts.push([215 + g() * 100, 200 + g() * 100]);
+      for (i = 0; i < 13; i++) pts.push([465 + g() * 100, 200 + g() * 100]);
+    } else if (kind === 'eight'){
+      for (i = 0; i < 15; i++){
+        a = i / 15 * Math.PI * 2 + (Math.random() - 0.5) * 0.25;
+        pts.push([250 + Math.cos(a) * (82 + (Math.random() - 0.5) * 18), 200 + Math.sin(a) * (82 + (Math.random() - 0.5) * 18)]);
+      }
+      for (i = 0; i < 15; i++){
+        a = i / 15 * Math.PI * 2 + (Math.random() - 0.5) * 0.25;
+        pts.push([430 + Math.cos(a) * (82 + (Math.random() - 0.5) * 18), 200 + Math.sin(a) * (82 + (Math.random() - 0.5) * 18)]);
+      }
+    } else if (kind === 'random'){
+      for (i = 0; i < 26; i++) pts.push([70 + Math.random() * 540, 55 + Math.random() * 290]);
+    } // 'clear' -> empty
+    this.pts = pts;
+    this.compute();
+    this.autoScale();
+    this.draw();
+  };
+
+  /* pick a telling default scale: the largest multiplicative gap in the
+     merge distances (then the slider is set just inside that gap) */
+  Playground.prototype.autoScale = function(){
+    var deaths = [];
+    for (var i = 0; i < this.pers.h0.length; i++)
+      if (isFinite(this.pers.h0[i].d)) deaths.push(this.pers.h0[i].d);
+    deaths.sort(function(a, b){ return a - b; });
+    deaths.push(EPSMAX);
+    var best = 0.3 * EPSMAX;
+    if (deaths.length > 1){
+      var ratio = 0;
+      for (var k = 0; k < deaths.length - 1; k++){
+        var lo = Math.max(deaths[k], 8), hi = deaths[k + 1];
+        if (hi / lo > ratio){ ratio = hi / lo; best = Math.sqrt(lo * hi); }
+      }
+    }
+    this.eps = Math.max(12, Math.min(0.85 * EPSMAX, best));
+    this.slider.value = Math.round(this.eps / EPSMAX * 1000);
+  };
+
+  /* ---------- exact persistence of the Rips filtration ---------- */
+  Playground.prototype.compute = function(){
+    var pts = this.pts, n = pts.length, i, j, k, e;
+    var edges = [];
+    for (i = 0; i < n; i++) for (j = i + 1; j < n; j++){
+      var t = Math.hypot(pts[i][0] - pts[j][0], pts[i][1] - pts[j][1]);
+      if (t <= EPSMAX) edges.push({ i: i, j: j, t: t });
+    }
+    edges.sort(function(a, b){ return a.t - b.t; });
+
+    /* H0 by union–find over edges in order of length */
+    var par = new Int32Array(n);
+    for (i = 0; i < n; i++) par[i] = i;
+    function find(x){ while (par[x] !== x){ par[x] = par[par[x]]; x = par[x]; } return x; }
+    var h0 = [], pos = new Uint8Array(edges.length);
+    for (e = 0; e < edges.length; e++){
+      var a = find(edges[e].i), b = find(edges[e].j);
+      if (a === b) pos[e] = 1;                    // creates a cycle
+      else { par[a] = b; h0.push({ b: 0, d: edges[e].t }); }
+    }
+    var comp = 0;
+    for (i = 0; i < n; i++) if (find(i) === i) comp++;
+    for (i = 0; i < comp; i++) h0.push({ b: 0, d: Infinity });
+    h0.sort(function(x, y){ return (isFinite(x.d) ? x.d : 1e18) - (isFinite(y.d) ? y.d : 1e18); });
+
+    /* triangles of the Rips complex */
+    var eIdx = Object.create(null);
+    for (e = 0; e < edges.length; e++) eIdx[edges[e].i + '_' + edges[e].j] = e;
+    var tris = [];
+    for (i = 0; i < n; i++) for (j = i + 1; j < n; j++){
+      var eij = eIdx[i + '_' + j]; if (eij === undefined) continue;
+      for (k = j + 1; k < n; k++){
+        var eik = eIdx[i + '_' + k]; if (eik === undefined) continue;
+        var ejk = eIdx[j + '_' + k]; if (ejk === undefined) continue;
+        tris.push({ t: Math.max(edges[eij].t, edges[eik].t, edges[ejk].t), e: [eij, eik, ejk] });
+      }
+    }
+    tris.sort(function(a, b){ return a.t - b.t; });
+
+    /* H1: reduce the triangle boundary matrix over GF(2) */
+    var W32 = (edges.length + 31) >> 5;
+    var lowCol = new Int32Array(Math.max(1, edges.length)); lowCol.fill(-1);
+    var stored = [];
+    var paired = new Uint8Array(edges.length);
+    var h1 = [];
+    function lowOf(col){
+      for (var w = W32 - 1; w >= 0; w--) if (col[w]) return (w << 5) + (31 - Math.clz32(col[w]));
+      return -1;
+    }
+    for (var ti = 0; ti < tris.length; ti++){
+      var col = new Uint32Array(W32), es = tris[ti].e, q, w;
+      for (q = 0; q < 3; q++) col[es[q] >> 5] ^= (1 << (es[q] & 31));
+      var lo = lowOf(col);
+      while (lo >= 0 && lowCol[lo] >= 0){
+        var other = stored[lowCol[lo]];
+        for (w = 0; w < W32; w++) col[w] ^= other[w];
+        lo = lowOf(col);
+      }
+      if (lo >= 0){
+        stored.push(col); lowCol[lo] = stored.length - 1; paired[lo] = 1;
+        if (tris[ti].t - edges[lo].t > 1e-7) h1.push({ b: edges[lo].t, d: tris[ti].t });
+      }
+    }
+    for (e = 0; e < edges.length; e++)
+      if (pos[e] && !paired[e]) h1.push({ b: edges[e].t, d: Infinity });
+    h1.sort(function(x, y){ return x.b - y.b; });
+
+    this.pers = { h0: h0, h1: h1 };
+    this.edges = edges;
+    this.tris = tris;
+  };
+
+  /* ---------- drawing ---------- */
+  Playground.prototype.setupCanvas = function(cv, hVirtual){
+    var cw = cv.clientWidth;
+    if (!cw) return null;
+    var dpr = window.devicePixelRatio || 1;
+    var scale = cw / VW;
+    var hCss = Math.round(hVirtual * scale);
+    if (cv.width !== Math.round(cw * dpr) || cv.height !== Math.round(hCss * dpr)){
+      cv.width = Math.round(cw * dpr);
+      cv.height = Math.round(hCss * dpr);
+      cv.style.height = hCss + 'px';
+    }
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+    return ctx;
+  };
+
+  Playground.prototype.draw = function(){
+    this.drawCloud();
+    this.drawBars();
+    this.readout();
+  };
+
+  Playground.prototype.drawCloud = function(){
+    var ctx = this.setupCanvas(this.cloud, VH);
+    if (!ctx) return;
+    var eps = this.eps, pts = this.pts, i;
+    ctx.clearRect(0, 0, VW, VH);
+    ctx.fillStyle = '#FDFAF3'; ctx.fillRect(0, 0, VW, VH);
+    /* discs of radius eps/2 */
+    ctx.fillStyle = 'rgba(200,99,62,0.08)';
+    ctx.strokeStyle = 'rgba(200,99,62,0.18)';
+    ctx.lineWidth = 1;
+    for (i = 0; i < pts.length; i++){
+      ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], eps / 2, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+    }
+    /* filled triangles at this scale */
+    var alive = [];
+    for (i = 0; i < this.tris.length && this.tris[i].t <= eps; i++) alive.push(this.tris[i]);
+    if (alive.length && alive.length <= 5200){
+      ctx.fillStyle = 'rgba(200,99,62,0.05)';
+      ctx.beginPath();
+      for (i = 0; i < alive.length; i++){
+        var es = alive[i].e;
+        var p1 = pts[this.edges[es[0]].i], p2 = pts[this.edges[es[0]].j];
+        var t3 = this.edges[es[1]];
+        var p3 = pts[(t3.i === this.edges[es[0]].i || t3.i === this.edges[es[0]].j) ? t3.j : t3.i];
+        ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.lineTo(p3[0], p3[1]); ctx.closePath();
+      }
+      ctx.fill();
+    }
+    /* edges */
+    ctx.strokeStyle = 'rgba(28,24,20,0.52)';
+    ctx.lineWidth = 1.15;
+    ctx.beginPath();
+    for (i = 0; i < this.edges.length; i++){
+      var ed = this.edges[i];
+      if (ed.t > eps) break;
+      ctx.moveTo(pts[ed.i][0], pts[ed.i][1]);
+      ctx.lineTo(pts[ed.j][0], pts[ed.j][1]);
+    }
+    ctx.stroke();
+    /* points */
+    for (i = 0; i < pts.length; i++){
+      ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], 4.4, 0, Math.PI * 2);
+      ctx.fillStyle = '#C8633E'; ctx.fill();
+      ctx.strokeStyle = '#FBF7EF'; ctx.lineWidth = 1.6; ctx.stroke();
+    }
+    /* empty-state nudge */
+    if (!pts.length){
+      ctx.fillStyle = '#948876';
+      ctx.font = '500 15px "Hanken Grotesk", "Vazirmatn", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(this.lang === 'fa' ? 'برای افزودن نقطه کلیک کنید' : 'click to add points', VW / 2, VH / 2);
+    }
+  };
+
+  Playground.prototype.drawBars = function(){
+    var h0 = this.pers.h0, h1 = this.pers.h1;
+    var X0 = 14, X1 = VW - 32;                      // bar area (virtual coords)
+    var labH = 16, rowH1 = h1.length > 14 ? 5 : 8, rowH0 = h0.length > 26 ? 4 : 6;
+    var top = 10;
+    var h1H = labH + Math.max(1, h1.length) * rowH1 + 8;
+    var h0H = labH + h0.length * rowH0 + 12;
+    var HV = top + h1H + h0H;
+    var ctx = this.setupCanvas(this.bars, HV);
+    if (!ctx) return;
+    var self = this;
+    ctx.clearRect(0, 0, VW, HV);
+    ctx.fillStyle = '#FDFAF3'; ctx.fillRect(0, 0, VW, HV);
+    function x(t){ return X0 + Math.min(t, EPSMAX) / EPSMAX * (X1 - X0); }
+    function label(txt, y, color){
+      ctx.fillStyle = color;
+      ctx.font = '600 10px "Hanken Grotesk", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(txt, X0, y);
+    }
+    var T = this.lang === 'fa'
+      ? { h1: 'H₁ — حلقه‌ها', h0: 'H₀ — تکه‌ها' }
+      : { h1: 'H₁ — loops', h0: 'H₀ — pieces' };
+
+    /* H1 block */
+    var y = top;
+    label(T.h1, y + 8, '#C8633E');
+    y += labH;
+    var i, bar, alive;
+    for (i = 0; i < h1.length; i++){
+      bar = h1[i];
+      alive = bar.b <= this.eps && this.eps < bar.d;
+      ctx.strokeStyle = alive ? 'rgba(200,99,62,0.95)' : 'rgba(200,99,62,0.28)';
+      ctx.lineWidth = rowH1 - 2.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x(bar.b), y + i * rowH1 + rowH1 / 2);
+      ctx.lineTo(isFinite(bar.d) ? x(bar.d) : X1 + 10, y + i * rowH1 + rowH1 / 2);
+      ctx.stroke();
+    }
+    y += Math.max(1, h1.length) * rowH1 + 8;
+
+    /* divider */
+    ctx.strokeStyle = '#E4DAC6'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, y - 4); ctx.lineTo(VW, y - 4); ctx.stroke();
+
+    /* H0 block */
+    label(T.h0, y + 8, '#6B6155');
+    y += labH;
+    for (i = 0; i < h0.length; i++){
+      bar = h0[i];
+      alive = this.eps < bar.d;
+      ctx.strokeStyle = alive ? 'rgba(28,24,20,0.85)' : 'rgba(28,24,20,0.22)';
+      ctx.lineWidth = rowH0 - 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x(0), y + i * rowH0 + rowH0 / 2);
+      ctx.lineTo(isFinite(bar.d) ? x(bar.d) : X1 + 10, y + i * rowH0 + rowH0 / 2);
+      ctx.stroke();
+    }
+
+    /* current-scale line */
+    var ex = x(this.eps);
+    ctx.strokeStyle = '#C8633E';
+    ctx.lineWidth = 1.4;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(ex, 4); ctx.lineTo(ex, HV - 4); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#C8633E';
+    ctx.beginPath();
+    ctx.moveTo(ex - 4, 0); ctx.lineTo(ex + 4, 0); ctx.lineTo(ex, 6); ctx.closePath();
+    ctx.fill();
+  };
+
+  Playground.prototype.readout = function(){
+    var b0 = 0, b1 = 0, i;
+    for (i = 0; i < this.pers.h0.length; i++) if (this.eps < this.pers.h0[i].d) b0++;
+    for (i = 0; i < this.pers.h1.length; i++) if (this.pers.h1[i].b <= this.eps && this.eps < this.pers.h1[i].d) b1++;
+    var f = this.lang === 'fa' ? faDig : String;
+    this.b0el.textContent = f(b0);
+    this.b1el.textContent = f(b1);
+  };
+
+  /* ---------- boot ---------- */
+  var instances = [];
+  document.querySelectorAll('[data-pg]').forEach(function(el){ instances.push(new Playground(el)); });
+  function refreshAll(){ instances.forEach(function(p){ p.draw(); }); }
+  window.PMPG = { refreshAll: refreshAll };
+  window.addEventListener('resize', refreshAll);
+  refreshAll();
+})();
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From a Plane That Is Not a Plane to a Code That Is a Code — Kianoosh Shokri · Face to Face with Mathematics</title>
+<meta name="description" content="The Fano plane — seven points, seven lines — and, hiding inside it, block designs, orthogonal arrays, covering arrays and error-correcting codes. By Kianoosh Shokri. With interactive explorers.">
+
+<meta property="og:title" content="From a Plane That Is Not a Plane to a Code That Is a Code — Kianoosh Shokri">
+<meta property="og:description" content="Face to Face with Mathematics · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/kianoosh-shokri.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX for crisp typeset mathematics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>/* KaTeX inside RTL text — keep formulas LTR & bidi-isolated */
+.katex, .katex-display { direction: ltr; unicode-bidi: isolate; }
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+  .ltr { direction: ltr; unicode-bidi: isolate; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 44px; line-height: 1.1; font-weight: 500; letter-spacing: -.02em; margin: 16px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); align-self: center; }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 40px 0 14px; padding-top: 8px; }
+
+  /* figures + matrix tables */
+  .figure { margin: 28px 0; }
+  .figcap { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); margin-top: 9px; line-height: 1.55; }
+  .figcap .fno { color: var(--accent); font-weight: 600; }
+  .mt-wrap { overflow-x: auto; }
+  table.mtable { border-collapse: collapse; margin: 0 auto; direction: ltr; font-family: "Hanken Grotesk", sans-serif; font-variant-numeric: tabular-nums; }
+  table.mtable td, table.mtable th { border: 1px solid #D6C9AE; min-width: 30px; height: 30px; text-align: center; font-size: 13.5px; padding: 1px 7px; background: #FDFAF3; font-weight: 500; }
+  table.mtable th { background: #F3EBDA; color: var(--ink); font-weight: 700; font-size: 13px; }
+  table.mtable .blocklab { font-size: 13px; padding: 1px 12px; white-space: nowrap; }
+  table.mtable tr.rule-above td { border-top: 2.5px solid var(--ink); }
+  table.mtable td.rule-left { border-left: 2.5px solid var(--ink); }
+  table.mtable th.clickable, table.mtable tr.clickable { cursor: pointer; }
+  table.mtable th.clickable:hover { background: #EADFC7; }
+  table.mtable th.selcol { background: var(--accent); color: #fff; border-color: var(--accent); }
+  table.mtable td.selcol { background: #F5DFCB; }
+  table.mtable tr.selrow td { background: #F5DFCB; }
+  table.mtable td.diff { background: var(--accent); color: #fff; font-weight: 700; }
+  table.mtable td.zerohl { background: #E4ECD9; font-weight: 700; }
+
+  /* ---------- Interactive panels ---------- */
+  .playground { border: 1px solid var(--ink); border-radius: 4px; background: #F7F1E3; margin: 32px 0; overflow: hidden; }
+  .pg-head { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .pg-title { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  .pg-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pg-presets button { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; font-weight: 500; border: 1px solid #D6C9AE; background: var(--paper); border-radius: 999px; padding: 6px 13px; cursor: pointer; color: var(--ink); }
+  .pg-presets button.on { background: var(--black); color: var(--paper); border-color: var(--black); }
+  .pg-body { padding: 14px 16px; }
+  .pg-hint { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); padding: 10px 16px 13px; line-height: 1.6; border-top: 1px solid var(--line); }
+  .wd-read { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 14px; line-height: 1.65; min-height: 24px; }
+  .wd-read b { color: var(--accent); }
+  .wd-read .pill { display: inline-block; border: 1px solid #D6C9AE; background: var(--paper); border-radius: 999px; padding: 2px 10px; margin: 2px 3px 2px 0; font-size: 12.5px; direction: ltr; unicode-bidi: isolate; }
+  .wd-read .pill.hit { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+  /* Fano SVG */
+  .fano-svg { display: block; width: 100%; max-width: 400px; margin: 0 auto; }
+  .fano-svg .fp-line { stroke: var(--ink); stroke-width: 2; fill: none; transition: stroke .12s, stroke-width .12s, opacity .12s; }
+  .fano-svg .fp-line.hl { stroke: var(--accent); stroke-width: 4.5; }
+  .fano-svg .fp-line.dim { opacity: .18; }
+  .fano-svg .fp-hit { stroke: transparent; stroke-width: 16; fill: none; cursor: pointer; }
+  .fano-svg .fp-pt circle { fill: #FDFAF3; stroke: var(--ink); stroke-width: 1.8; cursor: pointer; transition: fill .12s; }
+  .fano-svg .fp-pt.sel circle { fill: var(--accent); stroke: var(--accent); }
+  .fano-svg .fp-pt.onl circle { fill: #EAD9C4; }
+  .fano-svg .fp-pt text { font-family: "Hanken Grotesk", sans-serif; font-size: 14px; font-weight: 700; fill: var(--ink); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+  .fano-svg .fp-pt.sel text { fill: #fff; }
+  .fano-svg .fp-vec { font-family: "Hanken Grotesk", sans-serif; font-size: 11px; font-weight: 600; fill: var(--muted); text-anchor: middle; pointer-events: none; }
+  .fano-two { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; direction: ltr; }
+  .fano-two .fano-svg { max-width: 320px; }
+  .fano-sub { text-align: center; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; color: var(--muted); margin-top: 2px; direction: ltr; }
+
+  .cov-grid { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start; direction: ltr; }
+  .cov-side { min-width: 180px; }
+  .cov-side .fano-svg { max-width: 175px; margin: 0; }
+  @media (max-width: 620px) { .cov-grid { grid-template-columns: 1fr; } .cov-side { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; } }
+
+  /* contributor colophon */
+  .colophon { margin-top: 46px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: 1fr; gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .colophon .mail { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; display: inline-block; font-size: 12.5px; color: var(--accent); text-decoration: none; margin-top: 6px; direction: ltr; unicode-bidi: isolate; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; direction: ltr; text-align: left; }
+  .refs li { margin-bottom: 10px; }
+  .refs a { color: var(--accent); word-break: break-word; }
+  .cite { color: var(--accent); text-decoration: none; font-size: .82em; vertical-align: super; line-height: 0; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+  [dir="rtl"] .pg-hint { text-align: right; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 22px 32px; }
+    h1.title { font-size: 32px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="Face to Face with Mathematics" data-fa="رویارو با ریاضیات"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#B08A2E;display:inline-block;flex:0 0 auto;"></span><span data-en="Undergraduate maths · July 2026" data-fa="ریاضیِ کارشناسی · تیر ۱۴۰۵"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="kicker">Face to Face with Mathematics</div>
+  <h1 class="title">From a Plane That Is Not a Plane to a Code That Is a Code</h1>
+  <p class="standfirst">Seven points, seven lines — and, hiding inside them, block designs, orthogonal arrays, covering arrays, and error-correcting codes. A walk from the Fano plane to a code, with everything alive under your fingers.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/kianoosh-shokri.jpg" alt="Kianoosh Shokri">
+    <span class="name">Kianoosh Shokri</span>
+  </div>
+
+  <div class="body">
+    <h2 class="subhead">1. Introduction</h2>
+
+    <p>One fundamental key to understanding, learning, teaching, and expanding the frontiers of mathematics is discovering the connections and links among different topics. A different perspective can provide a powerful tool that might be decisive in simplifying or solving a problem. In addition, this can be vital in teaching, since students may find an approach suitable for them to learn a mathematical object. In the following, we will explore this connection and some of its advantages through an explicit example. We will see how the Fano plane can be connected to orthogonal arrays, BIBDs, covering arrays, and codes.</p>
+
+    <h2 class="subhead">2. Fano plane</h2>
+
+    <p>The <em>Fano plane</em> is a finite geometry with 7 points and 7 lines such that no two lines are parallel. It is shown in Figure 1. Note that this plane is different from the usual planes we are familiar with, and the whole configuration (points, lines, and the relation between them) is called the Fano plane.</p>
+
+    <!-- ===== Interactive Figure 1 — the Fano plane ===== -->
+    <div class="playground" data-fanox data-wlang="en">
+      <div class="pg-head">
+        <span class="pg-title">Interactive · Figure 1 — the Fano plane</span>
+        <div class="pg-presets" data-modes>
+          <button data-mode="explore" class="on">Lines</button>
+          <button data-mode="pair">Two points</button>
+          <button data-mode="gen">+1 (mod 7)</button>
+        </div>
+        <div class="pg-presets" data-labels>
+          <button data-lab="num" class="on">0–6</button>
+          <button data-lab="omega">ω-powers</button>
+          <button data-lab="vec">vectors</button>
+        </div>
+      </div>
+      <div class="pg-body">
+        <svg class="fano-svg" data-svg viewBox="-10 -2 442 396" role="img" aria-label="The Fano plane: a triangle with its medians and inscribed circle; seven labelled points"></svg>
+        <div class="wd-read" data-read style="margin-top:12px;"></div>
+      </div>
+      <div class="pg-hint" data-hint></div>
+    </div>
+
+    <p>As can be seen in Figure 1, we labeled the points of the Fano plane. This labeling is not random. Let \(X = \{ 0, 1, 2, 3, 4, 5, 6 \}\) be the set of labels corresponding to the points and let \(\mathcal{B} = \{ \{0,1,3\}, \{0,2,6\}, \{1,5,6\}, \{0,4,5\}, \{3,4,6\}, \{2,3,5\}, \{1,2,4\} \}\) be a set of subsets (blocks) of size \(3\) of \(X\) corresponding to the lines of the Fano plane. Two interesting properties emerge here: (1) any pair of numbers from \(X\) is a subset of exactly one element of \(\mathcal{B}\) — pick two points in Figure 1 and see for yourself — and (2) any element of \(\mathcal{B}\) can generate the rest; for instance, if we pick \(\{0,1,3\}\) and add \(1\) to each of its elements (\(\bmod\ 7\)), then \(\{1,2,4\}\) is generated, which is another element of \(\mathcal{B}\) — the third mode of Figure 1 plays this out. The two components \(X\) and \(\mathcal{B}\), as introduced with the first property, are called a <em>Balanced Incomplete Block Design (BIBD)</em>. Note that the second property is not a general consequence of BIBDs. The labeling in Figure 1 is not the only labeling with interesting outcomes. Another type of labeling can be given. However, it is not completely unrelated to the first, since everything is related in the Fano plane. We study it in the next section.</p>
+
+    <h2 class="subhead">3. Generator matrix</h2>
+
+    <p>Let \(f(x) = x^3 + x + 1\) over \(\mathbb{Z}_2\) be a reference polynomial, and let \(\omega\) be a root of \(f\). We can represent \(\omega^i\) for \(0 \leq i \leq 6\) using our reference polynomial \(f\). For example, since \(\omega\) is a root of \(f\), \(\omega^3 + \omega + 1 = 0\), which leads to \(\omega^3 = \omega + 1\). Then \(\omega^4 = \omega \omega^3 = \omega(\omega + 1) = \omega^2 + \omega\). Also, \(\omega^5 = \omega \omega^4 = \omega(\omega^2 + \omega) = \omega^3 + \omega^2 = \omega^2 + \omega + 1\). Similarly, \(\omega^6 = \omega \omega^5 = \omega(\omega^2 + \omega + 1) = \omega^3 + \omega^2 + \omega = \omega^2 + 1\). An interesting observation is that the powers of \(\omega\) can be represented as linear combinations of \(\omega^0\), \(\omega^1\), and \(\omega^2\), which form a basis. Instead of using a summation, one can use only the coefficients. For example, instead of \(\omega^0\), we use \([1, 0, 0]^T\), and instead of \(\omega^4 = \omega^2 + \omega\), we use \([0, 1, 1]^T\). Our new labeling of the Fano plane can be seen in Figure 1 by switching its labels to <em>ω-powers</em> or to the coordinate <em>vectors</em>.</p>
+
+    <p>A matrix \(G\) can be constructed using the vectors we have just created as its columns. \(G\) is called a generator matrix and is displayed in Figure 2. This name suits the matrix since \(G\) generates different objects and connects them to a core concept (the Fano plane).</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="G"></div>
+      <figcaption class="figcap"><span class="fno">Figure 2.</span> Generator matrix \(G\) corresponding to the points of the Fano plane.</figcaption>
+    </figure>
+
+    <h2 class="subhead">4. Orthogonal array</h2>
+
+    <p>Let \(A(G)\) be the array constructed by the linear combination of rows of \(G\) over the elements of \(\mathbb{Z}_2\). \(A(G)\) is presented in Figure 3.</p>
+
+    <!-- ===== Interactive Figure 3 — coverage checker ===== -->
+    <div class="playground" data-cov data-wlang="en">
+      <div class="pg-head">
+        <span class="pg-title">Interactive · Figure 3 — the array A(G)</span>
+        <div class="pg-presets"><button data-reset>Clear columns</button></div>
+      </div>
+      <div class="pg-body">
+        <div class="cov-grid">
+          <div class="mt-wrap" data-table></div>
+          <div class="cov-side">
+            <svg class="fano-svg" data-minisvg viewBox="-10 -2 442 396" aria-hidden="true"></svg>
+            <div class="wd-read" data-read style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="pg-hint" data-hint></div>
+    </div>
+
+    <p>One important property of the columns of \(G\) is that no two columns are multiples of each other; consequently, for an arbitrary pair of columns, any \(2\)-tuple occurs at least once in a row of the array \(A(G)\). By carefully analysing the space spanned by the rows of \(G\), one can show that each \(2\)-tuple occurs exactly twice as a row. Such a construction is called an <em>orthogonal array</em> of strength \(2\) (considering \(2\)-tuples) with repetition \(2\) (since each \(2\)-tuple occurs twice). Note that if the repetition is at least once, then we have a <em>covering array</em>. Hence, \(A(G)\) is an orthogonal array. For instance, by picking the first and the second columns in Figure 3, \((0, 0)\), \((0, 1)\), \((1, 0)\), and \((1, 1)\) are each covered twice. Orthogonal arrays and covering arrays have many applications, especially in designing computer test suites. For more information, see <a class="cite" href="#ref-en-8">[8]</a>.</p>
+
+    <h2 class="subhead">5. Orthogonal array, BIBD, and underlying geometry</h2>
+
+    <p>A block \(S = \{i, j, k\}\) of the BIBD in Figure 4 corresponds to three collinear points \(i, j, k\) in the Fano plane. Let \(M_S\) be a \(3 \times 3\) submatrix of \(G\) corresponding to the columns with labels in the set \(S = \{i, j, k\}\), where \(0 \leq i &lt; j &lt; k \leq 6\). The set \(S\) is a block of the BIBD if and only if \(\operatorname{rank}(M_S) = 2\). This follows from the existence of a row with zeros in the columns of \(M_S\) in \(A(G)\). Geometrically, the points corresponding to the labels in \(S\) are collinear. If \(S\) is not a block of the BIBD, then \(\operatorname{rank}(M_S) = 3\), and the corresponding points in the Fano plane are not collinear. When \(\operatorname{rank}(M_S) = 3\), all distinct \(3\)-tuples occur as rows of \(A(G)\) for the column indices in \(S\) — try picking three columns in Figure 3, once collinear and once not. In \(A(G)\), there are exactly seven \(3\)-sets of columns, corresponding to the blocks of the BIBD, for which not all distinct \(2^3\) \(3\)-tuples are covered. This shows that \(A(G)\) is a strength-\(2\) orthogonal array that is very close to being a strength-\(3\) orthogonal array, since 28 out of the 35 \(3\)-sets of columns have the required coverage.</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="ZEROS"></div>
+      <figcaption class="figcap"><span class="fno">Figure 4.</span> Positions of zeros in each non-zero row correspond to blocks of a 2-(7, 3, 1) design.</figcaption>
+    </figure>
+
+    <h2 class="subhead">6. Covering arrays from the Fano plane</h2>
+
+    <p>The orthogonal array \(A(G)\) is very close to being a strength-\(3\) orthogonal array since only \(\frac{1}{5}\) of the \(3\)-sets of columns do not have the required coverage. This suggests adding more rows to construct a strength-\(3\) covering array. We present a method to construct a covering array of strength \(3\) with \(15\) rows and \(7\) columns. A general method for any prime power \(q\) is given in <a class="cite" href="#ref-en-9">[9]</a>.</p>
+
+    <p>Let \(G^{-1}\) be a new generator matrix constructed using \(\omega^{-1}\) in place of \(\omega\) in the construction of \(G\), and let \(A(G^{-1})\) be the array obtained by taking linear combinations of the rows of \(G^{-1}\) over the elements of \(\mathbb{Z}_2\).</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="GINV"></div>
+    </figure>
+
+    <p>The array obtained by the vertical concatenation of \(A(G)\) and \(A(G^{-1})\), with one copy of the zero row removed, is our desired covering array, shown in Figure 5.</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="CA15"></div>
+      <figcaption class="figcap"><span class="fno">Figure 5.</span> A covering array of strength 3 obtained by the vertical concatenation of \(A(G)\) and \(A(G^{-1})\) with one copy of the zero row removed.</figcaption>
+    </figure>
+
+    <p>Note that this strength-\(3\) covering array is obtained by using two orthogonal arrays of strength \(2\). This suggests a deep connection between two Fano planes and covering arrays. The geometric interpretation underlying this construction is quite interesting. The columns of \(G\) and \(G^{-1}\) correspond to two Fano planes on the same point set such that the intersection of any two lines, one from each plane, has size at most two. Figure 6 and Figure 7 show the two Fano planes and the corresponding blocks. The labels of the Fano plane corresponding to \(G^{-1}\) are written modulo \(7\) to obtain two Fano planes with the same point set. These two Fano planes are called <em>orthogoval</em> planes <a class="cite" href="#ref-en-5">[5]</a>.</p>
+
+    <!-- ===== Interactive Figure 6 — orthogoval planes ===== -->
+    <div class="playground" data-orth data-wlang="en">
+      <div class="pg-head">
+        <span class="pg-title">Interactive · Figure 6 — a pair of orthogoval Fano planes</span>
+        <div class="pg-presets"><button data-reset>Clear</button></div>
+      </div>
+      <div class="pg-body">
+        <div class="fano-two">
+          <div><svg class="fano-svg" data-svg-a viewBox="-10 -2 442 396"></svg><div class="fano-sub">corresponding to G</div></div>
+          <div><svg class="fano-svg" data-svg-b viewBox="-10 -2 442 396"></svg><div class="fano-sub">corresponding to G⁻¹</div></div>
+        </div>
+        <div class="wd-read" data-read style="margin-top:12px;"></div>
+      </div>
+      <div class="pg-hint" data-hint></div>
+    </div>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="ORTHBLOCKS"></div>
+      <figcaption class="figcap"><span class="fno">Figure 7.</span> A pair of orthogoval Fano planes corresponding to \(G\) and \(G^{-1}\).</figcaption>
+    </figure>
+
+    <p>A recursive construction can be used to obtain new families of covering arrays. For more information about these methods, see <a class="cite" href="#ref-en-3">[3, 4, 6, 7, 10]</a>. We want to use a recursive construction called \(x\)-plication, which was introduced in <a class="cite" href="#ref-en-11">[11]</a>. We use \(A(G)\), \(A(G) + 1\), which is obtained by adding \(1\) to all entries of \(A(G)\) in \(\mathbb{Z}_2\), and \(A(G^{-1})\) in the \(2\)-plication construction to obtain a covering array of strength 3 with 16 rows and 14 columns. This covering array is shown in Figure 8. It is worth mentioning that this covering array can be obtained by removing two columns from a Hadamard matrix (see <a class="cite" href="#ref-en-12">[12]</a>).</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" style="margin-bottom:14px;" data-mtable="PLICSCHEME"></div>
+      <div class="mt-wrap" data-mtable="CA16"></div>
+      <figcaption class="figcap"><span class="fno">Figure 8.</span> A covering array of strength 3 obtained by a recursive construction.</figcaption>
+    </figure>
+
+    <h2 class="subhead">7. Codes from the Fano plane</h2>
+
+    <p>It is quite interesting to observe that \(A(G)\) is a linear \((7, 3, 4)_2\)-code. Let us define a linear code and see the connection. For \(n \geq k\), an <em>\((n, k, d)_q\)-code</em> \(C\) is a collection of \(q^k\) \(n\)-tuples over an alphabet \(\mathcal{A}\) of size \(q\) such that the minimum (Hamming) distance between any two codewords of \(C\) is \(d\). That is, there exist two codewords agreeing in \(n - d\) coordinates, and no two codewords agree in as many as \(n - d + 1\) coordinates. In general, \(q\) need not be a prime power. In the special case that \(\mathcal{A} = \mathbb{F}_q\) and \(C\) is a vector space of dimension \(k\) over \(\mathbb{F}_q\), \(C\) is a linear \((n, k, d)_q\)-code. In this case, the minimum distance property translates to the property that each nonzero codeword has at least \(d\) nonzero coordinates. In a \((n, k, d)_q\)-code, the distance \(d\) is bounded by the Singleton bound, that is, \(d \leq n - k + 1\). For a \((n, k, d)_q\)-code, if \(d = n - k + 1\), then the code is called a maximum distance separable (MDS) code, and if \(d = n - k\), then the code is called an almost-MDS (AMDS) code. For more information on MDS codes, see <a class="cite" href="#ref-en-2">[2]</a>, and for AMDS codes, see <a class="cite" href="#ref-en-1">[1]</a>.</p>
+
+    <p>The rows of \(A(G)\) are a collection of \(2^3\) binary \(7\)-tuples. Since the positions of zeros in each row of \(A(G)\) correspond to lines of the Fano plane, the maximum number of zeros in each nonzero codeword is \(3\), which gives \(d = 4\). In addition, \(d = n - k = 7 - 3 = 4\), so \(A(G)\) is a linear AMDS \((7, 3, 4)_2\)-code — measure it yourself below. It is worth mentioning that our matrix \(G\) is called the generator matrix of the code.</p>
+
+    <!-- ===== Interactive — Hamming distance ===== -->
+    <div class="playground" data-dist data-wlang="en">
+      <div class="pg-head">
+        <span class="pg-title">Interactive · A(G) as a code — Hamming distance</span>
+        <div class="pg-presets"><button data-reset>Clear rows</button></div>
+      </div>
+      <div class="pg-body">
+        <div class="mt-wrap" data-table></div>
+        <div class="wd-read" data-read style="margin-top:12px;"></div>
+      </div>
+      <div class="pg-hint" data-hint></div>
+    </div>
+
+    <p>Another linear code can be obtained using the null space of \(G\). Construct a matrix \(C\) whose columns are vectors of the null space of \(G\). Then \(C^T\) is a linear AMDS \((7, 4, 3)\)-code that is given in Figure 9. A good exercise is to prove why it is a \((7, 4, 3)\)-code, and we leave it for a curious reader.</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="CT"></div>
+      <figcaption class="figcap"><span class="fno">Figure 9.</span> A linear code obtained using the null space of \(G\).</figcaption>
+    </figure>
+
+    <h2 class="subhead">8. Conclusion</h2>
+
+    <p>The purpose of this article was to introduce mathematical objects that can all be studied from different points of view. Still, they can also be constructed and studied from the same origin. Our choice for this origin was the Fano plane. The generator matrix constructed from the tuple representation of points in the Fano plane was the key to connecting different concepts, such as orthogonal arrays, BIBDs, covering arrays, and codes. Finding such a connection in mathematics can be a powerful tool for understanding and expanding the mathematical universe.</p>
+  </div>
+
+  <!-- ===== Contributor colophon ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Author</div>
+        <div class="who">Kianoosh Shokri</div>
+        <div class="aff">Department of Mathematics, University of Ottawa</div>
+        <a class="mail" href="mailto:kshokri@uottawa.ca">✉ kshokri@uottawa.ca</a>
+      </div>
+    </div>
+    <div class="origin">Written for <em>People and Mathematics</em> · Face to Face with Mathematics · July 2026. The interactive explorers are the journal’s addition.</div>
+  </div>
+
+  <div class="refs">
+    <h3>References</h3>
+    <ol>
+      <li id="ref-en-1">Alderson, T. L., &amp; Zhang, Z. (2025). Projective systems and bounds on the length of codes of non-zero defect. <em>arXiv preprint</em> <a href="https://arxiv.org/abs/2504.19325">arXiv:2504.19325</a>.</li>
+      <li id="ref-en-2">Ball, S. (2015). <em>Finite geometry and combinatorial applications.</em> London Mathematical Society Student Texts, 82. Cambridge University Press.</li>
+      <li id="ref-en-3">Chateauneuf, M., &amp; Kreher, D. L. (2002). On the state of strength-three covering arrays. <em>Journal of Combinatorial Designs, 10</em>(4), 217–238.</li>
+      <li id="ref-en-4">Cohen, M. B., Colbourn, C. J., &amp; Ling, A. C. H. (2008). Constructing strength three covering arrays with augmented annealing. <em>Discrete Mathematics, 308</em>(13), 2709–2722.</li>
+      <li id="ref-en-5">Colbourn, C. J., Ingalls, C., Jedwab, J., Saaltink, M., Smith, K. W., &amp; Stevens, B. (2024). Sets of mutually orthogoval projective and affine planes. <em>Combinatorial Theory, 4</em>(1), #8.</li>
+      <li id="ref-en-6">Colbourn, C. J., Martirosyan, S. S., Mullen, G. L., Shasha, D., Sherwood, G. B., &amp; Yucas, J. L. (2006). Products of mixed covering arrays of strength two. <em>Journal of Combinatorial Designs, 14</em>(2), 124–138.</li>
+      <li id="ref-en-7">Martirosyan, S. S., &amp; Colbourn, C. J. (2005). Recursive constructions of covering arrays. <em>Bayreuther Mathematische Schriften, 74</em>, 266–275.</li>
+      <li id="ref-en-8">National Institute of Standards and Technology. Automated Combinatorial Testing for Software (ACTS). <a href="https://csrc.nist.rip/groups/SNS/acts/index.html">csrc.nist.rip/groups/SNS/acts</a></li>
+      <li id="ref-en-9">Panario, D., Saaltink, M., Stevens, B., &amp; Wevrick, D. (2020). An extension of a construction of covering arrays. <em>Journal of Combinatorial Designs, 28</em>(11), 842–861.</li>
+      <li id="ref-en-10">Roux, G. (1987). <em>k-Propriétés dans les tableaux de n colonnes: cas particulier de la k-surjectivité et de la k-permutivité.</em> PhD thesis, Université de Paris.</li>
+      <li id="ref-en-11">Shokri, K., &amp; Moura, L. (2025). New families of strength-3 covering arrays using linear feedback shift register sequences. <em>Journal of Combinatorial Designs, 33</em>(4), 156–171. <a href="https://doi.org/10.1002/jcd.21963">doi.org/10.1002/jcd.21963</a></li>
+      <li id="ref-en-12">Sloane, N. J. A. (1993). Covering arrays and intersecting codes. <em>Journal of Combinatorial Designs, 1</em>(1), 51–63.</li>
+    </ol>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">رویارو با ریاضیات</div>
+  <h1 class="title">از صفحه‌ای که صفحه نیست تا کدی که کد است</h1>
+  <p class="standfirst">هفت نقطه و هفت خط — و در دلِ آن‌ها، طرح‌های بلوکی، آرایه‌های متعامد، آرایه‌های پوشا و کدهای تصحیح خطا. گردشی از صفحهٔ فانو تا یک کد؛ با ابزارهایی که زیر انگشتان شما زنده‌اند.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/kianoosh-shokri.jpg" alt="کیانوش شکری">
+    <span class="name">کیانوش شکری</span>
+  </div>
+
+  <div class="body">
+    <h2 class="subhead">۱. مقدمه</h2>
+
+    <p>یکی از روش‌های بنیادی برای درک، یادگیری، آموزش، و گسترش مرزهای ریاضیات، کشف ارتباط‌ها و پیوندهای میان موضوعات گوناگون است. نگاه از زاویه‌ای متفاوت می‌تواند ابزاری قدرتمند فراهم کند که گاهی در ساده‌سازی یا حل یک مسئله نقش تعیین‌کننده‌ای دارد. افزون بر این، چنین نگاهی در آموزش نیز می‌تواند بسیار مهم باشد، زیرا ممکن است دانشجویان از طریق رویکردی که برای آنان مناسب‌تر است، یک مفهوم یا ساختار ریاضی را بهتر بیاموزند. در ادامه، این ارتباط و برخی از مزایای آن را از طریق یک مثال بررسی می‌کنیم. خواهیم دید که چگونه صفحهٔ فانو می‌تواند با آرایه‌های متعامد، طرح‌های بلوکی، آرایه‌های پوشا، و کدها مرتبط شود.</p>
+
+    <h2 class="subhead">۲. صفحهٔ فانو</h2>
+
+    <p><em>صفحهٔ فانو</em> یک هندسهٔ متناهی با ۷ نقطه و ۷ خط است که در آن هیچ دو خطی موازی نیستند. این صفحه در شکل ۱ نشان داده شده است. توجه کنید که این صفحه با صفحه‌های معمولی‌ای که با آن‌ها آشنا هستیم متفاوت است؛ در واقع، کل این پیکربندی، یعنی نقاط، خطوط، و رابطهٔ وقوع میان آن‌ها، صفحهٔ فانو نامیده می‌شود.</p>
+
+    <!-- ===== تعاملی: شکل ۱ — صفحهٔ فانو ===== -->
+    <div class="playground" data-fanox data-wlang="fa">
+      <div class="pg-head">
+        <span class="pg-title" dir="rtl">تعاملی · شکل ۱ — صفحهٔ فانو</span>
+        <div class="pg-presets" data-modes>
+          <button data-mode="explore" class="on">خط‌ها</button>
+          <button data-mode="pair">دو نقطه</button>
+          <button data-mode="gen">‎+1 (mod 7)‎</button>
+        </div>
+        <div class="pg-presets" data-labels>
+          <button data-lab="num" class="on">۰ تا ۶</button>
+          <button data-lab="omega">توان‌های ω</button>
+          <button data-lab="vec">بردارها</button>
+        </div>
+      </div>
+      <div class="pg-body">
+        <svg class="fano-svg" data-svg viewBox="-10 -2 442 396" role="img" aria-label="صفحهٔ فانو: مثلثی با میانه‌ها و دایرهٔ محاطی؛ هفت نقطهٔ برچسب‌دار"></svg>
+        <div class="wd-read" data-read dir="rtl" style="margin-top:12px;"></div>
+      </div>
+      <div class="pg-hint" data-hint dir="rtl"></div>
+    </div>
+
+    <p>همان‌گونه که در شکل ۱ دیده می‌شود، نقاط صفحهٔ فانو را برچسب‌گذاری کرده‌ایم. این برچسب‌گذاری تصادفی نیست. فرض کنید \(X = \{ 0, 1, 2, 3, 4, 5, 6 \}\) مجموعهٔ برچسب‌های متناظر با نقاط باشد و \(\mathcal{B} = \{ \{0,1,3\}, \{0,2,6\}, \{1,5,6\}, \{0,4,5\}, \{3,4,6\}, \{2,3,5\}, \{1,2,4\} \}\) مجموعه‌ای از زیرمجموعه‌های \(X\) با اندازهٔ \(3\) باشد که با خطوط صفحهٔ فانو متناظرند. در اینجا دو ویژگی جالب ظاهر می‌شود: (۱) هر جفت از اعداد موجود در \(X\) دقیقاً زیرمجموعهٔ یکی از اعضای \(\mathcal{B}\) است — در شکل ۱ دو نقطه را انتخاب کنید و خودتان ببینید — و (۲) هر عضو از \(\mathcal{B}\) می‌تواند بقیهٔ اعضا را تولید کند؛ برای نمونه، اگر \(\{0,1,3\}\) را انتخاب کنیم و به هر یک از عناصر آن \(1\) اضافه کنیم، به پیمانهٔ \(7\)، آنگاه \(\{1,2,4\}\) به دست می‌آید که خود یکی دیگر از اعضای \(\mathcal{B}\) است — حالت سوم شکل ۱ همین را بازی می‌کند. دو مؤلفهٔ \(X\) و \(\mathcal{B}\)، همراه با ویژگی نخست، یک <em>طرح بلوکی متوازن ناقص</em> یا <span class="ltr">Balanced Incomplete Block Design (BIBD)</span> نامیده می‌شوند. توجه کنید که ویژگی دوم نتیجه‌ای کلی از <span class="ltr">BIBD</span>ها نیست. برچسب‌گذاری موجود در شکل ۱ تنها برچسب‌گذاری‌ای نیست که نتایج جالبی به همراه دارد. نوع دیگری از برچسب‌گذاری نیز می‌توان ارائه کرد. با این حال، این برچسب‌گذاری کاملاً بی‌ارتباط با برچسب‌گذاری نخست نیست، زیرا در صفحهٔ فانو همه‌چیز به هم مرتبط است. این موضوع را در بخش بعدی بررسی می‌کنیم.</p>
+
+    <h2 class="subhead">۳. ماتریس مولد</h2>
+
+    <p>فرض کنید \(f(x) = x^3 + x + 1\) روی \(\mathbb{Z}_2\) یک چندجمله‌ای مرجع باشد و \(\omega\) ریشه‌ای از \(f\) باشد. با استفاده از چندجمله‌ای مرجع \(f\)، می‌توانیم \(\omega^i\) را برای \(0 \leq i \leq 6\) نمایش دهیم. برای مثال، چون \(\omega\) ریشهٔ \(f\) است، داریم \(\omega^3 + \omega + 1 = 0\)، و بنابراین \(\omega^3 = \omega + 1\). سپس \(\omega^4 = \omega \omega^3 = \omega(\omega + 1) = \omega^2 + \omega\). همچنین، \(\omega^5 = \omega \omega^4 = \omega(\omega^2 + \omega) = \omega^3 + \omega^2 = \omega^2 + \omega + 1\). به طور مشابه، \(\omega^6 = \omega \omega^5 = \omega(\omega^2 + \omega + 1) = \omega^3 + \omega^2 + \omega = \omega^2 + 1\). نکتهٔ جالب این است که توان‌های \(\omega\) را می‌توان به صورت ترکیب‌های خطی از \(\omega^0\)، \(\omega^1\)، و \(\omega^2\) نمایش داد؛ این سه عنصر یک پایه تشکیل می‌دهند. به جای استفاده از نمایش جمعی، می‌توان تنها از ضرایب استفاده کرد. برای نمونه، به جای \(\omega^0\)، بردار \([1,0,0]^T\) را به کار می‌بریم، و به جای \(\omega^4 = \omega^2 + \omega\)، از \([0,1,1]^T\) استفاده می‌کنیم. برچسب‌گذاری جدید ما از صفحهٔ فانو را می‌توانید در شکل ۱ ببینید؛ کافی است برچسب‌ها را روی <em>توان‌های ω</em> یا <em>بردارها</em> بگذارید.</p>
+
+    <p>می‌توان ماتریسی به نام \(G\) ساخت که ستون‌های آن همان بردارهایی هستند که به‌تازگی به دست آوردیم. ماتریس \(G\) یک ماتریس مولد نامیده می‌شود و در شکل ۲ نمایش داده شده است. این نام برای این ماتریس مناسب است، زیرا \(G\) اشیای گوناگونی را تولید می‌کند و آن‌ها را به یک مفهوم محوری، یعنی صفحهٔ فانو، مرتبط می‌سازد.</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="G"></div>
+      <figcaption class="figcap"><span class="fno">شکل ۲.</span> ماتریس مولد \(G\) متناظر با نقاط صفحهٔ فانو.</figcaption>
+    </figure>
+
+    <h2 class="subhead">۴. آرایهٔ متعامد</h2>
+
+    <p>فرض کنید \(A(G)\) آرایه‌ای باشد که از همهٔ ترکیب‌های خطی سطرهای \(G\) با ضرایبی از \(\mathbb{Z}_2\) ساخته می‌شود. آرایهٔ \(A(G)\) در شکل ۳ نمایش داده شده است.</p>
+
+    <!-- ===== تعاملی: شکل ۳ — بررسی پوشش ===== -->
+    <div class="playground" data-cov data-wlang="fa">
+      <div class="pg-head">
+        <span class="pg-title" dir="rtl">تعاملی · شکل ۳ — آرایهٔ A(G)</span>
+        <div class="pg-presets"><button data-reset>پاک‌کردن ستون‌ها</button></div>
+      </div>
+      <div class="pg-body">
+        <div class="cov-grid">
+          <div class="mt-wrap" data-table></div>
+          <div class="cov-side">
+            <svg class="fano-svg" data-minisvg viewBox="-10 -2 442 396" aria-hidden="true"></svg>
+            <div class="wd-read" data-read dir="rtl" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="pg-hint" data-hint dir="rtl"></div>
+    </div>
+
+    <p>یکی از ویژگی‌های مهم ستون‌های \(G\) این است که هیچ دو ستونی مضرب یکدیگر نیستند؛ در نتیجه، برای هر جفت دلخواه از ستون‌ها، هر \(2\)-تایی دست‌کم یک بار در یکی از سطرهای آرایهٔ \(A(G)\) ظاهر می‌شود. با تحلیل دقیق فضای تولیدشده توسط سطرهای \(G\)، می‌توان نشان داد که هر \(2\)-تایی دقیقاً دو بار در سطرهای این آرایه ظاهر می‌شود. چنین ساختاری یک <em>آرایهٔ متعامد</em> با قدرت \(2\) نامیده می‌شود، زیرا تمام \(2\)-تایی‌ها را در نظر می‌گیریم. توجه کنیم هر \(2\)-تایی دو بار ظاهر شده است، و اگر تکرار دست‌کم یک بار باشد، آنگاه یک <em>آرایهٔ پوشا</em> داریم. بنابراین، \(A(G)\) یک آرایهٔ متعامد است. برای نمونه، اگر در شکل ۳ ستون‌های اول و دوم را انتخاب کنیم، هر یک از \(2\)-تایی‌های \((0,0)\)، \((0,1)\)، \((1,0)\)، و \((1,1)\) دقیقاً دو بار پوشش داده می‌شود. آرایه‌های متعامد و آرایه‌های پوشا کاربردهای فراوانی دارند، به‌ویژه در طراحی انواع تست‌های رفع باگ برای نرم‌افزارها و سخت‌افزارهای کامپیوتری. برای اطلاعات بیشتر، به <a class="cite" href="#ref-fa-8">[۸]</a> مراجعه کنید.</p>
+
+    <h2 class="subhead">۵. آرایهٔ متعامد، طرح بلوکی متوازن ناقص، و هندسهٔ مرتبط</h2>
+
+    <p>یک بلوک \(S = \{i, j, k\}\) از <span class="ltr">BIBD</span> در شکل ۴ متناظر با سه نقطهٔ هم‌خط \(i, j, k\) در صفحهٔ فانو است. فرض کنید \(M_S\) زیرماتریسی \(3 \times 3\) از \(G\) باشد که از ستون‌هایی با برچسب‌های موجود در مجموعهٔ \(S = \{i, j, k\}\) تشکیل شده است، که در آن \(0 \leq i &lt; j &lt; k \leq 6\). مجموعهٔ \(S\) یک بلوک از <span class="ltr">BIBD</span> است اگر و تنها اگر \(\operatorname{rank}(M_S) = 2\). این نتیجه از وجود سطری در \(A(G)\) به دست می‌آید که در ستون‌های متناظر با \(M_S\) مقدار صفر دارد. از دید هندسی، نقاط متناظر با برچسب‌های موجود در \(S\) هم‌خط هستند. اگر \(S\) یک بلوک از <span class="ltr">BIBD</span> نباشد، آنگاه \(\operatorname{rank}(M_S) = 3\)، و نقاط متناظر در صفحهٔ فانو هم‌خط نیستند. هنگامی که \(\operatorname{rank}(M_S) = 3\)، همهٔ \(3\)-تایی‌های متمایز به عنوان سطرهایی از \(A(G)\) در ستون‌های متناظر با اندیس‌های موجود در \(S\) ظاهر می‌شوند — در شکل ۳ سه ستون انتخاب کنید؛ یک بار هم‌خط و یک بار ناهم‌خط. در \(A(G)\) دقیقاً هفت \(3\)-مجموعه از ستون‌ها وجود دارد که متناظر با بلوک‌های <span class="ltr">BIBD</span> هستند و برای آن‌ها همهٔ \(2^3\) تا \(3\)-تایی متمایز پوشش داده نمی‌شوند. این نشان می‌دهد که \(A(G)\) یک آرایهٔ متعامد با قدرت \(2\) است که بسیار به یک آرایهٔ متعامد با قدرت \(3\) نزدیک است، زیرا از میان \(35\) مجموعهٔ سه‌تایی از ستون‌ها، \(28\) مجموعه پوشش موردنیاز را دارند.</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="ZEROS"></div>
+      <figcaption class="figcap"><span class="fno">شکل ۴.</span> مکان صفرها در هر سطر ناصفر متناظر با بلوک‌های یک طرح \(2\)-\((7,3,1)\) است.</figcaption>
+    </figure>
+
+    <h2 class="subhead">۶. آرایه‌های پوشا از صفحهٔ فانو</h2>
+
+    <p>آرایهٔ متعامد \(A(G)\) بسیار به یک آرایهٔ متعامد با قدرت \(3\) نزدیک است، زیرا تنها \(\frac{1}{5}\) از \(3\)-مجموعه‌های ستون‌ها پوشش موردنیاز را ندارند. این موضوع نشان می‌دهد که با افزودن سطرهای بیشتر، می‌توان یک آرایهٔ پوشا با قدرت \(3\) ساخت. در ادامه، روشی برای ساخت یک آرایهٔ پوشا با قدرت \(3\)، دارای \(15\) سطر و \(7\) ستون، ارائه می‌کنیم. روشی کلی برای هر توان اول \(q\) در <a class="cite" href="#ref-fa-9">[۹]</a> آمده است.</p>
+
+    <p>فرض کنید \(G^{-1}\) ماتریس مولد جدیدی باشد که در ساخت آن، به جای \(\omega\) در ساخت \(G\)، از \(\omega^{-1}\) استفاده شده است. همچنین فرض کنید \(A(G^{-1})\) آرایه‌ای باشد که از همهٔ ترکیب‌های خطی سطرهای \(G^{-1}\) با ضرایبی از \(\mathbb{Z}_2\) به دست می‌آید.</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="GINV"></div>
+    </figure>
+
+    <p>آرایه‌ای که از ادغام \(A(G)\) و \(A(G^{-1})\) به دست می‌آید، پس از حذف یک نسخه از سطر صفر، همان آرایهٔ پوشای موردنظر ما است که در شکل ۵ نشان داده شده است.</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="CA15"></div>
+      <figcaption class="figcap"><span class="fno">شکل ۵.</span> یک آرایهٔ پوشا با قدرت \(3\) که از ادغام \(A(G)\) و \(A(G^{-1})\) و حذف یک نسخه از سطر صفر به دست آمده است.</figcaption>
+    </figure>
+
+    <p>توجه کنید که این آرایهٔ پوشا با قدرت \(3\) با استفاده از دو آرایهٔ متعامد با قدرت \(2\) به دست آمده است. این موضوع نشان‌دهندهٔ ارتباطی عمیق میان دو صفحهٔ فانو و آرایه‌های پوشاست. تفسیر هندسیِ این ساخت بسیار جالب است. ستون‌های \(G\) و \(G^{-1}\) متناظر با دو صفحهٔ فانو با نقاط مشترک هستند، به گونه‌ای که اشتراک هر دو خط، یکی از هر صفحه، اندازه‌ای حداکثر برابر با دو دارد. شکل ۶ و شکل ۷ این دو صفحهٔ فانو و بلوک‌های متناظر با آن‌ها را نشان می‌دهند. برچسب‌های صفحهٔ فانوی متناظر با \(G^{-1}\) به پیمانهٔ \(7\) نوشته شده‌اند تا دو صفحهٔ فانو با مجموعهٔ نقاط یکسان به دست آید. این دو صفحهٔ فانو، صفحه‌های <span class="ltr">orthogoval</span> نامیده می‌شوند <a class="cite" href="#ref-fa-5">[۵]</a>.</p>
+
+    <!-- ===== تعاملی: شکل ۶ — صفحه‌های orthogoval ===== -->
+    <div class="playground" data-orth data-wlang="fa">
+      <div class="pg-head">
+        <span class="pg-title" dir="rtl">تعاملی · شکل ۶ — یک جفت صفحهٔ فانوی orthogoval</span>
+        <div class="pg-presets"><button data-reset>پاک کن</button></div>
+      </div>
+      <div class="pg-body">
+        <div class="fano-two">
+          <div><svg class="fano-svg" data-svg-a viewBox="-10 -2 442 396"></svg><div class="fano-sub">متناظر با G</div></div>
+          <div><svg class="fano-svg" data-svg-b viewBox="-10 -2 442 396"></svg><div class="fano-sub">متناظر با G⁻¹</div></div>
+        </div>
+        <div class="wd-read" data-read dir="rtl" style="margin-top:12px;"></div>
+      </div>
+      <div class="pg-hint" data-hint dir="rtl"></div>
+    </div>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="ORTHBLOCKS"></div>
+      <figcaption class="figcap"><span class="fno">شکل ۷.</span> یک جفت صفحهٔ فانوی <span class="ltr">orthogoval</span> متناظر با \(G\) و \(G^{-1}\).</figcaption>
+    </figure>
+
+    <p>می‌توان از یک ساختار بازگشتی برای به دست آوردن خانواده‌های جدیدی از آرایه‌های پوشا استفاده کرد. برای اطلاعات بیشتر دربارهٔ این روش‌ها، به <a class="cite" href="#ref-fa-3">[۳، ۴، ۶، ۷، ۱۰]</a> مراجعه کنید. می‌خواهیم از ساختار بازگشتی به نام <span class="ltr">x-plication</span> استفاده کنیم که در <a class="cite" href="#ref-fa-11">[۱۱]</a> معرفی شده است. در ساخت <span class="ltr">2-plication</span>، از \(A(G)\)، از \(A(G) + 1\) که با افزودن \(1\) به همهٔ درایه‌های \(A(G)\) در \(\mathbb{Z}_2\) به دست می‌آید، و از \(A(G^{-1})\) استفاده می‌کنیم تا یک آرایهٔ پوشا با قدرت \(3\)، دارای \(16\) سطر و \(14\) ستون، به دست آوریم. این آرایهٔ پوشا در شکل ۸ نشان داده شده است. شایان ذکر است که این آرایهٔ پوشا را می‌توان با حذف دو ستون از یک ماتریس هادامارد نیز به دست آورد؛ نگاه کنید به <a class="cite" href="#ref-fa-12">[۱۲]</a>.</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" style="margin-bottom:14px;" data-mtable="PLICSCHEME"></div>
+      <div class="mt-wrap" data-mtable="CA16"></div>
+      <figcaption class="figcap"><span class="fno">شکل ۸.</span> یک آرایهٔ پوشا با قدرت \(3\) که از یک ساخت بازگشتی به دست آمده است.</figcaption>
+    </figure>
+
+    <h2 class="subhead">۷. کدهایی از صفحهٔ فانو</h2>
+
+    <p>مشاهدهٔ این نکته بسیار جالب است که \(A(G)\) یک کد خطی \((7,3,4)_2\) است. ابتدا کد خطی را تعریف می‌کنیم و سپس ارتباط آن را می‌بینیم. برای \(n \geq k\)، یک <em>کد \((n,k,d)_q\)</em>، مانند \(C\)، مجموعه‌ای از \(q^k\) تا \(n\)-تایی روی الفبایی \(\mathcal{A}\) با اندازهٔ \(q\) است، به طوری که کمترین فاصلهٔ هَمینگ میان هر دو کلمهٔ کد در \(C\) برابر با \(d\) باشد. به عبارت دیگر، دو کلمهٔ کد وجود دارند که در \(n-d\) مختص با هم برابرند، و هیچ دو کلمهٔ کدی وجود ندارند که در \(n-d+1\) مختص با هم برابر باشند. به طور کلی، لازم نیست \(q\) توان اول باشد. در حالت خاصی که \(\mathcal{A} = \mathbb{F}_q\) و \(C\) یک فضای برداری با بعد \(k\) روی \(\mathbb{F}_q\) باشد، \(C\) یک کد خطی \((n,k,d)_q\) نامیده می‌شود. در این حالت، ویژگی کمترین فاصله به این ویژگی تبدیل می‌شود که هر کلمهٔ کد ناصفر دست‌کم \(d\) مختص ناصفر داشته باشد. در یک کد \((n,k,d)_q\)، فاصلهٔ \(d\) با کران سینگلتون محدود می‌شود؛ یعنی \(d \leq n-k+1\). برای یک کد \((n,k,d)_q\)، اگر \(d = n-k+1\) باشد، آن کد یک کد <span class="ltr">MDS</span> نامیده می‌شود؛ و اگر \(d = n-k\) باشد، آن کد یک کد تقریباً <span class="ltr">MDS</span>، یا <span class="ltr">AMDS</span>، نامیده می‌شود. برای اطلاعات بیشتر دربارهٔ کدهای <span class="ltr">MDS</span> به <a class="cite" href="#ref-fa-2">[۲]</a>، و دربارهٔ کدهای <span class="ltr">AMDS</span> به <a class="cite" href="#ref-fa-1">[۱]</a> مراجعه کنید.</p>
+
+    <p>سطرهای \(A(G)\) مجموعه‌ای از \(2^3\) تا \(7\)-تایی دودویی هستند. از آنجا که مکان صفرها در هر سطر \(A(G)\) متناظر با خطوط صفحهٔ فانو است، بیشترین تعداد صفرها در هر کلمهٔ کد ناصفر برابر با \(3\) است، و بنابراین \(d = 4\). افزون بر این، \(d = n-k = 7-3 = 4\)، پس \(A(G)\) یک کد خطی <span class="ltr">AMDS</span> از نوع \((7,3,4)_2\) است — در پایین خودتان اندازه بگیرید. شایان ذکر است که ماتریس \(G\) ماتریس مولد این کد نامیده می‌شود.</p>
+
+    <!-- ===== تعاملی: فاصلهٔ همینگ ===== -->
+    <div class="playground" data-dist data-wlang="fa">
+      <div class="pg-head">
+        <span class="pg-title" dir="rtl">تعاملی · A(G) به‌مثابهٔ کد — فاصلهٔ همینگ</span>
+        <div class="pg-presets"><button data-reset>پاک‌کردن سطرها</button></div>
+      </div>
+      <div class="pg-body">
+        <div class="mt-wrap" data-table></div>
+        <div class="wd-read" data-read dir="rtl" style="margin-top:12px;"></div>
+      </div>
+      <div class="pg-hint" data-hint dir="rtl"></div>
+    </div>
+
+    <p>کد خطی دیگری نیز می‌توان با استفاده از فضای پوچ \(G\) به دست آورد. ماتریسی مانند \(C\) بسازید که ستون‌های آن بردارهای فضای پوچ \(G\) باشند. آنگاه \(C^T\) یک کد خطی <span class="ltr">AMDS</span> از نوع \((7,4,3)_2\) است که در شکل ۹ آمده است. تمرین خوبی است که ثابت کنید چرا این یک کد \((7,4,3)_2\) است؛ این کار را به خوانندهٔ کنجکاو واگذار می‌کنیم.</p>
+
+    <figure class="figure">
+      <div class="mt-wrap" data-mtable="CT"></div>
+      <figcaption class="figcap"><span class="fno">شکل ۹.</span> یک کد خطی که با استفاده از فضای پوچ \(G\) به دست آمده است.</figcaption>
+    </figure>
+
+    <h2 class="subhead">۸. نتیجه‌گیری</h2>
+
+    <p>هدف این مقاله معرفی اشیای ریاضی‌ای بود که هر یک را می‌توان از دیدگاه‌های متفاوتی مطالعه کرد، اما در عین حال می‌توان آن‌ها را از یک منشأ مشترک نیز ساخت و بررسی نمود. انتخاب ما برای این منشأ، صفحهٔ فانو بود. ماتریس مولدی که از نقاط صفحهٔ فانو ساخته شد، کلید برقراری ارتباط میان مفاهیم گوناگونی مانند آرایه‌های متعامد، طرح‌های بلوکی متوازن ناقص، آرایه‌های پوشا، و کدها بود. یافتن چنین ارتباطی در ریاضیات می‌تواند ابزاری قدرتمند برای فهم و گسترش جهان ریاضی باشد.</p>
+  </div>
+
+  <!-- ===== کارنامه‌ی دست‌اندرکاران ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">نویسنده</div>
+        <div class="who">کیانوش شکری</div>
+        <div class="aff">گروه ریاضیات، دانشگاه اتاوا</div>
+        <a class="mail" href="mailto:kshokri@uottawa.ca">✉ kshokri@uottawa.ca</a>
+      </div>
+    </div>
+    <div class="origin">نوشته‌شده برای «آدم‌ها و ریاضیات» · رویارو با ریاضیات · تیر ۱۴۰۵. ابزارهای تعاملی افزوده‌ی مجله است.</div>
+  </div>
+
+  <div class="refs">
+    <h3>مراجع</h3>
+    <ol>
+      <li id="ref-fa-1">Alderson, T. L., &amp; Zhang, Z. (2025). Projective systems and bounds on the length of codes of non-zero defect. <em>arXiv preprint</em> <a href="https://arxiv.org/abs/2504.19325">arXiv:2504.19325</a>.</li>
+      <li id="ref-fa-2">Ball, S. (2015). <em>Finite geometry and combinatorial applications.</em> London Mathematical Society Student Texts, 82. Cambridge University Press.</li>
+      <li id="ref-fa-3">Chateauneuf, M., &amp; Kreher, D. L. (2002). On the state of strength-three covering arrays. <em>Journal of Combinatorial Designs, 10</em>(4), 217–238.</li>
+      <li id="ref-fa-4">Cohen, M. B., Colbourn, C. J., &amp; Ling, A. C. H. (2008). Constructing strength three covering arrays with augmented annealing. <em>Discrete Mathematics, 308</em>(13), 2709–2722.</li>
+      <li id="ref-fa-5">Colbourn, C. J., Ingalls, C., Jedwab, J., Saaltink, M., Smith, K. W., &amp; Stevens, B. (2024). Sets of mutually orthogoval projective and affine planes. <em>Combinatorial Theory, 4</em>(1), #8.</li>
+      <li id="ref-fa-6">Colbourn, C. J., Martirosyan, S. S., Mullen, G. L., Shasha, D., Sherwood, G. B., &amp; Yucas, J. L. (2006). Products of mixed covering arrays of strength two. <em>Journal of Combinatorial Designs, 14</em>(2), 124–138.</li>
+      <li id="ref-fa-7">Martirosyan, S. S., &amp; Colbourn, C. J. (2005). Recursive constructions of covering arrays. <em>Bayreuther Mathematische Schriften, 74</em>, 266–275.</li>
+      <li id="ref-fa-8">National Institute of Standards and Technology. Automated Combinatorial Testing for Software (ACTS). <a href="https://csrc.nist.rip/groups/SNS/acts/index.html">csrc.nist.rip/groups/SNS/acts</a></li>
+      <li id="ref-fa-9">Panario, D., Saaltink, M., Stevens, B., &amp; Wevrick, D. (2020). An extension of a construction of covering arrays. <em>Journal of Combinatorial Designs, 28</em>(11), 842–861.</li>
+      <li id="ref-fa-10">Roux, G. (1987). <em>k-Propriétés dans les tableaux de n colonnes: cas particulier de la k-surjectivité et de la k-permutivité.</em> PhD thesis, Université de Paris.</li>
+      <li id="ref-fa-11">Shokri, K., &amp; Moura, L. (2025). New families of strength-3 covering arrays using linear feedback shift register sequences. <em>Journal of Combinatorial Designs, 33</em>(4), 156–171. <a href="https://doi.org/10.1002/jcd.21963">doi.org/10.1002/jcd.21963</a></li>
+      <li id="ref-fa-12">Sloane, N. J. A. (1993). Covering arrays and intersecting codes. <em>Journal of Combinatorial Designs, 1</em>(1), 51–63.</li>
+    </ol>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a>
+</footer>
+
+<script>
+  /* ---------- language toggle ---------- */
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  }
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+
+  /* ---------- KaTeX ---------- */
+  function renderMath(){
+    if (!window.renderMathInElement) { setTimeout(renderMath, 60); return; }
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+  renderMath();
+</script>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ================= data ================= */
+  var LINES = [[0,1,3],[0,2,6],[1,5,6],[0,4,5],[3,4,6],[2,3,5],[1,2,4]];
+  var G = [[1,0,0,1,0,1,1],[0,1,0,1,1,1,0],[0,0,1,0,1,1,1]];
+  var GINV = [[1,1,1,0,1,0,0],[0,0,1,1,1,0,1],[0,1,1,1,0,1,0]];
+  var AG = [
+    [0,0,1,0,1,1,1],[0,1,0,1,1,1,0],[0,1,1,1,0,0,1],[1,0,0,1,0,1,1],
+    [1,0,1,1,1,0,0],[1,1,0,0,1,0,1],[1,1,1,0,0,1,0],[0,0,0,0,0,0,0]
+  ];
+  var CA15 = [
+    [0,0,0,0,0,0,0],
+    [0,0,1,0,1,1,1],[0,1,0,1,1,1,0],[0,1,1,1,0,0,1],[1,0,0,1,0,1,1],
+    [1,0,1,1,1,0,0],[1,1,0,0,1,0,1],[1,1,1,0,0,1,0],
+    [0,1,1,1,0,1,0],[0,0,1,1,1,0,1],[0,1,0,0,1,1,1],[1,1,1,0,1,0,0],
+    [1,0,0,1,1,1,0],[1,1,0,1,0,0,1],[1,0,1,0,0,1,1]
+  ];
+  var CA16 = [
+    [0,0,0,0,0,0,0, 0,0,0,0,0,0,0],
+    [0,0,1,0,1,1,1, 0,0,1,0,1,1,1],
+    [0,1,0,1,1,1,0, 0,1,0,1,1,1,0],
+    [0,1,1,1,0,0,1, 0,1,1,1,0,0,1],
+    [1,0,0,1,0,1,1, 1,0,0,1,0,1,1],
+    [1,0,1,1,1,0,0, 1,0,1,1,1,0,0],
+    [1,1,0,0,1,0,1, 1,1,0,0,1,0,1],
+    [1,1,1,0,0,1,0, 1,1,1,0,0,1,0],
+    [0,0,0,0,0,0,0, 1,1,1,1,1,1,1],
+    [0,1,1,1,0,1,0, 1,0,0,0,1,0,1],
+    [0,0,1,1,1,0,1, 1,1,0,0,0,1,0],
+    [0,1,0,0,1,1,1, 1,0,1,1,0,0,0],
+    [1,1,1,0,1,0,0, 0,0,0,1,0,1,1],
+    [1,0,0,1,1,1,0, 0,1,1,0,0,0,1],
+    [1,1,0,1,0,0,1, 0,0,1,0,1,1,0],
+    [1,0,1,0,0,1,1, 0,1,0,1,1,0,0]
+  ];
+  var CT = [
+    [0,0,0,0,0,0,0],[1,0,1,0,0,0,1],[1,1,1,0,0,1,0],[0,1,0,0,0,1,1],
+    [0,1,1,0,1,0,0],[1,1,0,0,1,0,1],[1,0,0,0,1,1,0],[0,0,1,0,1,1,1],
+    [1,1,0,1,0,0,0],[0,1,1,1,0,0,1],[0,0,1,1,0,1,0],[1,0,0,1,0,1,1],
+    [1,0,1,1,1,0,0],[0,0,0,1,1,0,1],[0,1,0,1,1,1,0],[1,1,1,1,1,1,1]
+  ];
+  /* zeros table, in the paper's order: rows of A(G) paired with their blocks */
+  var ZEROROWS = [
+    { r:[0,0,1,0,1,1,1], b:[0,1,3] }, { r:[0,1,0,1,1,1,0], b:[0,2,6] },
+    { r:[1,0,1,1,1,0,0], b:[1,5,6] }, { r:[0,1,1,1,0,0,1], b:[0,4,5] },
+    { r:[1,1,1,0,0,1,0], b:[3,4,6] }, { r:[1,1,0,0,1,0,1], b:[2,3,5] },
+    { r:[1,0,0,1,0,1,1], b:[1,2,4] }, { r:[0,0,0,0,0,0,0], b:null }
+  ];
+  var ORTH_B = [[0,4,6],[0,1,5],[0,2,3],[3,5,6],[1,2,6],[2,4,5],[1,3,4]];
+
+  var VEC = ['100','010','001','110','011','111','101']; /* coefficients of 1, ω, ω² for point i */
+  var SUP = ['⁰','¹','²','³','⁴','⁵','⁶'];
+
+  function faDig(s){ return String(s).replace(/[0-9]/g, function(d){ return '۰۱۲۳۴۵۶۷۸۹'[+d]; }); }
+  function fmtNum(n, lang){ return lang === 'fa' ? faDig(n) : String(n); }
+  function setTxt(sel){ return '{' + sel.slice().sort().join(', ') + '}'; }
+
+  /* ================= Fano SVG renderer ================= */
+  var PK = ['top','bl','br','ml','c','mb','mr'];
+  var POS = { top:[210.5,42], bl:[32,352], br:[389,352], ml:[121,197], c:[210.5,248], mb:[210.5,352], mr:[300,197] };
+  var CIRCLE = { cx:210.5, cy:248, r:104 };
+  var LINESPOS = [
+    { pts:['top','ml','bl'] }, { pts:['top','mr','br'] }, { pts:['bl','mb','br'] },
+    { pts:['ml','c','br'] },   { pts:['top','c','mb'] },  { pts:['bl','c','mr'] },
+    { pts:['ml','mb','mr'], circle:true }
+  ];
+  var LAB_G    = { top:3, bl:5, br:1, ml:2, c:4, mb:6, mr:0 };
+  var LAB_GINV = { top:4, bl:2, br:6, ml:5, c:3, mb:1, mr:0 };
+  var NS = 'http://www.w3.org/2000/svg';
+
+  function mk(tag, attrs){
+    var el = document.createElementNS(NS, tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  /* renderFano: builds the plane in svg; returns an api */
+  function renderFano(svg, labeling, opts){
+    opts = opts || {};
+    svg.innerHTML = '';
+    var lineEls = [], hitEls = [], ptEls = {}, vecEls = {};
+    var lineBlocks = LINESPOS.map(function(L){
+      return L.pts.map(function(p){ return labeling[p]; }).sort();
+    });
+
+    LINESPOS.forEach(function(L, idx){
+      var vis, hit;
+      if (L.circle){
+        vis = mk('circle', { cx:CIRCLE.cx, cy:CIRCLE.cy, r:CIRCLE.r, 'class':'fp-line' });
+        hit = mk('circle', { cx:CIRCLE.cx, cy:CIRCLE.cy, r:CIRCLE.r, 'class':'fp-hit' });
+      } else {
+        var a = POS[L.pts[0]], b = POS[L.pts[2]];
+        vis = mk('line', { x1:a[0], y1:a[1], x2:b[0], y2:b[1], 'class':'fp-line' });
+        hit = mk('line', { x1:a[0], y1:a[1], x2:b[0], y2:b[1], 'class':'fp-hit' });
+      }
+      svg.appendChild(vis); lineEls.push(vis);
+      if (opts.linesClickable){
+        hit.addEventListener('click', function(){ opts.onLine && opts.onLine(idx); });
+        svg.appendChild(hit);
+      }
+      hitEls.push(hit);
+    });
+
+    PK.forEach(function(p){
+      var g = mk('g', { 'class':'fp-pt' });
+      var xy = POS[p];
+      var c = mk('circle', { cx:xy[0], cy:xy[1], r:16 });
+      var t = mk('text', { x:xy[0], y:xy[1] });
+      t.textContent = labeling[p];
+      g.appendChild(c); g.appendChild(t);
+      if (opts.pointsClickable){
+        g.addEventListener('click', function(){ opts.onPoint && opts.onPoint(labeling[p]); });
+        g.style.cursor = 'pointer';
+      }
+      svg.appendChild(g);
+      ptEls[labeling[p]] = g;
+
+      /* outward offset for the vector tag */
+      var dx = xy[0] - CIRCLE.cx, dy = xy[1] - CIRCLE.cy;
+      var len = Math.sqrt(dx*dx + dy*dy) || 1;
+      var off = 34;
+      var vx = xy[0] + (len < 5 ? 30 : dx/len*off);
+      var vy = xy[1] + (len < 5 ? -24 : dy/len*off) + 4;
+      var vt = mk('text', { x:vx, y:vy, 'class':'fp-vec' });
+      vt.style.display = 'none';
+      svg.appendChild(vt);
+      vecEls[labeling[p]] = vt;
+    });
+
+    var api = {
+      blocks: lineBlocks,
+      setLabels: function(mode){
+        PK.forEach(function(p){
+          var i = labeling[p];
+          var t = ptEls[i].querySelector('text');
+          if (mode === 'omega'){ t.textContent = 'ω' + SUP[i]; t.setAttribute('font-size','12'); }
+          else { t.textContent = i; t.removeAttribute('font-size'); }
+          vecEls[i].style.display = (mode === 'vec') ? '' : 'none';
+          vecEls[i].textContent = '[' + VEC[i].split('').join(',') + ']';
+        });
+      },
+      highlightLine: function(idx, exclusive){
+        lineEls.forEach(function(el, i){
+          el.classList.toggle('hl', i === idx);
+          el.classList.toggle('dim', exclusive && idx != null && i !== idx);
+        });
+      },
+      clearLines: function(){
+        lineEls.forEach(function(el){ el.classList.remove('hl'); el.classList.remove('dim'); });
+      },
+      markPoints: function(selArr, onLineArr){
+        for (var i = 0; i <= 6; i++){
+          ptEls[i].classList.toggle('sel', selArr.indexOf(i) !== -1);
+          ptEls[i].classList.toggle('onl', onLineArr ? (onLineArr.indexOf(i) !== -1 && selArr.indexOf(i) === -1) : false);
+        }
+      }
+    };
+    return api;
+  }
+
+  function sameSet(a, b){
+    if (a.length !== b.length) return false;
+    var x = a.slice().sort().join(','), y = b.slice().sort().join(',');
+    return x === y;
+  }
+  function findLine(blocks, pts){
+    for (var i = 0; i < blocks.length; i++){
+      var ok = pts.every(function(p){ return blocks[i].indexOf(p) !== -1; });
+      if (ok) return i;
+    }
+    return -1;
+  }
+
+  /* ================= W1 — Fano explorer ================= */
+  var STR = {
+    en: {
+      exploreHint: 'Tap a line (the circle is a line too!) to see which three points it carries. Every pair of points lies on exactly one line.',
+      pairHint: 'Tap two points — the unique line through them lights up. Then try any other pair.',
+      genHint: 'Start from the line {0, 1, 3} and press +1: every label increases by 1 (mod 7), and the result is again a line. Seven presses visit all seven lines and return home.',
+      lineIs: function(b){ return 'This line is the block <b>' + setTxt(b) + '</b>.'; },
+      pickTwo: 'Pick a second point…',
+      pairIs: function(p, b){ return 'The pair <b>' + setTxt(p) + '</b> lies on exactly one line: <b>' + setTxt(b) + '</b>.'; },
+      genState: function(b){ return 'Current line: <b>' + setTxt(b) + '</b>'; },
+      genBtn: '+1 (mod 7)', resetBtn: 'Reset',
+      labelsHint: ' Switch the labels to ω-powers or coordinate vectors to preview Section 3.'
+    },
+    fa: {
+      exploreHint: 'روی یک خط بزنید (دایره هم یک خط است!) تا ببینید کدام سه نقطه را در بر دارد. هر جفت نقطه دقیقاً روی یک خط است.',
+      pairHint: 'دو نقطه را انتخاب کنید — یگانه خطِ گذرنده از آن دو روشن می‌شود. بعد جفتی دیگر را امتحان کنید.',
+      genHint: 'از خط {0, 1, 3} شروع کنید و +1 را بزنید: هر برچسب به پیمانهٔ ۷ یکی زیاد می‌شود و حاصل باز هم یک خط است. با هفت بار زدن، هر هفت خط را می‌بینید و به خانه برمی‌گردید.',
+      lineIs: function(b){ return 'این خط همان بلوکِ <b>' + setTxt(b) + '</b> است.'; },
+      pickTwo: 'نقطهٔ دوم را انتخاب کنید…',
+      pairIs: function(p, b){ return 'جفتِ <b>' + setTxt(p) + '</b> دقیقاً روی یک خط است: <b>' + setTxt(b) + '</b>.'; },
+      genState: function(b){ return 'خطِ کنونی: <b>' + setTxt(b) + '</b>'; },
+      genBtn: '‎+1 (mod 7)‎', resetBtn: 'از نو',
+      labelsHint: ' برچسب‌ها را روی توان‌های ω یا بردارها بگذارید تا پیش‌نمایی از بخش ۳ ببینید.'
+    }
+  };
+
+  document.querySelectorAll('[data-fanox]').forEach(function(root){
+    var lang = root.getAttribute('data-wlang') || 'en';
+    var T = STR[lang];
+    var svg = root.querySelector('[data-svg]');
+    var read = root.querySelector('[data-read]');
+    var hint = root.querySelector('[data-hint]');
+    var mode = 'explore', labMode = 'num';
+    var pairSel = [], genBlock = [0,1,3];
+
+    var api = renderFano(svg, LAB_G, {
+      linesClickable: true, pointsClickable: true,
+      onLine: function(idx){
+        if (mode !== 'explore') return;
+        api.highlightLine(idx, true);
+        api.markPoints([], api.blocks[idx]);
+        read.innerHTML = T.lineIs(api.blocks[idx]);
+      },
+      onPoint: function(i){
+        if (mode !== 'pair') return;
+        if (pairSel.indexOf(i) !== -1){ pairSel = pairSel.filter(function(x){ return x !== i; }); }
+        else { if (pairSel.length === 2) pairSel = []; pairSel.push(i); }
+        if (pairSel.length === 2){
+          var li = findLine(api.blocks, pairSel);
+          api.highlightLine(li, true);
+          api.markPoints(pairSel, api.blocks[li]);
+          read.innerHTML = T.pairIs(pairSel, api.blocks[li]);
+        } else {
+          api.clearLines();
+          api.markPoints(pairSel, []);
+          read.innerHTML = pairSel.length ? T.pickTwo : '';
+        }
+      }
+    });
+
+    /* gen-mode controls */
+    var genBar = document.createElement('div');
+    genBar.className = 'pg-presets';
+    genBar.style.cssText = 'margin-top:10px;display:none;';
+    var stepBtn = document.createElement('button'); stepBtn.textContent = T.genBtn;
+    var resetBtn = document.createElement('button'); resetBtn.textContent = T.resetBtn;
+    genBar.appendChild(stepBtn); genBar.appendChild(resetBtn);
+    read.parentNode.insertBefore(genBar, read);
+
+    function genShow(){
+      var li = findLine(api.blocks, genBlock);
+      api.highlightLine(li, true);
+      api.markPoints(genBlock, []);
+      read.innerHTML = T.genState(api.blocks[li]);
+    }
+    stepBtn.addEventListener('click', function(){
+      genBlock = genBlock.map(function(x){ return (x + 1) % 7; });
+      genShow();
+    });
+    resetBtn.addEventListener('click', function(){ genBlock = [0,1,3]; genShow(); });
+
+    function setMode(m){
+      mode = m; pairSel = []; genBlock = [0,1,3];
+      api.clearLines(); api.markPoints([], []);
+      read.innerHTML = '';
+      genBar.style.display = (m === 'gen') ? 'flex' : 'none';
+      hint.textContent = (m === 'explore' ? T.exploreHint : m === 'pair' ? T.pairHint : T.genHint) + (m === 'explore' ? T.labelsHint : '');
+      if (m === 'gen') genShow();
+      root.querySelectorAll('[data-modes] button').forEach(function(b){
+        b.classList.toggle('on', b.getAttribute('data-mode') === m);
+      });
+    }
+    root.querySelectorAll('[data-modes] button').forEach(function(b){
+      b.addEventListener('click', function(){ setMode(b.getAttribute('data-mode')); });
+    });
+    root.querySelectorAll('[data-labels] button').forEach(function(b){
+      b.addEventListener('click', function(){
+        labMode = b.getAttribute('data-lab');
+        api.setLabels(labMode);
+        root.querySelectorAll('[data-labels] button').forEach(function(x){ x.classList.toggle('on', x === b); });
+      });
+    });
+    setMode('explore');
+  });
+
+  /* ================= table builder ================= */
+  function buildMatrix(rows, opts){
+    opts = opts || {};
+    var tbl = document.createElement('table');
+    tbl.className = 'mtable';
+    if (opts.headers){
+      var tr = document.createElement('tr');
+      opts.headers.forEach(function(h, ci){
+        var th = document.createElement('th');
+        th.innerHTML = h;
+        if (opts.clickCols && ci < 7){ th.className = 'clickable'; th.setAttribute('data-col', ci); }
+        tr.appendChild(th);
+      });
+      tbl.appendChild(tr);
+    }
+    rows.forEach(function(row, ri){
+      var tr = document.createElement('tr');
+      if (opts.ruleAbove && opts.ruleAbove.indexOf(ri) !== -1) tr.className = 'rule-above';
+      if (opts.clickRows){ tr.classList.add('clickable'); tr.setAttribute('data-row', ri); }
+      row.forEach(function(v, ci){
+        var td = document.createElement('td');
+        td.innerHTML = v;
+        if (opts.ruleLeft && opts.ruleLeft.indexOf(ci) !== -1) td.classList.add('rule-left');
+        td.setAttribute('data-c', ci);
+        tr.appendChild(td);
+      });
+      if (opts.rowExtra){
+        var ex = opts.rowExtra(ri);
+        if (ex !== null){ var td2 = document.createElement('td'); td2.className = 'blocklab rule-left'; td2.textContent = ex; tr.appendChild(td2); }
+      }
+      tbl.appendChild(tr);
+    });
+    return tbl;
+  }
+
+  /* ================= static figures ================= */
+  var omegaHead = ['ω⁰','ω¹','ω²','ω³','ω⁴','ω⁵','ω⁶'];
+  var omegaInvHead = ['ω⁰','ω⁻¹','ω⁻²','ω⁻³','ω⁻⁴','ω⁻⁵','ω⁻⁶'];
+  function colsToRows(){ return null; }
+
+  document.querySelectorAll('[data-mtable]').forEach(function(holder){
+    var kind = holder.getAttribute('data-mtable');
+    var isFa = !!holder.closest('[data-lang-block="fa"]');
+    var tbl = null;
+    if (kind === 'G'){
+      tbl = buildMatrix(G, { headers: omegaHead });
+      var capL = document.createElement('div');
+      capL.style.cssText = 'text-align:center;font-family:"Hanken Grotesk",sans-serif;font-size:14px;font-weight:600;margin-bottom:6px;direction:ltr;';
+      capL.textContent = 'G =';
+      holder.appendChild(capL);
+    }
+    else if (kind === 'GINV'){
+      tbl = buildMatrix(GINV, { headers: omegaInvHead });
+      var capL2 = document.createElement('div');
+      capL2.style.cssText = 'text-align:center;font-family:"Hanken Grotesk",sans-serif;font-size:14px;font-weight:600;margin-bottom:6px;direction:ltr;';
+      capL2.textContent = 'G⁻¹ =';
+      holder.appendChild(capL2);
+    }
+    else if (kind === 'ZEROS'){
+      tbl = buildMatrix(ZEROROWS.map(function(z){ return z.r; }), {
+        headers: ['0','1','2','3','4','5','6', isFa ? 'بلوک‌های BIBD' : 'Blocks of the BIBD'],
+        rowExtra: function(ri){ return ZEROROWS[ri].b ? setTxt(ZEROROWS[ri].b) : ''; }
+      });
+      /* highlight the zeros that spell each block */
+      Array.prototype.slice.call(tbl.rows).forEach(function(tr, i){
+        if (i === 0) return; /* header */
+        var z = ZEROROWS[i-1];
+        if (!z.b) return;
+        z.b.forEach(function(c){ tr.cells[c].classList.add('zerohl'); });
+      });
+    }
+    else if (kind === 'CA15'){
+      tbl = buildMatrix(CA15, { ruleAbove: [8] });
+    }
+    else if (kind === 'CA16'){
+      tbl = buildMatrix(CA16, { ruleAbove: [8], ruleLeft: [7] });
+    }
+    else if (kind === 'CT'){
+      tbl = buildMatrix(CT, {});
+      var capL3 = document.createElement('div');
+      capL3.style.cssText = 'text-align:center;font-family:"Hanken Grotesk",sans-serif;font-size:14px;font-weight:600;margin-bottom:6px;direction:ltr;';
+      capL3.textContent = 'Cᵀ =';
+      holder.appendChild(capL3);
+    }
+    else if (kind === 'ORTHBLOCKS'){
+      var rows = LINES.map(function(b, i){ return [setTxt(b), setTxt(ORTH_B[i])]; });
+      tbl = buildMatrix(rows, { headers: isFa
+        ? ['خطوط صفحهٔ فانوی متناظر با G', 'خطوط صفحهٔ فانوی متناظر با G⁻¹']
+        : ['Lines of the Fano plane for G', 'Lines of the Fano plane for G⁻¹'] });
+      tbl.querySelectorAll('td').forEach(function(td){ td.style.minWidth = '150px'; });
+    }
+    else if (kind === 'PLICSCHEME'){
+      tbl = buildMatrix([['A(G)', 'A(G)'], ['A(G⁻¹)', 'A(G⁻¹) + 1']], {});
+      tbl.querySelectorAll('td').forEach(function(td){ td.style.cssText = 'min-width:90px;height:36px;font-weight:600;'; });
+    }
+    if (tbl) holder.appendChild(tbl);
+  });
+
+  /* ================= W2 — coverage checker ================= */
+  var CSTR = {
+    en: {
+      hint: 'Tap column headers to choose 2 or 3 columns of A(G). With two columns, every pair 00, 01, 10, 11 appears exactly twice — strength 2. With three columns: if the three points are NOT collinear, all 8 triples appear; if they form a line of the Fano plane, half the triples are missing.',
+      none: 'Choose two or three columns above.',
+      one: 'Choose one more column…',
+      pairs: function(cols){ return 'Columns <b>' + setTxt(cols) + '</b> — each pair appears:'; },
+      triples: function(cols){ return 'Columns <b>' + setTxt(cols) + '</b> — the 8 possible triples:'; },
+      isLine: function(b){ return ' <b>' + setTxt(b) + '</b> is a line of the Fano plane — the three points are collinear, rank(M<sub>S</sub>) = 2, and 4 of the 8 triples never appear.'; },
+      notLine: ' These three points are <b>not collinear</b> — rank(M<sub>S</sub>) = 3, and every one of the 8 triples appears exactly once.',
+      times: function(n){ return '×' + n; }
+    },
+    fa: {
+      hint: 'روی سرستون‌ها بزنید و ۲ یا ۳ ستون از A(G) را انتخاب کنید. با دو ستون، هر جفتِ 00، 01، 10، 11 دقیقاً دو بار ظاهر می‌شود — قدرت ۲. با سه ستون: اگر سه نقطه هم‌خط نباشند، هر ۸ سه‌تایی ظاهر می‌شود؛ و اگر یک خطِ صفحهٔ فانو باشند، نیمی از سه‌تایی‌ها غایب‌اند.',
+      none: 'از بالا دو یا سه ستون انتخاب کنید.',
+      one: 'یک ستون دیگر انتخاب کنید…',
+      pairs: function(cols){ return 'ستون‌های <b>' + setTxt(cols) + '</b> — هر جفت این‌قدر ظاهر می‌شود:'; },
+      triples: function(cols){ return 'ستون‌های <b>' + setTxt(cols) + '</b> — ۸ سه‌تاییِ ممکن:'; },
+      isLine: function(b){ return ' <b>' + setTxt(b) + '</b> یک خطِ صفحهٔ فانوست — سه نقطه هم‌خط‌اند، rank(M<sub>S</sub>) = 2، و ۴ تا از ۸ سه‌تایی هرگز ظاهر نمی‌شوند.'; },
+      notLine: ' این سه نقطه <b>هم‌خط نیستند</b> — rank(M<sub>S</sub>) = 3، و هر ۸ سه‌تایی دقیقاً یک بار ظاهر می‌شود.',
+      times: function(n){ return '×' + faDig(n); }
+    }
+  };
+
+  document.querySelectorAll('[data-cov]').forEach(function(root){
+    var lang = root.getAttribute('data-wlang') || 'en';
+    var T = CSTR[lang];
+    var read = root.querySelector('[data-read]');
+    root.querySelector('[data-hint]').textContent = T.hint;
+
+    var tbl = buildMatrix(AG, { headers:['0','1','2','3','4','5','6'], clickCols:true });
+    root.querySelector('[data-table]').appendChild(tbl);
+    var mini = renderFano(root.querySelector('[data-minisvg]'), LAB_G, {});
+    var sel = [];
+
+    function refresh(){
+      tbl.querySelectorAll('th').forEach(function(th){
+        var c = +th.getAttribute('data-col');
+        th.classList.toggle('selcol', sel.indexOf(c) !== -1);
+      });
+      tbl.querySelectorAll('td').forEach(function(td){
+        td.classList.toggle('selcol', sel.indexOf(+td.getAttribute('data-c')) !== -1);
+      });
+      var li = (sel.length === 3) ? findLine(mini.blocks, sel) : -1;
+      mini.markPoints(sel, li !== -1 ? mini.blocks[li] : []);
+      mini.highlightLine(li !== -1 ? li : null, false);
+
+      if (sel.length < 2){ read.innerHTML = sel.length ? T.one : T.none; return; }
+      var counts = {};
+      AG.forEach(function(row){
+        var key = sel.slice().sort(function(a,b){return a-b;}).map(function(c){ return row[c]; }).join('');
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      var all = [];
+      var n = sel.length;
+      for (var v = 0; v < (1 << n); v++){
+        var key = v.toString(2); while (key.length < n) key = '0' + key;
+        all.push(key);
+      }
+      var pills = all.map(function(k){
+        var c = counts[k] || 0;
+        return '<span class="pill' + (c ? ' hit' : '') + '">' + k + ' ' + T.times(c) + '</span>';
+      }).join('');
+      var head = (n === 2 ? T.pairs(sel) : T.triples(sel));
+      var verdict = '';
+      if (n === 3){ verdict = (li !== -1) ? T.isLine(sel) : T.notLine; }
+      read.innerHTML = head + '<div style="margin-top:6px;">' + pills + '</div>' + (verdict ? '<div style="margin-top:6px;">' + verdict + '</div>' : '');
+    }
+
+    tbl.querySelectorAll('th.clickable').forEach(function(th){
+      th.addEventListener('click', function(){
+        var c = +th.getAttribute('data-col');
+        if (sel.indexOf(c) !== -1) sel = sel.filter(function(x){ return x !== c; });
+        else { if (sel.length === 3) sel = []; sel.push(c); }
+        refresh();
+      });
+    });
+    root.querySelector('[data-reset]').addEventListener('click', function(){ sel = []; refresh(); });
+    refresh();
+  });
+
+  /* ================= W3 — Hamming distance ================= */
+  var DSTR = {
+    en: {
+      hint: 'Tap one row to see its weight (the number of nonzero coordinates — always 0, 4 or 7 here). Tap two rows to measure their Hamming distance: the differing coordinates light up, and the distance is never less than 4.',
+      none: 'Pick one or two codewords (rows).',
+      weight: function(w){ return 'This codeword has weight <b>' + w + '</b> — its zeros sit exactly on a line of the Fano plane.'; },
+      weight0: 'The zero codeword — weight <b>0</b>.',
+      dist: function(d){ return 'Hamming distance <b>d = ' + d + '</b> — the two codewords differ in ' + d + ' coordinates. Never less than 4: a (7, 3, 4)₂-code.'; }
+    },
+    fa: {
+      hint: 'روی یک سطر بزنید تا وزنِ آن را ببینید (تعداد مختص‌های ناصفر — اینجا همیشه ۰، ۴ یا ۷). روی دو سطر بزنید تا فاصلهٔ همینگِ آن دو را اندازه بگیرید: مختص‌های متفاوت روشن می‌شوند و فاصله هرگز از ۴ کمتر نیست.',
+      none: 'یک یا دو کلمهٔ کد (سطر) انتخاب کنید.',
+      weight: function(w){ return 'وزنِ این کلمهٔ کد <b>' + faDig(w) + '</b> است — صفرهای آن دقیقاً روی یک خطِ صفحهٔ فانو نشسته‌اند.'; },
+      weight0: 'کلمهٔ کدِ صفر — وزن <b>۰</b>.',
+      dist: function(d){ return 'فاصلهٔ همینگ <b>d = ' + faDig(d) + '</b> — دو کلمهٔ کد در ' + faDig(d) + ' مختص با هم تفاوت دارند. هرگز کمتر از ۴ نمی‌شود: یک کد (7, 3, 4)₂.'; }
+    }
+  };
+
+  document.querySelectorAll('[data-dist]').forEach(function(root){
+    var lang = root.getAttribute('data-wlang') || 'en';
+    var T = DSTR[lang];
+    var read = root.querySelector('[data-read]');
+    root.querySelector('[data-hint]').textContent = T.hint;
+
+    var tbl = buildMatrix(AG, { clickRows: true });
+    root.querySelector('[data-table]').appendChild(tbl);
+    var sel = [];
+
+    function refresh(){
+      tbl.querySelectorAll('tr').forEach(function(tr){
+        var r = +tr.getAttribute('data-row');
+        tr.classList.toggle('selrow', sel.indexOf(r) !== -1);
+        tr.querySelectorAll('td').forEach(function(td){ td.classList.remove('diff'); });
+      });
+      if (sel.length === 0){ read.innerHTML = T.none; return; }
+      if (sel.length === 1){
+        var w = AG[sel[0]].reduce(function(a,b){ return a + b; }, 0);
+        read.innerHTML = (w === 0) ? T.weight0 : T.weight(w);
+        return;
+      }
+      var a = AG[sel[0]], b = AG[sel[1]], d = 0;
+      for (var c = 0; c < 7; c++){
+        if (a[c] !== b[c]){
+          d++;
+          sel.forEach(function(r){
+            tbl.querySelector('tr[data-row="' + r + '"]').cells[c].classList.add('diff');
+          });
+        }
+      }
+      read.innerHTML = T.dist(d);
+    }
+    tbl.querySelectorAll('tr.clickable').forEach(function(tr){
+      tr.addEventListener('click', function(){
+        var r = +tr.getAttribute('data-row');
+        if (sel.indexOf(r) !== -1) sel = sel.filter(function(x){ return x !== r; });
+        else { if (sel.length === 2) sel = []; sel.push(r); }
+        refresh();
+      });
+    });
+    root.querySelector('[data-reset]').addEventListener('click', function(){ sel = []; refresh(); });
+    refresh();
+  });
+
+  /* ================= W4 — orthogoval pair ================= */
+  var OSTR = {
+    en: {
+      hint: 'Pick one line in each plane (same seven points, two different sets of lines). Their intersection never has more than two points — that is what makes the pair orthogoval, and it is exactly why stacking A(G) on A(G⁻¹) covers all the triples.',
+      pickA: 'Now pick a line in the right plane…',
+      pickB: 'Pick a line in the left plane…',
+      none: 'Pick a line in each plane.',
+      res: function(a, b, inter){
+        return 'Left line <b>' + setTxt(a) + '</b> · right line <b>' + setTxt(b) + '</b> → shared points: <b>' +
+          (inter.length ? setTxt(inter) : '∅') + '</b> (' + inter.length + ' ≤ 2 ✓)';
+      }
+    },
+    fa: {
+      hint: 'از هر صفحه یک خط انتخاب کنید (همان هفت نقطه، دو مجموعه خطِ متفاوت). اشتراکِ آن دو هرگز بیش از دو نقطه ندارد — همین است که این جفت را orthogoval می‌کند، و دقیقاً به همین دلیل است که سوارکردنِ A(G) روی A(G⁻¹) همهٔ سه‌تایی‌ها را می‌پوشاند.',
+      pickA: 'حالا از صفحهٔ راست خطی انتخاب کنید…',
+      pickB: 'از صفحهٔ چپ خطی انتخاب کنید…',
+      none: 'از هر صفحه یک خط انتخاب کنید.',
+      res: function(a, b, inter){
+        return 'خطِ چپ <b>' + setTxt(a) + '</b> · خطِ راست <b>' + setTxt(b) + '</b> ← نقاط مشترک: <b>' +
+          (inter.length ? setTxt(inter) : '∅') + '</b> (' + faDig(inter.length) + ' ≤ ۲ ✓)';
+      }
+    }
+  };
+
+  document.querySelectorAll('[data-orth]').forEach(function(root){
+    var lang = root.getAttribute('data-wlang') || 'en';
+    var T = OSTR[lang];
+    var read = root.querySelector('[data-read]');
+    root.querySelector('[data-hint]').textContent = T.hint;
+    var selA = null, selB = null;
+
+    function refresh(){
+      apiA.highlightLine(selA, false);
+      apiB.highlightLine(selB, false);
+      if (selA == null && selB == null){ read.innerHTML = T.none; apiA.markPoints([], []); apiB.markPoints([], []); return; }
+      if (selA != null && selB == null){ apiA.markPoints([], apiA.blocks[selA]); apiB.markPoints([], []); read.innerHTML = T.pickA; return; }
+      if (selA == null && selB != null){ apiB.markPoints([], apiB.blocks[selB]); apiA.markPoints([], []); read.innerHTML = T.pickB; return; }
+      var a = apiA.blocks[selA], b = apiB.blocks[selB];
+      var inter = a.filter(function(x){ return b.indexOf(x) !== -1; });
+      apiA.markPoints(inter, a); apiB.markPoints(inter, b);
+      read.innerHTML = T.res(a, b, inter);
+    }
+    var apiA = renderFano(root.querySelector('[data-svg-a]'), LAB_G, {
+      linesClickable: true, onLine: function(i){ selA = (selA === i) ? null : i; refresh(); }
+    });
+    var apiB = renderFano(root.querySelector('[data-svg-b]'), LAB_GINV, {
+      linesClickable: true, onLine: function(i){ selB = (selB === i) ? null : i; refresh(); }
+    });
+    root.querySelector('[data-reset]').addEventListener('click', function(){ selA = null; selB = null; refresh(); });
+    refresh();
+  });
+
+})();
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

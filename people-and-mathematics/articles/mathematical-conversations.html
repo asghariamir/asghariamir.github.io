@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Face to Face with Mathematics — رویارو با ریاضیات · People and Mathematics</title>
+<meta name="description" content="Face to Face with Mathematics: talking mathematics, in essays and in short three-minute films. One concept, three minutes. A People and Mathematics publication.">
+
+<meta property="og:title" content="Face to Face with Mathematics — رویارو با ریاضیات">
+<meta property="og:description" content="One concept, three minutes. Short films and conversations in mathematics. People and Mathematics — آدم‌ها و ریاضیات.">
+<meta property="og:image" content="../assets/logo.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb a { text-decoration: none; }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Intro ---------- */
+  .intro { max-width: 1080px; margin: 0 auto; padding: 56px 40px 14px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 52px; line-height: 1.05; font-weight: 500; letter-spacing: -.02em; margin: 16px 0 0; max-width: 14em; }
+  h1.title em { font-style: italic; color: #43392E; font-weight: 400; }
+  .standfirst { font-size: 21px; line-height: 1.55; color: #43392E; margin: 20px 0 0; max-width: 34em; }
+  [data-lang-block="en"] .standfirst { font-style: italic; }
+  .dedication { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13.5px; color: var(--muted); margin: 22px 0 0; padding-top: 18px; border-top: 1px solid var(--line); line-height: 1.6; max-width: 40em; }
+
+  /* ---------- Films ---------- */
+  .films { max-width: 1080px; margin: 0 auto; padding: 30px 40px 20px; }
+  .film { margin: 0 0 56px; }
+  .film-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--black); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .film-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  .film-langs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .fl-btn { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; cursor: pointer; background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; }
+  .fl-btn.on { background: var(--black); color: var(--paper); border-color: var(--black); }
+  .film-v { display: none; }
+  .film-v.active { display: block; }
+  .film-placeholder { background: #EAE0CC; background-image: repeating-linear-gradient(135deg, #E6DAC1 0 13px, #EFE6D2 13px 26px); border: 1px dashed #C9BCA0; }
+  .film-placeholder.active { display: flex; align-items: center; justify-content: center; }
+  .film-placeholder .imglabel { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; letter-spacing: .02em; color: #7C7160; background: rgba(251,247,239,.82); padding: 6px 12px; border-radius: 3px; }
+
+  .film-meta { margin-top: 22px; display: grid; grid-template-columns: 1fr auto; gap: 24px 40px; align-items: end; border-top: 1px solid var(--line); padding-top: 22px; }
+  .film-no { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: #948876; }
+  .series { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-top: 4px; }
+  .film-concept { font-size: 40px; font-weight: 500; letter-spacing: -.015em; line-height: 1.06; margin: 12px 0 0; }
+  .film-concept .plural { font-style: italic; color: #8A7C6B; font-weight: 400; font-size: .58em; letter-spacing: 0; }
+  .film-blurb { font-size: 17px; line-height: 1.55; color: #43392E; margin: 14px 0 0; max-width: 40em; }
+  [data-lang-block="en"] .film-blurb { font-style: italic; }
+  .speaker { text-align: right; }
+  [dir="rtl"] .speaker { text-align: left; }
+  .speaker-by { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: #948876; }
+  .speaker-name { font-size: 23px; font-weight: 500; letter-spacing: -.01em; line-height: 1.15; margin-top: 6px; white-space: nowrap; }
+  .speaker-mail { display: inline-block; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13.5px; font-weight: 600; color: var(--accent); text-decoration: none; margin-top: 7px; }
+  .speaker-mail:hover { text-decoration: underline; }
+
+  .subnote { display: inline-flex; align-items: center; gap: 9px; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; font-weight: 600; color: var(--muted); background: #F1E9D8; border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px; margin-top: 18px; }
+  .subnote .cc { font-size: 11px; letter-spacing: .04em; border: 1.4px solid currentColor; border-radius: 3px; padding: 0 4px; line-height: 1.5; }
+
+  /* Editors' note — shown only on the Persian page (see html[lang] rule) */
+  .film-note { max-width: 44em; margin: 22px 0 0; padding: 15px 20px; background: #F4ECDC; border: 1px solid var(--line); border-inline-start: 3px solid var(--accent); border-radius: 0 4px 4px 0; }
+  .film-note .lab { display: block; font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 12.5px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .film-note p { margin: 0; font-family: "Vazirmatn", "B Nazanin", serif; font-size: 15.5px; line-height: 2; color: #43392E; }
+  html[lang="en"] .film-note { display: none; }
+
+  /* upcoming film placeholder */
+  .film--soon .film-frame { background: #EAE0CC; background-image: repeating-linear-gradient(135deg, #E6DAC1 0 13px, #EFE6D2 13px 26px); border: 1px dashed #C9BCA0; display: flex; align-items: center; justify-content: center; }
+  .film--soon .imglabel { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; letter-spacing: .02em; color: #7C7160; background: rgba(251,247,239,.82); padding: 6px 12px; border-radius: 3px; }
+  .film--soon .film-concept, .film--soon .speaker-name { color: #B4A892; }
+
+  /* ---------- Closing call ---------- */
+  .submit { max-width: 1080px; margin: 0 auto; padding: 26px 40px 0; }
+  .submit-in { background: var(--black); color: var(--paper); border-radius: 4px; padding: 34px 36px; display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
+  .submit-in .sk { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  .submit-in h3 { margin: 10px 0 0; font-size: 26px; font-weight: 500; letter-spacing: -.01em; line-height: 1.15; }
+  .submit-in p { margin: 8px 0 0; font-size: 16px; line-height: 1.55; color: #D9D0C0; max-width: 38em; }
+  .submit-cta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid #4A443B; border-radius: 999px; padding: 12px 22px; white-space: nowrap; color: var(--paper); }
+  .submit-cta:hover { border-color: var(--accent); }
+
+  .footer { border-top: 1px solid var(--ink); margin-top: 40px; padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin-left: auto; margin-right: auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* RTL */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .film-concept, [dir="rtl"] .speaker-name { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .speaker-name { white-space: normal; }
+
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 720px) {
+    .film-meta { grid-template-columns: 1fr; gap: 18px; }
+    .speaker { text-align: left; }
+    [dir="rtl"] .speaker { text-align: right; }
+    .film-concept { font-size: 32px; }
+  }
+  @media (max-width: 560px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .intro, .films, .submit { padding-left: 20px; padding-right: 20px; }
+    h1.title { font-size: 36px; }
+    .standfirst { font-size: 18px; }
+  }
+
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="Face to Face with Mathematics" data-fa="رویارو با ریاضیات"></span></div>
+  <div class="crumb sans" data-en="Films" data-fa="فیلم‌ها"></div>
+</div>
+
+<!-- =================== ENGLISH (intro) =================== -->
+<section class="intro" data-lang-block="en">
+  <div class="kicker">Face to Face with Mathematics</div>
+  <h1 class="title">One concept, <em>one film.</em></h1>
+  <p class="standfirst">This section talks mathematics — in essays, and now in a series of short films. A mathematician takes a single idea and gives it a film — anything up to twenty minutes: long enough to meet the idea, not so long that it hardens into a definition.</p>
+  <p class="dedication">A growing series. New films are added as they arrive — some in both Persian and English, each version its own rather than a translation.</p>
+</section>
+
+<!-- =================== فارسی (intro) =================== -->
+<section class="intro" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">رویارو با ریاضیات</div>
+  <h1 class="title">یک مفهوم، <em>یک فیلم.</em></h1>
+  <p class="standfirst">این بخش درباره‌ی ریاضی گفت‌وگو می‌کند — در نوشته، و اکنون در مجموعه‌ای از فیلم‌های کوتاه. یک ریاضی‌دان یک ایده‌ی واحد را برمی‌گزیند و فیلمی به آن می‌دهد — تا بیست دقیقه: به‌اندازه‌ای که با ایده آشنا شوی، نه آن‌قدر که به تعریفی خشک بدل شود.</p>
+  <p class="dedication">مجموعه‌ای در حالِ رشد. فیلم‌های تازه به‌مرورِ رسیدنشان افزوده می‌شوند — برخی به فارسی و انگلیسی، و هر نسخه از آنِ خود، نه ترجمه.</p>
+</section>
+
+<!-- ============================================================
+     THE FILMS
+
+     TO ADD A FILM:
+       1. Share the video on Google Drive as "Anyone with the link".
+       2. Copy the file ID from its URL and paste it into the
+          iframe src below:  .../file/d/<FILE-ID>/preview
+       3. Update the film number, concept, speaker, and the two
+          data-en / data-fa blurb lines.
+     ============================================================ -->
+<div class="films">
+
+  <!-- Film 01 — Sheaf, Artan Sheshmani -->
+  <figure class="film">
+    <div class="film-langs sans">
+      <button type="button" class="fl-btn on" data-v="fa">فارسی</button>
+      <button type="button" class="fl-btn" data-v="en">English</button>
+    </div>
+    <div class="film-frame film-v film-v-fa active">
+      <iframe src="https://drive.google.com/file/d/1DYDH9BHu4i3EwW7Q24OuC5SLsTqUwzwF/preview"
+              allow="autoplay; fullscreen" allowfullscreen
+              title="Face to Face with Mathematics — Sheaf (Persian), by Artan Sheshmani"></iframe>
+    </div>
+    <!-- English film -->
+    <div class="film-frame film-v film-v-en">
+      <iframe src="https://drive.google.com/file/d/1mVCA6PSc2E5e2vrNidJ9m3NbgFYqBzKa/preview"
+              allow="autoplay; fullscreen" allowfullscreen
+              title="Face to Face with Mathematics — Sheaf (English), by Artan Sheshmani"></iframe>
+    </div>
+    <figcaption class="film-meta">
+      <div>
+        <div class="film-no" data-en="Film 01" data-fa="فیلم ۰۱"></div>
+        <div class="series" data-en="One concept · one film" data-fa="یک مفهوم · یک فیلم"></div>
+        <div class="film-concept">Sheaf <span class="plural" data-en="(pl. sheaves)" data-fa="(بافه)"></span></div>
+        <div class="sans" style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12.5px;color:#6B6155;"><span style="width:8px;height:8px;border-radius:50%;background:#C8633E;display:inline-block;flex:0 0 auto;"></span><span data-en="Graduate maths" data-fa="ریاضیِ تحصیلاتِ تکمیلی"></span></div>
+        <p class="film-blurb" data-en="What is a sheaf? An idea for keeping local information consistent enough to be glued into something global — met here in three minutes." data-fa="بافه چیست؟ ایده‌ای برای آن‌که اطلاعاتِ محلی چنان سازگار بمانند که بتوان آن‌ها را به یک کلِ سراسری چسباند — در این‌جا در سه دقیقه با آن آشنا می‌شویم."></p>
+        <div class="subnote">
+          <span class="cc sans">EN / FA</span>
+          <span data-en="Two companion films — Persian and English, not a translation" data-fa="دو فیلمِ همراه — فارسی و انگلیسی، نه ترجمه"></span>
+        </div>
+      </div>
+      <div class="speaker">
+        <img src="../assets/artan-sheshmani.jpg" alt="Artan Sheshmani" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:1.5px solid #DBD0BA;margin-bottom:8px;">
+        <div class="speaker-by" data-en="With" data-fa="با"></div>
+        <div class="speaker-name">Artan Sheshmani</div>
+        <a class="speaker-mail" href="mailto:artan@bimsa.cn">artan@bimsa.cn</a>
+      </div>
+    </figcaption>
+    <div class="film-note" dir="rtl" lang="fa">
+      <span class="lab">یادداشتِ سردبیران</span>
+      <p>آرتان به اطلاع ما رساند که در یکی از مثال‌های موردِ استفاده در فیلم، ادعای او اشتباه است. مثالِ موردِ اشاره مثالی از زندگیِ روزمره است، و با مشورت با خودِ آرتان به این نتیجه رسیدیم که به‌جای اصلاحِ آن روی ویدیو، یافتنِ آن اشتباه را به خودِ بیننده واگذار کنیم.</p>
+    </div>
+  </figure>
+
+  <!-- Upcoming film placeholder -->
+  <figure class="film film--soon">
+    <div class="film-frame"><span class="imglabel" data-en="next film — coming soon" data-fa="فیلمِ بعدی — به‌زودی"></span></div>
+    <figcaption class="film-meta">
+      <div>
+        <div class="film-no" data-en="Film 02" data-fa="فیلم ۰۲"></div>
+        <div class="series" data-en="One concept · one film" data-fa="یک مفهوم · یک فیلم"></div>
+        <div class="film-concept" data-en="Coming soon" data-fa="به‌زودی"></div>
+      </div>
+      <div class="speaker">
+        <div class="speaker-by" data-en="With" data-fa="با"></div>
+        <div class="speaker-name" data-en="A mathematician" data-fa="یک ریاضی‌دان"></div>
+      </div>
+    </figcaption>
+  </figure>
+
+</div>
+
+<!-- ===== Call ===== -->
+<section class="submit">
+  <div class="submit-in">
+    <div>
+      <div class="sk" data-en="An invitation" data-fa="یک دعوت"></div>
+      <h3 data-en="Have a concept you could explain in a short film?" data-fa="مفهومی دارید که در فیلمی کوتاه بتوانید توضیحش دهید؟"></h3>
+      <p data-en="We are gathering short films for this section — one idea, a short film, in Persian or English. Write to the editors and we will help you make it." data-fa="در حالِ گردآوریِ فیلم‌های کوتاه برای این بخشیم — یک ایده، فیلمی کوتاه، به فارسی یا انگلیسی. به سردبیران بنویسید تا در ساختنش کمکتان کنیم."></p>
+    </div>
+    <a class="submit-cta" href="../index.html" data-en="Write to the editors →" data-fa="به سردبیران بنویسید ←"></a>
+  </div>
+</section>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  }
+  document.querySelectorAll('.film').forEach(function(film){
+    var btns = film.querySelectorAll('.fl-btn');
+    btns.forEach(function(b){
+      b.addEventListener('click', function(){
+        var v = b.getAttribute('data-v');
+        btns.forEach(function(x){ x.classList.toggle('on', x === b); });
+        film.querySelectorAll('.film-v').forEach(function(f){ f.classList.toggle('active', f.classList.contains('film-v-' + v)); });
+      });
+    });
+  });
+
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

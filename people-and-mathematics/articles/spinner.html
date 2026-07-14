@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Educational tools are useful — a model for recreating a spinner · Zohreh Pandi · Classroom Ideas</title>
+<meta name="description" content="Zohreh Pandi on a class that recreated a probability spinner with a box of beads — and discovered the structure of the answers. Classroom Ideas, a People and Mathematics publication.">
+
+<meta property="og:title" content="A model for recreating a spinner — Zohreh Pandi">
+<meta property="og:description" content="Classroom Ideas · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/logo.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root {
+    --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6;
+    --red: #CE4B3C; --yellow: #E0A32E; --blue: #3E6B99; --green: #4E8060;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  /* breadcrumb sub-bar */
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+  .subright { display: flex; align-items: center; gap: 16px; }
+  .pdfbtn { display: inline-flex; align-items: center; gap: 7px; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: .02em; color: var(--ink); background: transparent; border: 1px solid var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; transition: background .15s, color .15s; }
+  .pdfbtn:hover { background: var(--black); color: var(--paper); }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 44px; line-height: 1.1; font-weight: 500; letter-spacing: -.02em; margin: 16px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; }
+  .standfirst b { font-style: normal; font-weight: 600; color: var(--ink); }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+  .byline .meta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .byline .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; align-self: center; }
+
+  .byline .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); align-self: center; }
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 26px; font-weight: 500; letter-spacing: -.01em; margin: 40px 0 14px; padding-top: 8px; }
+
+  /* question list */
+  .qlist { list-style: none; margin: 8px 0 20px; padding: 0; }
+  .qlist li { position: relative; padding-inline-start: 22px; margin: 0 0 9px; font-size: 18px; }
+  .qlist li::before { content: ""; position: absolute; inset-inline-start: 3px; top: .62em; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  /* chat block — children's answers */
+  .chat { border-inline-start: 3px solid var(--line); margin: 20px 0 24px; padding: 4px 0 4px 20px; }
+  [dir="rtl"] .chat { padding: 4px 20px 4px 0; }
+  .chat .cl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; color: #43392E; padding: 5px 0; line-height: 1.4; }
+  .chat .cl b { color: var(--ink); font-weight: 600; }
+
+  /* principle / teacher tip callout */
+  .principle { border-inline-start: 3px solid var(--accent); background: #F4ECDC; padding: 18px 22px; margin: 30px 0; border-radius: 0 4px 4px 0; }
+  [dir="rtl"] .principle { border-radius: 4px 0 0 4px; }
+  .principle .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-bottom: 7px; }
+  .principle .txt { font-size: 18px; line-height: 1.62; }
+
+  .pullquote { font-size: 25px; line-height: 1.34; font-weight: 500; letter-spacing: -.01em; color: var(--ink); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); padding: 20px 0; margin: 30px 0; }
+
+  /* ---------- Interactive figures ---------- */
+  .figure { margin: 30px 0; border: 1px solid var(--line); background: #F6EFE1; border-radius: 7px; padding: 22px 22px 20px; }
+  .figcap { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-bottom: 18px; line-height: 1.55; }
+  .figlab { text-transform: uppercase; letter-spacing: .1em; font-size: 10.5px; font-weight: 700; color: var(--accent); margin-inline-end: 8px; }
+
+  .spinner-stage { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; }
+  .wheel-wrap { position: relative; width: 224px; height: 224px; flex: 0 0 auto; margin: 0 auto; }
+  .wheel { width: 100%; height: 100%; display: block; filter: drop-shadow(0 2px 7px rgba(0,0,0,.14)); transform: rotate(0deg); }
+  .pointer { position: absolute; top: -3px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 11px solid transparent; border-right: 11px solid transparent; border-top: 21px solid var(--ink); z-index: 2; }
+  .tally { flex: 1 1 250px; min-width: 240px; display: flex; flex-direction: column; gap: 15px; }
+  .titem .thead { display: flex; align-items: center; gap: 9px; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13.5px; }
+  .titem .swatch { width: 14px; height: 14px; border-radius: 3px; flex: 0 0 auto; }
+  .titem .tname { font-weight: 600; }
+  .titem .tval { margin-inline-start: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .tbar { height: 8px; background: #E7DCC7; border-radius: 5px; position: relative; overflow: visible; margin-top: 7px; }
+  .tbar > i { display: block; height: 100%; width: 0; border-radius: 5px; transition: width .45s ease; }
+  .ttick { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--ink); opacity: .38; }
+  .ttick::after { content: attr(data-t); position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-family: "Hanken Grotesk","Vazirmatn",sans-serif; font-size: 9px; color: var(--muted); white-space: nowrap; }
+
+  .controls { display: flex; align-items: center; gap: 13px; margin-top: 20px; flex-wrap: wrap; }
+  .btn { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-weight: 600; font-size: 14px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 999px; padding: 10px 24px; cursor: pointer; transition: transform .1s, opacity .15s; }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn:disabled { opacity: .38; cursor: default; }
+  .cmeta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* beads */
+  .beads-box { display: flex; flex-wrap: wrap; gap: 11px; padding: 18px; background: #EFE6D2; border: 1px dashed #CBBB9C; border-radius: 9px; min-height: 74px; align-items: center; }
+  .bead { width: 27px; height: 27px; border-radius: 50%; box-shadow: inset 0 -3px 6px rgba(0,0,0,.22), 0 1px 2px rgba(0,0,0,.16); transition: opacity .25s, transform .12s; }
+  .bead.out { opacity: .15; }
+  .bead.flash { transform: scale(1.28); }
+  .drawn-wrap { margin-top: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 24px; }
+  .drawn-label { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .drawn-tray { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .drawn-tray .bead { width: 19px; height: 19px; }
+  .replace-toggle { display: inline-flex; align-items: center; gap: 8px; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--ink); cursor: pointer; user-select: none; }
+  .replace-toggle input { width: 15px; height: 15px; accent-color: var(--accent); }
+  .status { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; line-height: 1.5; color: #6B5B49; margin-top: 14px; min-height: 1.4em; }
+  .status b { color: var(--accent); font-weight: 600; }
+  .beads-tally { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 16px; margin-top: 18px; }
+  .beads-tally .titem { min-width: 0; }
+
+  /* ---------- Contributor colophon ---------- */
+  .colophon { margin-top: 46px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .colophon .role .mail { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; margin-top: 5px; display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; word-break: break-all; }
+  .colophon .role .mail:hover { text-decoration: underline; }
+  .colophon .role .todo { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; color: #B0A48F; font-style: italic; margin-top: 3px; }
+  .colophon .who + .who { margin-top: 11px; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+  .origin a { color: var(--accent); }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; }
+  .refs li { margin-bottom: 10px; }
+  .refs a { color: var(--accent); word-break: break-word; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+  [dir="rtl"] .qlist li { font-size: 17px; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  /* print-only journal slug + citation */
+  .printhead, .printfoot { display: none; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 22px 32px; }
+    h1.title { font-size: 31px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .beads-tally { grid-template-columns: repeat(2, 1fr); }
+    .pullquote { font-size: 21px; }
+  }
+
+  @media print {
+    .topband, .subbar, .footer, .langtoggle, .pointer, .controls, .drawn-wrap, .status { display: none !important; }
+    body { background: #fff; }
+    .article { max-width: 100%; padding: 0 12px; }
+    .figure { break-inside: avoid; background: #fff; border-color: #ccc; }
+    a { color: inherit; text-decoration: none; }
+    .printhead { display: flex !important; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; border-bottom: 1.5px solid var(--ink); padding-bottom: 8px; margin-bottom: 20px; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+    .printhead .ph-brand { font-size: 12px; font-weight: 700; letter-spacing: .01em; }
+    .printhead .ph-meta { font-size: 10.5px; color: #555; }
+    .printfoot { display: block !important; margin-top: 28px; padding-top: 12px; border-top: 1.5px solid var(--ink); font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10.5px; line-height: 1.65; color: #333; }
+    .printfoot .pf-strong { font-weight: 700; color: #000; }
+  }
+
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="Classroom Ideas" data-fa="ایده‌های کلاسی"></span></div>
+  <div class="subright">
+    <span class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#567D46;display:inline-block;flex:0 0 auto;"></span><span data-en="School maths · June 2026" data-fa="ریاضیِ مدرسه · خرداد ۱۴۰۵"></span></span>
+    <button class="pdfbtn" onclick="window.print()"><span>↓</span><span data-en="PDF" data-fa="پی‌دی‌اف"></span></button>
+  </div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="printhead">
+    <span class="ph-brand">People and Mathematics · آدم‌ها و ریاضیات</span>
+    <span class="ph-meta">June 2026 &nbsp;—&nbsp; Classroom Ideas · mathswell.com</span>
+  </div>
+  <div class="kicker">Classroom Ideas</div>
+  <h1 class="title">Educational tools are useful — sometimes by their presence, and sometimes by their absence</h1>
+  <p class="standfirst"><b>A model for recreating a spinner.</b> Sometimes a new question helps learning more than any explanation. This is the narrative of a class that turned into a learning space with a single question.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/pandi.jpg" alt="Zohreh Pandi">
+    <span class="name">Zohreh Pandi</span>
+  </div>
+
+  <div class="body">
+    <p>The class was online. I showed the children a spinner on the screen. We weren't supposed to play. For a few minutes I only asked questions about the shape of the spinner: “We want to spin the pointer.</p>
+    <ul class="qlist">
+      <li>Which colour is more likely?</li>
+      <li>If you could choose one colour to win, which would you pick?</li>
+      <li>Which colour has the lowest chance of the pointer landing on it?</li>
+      <li>Which colours have an equal probability?”</li>
+    </ul>
+
+    <!-- ===== Interactive figure 1: the spinner ===== -->
+    <div class="figure spinner-widget" data-lang="en">
+      <div class="figcap"><span class="figlab">Figure 1</span> The probability spinner — spin it and watch the tally settle toward the true chances. (Faint marks show 50 · 25 · 12.5 · 12.5%.)</div>
+      <div class="spinner-stage">
+        <div class="wheel-wrap">
+          <svg class="wheel" viewBox="0 0 200 200" aria-hidden="true"></svg>
+          <div class="pointer"></div>
+        </div>
+        <div class="tally"></div>
+      </div>
+      <div class="controls">
+        <button class="btn spin-btn" data-en="Spin" data-fa="بچرخان">Spin</button>
+        <button class="btn ghost reset-btn" data-en="Reset" data-fa="از نو">Reset</button>
+        <span class="cmeta spincount"></span>
+      </div>
+    </div>
+
+    <p>Almost all the questions were easy for the seventh-graders — without spinning even once. Just by looking at the shape, they could talk about the probabilities. Now I posed the main question: “Suppose we want to play this same game, but we have no spinner. The random generator we have is a box and coloured beads. How should we prepare the box so that it behaves exactly like this spinner — how do we recreate the spinner using the box and beads?”</p>
+
+    <h2 class="subhead">The chat exploded</h2>
+    <p>I asked the children to write only their answers in the chat, and for no one to explain just yet. Seconds later the chat was full:</p>
+    <div class="chat">
+      <div class="cl"><b>3</b> red, <b>2</b> yellow, <b>1</b> blue, <b>1</b> green</div>
+      <div class="cl"><b>4</b> red, <b>3</b> yellow, <b>2</b> blue, <b>1</b> green</div>
+      <div class="cl"><b>5</b> red, <b>3</b> yellow, <b>2</b> blue, <b>2</b> green</div>
+      <div class="cl"><b>1</b> yellow, <b>1</b> blue, <b>1</b> green, <b>1</b> red</div>
+      <div class="cl"><b>4</b> red, <b>2</b> yellow, <b>1</b> blue, <b>1</b> green</div>
+      <div class="cl"><b>20</b> red, <b>10</b> yellow, <b>5</b> blue, <b>1</b> green</div>
+      <div class="cl"><b>1</b> green, <b>2</b> blue, <b>3</b> yellow, <b>4</b> red</div>
+    </div>
+    <p>The answers came one after another; some gave several, and many were repeated. I asked the children to read one another's writing once they had written down their own idea.</p>
+
+    <h2 class="subhead">Now let's talk about the answers</h2>
+    <p>At the children's suggestion we brought some answers to the screen and discussed them. One said: “Blue and green are equal in the figure, so the number of blue and green beads must be equal.” Another: “Red takes up half the circle, so half the beads must be red.” Gradually the talk moved away from ‘more’ and ‘less’ — they seemed to be talking about preserving ratios, though no one had yet uttered the word.</p>
+
+    <h2 class="subhead">Once again</h2>
+    <p>Now I asked them again to write their new ideas in the chat and to read each other's. This time it was clear they had read the previous chat; the answers had changed. Among them you could now see:</p>
+    <div class="chat">
+      <div class="cl"><b>4</b>, <b>2</b>, <b>1</b>, <b>1</b></div>
+      <div class="cl"><b>8</b>, <b>4</b>, <b>2</b>, <b>2</b></div>
+      <div class="cl"><b>20</b>, <b>10</b>, <b>5</b>, <b>5</b></div>
+      <div class="cl">and even… <b>12.5</b>, <b>12.5</b>, <b>25</b>, <b>50</b></div>
+    </div>
+    <p>That last answer interested some of them. One wrote: “Well done — that exact percentage is right.” Another: “But we don't have 12.5 beads!” The next: “Yet the ratio of the beads is those very percentages: 50 percent red, 25 percent yellow, and the other 25 percent split equally between blue and green.”</p>
+    <p>That single word — <em>ratio</em> — revealed new answers. Now the problem was no longer just probability; the idea of using ratios to build the model had come to the front. The discussion carried on: the children wrote new answers, critiqued each other, and revised again. One line drew much approval: “The correct answer is not a single answer.”</p>
+    <p>The conversation continued until a child wrote: “I think the total number of beads must be a multiple of 8.” This caught almost everyone's attention and won a lot of agreement — and perhaps those very confirmations made some curious about the <em>why</em>, turning the chat into a spoken discussion. Someone began giving examples:</p>
+    <div class="chat">
+      <div class="cl">If there are <b>8</b> beads: 4, 2, 1, 1</div>
+      <div class="cl">If there are <b>16</b> beads: 8, 4, 2, 2</div>
+      <div class="cl">If there are <b>40</b> beads: 20, 10, 5, 5</div>
+    </div>
+    <div class="pullquote">Instead of finding a single answer, the children had found the <em>structure</em> of the answers — infinitely many, on the one condition that the ratio 4 : 2 : 1 : 1 is preserved.</div>
+
+    <h2 class="subhead">Now let's see whether it actually works</h2>
+    <p>Until now we had only talked about the model; it was time to test it. I brought a virtual box-and-beads tool onto the screen, set it up with 4 red, 2 yellow, 1 blue and 1 green, and made sure the children accepted this box as a stand-in random generator for the spinner. I began drawing beads — but deliberately did <em>not</em> return them to the box.</p>
+
+    <!-- ===== Interactive figure 2: box and beads ===== -->
+    <div class="figure beads-widget" data-lang="en">
+      <div class="figcap"><span class="figlab">Figure 2</span> The box-and-beads model (4 : 2 : 1 : 1). Draw beads without returning them and the box drifts from the spinner; tick “return each bead” and it never runs out — just like the spinner.</div>
+      <div class="beads-box"></div>
+      <div class="drawn-wrap">
+        <span class="drawn-label" data-en="Drawn:" data-fa="برداشته‌شده:">Drawn:</span>
+        <div class="drawn-tray"></div>
+      </div>
+      <div class="controls">
+        <button class="btn draw-btn" data-en="Draw a bead" data-fa="یک مهره بردار">Draw a bead</button>
+        <label class="replace-toggle"><input type="checkbox" class="replace-cb"><span data-en="Return each bead to the box" data-fa="هر مهره را به جعبه برگردان">Return each bead to the box</span></label>
+        <button class="btn ghost refill-btn" data-en="Refill" data-fa="پرکردن دوباره">Refill</button>
+      </div>
+      <div class="status"></div>
+      <div class="beads-tally"></div>
+    </div>
+
+    <p>After a few draws I asked the children to answer one question in the chat: “Do you agree that this box behaves exactly like the spinner?” This time the answers came quickly:</p>
+    <div class="chat">
+      <div class="cl">It's only like the spinner the first time.</div>
+      <div class="cl">The probabilities change after each draw.</div>
+      <div class="cl">If a green comes out, the green is gone — but in the spinner green can come up again.</div>
+      <div class="cl">If a red comes out, red is no longer half — but the spinner is always half red.</div>
+      <div class="cl">The box is limited; the spinner is not.</div>
+      <div class="cl">The box's composition is disrupted with every bead drawn.</div>
+    </div>
+    <p>What the children pointed to was the heart of the model we had built: the spinner, after every spin, is the same spinner as before; but the box, after every bead drawn, changes and drifts away from the initial model. As the conversation went on, the suggestion arose to return each drawn bead to the box every time, to complete the model. Unanimously, the children accepted the box-and-beads model as a fitting way to recreate the spinner, and the class came to an end.</p>
+
+    <h2 class="subhead">Something more than probability</h2>
+    <p>If they ask me what this activity was about, I probably wouldn't say “probability.” My feeling is that what took place was an experience of doing mathematics and building a mathematical model — an experience that can help develop the children's belief in the integrity and efficiency of mathematics.</p>
+
+    <div class="principle">
+      <div class="lab" data-en="A tip for teachers" data-fa="یک نکته برای معلم‌ها">A tip for teachers</div>
+      <div class="txt">If you run this activity in class, don't rush to find the correct answer. Let the chat fill with different answers. Let the children read one another's. Ask them to ask just one question: “Does this box of beads my friend described really behave like the spinner?” In my experience the important part of learning begins exactly when the children start to critique each other's models — when, on seeing another's answer, a question arises that is genuinely their own point of curiosity; not when the teacher asks a question or announces the correct answer.</div>
+    </div>
+
+    <div class="origin" style="border-top:1px solid var(--line);">
+      <span class="lab">Postscript</span>
+      <p style="margin:10px 0 0;">1 · This activity was designed and run in full in one seventh-grade class, and — up to the point where the virtual tool is used — in three sixth-grade classes. All four ran actively, with most students taking part. This narrative follows the seventh-grade class.</p>
+      <p style="margin:8px 0 0;">2 · The source of inspiration was the doctoral dissertation of Jennifer Anne Way (2003), <em>The Development of Children's Notions of Probability</em>, Queensland University of Technology.</p>
+      <p style="margin:8px 0 0;">3 · The virtual box-and-beads tool used in class: <a href="https://mathink.ir/random/" target="_blank" rel="noopener">mathink.ir/random</a>.</p>
+    </div>
+  </div>
+
+  <!-- ===== Contributor colophon ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Author</div>
+        <div class="who">Zohreh Pandi</div>
+        <a class="mail" href="mailto:zohrepandi@gmail.com">✉ zohrepandi@gmail.com</a>
+      </div>
+    </div>
+    <div class="origin">Written for <em>People and Mathematics</em> — Classroom Ideas. Interactive spinner and box-and-beads by the journal, after the tool at <a href="https://mathink.ir/random/" target="_blank" rel="noopener">mathink.ir/random</a>.</div>
+  </div>
+
+  <div class="refs">
+    <h3>References</h3>
+    <ol>
+      <li>Jennifer Anne Way (2003). <em>The Development of Children's Notions of Probability.</em> PhD Thesis, Queensland University of Technology.</li>
+      <li>Box-and-beads virtual tool (random generator). <a href="https://mathink.ir/random/" target="_blank" rel="noopener">https://mathink.ir/random/</a></li>
+    </ol>
+  </div>
+
+  <div class="printfoot">
+    <span class="pf-strong">People and Mathematics — آدم‌ها و ریاضیات</span>, a bilingual journal · June 2026 · Classroom Ideas.
+    “Educational tools are useful — a model for recreating a spinner,” by Zohreh Pandi. © the author; published by People and Mathematics, a Mathswell publication.
+    Read the online edition — with the interactive spinner and box-and-beads — and download other articles at mathswell.com.
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="printhead">
+    <span class="ph-brand">آدم‌ها و ریاضیات · People and Mathematics</span>
+    <span class="ph-meta">خرداد ۱۴۰۵ &nbsp;—&nbsp; ایده‌های کلاسی · mathswell.com</span>
+  </div>
+  <div class="kicker">ایده‌های کلاسی</div>
+  <h1 class="title">وسایل آموزشی مفیدند؛ گاهی با بودنشان و گاهی با نبودنشان!</h1>
+  <p class="standfirst"><b>مدلی برای بازآفرینی یک چرخنده.</b> بعضی وقت‌ها یک سؤالِ جدید بیشتر از هر توضیحی به یادگیری کمک می‌کند. این نوشته، روایتِ کلاسی است که با یک سؤال به فضای یادگیری تبدیل شد.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/pandi.jpg" alt="زهره پندی">
+    <span class="name">زهره پندی</span>
+  </div>
+
+  <div class="body">
+    <p>کلاس آنلاین بود. یک چرخنده را روی صفحه به بچه‌ها نشان دادم. قرار نبود بازی کنیم. چند دقیقه‌ای فقط درباره‌ی شکلِ چرخنده سؤال می‌پرسیدم: «می‌خواهیم عقربه‌ی چرخنده را بچرخانیم…</p>
+    <ul class="qlist">
+      <li>احتمالِ کدام رنگ بیشتر است؟</li>
+      <li>اگر بتوانی یک رنگ را برای برنده‌شدن انتخاب کنی، انتخابت کدام است؟</li>
+      <li>شانسِ ایستادنِ عقربه روی کدام رنگ کمتر است؟</li>
+      <li>کدام رنگ‌ها احتمالِ برابری دارند؟»</li>
+    </ul>
+
+    <!-- ===== چرخنده‌ی تعاملی ===== -->
+    <div class="figure spinner-widget" data-lang="fa">
+      <div class="figcap"><span class="figlab">شکل ۱</span> چرخنده‌ی احتمال — بچرخانش و ببین شمارش چطور به‌سمتِ شانس‌های واقعی می‌رود. (نشان‌های کم‌رنگ ۵۰ · ۲۵ · ۱۲٫۵ · ۱۲٫۵ درصد را نشان می‌دهند.)</div>
+      <div class="spinner-stage">
+        <div class="wheel-wrap">
+          <svg class="wheel" viewBox="0 0 200 200" aria-hidden="true"></svg>
+          <div class="pointer"></div>
+        </div>
+        <div class="tally"></div>
+      </div>
+      <div class="controls">
+        <button class="btn spin-btn">بچرخان</button>
+        <button class="btn ghost reset-btn">از نو</button>
+        <span class="cmeta spincount"></span>
+      </div>
+    </div>
+
+    <p>تقریباً همه‌ی سؤال‌ها برای بچه‌های کلاسِ هفتم ساده بود؛ بدونِ اینکه حتی یک بار چرخنده را بچرخانیم، فقط با نگاه‌کردن به شکلِ آن می‌توانستند درباره‌ی احتمال‌ها حرف بزنند. حالا سؤالِ اصلی را مطرح کردم: «فرض کنید می‌خواهیم همین بازی را انجام بدهیم، اما چرخنده نداریم. ابزارِ مولدِ تصادفی‌ای که داریم یک جعبه و مهره‌های رنگی است. چطور جعبه را آماده کنیم که دقیقاً مثلِ همین چرخنده رفتار کند — یعنی چطور این چرخنده را به کمکِ جعبه و مهره‌ها بازآفرینی کنیم؟»</p>
+
+    <h2 class="subhead">چتِ کلاس منفجر شد</h2>
+    <p>از بچه‌ها خواستم جوابشان را فقط در چت بنویسند و فعلاً کسی توضیح ندهد. چند ثانیه بعد، چتِ کلاس پر شده بود:</p>
+    <div class="chat">
+      <div class="cl"><b>۳</b> قرمز، <b>۲</b> زرد، <b>۱</b> آبی، <b>۱</b> سبز</div>
+      <div class="cl"><b>۴</b> قرمز، <b>۳</b> زرد، <b>۲</b> آبی، <b>۱</b> سبز</div>
+      <div class="cl"><b>۵</b> قرمز، <b>۳</b> زرد، <b>۲</b> آبی، <b>۲</b> سبز</div>
+      <div class="cl"><b>۱</b> زرد، <b>۱</b> آبی، <b>۱</b> سبز، <b>۱</b> قرمز</div>
+      <div class="cl"><b>۴</b> قرمز، <b>۲</b> زرد، <b>۱</b> آبی، <b>۱</b> سبز</div>
+      <div class="cl"><b>۲۰</b> قرمز، <b>۱۰</b> زرد، <b>۵</b> آبی، <b>۱</b> سبز</div>
+      <div class="cl"><b>۱</b> سبز، <b>۲</b> آبی، <b>۳</b> زرد، <b>۴</b> قرمز</div>
+    </div>
+    <p>جواب‌ها پشتِ‌سرِ هم می‌آمدند؛ بعضی‌ها چند جواب داشتند و خیلی جواب‌ها تکرار می‌شد. از بچه‌ها خواستم وقتی ایده‌های خودشان را نوشتند، نوشته‌ی همدیگر را بخوانند.</p>
+
+    <h2 class="subhead">حالا بیایید درباره‌ی جواب‌ها حرف بزنیم</h2>
+    <p>چند تا از پاسخ‌ها را به پیشنهادِ بچه‌ها روی صفحه آوردیم و درباره‌شان گفت‌وگو کردیم. یکی گفت: «آبی و سبز در شکل با هم برابرند؛ پس تعدادِ مهره‌های آبی و سبز هم باید مساوی باشد.» دیگری گفت: «در چرخنده، قرمز نصفِ دایره را گرفته؛ باید نصفِ مهره‌ها قرمز باشد.» کم‌کم بحث از «بیشتر و کمتر» فاصله گرفت و انگار درباره‌ی حفظِ نسبت‌ها حرف می‌زدند، بی‌آنکه هنوز کسی این واژه را به زبان آورده باشد.</p>
+
+    <h2 class="subhead">یک بارِ دیگر</h2>
+    <p>حالا دوباره از بچه‌ها خواستم ایده‌های تازه‌شان را در چت بنویسند و ایده‌های یکدیگر را بخوانند. این بار معلوم بود چتِ قبلی را خوانده‌اند؛ جواب‌ها فرق کرده بود. این بار میانِ پاسخ‌ها می‌شد این‌ها را دید:</p>
+    <div class="chat">
+      <div class="cl"><b>۴</b>، <b>۲</b>، <b>۱</b>، <b>۱</b></div>
+      <div class="cl"><b>۸</b>، <b>۴</b>، <b>۲</b>، <b>۲</b></div>
+      <div class="cl"><b>۲۰</b>، <b>۱۰</b>، <b>۵</b>، <b>۵</b></div>
+      <div class="cl">و حتی… <b>۵۰</b>، <b>۲۵</b>، <b>۱۲٫۵</b>، <b>۱۲٫۵</b></div>
+    </div>
+    <p>این جوابِ آخر برای بعضی از بچه‌ها جالب بود. یکی نوشت: «آفرین! همین درصد درست است.» دیگری نوشت: «۱۲٫۵ تا مهره که نداریم!» آن یکی نوشت: «ولی نسبتِ مهره‌ها همین درصدهاست: ۵۰ درصد قرمز، ۲۵ درصد زرد، و ۲۵ درصدِ دیگر به‌طورِ مساوی آبی و سبز.»</p>
+    <p>همین واژه‌ی «نسبت» پاسخ‌های تازه‌ای را آشکار کرد. حالا دیگر مسئله برای بچه‌ها فقط «احتمال» نبود؛ ایده‌ی استفاده از نسبت‌ها در ساختنِ مدل پررنگ شده بود. بحث دوباره ادامه یافت؛ بچه‌ها جواب‌های تازه می‌نوشتند، همدیگر را نقد می‌کردند و باز اصلاح می‌کردند. یکی از نوشته‌ها که تأییدِ بسیاری را در پی داشت این بود: «پاسخِ درست، یک پاسخ نیست.»</p>
+    <p>گفت‌وگو ادامه داشت تا اینکه یکی از بچه‌ها نوشت: «فکر کنم تعدادِ کلِ مهره‌ها باید مضربی از ۸ باشد.» این پاسخ تقریباً نظرِ همه را جلب کرد و تأییدهای زیادی گرفت؛ و شاید همین تأییدها بعضی‌ها را کنجکاو کرد که درباره‌ی چراییِ آن بپرسند و گفت‌وگو شفاهی شد. یکی شروع کرد به مثال‌زدن:</p>
+    <div class="chat">
+      <div class="cl">اگر <b>۸</b> مهره باشد: ۴، ۲، ۱، ۱</div>
+      <div class="cl">اگر <b>۱۶</b> مهره باشد: ۸، ۴، ۲، ۲</div>
+      <div class="cl">اگر <b>۴۰</b> مهره باشد: ۲۰، ۱۰، ۵، ۵</div>
+    </div>
+    <div class="pullquote">بچه‌ها به‌جای اینکه یک پاسخ پیدا کنند، <em>ساختارِ</em> پاسخ‌ها را پیدا کرده بودند — بی‌نهایت پاسخ، تنها به این شرط که نسبتِ ۴ : ۲ : ۱ : ۱ حفظ شود.</div>
+
+    <h2 class="subhead">حالا ببینیم واقعاً کار می‌کند یا نه</h2>
+    <p>تا اینجا فقط درباره‌ی مدل حرف زده بودیم؛ وقتِ آزمایشش بود. یک ابزارِ مجازیِ جعبه و مهره را روی صفحه آوردم، جعبه را با ۴ مهره‌ی قرمز، ۲ زرد، ۱ آبی و ۱ سبز ساختم و مطمئن شدم بچه‌ها این جعبه را به‌عنوانِ مولدِ تصادفیِ جایگزینِ چرخنده می‌پذیرند. شروع کردم به مهره بیرون‌آوردن، اما به‌عمد مهره‌ها را به جعبه برنمی‌گرداندم.</p>
+
+    <!-- ===== جعبه و مهره‌ی تعاملی ===== -->
+    <div class="figure beads-widget" data-lang="fa">
+      <div class="figcap"><span class="figlab">شکل ۲</span> مدلِ جعبه و مهره (۴ : ۲ : ۱ : ۱). مهره‌ها را بدونِ بازگرداندن بردار و جعبه از چرخنده فاصله می‌گیرد؛ گزینه‌ی «هر مهره را برگردان» را بزن و دیگر تمام نمی‌شود — درست مثلِ چرخنده.</div>
+      <div class="beads-box"></div>
+      <div class="drawn-wrap">
+        <span class="drawn-label">برداشته‌شده:</span>
+        <div class="drawn-tray"></div>
+      </div>
+      <div class="controls">
+        <button class="btn draw-btn">یک مهره بردار</button>
+        <label class="replace-toggle"><input type="checkbox" class="replace-cb"><span>هر مهره را به جعبه برگردان</span></label>
+        <button class="btn ghost refill-btn">پرکردن دوباره</button>
+      </div>
+      <div class="status"></div>
+      <div class="beads-tally"></div>
+    </div>
+
+    <p>چند بار که مهره برداشتیم، از بچه‌ها خواستم جوابِ این سؤال را در چت بنویسند: «موافقید که این جعبه دقیقاً مثلِ چرخنده رفتار می‌کند؟» این بار جواب‌ها سریع آمد:</p>
+    <div class="chat">
+      <div class="cl">فقط بارِ اول مثلِ چرخنده است.</div>
+      <div class="cl">بعد از هر بار برداشتن، احتمال‌ها عوض می‌شود.</div>
+      <div class="cl">اگر سبز بیرون بیاید دیگر سبز تمام شده؛ ولی در چرخنده دوباره ممکن است سبز بیاید.</div>
+      <div class="cl">اگر قرمز بیرون بیاید دیگر نصفِ مهره‌ها قرمز نیست؛ ولی چرخنده همیشه نصف قرمز است.</div>
+      <div class="cl">جعبه محدود است، اما چرخنده محدود نیست.</div>
+      <div class="cl">ترکیبِ جعبه با هر بار برداشتنِ مهره به هم می‌خورد.</div>
+    </div>
+    <p>اشاره‌ی بچه‌ها به نکته‌ی اصلیِ مدلی که ساخته بودیم جالب بود: چرخنده بعد از هر چرخش همان چرخنده‌ی قبلی است؛ اما جعبه بعد از هر بار برداشتنِ یک مهره عوض می‌شود و از مدلِ اولیه فاصله می‌گیرد. در ادامه پیشنهادِ «بازگرداندنِ مهره‌ی برداشته‌شده به جعبه در هر بار» برای کامل‌کردنِ مدل مطرح شد. بچه‌ها به‌اتفاق این مدلِ جعبه و مهره را مدلِ مناسبی برای بازآفرینیِ چرخنده تأیید کردند و کلاس به پایان رسید.</p>
+
+    <h2 class="subhead">چیزی بیشتر از احتمال</h2>
+    <p>اگر از من بپرسند این فعالیت درباره‌ی چه بود، احتمالاً نمی‌گویم «احتمال». حسِ من این است که آنچه رخ داد تجربه‌ی ریاضی‌ورزی و ساختنِ یک مدلِ ریاضی بود؛ تجربه‌ای که می‌تواند به رشدِ باورِ بچه‌ها به یکپارچگی و کارآمدیِ ریاضی کمک کند.</p>
+
+    <div class="principle">
+      <div class="lab">یک نکته برای معلم‌ها</div>
+      <div class="txt">اگر این فعالیت را در کلاس اجرا کردید، برای یافتنِ جوابِ درست عجله نکنید. بگذارید چتِ کلاس پر از جواب‌های مختلف شود و بچه‌ها جواب‌های همدیگر را بخوانند. از آن‌ها بخواهید فقط یک سؤال بپرسند: «این جعبه با مهره‌هایی که دوستم نوشته، واقعاً مثلِ چرخنده رفتار می‌کند؟» به تجربه‌ی من، بخشِ مهمِ یادگیری دقیقاً از همان لحظه‌ای آغاز می‌شود که بچه‌ها شروع می‌کنند به نقدِ مدل‌های یکدیگر؛ یعنی وقتی با دیدنِ پاسخِ دیگری سؤالی برای خودشان پیدا می‌شود که واقعاً محلِ کنجکاویِ خودشان است — نه وقتی معلم سؤالی می‌پرسد یا جوابِ درست را اعلام می‌کند.</div>
+    </div>
+
+    <div class="origin" style="border-top:1px solid var(--line);">
+      <span class="lab">پی‌نوشت</span>
+      <p style="margin:10px 0 0;">۱ · این فعالیت به‌طورِ کامل در یک کلاسِ هفتم و — تا جایی که به ابزارِ مجازی می‌رسد — در سه کلاسِ ششم طرح و اجرا شد. هر چهار کلاس فعالانه و با مشارکتِ اکثرِ دانش‌آموزان پیش رفت. این روایت بر پایه‌ی اجرای آن در کلاسِ هفتم نوشته شده است.</p>
+      <p style="margin:8px 0 0;">۲ · منبعِ الهامِ این فعالیت این رساله‌ی دکترا بوده است: Jennifer Anne Way (2003), <em>The Development of Children's Notions of Probability</em>, Queensland University of Technology.</p>
+      <p style="margin:8px 0 0;">۳ · ابزارِ مجازیِ جعبه و مهره که در کلاس استفاده شد: <a href="https://mathink.ir/random/" target="_blank" rel="noopener">mathink.ir/random</a>.</p>
+    </div>
+  </div>
+
+  <!-- ===== کارنامه‌ی دست‌اندرکاران ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">نویسنده</div>
+        <div class="who">زهره پندی</div>
+        <a class="mail" href="mailto:zohrepandi@gmail.com">✉ zohrepandi@gmail.com</a>
+      </div>
+    </div>
+    <div class="origin">نوشته‌شده برای «آدم‌ها و ریاضیات» — ایده‌های کلاسی. چرخنده و جعبه‌ی تعاملی از مجله، برپایه‌ی ابزارِ <a href="https://mathink.ir/random/" target="_blank" rel="noopener">mathink.ir/random</a>.</div>
+  </div>
+
+  <div class="refs">
+    <h3>مراجع</h3>
+    <ol>
+      <li>Jennifer Anne Way (2003). <em>The Development of Children's Notions of Probability.</em> PhD Thesis, Queensland University of Technology.</li>
+      <li>ابزارِ مجازیِ جعبه و مهره (مولدِ تصادفی). <a href="https://mathink.ir/random/" target="_blank" rel="noopener">https://mathink.ir/random/</a></li>
+    </ol>
+  </div>
+
+  <div class="printfoot">
+    <span class="pf-strong">آدم‌ها و ریاضیات — People and Mathematics</span>، مجله‌ای دوزبانه · خرداد ۱۴۰۵ · ایده‌های کلاسی.
+    «وسایل آموزشی مفیدند؛ مدلی برای بازآفرینی یک چرخنده» نوشته‌ی زهره پندی. © نویسنده؛ منتشرشده در «آدم‌ها و ریاضیات»، از انتشاراتِ Mathswell.
+    نسخه‌ی آنلاین — همراه با چرخنده و جعبه‌ی تعاملی — و دیگر مقاله‌ها در mathswell.com در دسترس است.
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+  /* ---------- language ---------- */
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  }
+
+  /* ---------- shared data ---------- */
+  var WEDGES = [
+    { key:'red',    en:'Red',    fa:'قرمز', color:'#CE4B3C', start:0,   end:180, target:50   },
+    { key:'yellow', en:'Yellow', fa:'زرد',  color:'#E0A32E', start:180, end:270, target:25   },
+    { key:'blue',   en:'Blue',   fa:'آبی',  color:'#3E6B99', start:270, end:315, target:12.5 },
+    { key:'green',  en:'Green',  fa:'سبز',  color:'#4E8060', start:315, end:360, target:12.5 }
+  ];
+  function faDigits(s){
+    var map = {'0':'۰','1':'۱','2':'۲','3':'۳','4':'۴','5':'۵','6':'۶','7':'۷','8':'۸','9':'۹','.':'٫','%':'٪'};
+    return String(s).replace(/[0-9.%]/g, function(c){ return map[c]; });
+  }
+  function fmtNum(n, isFa){ return isFa ? faDigits(n) : String(n); }
+  function fmtPct(n, isFa){
+    var v = Math.round(n*10)/10;
+    var s = (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + '%';
+    return isFa ? faDigits(s) : s;
+  }
+
+  /* ---------- spinner ---------- */
+  function pol(cx, cy, r, deg){
+    var a = deg * Math.PI / 180;
+    return [cx + r*Math.sin(a), cy - r*Math.cos(a)];
+  }
+  function initSpinner(root){
+    var isFa = root.getAttribute('data-lang') === 'fa';
+    var svg = root.querySelector('.wheel');
+    var tally = root.querySelector('.tally');
+    var spinBtn = root.querySelector('.spin-btn');
+    var resetBtn = root.querySelector('.reset-btn');
+    var countEl = root.querySelector('.spincount');
+    var cx = 100, cy = 100, r = 92;
+    var svgNS = 'http://www.w3.org/2000/svg';
+
+    // draw wedges
+    WEDGES.forEach(function(w){
+      var large = (w.end - w.start) > 180 ? 1 : 0;
+      var p1 = pol(cx, cy, r, w.start), p2 = pol(cx, cy, r, w.end);
+      var path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', 'M '+cx+' '+cy+' L '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+
+        ' A '+r+' '+r+' 0 '+large+' 1 '+p2[0].toFixed(2)+' '+p2[1].toFixed(2)+' Z');
+      path.setAttribute('fill', w.color);
+      path.setAttribute('stroke', '#FBF7EF');
+      path.setAttribute('stroke-width', '2');
+      svg.appendChild(path);
+    });
+    var ring = document.createElementNS(svgNS, 'circle');
+    ring.setAttribute('cx', cx); ring.setAttribute('cy', cy); ring.setAttribute('r', r);
+    ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', '#1C1814'); ring.setAttribute('stroke-width', '2.5');
+    svg.appendChild(ring);
+    var hub = document.createElementNS(svgNS, 'circle');
+    hub.setAttribute('cx', cx); hub.setAttribute('cy', cy); hub.setAttribute('r', 11);
+    hub.setAttribute('fill', '#FBF7EF'); hub.setAttribute('stroke', '#1C1814'); hub.setAttribute('stroke-width', '2.5');
+    svg.appendChild(hub);
+
+    // tally rows
+    var counts = { red:0, yellow:0, blue:0, green:0 };
+    var rows = {};
+    WEDGES.forEach(function(w){
+      var item = document.createElement('div'); item.className = 'titem';
+      item.innerHTML =
+        '<div class="thead"><span class="swatch" style="background:'+w.color+'"></span>' +
+        '<span class="tname">'+(isFa?w.fa:w.en)+'</span>' +
+        '<span class="tval">'+fmtNum(0,isFa)+' · '+fmtPct(0,isFa)+'</span></div>' +
+        '<div class="tbar"><i style="background:'+w.color+'"></i>' +
+        '<span class="ttick" data-t="'+fmtPct(w.target,isFa)+'" style="left:'+w.target+'%"></span></div>';
+      tally.appendChild(item);
+      rows[w.key] = { val: item.querySelector('.tval'), fill: item.querySelector('.tbar > i') };
+    });
+
+    var total = 0, current = 0, spinning = false;
+    function updateCount(){
+      countEl.textContent = isFa ? (faDigits(total) + ' چرخش') : (total + (total===1?' spin':' spins'));
+    }
+    function refresh(){
+      WEDGES.forEach(function(w){
+        var n = counts[w.key];
+        var pct = total ? (n/total*100) : 0;
+        rows[w.key].val.textContent = fmtNum(n,isFa) + ' · ' + fmtPct(pct,isFa);
+        rows[w.key].fill.style.width = (total ? pct : 0) + '%';
+      });
+      updateCount();
+    }
+    refresh();
+
+    spinBtn.addEventListener('click', function(){
+      if (spinning) return;
+      spinning = true; spinBtn.disabled = true;
+      var a = Math.random() * 360;                 // wheel-local angle to bring under the pointer
+      var winner = WEDGES.find(function(w){ return a >= w.start && a < w.end; }) || WEDGES[0];
+      var base = current + 360*5;                   // at least 5 turns
+      var target = base - (base % 360) + ((360 - a) % 360);
+      if (target <= current + 360) target += 360;
+      current = target;
+      svg.style.transition = 'transform 3.4s cubic-bezier(.17,.67,.12,.99)';
+      svg.style.transform = 'rotate(' + current + 'deg)';
+      setTimeout(function(){
+        counts[winner.key]++; total++; refresh();
+        spinning = false; spinBtn.disabled = false;
+      }, 3500);
+    });
+    resetBtn.addEventListener('click', function(){
+      if (spinning) return;
+      counts = { red:0, yellow:0, blue:0, green:0 }; total = 0;
+      current = current % 360;
+      svg.style.transition = 'none';
+      svg.style.transform = 'rotate(' + current + 'deg)';
+      refresh();
+    });
+  }
+
+  /* ---------- box and beads ---------- */
+  function initBeads(root){
+    var isFa = root.getAttribute('data-lang') === 'fa';
+    var boxEl = root.querySelector('.beads-box');
+    var trayEl = root.querySelector('.drawn-tray');
+    var tallyEl = root.querySelector('.beads-tally');
+    var drawBtn = root.querySelector('.draw-btn');
+    var refillBtn = root.querySelector('.refill-btn');
+    var replaceCb = root.querySelector('.replace-cb');
+    var statusEl = root.querySelector('.status');
+
+    var recipe = [];
+    WEDGES.forEach(function(w){
+      var n = w.key==='red'?4 : w.key==='yellow'?2 : 1;
+      for (var i=0;i<n;i++) recipe.push(w);
+    });
+
+    var beadEls = [];
+    function buildBox(){
+      boxEl.innerHTML = ''; beadEls = [];
+      recipe.forEach(function(w){
+        var b = document.createElement('div');
+        b.className = 'bead'; b.style.background = w.color;
+        b.dataset.key = w.key;
+        boxEl.appendChild(b); beadEls.push(b);
+      });
+    }
+    var counts = { red:0, yellow:0, blue:0, green:0 };
+    var rows = {};
+    function buildTally(){
+      tallyEl.innerHTML = '';
+      WEDGES.forEach(function(w){
+        var item = document.createElement('div'); item.className = 'titem';
+        item.innerHTML =
+          '<div class="thead"><span class="swatch" style="background:'+w.color+'"></span>' +
+          '<span class="tname">'+(isFa?w.fa:w.en)+'</span>' +
+          '<span class="tval">'+fmtNum(0,isFa)+'</span></div>' +
+          '<div class="tbar"><i style="background:'+w.color+'"></i>' +
+          '<span class="ttick" data-t="'+fmtPct(w.target,isFa)+'" style="left:'+w.target+'%"></span></div>';
+        tallyEl.appendChild(item);
+        rows[w.key] = { val: item.querySelector('.tval'), fill: item.querySelector('.tbar > i') };
+      });
+    }
+    var totalDraws = 0;
+    function refreshTally(){
+      WEDGES.forEach(function(w){
+        var n = counts[w.key];
+        rows[w.key].val.textContent = fmtNum(n,isFa);
+        rows[w.key].fill.style.width = (totalDraws ? (n/totalDraws*100) : 0) + '%';
+      });
+    }
+    function setStatus(){
+      var withRep = replaceCb.checked;
+      var remaining = beadEls.filter(function(b){ return !b.classList.contains('out'); }).length;
+      if (withRep){
+        statusEl.innerHTML = isFa
+          ? 'با بازگرداندنِ هر مهره، جعبه هیچ‌وقت تمام نمی‌شود و نسبت‌ها ثابت می‌مانند — <b>درست مثلِ چرخنده.</b>'
+          : 'With every bead returned, the box never runs out and the ratios stay fixed — <b>just like the spinner.</b>';
+      } else if (remaining === 0){
+        statusEl.innerHTML = isFa
+          ? 'جعبه خالی شد. <b>دیگر هیچ شباهتی به چرخنده ندارد.</b> «پرکردن دوباره» را بزن یا مهره‌ها را برگردان.'
+          : 'The box is empty. <b>Nothing like the spinner now.</b> Refill, or return each bead.';
+      } else {
+        statusEl.innerHTML = isFa
+          ? 'بدونِ بازگرداندن، ترکیبِ جعبه با هر برداشت عوض می‌شود و از چرخنده فاصله می‌گیرد. (<b>'+faDigits(remaining)+'</b> مهره مانده)'
+          : 'Without returning them, the box changes with every draw and drifts from the spinner. (<b>'+remaining+'</b> beads left)';
+      }
+    }
+    function reset(){
+      buildBox(); trayEl.innerHTML = '';
+      counts = { red:0, yellow:0, blue:0, green:0 }; totalDraws = 0;
+      refreshTally(); drawBtn.disabled = false; setStatus();
+    }
+    buildTally(); reset();
+
+    drawBtn.addEventListener('click', function(){
+      var withRep = replaceCb.checked;
+      var pool = withRep ? beadEls : beadEls.filter(function(b){ return !b.classList.contains('out'); });
+      if (!pool.length) return;
+      var pick = pool[Math.floor(Math.random()*pool.length)];
+      var key = pick.dataset.key;
+      counts[key]++; totalDraws++;
+      // flash
+      pick.classList.add('flash');
+      setTimeout(function(){ pick.classList.remove('flash'); }, 130);
+      if (!withRep) { pick.classList.add('out'); pick.style.opacity = '0.15'; }
+      // tray
+      var t = document.createElement('div'); t.className = 'bead'; t.style.background = pick.style.background;
+      trayEl.appendChild(t);
+      while (trayEl.children.length > 24) trayEl.removeChild(trayEl.firstChild);
+      refreshTally();
+      var remaining = beadEls.filter(function(b){ return !b.classList.contains('out'); }).length;
+      if (!withRep && remaining === 0) drawBtn.disabled = true;
+      setStatus();
+    });
+    replaceCb.addEventListener('change', function(){
+      if (replaceCb.checked){
+        beadEls.forEach(function(b){ b.classList.remove('out'); b.style.opacity = ''; });
+        drawBtn.disabled = false;
+      }
+      setStatus();
+    });
+    refillBtn.addEventListener('click', reset);
+  }
+
+  /* ---------- boot ---------- */
+  document.querySelectorAll('.spinner-widget').forEach(initSpinner);
+  document.querySelectorAll('.beads-widget').forEach(initBeads);
+
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

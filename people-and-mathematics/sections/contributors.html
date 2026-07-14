@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contributors · People and Mathematics</title>
+<meta name="description" content="The contributors of People and Mathematics — آدم‌ها و ریاضیات. Find the people, then their work.">
+<link rel="icon" href="../assets/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: "B Nazanin"; src: url("../fonts/BNazanin.woff2") format("woff2"), url("../fonts/BNazanin.woff") format("woff"), url("../fonts/BNazanin.ttf") format("truetype"); font-weight: 400 700; font-display: swap; }
+  :root { --pm-accent: #C8633E; --pm-ink: #1C1814; --pm-paper: #FBF7EF; --pm-black: #0D0C0B; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; background: var(--pm-paper); color: var(--pm-ink); -webkit-font-smoothing: antialiased; }
+  ::selection { background: var(--pm-accent); color: var(--pm-paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", "B Nazanin", sans-serif; }
+  [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  .wrap { max-width: 1280px; margin: 0 auto; }
+  .accent { color: var(--pm-accent); }
+  a { color: inherit; }
+
+  .topband { background: var(--pm-black); color: var(--pm-paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px 40px; }
+  .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; color: inherit; }
+  .brand-logo { width: 54px; height: 54px; object-fit: contain; flex: 0 0 auto; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 21px; font-weight: 600; line-height: 1.1; }
+  .brand-en { font-size: 15px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  nav.menu { display: flex; align-items: center; gap: 22px; font-size: 13.5px; font-weight: 500; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; background: transparent; color: var(--pm-paper); }
+  .langtoggle button.on { background: var(--pm-paper); color: var(--pm-black); }
+
+  .crumbbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 13px 40px; border-bottom: 1px solid var(--pm-ink); }
+  .crumbbar a { text-decoration: none; }
+  .crumb { font-size: 13px; color: #6B6155; }
+  .crumb .accent { font-weight: 600; }
+
+  .sechead { padding: 52px 40px 34px; border-bottom: 1px solid var(--pm-ink); }
+  .sec-n { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--pm-accent); font-weight: 600; }
+  .sec-title { margin: 14px 0 0; font-size: 54px; line-height: 1.02; font-weight: 500; letter-spacing: -.02em; }
+  .sec-blurb { margin: 18px 0 0; font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; max-width: 34em; text-align: justify; }
+  [dir="rtl"] .sec-blurb { font-style: normal; }
+  .sec-count { margin-top: 20px; font-size: 13px; color: #948876; letter-spacing: .04em; text-transform: uppercase; }
+
+  .person-row { display: grid; grid-template-columns: 220px 1fr; gap: 40px; padding: 44px 40px; border-bottom: 1px solid #E4DAC6; align-items: start; }
+  .person-id { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+  .person-id img { width: 132px; height: 132px; border-radius: 50%; object-fit: cover; border: 1px solid #DBD0BA; }
+  .person-id .ph-ava { width: 132px; height: 132px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 44px; font-weight: 600; color: #948876; background: #EFE6D2; border: 1px solid #DBD0BA; }
+  .person-name { font-size: 27px; font-weight: 500; letter-spacing: -.01em; line-height: 1.15; }
+  .person-title { display: inline-block; white-space: nowrap; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--pm-accent); border: 1px solid var(--pm-accent); border-radius: 999px; padding: 3px 11px; }
+  [dir="rtl"] .person-title { letter-spacing: 0; text-transform: none; }
+  .person-count { font-size: 12px; color: #948876; letter-spacing: .05em; text-transform: uppercase; }
+
+  .work-row { display: grid; grid-template-columns: 1fr auto; gap: 8px 20px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid #EFE6D2; text-decoration: none; }
+  .work-row:last-child { border-bottom: 0; }
+  .work-row:hover .w-title { color: var(--pm-accent); }
+  .w-title { font-size: 21px; font-weight: 500; line-height: 1.2; transition: color .15s; }
+  .w-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #948876; flex-wrap: wrap; }
+  .w-sec { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--pm-accent); white-space: nowrap; }
+  .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; display: inline-block; }
+  .lvl { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .lvl .lvl-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+
+  /* “With thanks” — groups / communities (e.g. Bāham), logo + note */
+  .ack-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 52px 40px 6px; }
+  .ack-head .lab { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--pm-accent); font-weight: 600; }
+  .ack-head .tag { font-size: 12px; color: #B7AC99; }
+  [dir="rtl"] .ack-head .lab { letter-spacing: 0; }
+  .ack-logo { width: 132px; height: 132px; border-radius: 14px; background: #fff; border: 1px solid #DBD0BA; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .ack-logo img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+  .ack-note { font-family: "Hanken Grotesk", "Vazirmatn", "B Nazanin", sans-serif; font-size: 15.5px; line-height: 1.62; color: #43392E; margin: 14px 0 0; max-width: 46em; text-align: justify; }
+  [dir="rtl"] .ack-note { text-align: right; }
+
+  .footer { padding: 40px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap; border-top: 1px solid var(--pm-ink); margin-top: 40px; }
+  .footer .fl { font-size: 13px; color: #6B6155; }
+  .back { text-decoration: none; font-weight: 600; font-size: 14px; color: var(--pm-ink); border: 1px solid var(--pm-ink); border-radius: 999px; padding: 9px 18px; transition: background .15s, color .15s; }
+  .back:hover { background: var(--pm-black); color: var(--pm-paper); }
+
+  @media (max-width: 900px) {
+    .sec-title { font-size: 40px; }
+    .person-row { grid-template-columns: 1fr; gap: 22px; }
+    .person-id { flex-direction: row; align-items: center; }
+    .person-id img, .person-id .ph-ava, .person-id .ack-logo { width: 84px; height: 84px; }
+    .person-id .ack-logo { padding: 9px; border-radius: 10px; }
+  }
+  @media (max-width: 560px) {
+    .topband { flex-wrap: wrap; padding: 16px 20px; gap: 14px; }
+    .crumbbar, .sechead, .person-row, .footer { padding-left: 20px; padding-right: 20px; }
+    .sec-title { font-size: 32px; }
+    .w-title { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="../content.js"></script>
+<script>
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function pick(o, lang){ return o ? (o[lang] != null ? o[lang] : o.en) : ""; }
+function toLocal(n, isFa){ n = String(n); return isFa ? n.replace(/[0-9]/g, function(d){ return "۰۱۲۳۴۵۶۷۸۹"[+d]; }) : n; }
+function up(href){ return (!href || /^https?:/.test(href)) ? href : "../" + href; }
+function slug(s){ return String(s||"").replace(/\s+/g,"-").toLowerCase(); }
+
+var DATA = window.PM_CONTENT || { SECTIONS:[], WORKS:[], en:{}, fa:{} };
+
+function levelChip(levelId, lang){
+  var L = (DATA.LEVELS||[]).filter(function(x){ return x.id === levelId; })[0];
+  if (!L) return "";
+  return '<span class="lvl sans"><span class="lvl-dot" style="background:'+esc(L.color)+';"></span><span>'+esc(pick(L.name,lang))+'</span></span>';
+}
+
+function render(lang){
+  var c = DATA[lang] || DATA.en;
+  var isFa = lang === "fa";
+  var dir = isFa ? "rtl" : "ltr";
+  var arrow = isFa ? "←" : "→";
+  document.documentElement.lang = lang;
+  document.documentElement.dir = dir;
+  document.title = (isFa ? "نویسندگان و همکاران" : "Contributors") + " · People and Mathematics";
+
+  /* gather authors from the works, in order of first appearance */
+  var seen = {}, authors = [];
+  (DATA.WORKS||[]).forEach(function(w){
+    var t = w.en || {};
+    if (!t.author) return;
+    if (!seen[t.author]){ seen[t.author] = { en: t.author, fa: (w.fa && w.fa.author) || t.author, img: w.authorImg || "", works: [], roles: {} }; authors.push(seen[t.author]); }
+    if (!seen[t.author].img && w.authorImg) seen[t.author].img = w.authorImg;
+    seen[t.author].works.push(w);
+  });
+  /* … and the credited contributors (translation, editing, …) declared on works */
+  (DATA.WORKS||[]).forEach(function(w){
+    (w.credits||[]).forEach(function(cr){
+      var key = (cr.en && cr.en.name) || "";
+      if (!key) return;
+      if (!seen[key]){ seen[key] = { en: key, fa: (cr.fa && cr.fa.name) || key, img: cr.img || "", works: [], roles: {} }; authors.push(seen[key]); }
+      if (!seen[key].img && cr.img) seen[key].img = cr.img;
+      if (seen[key].works.indexOf(w) < 0) seen[key].works.push(w);
+      seen[key].roles[w.href] = { en: (cr.en && cr.en.role) || "", fa: (cr.fa && cr.fa.role) || "" };
+    });
+  });
+  /* the gallery ("A gallery") is not a person — leave it to its section page */
+  authors = authors.filter(function(a){ return !/^a gallery$/i.test(a.en); });
+
+  var rowsHtml = authors.map(function(a){
+    var nm = isFa ? a.fa : a.en;
+    var title = (DATA.PEOPLE && DATA.PEOPLE[a.en]) ? (isFa ? DATA.PEOPLE[a.en].fa : DATA.PEOPLE[a.en].en) : "";
+    var cnt = a.works.length === 1 ? c.contributorWorksOne : (c.contributorWorksMany||"{n}").replace("{n}", toLocal(a.works.length, isFa));
+    var ava = a.img
+      ? '<img src="'+esc(up(a.img))+'" alt="'+esc(nm)+'" loading="lazy">'
+      : '<div class="ph-ava">'+esc(a.en.charAt(0))+'</div>';
+    var worksHtml = a.works.map(function(w){
+      var t = w[lang] || w.en || {};
+      var sec = (DATA.SECTIONS||[]).filter(function(s){ return s.id === w.section; })[0] || {};
+      var lvl = levelChip(w.level, lang);
+      var role = a.roles && a.roles[w.href] ? (isFa ? a.roles[w.href].fa : a.roles[w.href].en) : "";
+      var inner =
+        '<span><span class="w-title">'+esc(t.title)+' <span class="accent">'+arrow+'</span></span>'
+        + '<span class="w-meta sans" style="margin-top:6px;display:flex;"><span>'+esc(w.date?pick(w.date,lang):"")+'</span><span class="dot"></span><span>'+esc(t.meta)+'</span>'+(role?'<span class="dot"></span><span class="accent">'+esc(role)+'</span>':'')+(lvl?'<span class="dot"></span>'+lvl:'')+'</span></span>'
+        + '<span class="w-sec sans">'+esc(pick(sec.name,lang))+'</span>';
+      return w.href ? '<a class="work-row" href="'+esc(up(w.href))+'">'+inner+'</a>' : '<div class="work-row">'+inner+'</div>';
+    }).join("");
+    return '<section class="person-row wrap" id="'+esc(slug(a.en))+'">'
+      + '<div class="person-id">'+ava+'<div><div class="person-name">'+esc(nm)+'</div>'+(title?'<div class="person-title sans" style="margin-top:9px;">'+esc(title)+'</div>':'')+'<div class="person-count sans" style="margin-top:'+(title?'9px':'6px')+';">'+esc(cnt)+'</div></div></div>'
+      + '<div>'+worksHtml+'</div>'
+      + '</section>';
+  }).join("");
+
+  /* groups / communities to acknowledge (Bāham …) — logo + note, not counted among the people */
+  var acksHtml = (DATA.ACKS||[]).map(function(a){
+    var t = isFa ? a.fa : a.en;
+    var nm = t.name;
+    var ava = a.img
+      ? (a.logo
+          ? '<div class="ack-logo"><img src="'+esc(up(a.img))+'" alt="'+esc(nm)+'"></div>'
+          : '<img src="'+esc(up(a.img))+'" alt="'+esc(nm)+'">')
+      : '<div class="ph-ava">'+esc((nm||'?').charAt(0))+'</div>';
+    return '<section class="person-row wrap" id="'+esc(slug(a.en.name))+'">'
+      + '<div class="person-id">'+ava+'</div>'
+      + '<div><div class="person-name">'+esc(nm)+'</div>'
+        + (t.role?'<div class="person-title sans" style="margin-top:9px;">'+esc(t.role)+'</div>':'')
+        + (t.note?'<p class="ack-note">'+esc(t.note)+'</p>':'')
+      + '</div>'
+      + '</section>';
+  }).join("");
+  var acksBlock = acksHtml
+    ? '<div class="ack-head sans"><span class="lab">'+esc(c.acksLabel||(isFa?'با سپاس':'With thanks'))+'</span><span class="tag">'+esc(c.acksTag||'')+'</span></div>' + acksHtml
+    : "";
+
+  var nav = c.nav || {};
+  document.getElementById("app").innerHTML =
+    '<div class="topband">'
+      + '<a class="brand" href="../index.html"><img class="brand-logo" src="../assets/logo.jpg" alt="People and Mathematics"><div><div class="brand-fa persian">آدم‌ها و ریاضیات</div><div class="brand-en">People and Mathematics</div></div></a>'
+      + '<nav class="menu sans">'
+        + '<a href="../index.html" style="text-decoration:none;">'+esc(nav.issues)+'</a>'
+        + '<div class="langtoggle">'
+          + '<button data-lang="en" class="'+(!isFa?'on':'')+'">EN</button>'
+          + '<button data-lang="fa" class="persian '+(isFa?'on':'')+'">فارسی</button>'
+        + '</div>'
+      + '</nav>'
+    + '</div>'
+
+    + '<div class="crumbbar">'
+      + '<div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent">'+esc(c.contributorsLabel)+'</span></div>'
+      + '<div class="crumb sans">'+esc(c.contributorsTag)+'</div>'
+    + '</div>'
+
+    + '<header class="sechead wrap">'
+      + '<div class="sec-n sans">'+esc(c.contributorsLabel)+'</div>'
+      + '<h1 class="sec-title">'+(isFa?'نویسندگان و همکاران':'The Contributors')+'</h1>'
+      + '<p class="sec-blurb">'+(isFa?'آدم‌ها را بیابید — بعد کارهایشان را. هر نام، همه‌ی مشارکت‌هایش در مجله را یک‌جا نشان می‌دهد.':'Find the people — then their work. Each name gathers everything its owner has contributed to the journal.')+'</p>'
+      + '<div class="sec-count sans">'+toLocal(authors.length, isFa)+' '+(isFa?'نفر':(authors.length===1?'person':'people'))+'</div>'
+    + '</header>'
+
+    + rowsHtml
+
+    + acksBlock
+
+    + '<footer class="footer wrap">'
+      + '<span class="fl sans">'+esc(c.pubLine).replace('mathswell.com','<a href="../index.html" style="color:inherit;">mathswell.com</a>')+'</span>'
+      + '<a class="back sans" href="../index.html">'+esc(c.backToJournal)+'</a>'
+    + '</footer>';
+
+  document.querySelectorAll(".langtoggle button").forEach(function(b){
+    b.addEventListener("click", function(){
+      var l = b.getAttribute("data-lang");
+      try { localStorage.setItem("pm-lang", l); } catch(e){}
+      render(l);
+      window.scrollTo(0, 0);
+    });
+  });
+
+  if (location.hash){
+    var el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.pageYOffset - 20);
+  }
+}
+
+var startLang = "en";
+try { var saved = localStorage.getItem("pm-lang"); if (saved === "en" || saved === "fa") startLang = saved; } catch(e){}
+render(startLang);
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

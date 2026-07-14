@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Women in Mathematics Event — a report · People and Mathematics</title>
+<meta name="description" content="How students at Sharif built a two-year celebration of Maryam Mirzakhani — and everything it took to hold it. A report by Farnaz Haj Manouchehri and Bamdad Torabi, kept for the record.">
+
+<meta property="og:title" content="Women in Mathematics Event — a report">
+<meta property="og:description" content="Mathematical Culture · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/wim/wim-logo-mark.png">
+<meta property="og:type" content="article">
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root {
+    --paper: #FBF7EF; --ink: #1C1814; --black: #0D0C0B;
+    --teal: #0D353D; --teal-2: #14484F; --amber: #E7A11C; --amber-deep: #B97E12;
+    --muted: #6B6155; --line: #E4DAC6;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--amber); color: var(--teal); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: var(--teal); }
+  a:hover { color: var(--amber-deep); }
+  .ltr { direction: ltr; unicode-bidi: isolate; }
+  img { max-width: 100%; }
+
+  .standfirst, .body p, .body li { text-align: justify; }
+
+  /* Masthead */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; background: transparent; color: var(--paper); font-family: "Hanken Grotesk","Vazirmatn",sans-serif; }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--teal); font-weight: 600; }
+
+  /* Hero */
+  .hero { background: var(--teal); color: var(--paper); padding: 60px 28px 66px; text-align: center; position: relative; overflow: hidden; }
+  .hero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% -10%, rgba(231,161,28,.10), transparent 60%); pointer-events: none; }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; }
+  .hero-logo { width: 210px; height: auto; margin: 0 auto 22px; display: block; }
+  .hero .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 600; color: var(--amber); }
+  [dir="rtl"] .hero .kicker { letter-spacing: .04em; }
+  .hero h1 { font-size: 52px; line-height: 1.05; font-weight: 500; letter-spacing: -.022em; margin: 16px 0 0; }
+  .hero .standfirst { font-size: 20px; line-height: 1.55; color: #DCE7E4; margin: 20px auto 0; max-width: 620px; text-wrap: pretty; font-style: italic; }
+  [dir="rtl"] .hero h1 { font-family: "Vazirmatn","B Nazanin",serif; line-height: 1.2; }
+  [dir="rtl"] .hero .standfirst { font-style: normal; line-height: 1.9; }
+
+  /* Column */
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 28px 40px; }
+  .byline { display: flex; align-items: center; gap: 14px; margin: 30px 0 0; padding: 20px 0; border-bottom: 1px solid var(--line); }
+  .byline .avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; background: var(--teal); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15.5px; font-weight: 600; }
+  .byline .meta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+  .companion { display: flex; align-items: center; gap: 14px; margin-top: 26px; border: 1px solid var(--line); border-radius: 6px; background: #F4ECDC; text-decoration: none; color: inherit; padding: 13px 16px; }
+  .companion:hover { border-color: var(--teal); }
+  .companion .cico { width: 42px; height: 42px; border-radius: 8px; background: var(--teal); flex: 0 0 auto; object-fit: cover; }
+  .companion .c-lab { font-family: "Hanken Grotesk","Vazirmatn",sans-serif; font-size: 10.5px; letter-spacing: .11em; text-transform: uppercase; font-weight: 600; color: var(--amber-deep); }
+  .companion .c-title { font-family: "Newsreader","Vazirmatn",serif; font-size: 17px; font-weight: 500; margin-top: 3px; }
+  .companion .c-arrow { margin-inline-start: auto; color: var(--teal); font-weight: 700; font-size: 20px; }
+  [dir="ltr"] .companion .c-arrow::after { content: "\2192"; }
+  [dir="rtl"] .companion .c-arrow::after { content: "\2190"; }
+
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body > p:first-of-type::first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--teal); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 46px 0 15px; padding-top: 20px; border-top: 1px solid var(--line); position: relative; }
+  .subhead::before { content: ""; position: absolute; top: -1px; inset-inline-start: 0; width: 46px; height: 3px; background: var(--amber); }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body > p:first-of-type::first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  .aside { font-style: italic; color: var(--muted); font-size: 17px; border-inline-start: 2px solid var(--amber); padding-inline-start: 14px; margin: 24px 0; }
+  [dir="rtl"] .aside { font-style: normal; }
+
+  /* figures — people first */
+  figure { margin: 30px 0; }
+  figure img { width: 100%; display: block; border: 1px solid var(--line); border-radius: 5px; background: #efe7d6; }
+  figure figcaption { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 9px; line-height: 1.5; }
+  figure figcaption b { color: var(--teal); font-weight: 600; }
+  [dir="rtl"] figure figcaption { text-align: right; line-height: 1.7; }
+  .figrow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .figrow.three { grid-template-columns: repeat(3, 1fr); }
+  .figrow figure { margin: 0; }
+  .figcap-wide { font-family: "Hanken Grotesk","Vazirmatn",sans-serif; font-size: 12.5px; color: var(--muted); margin: 10px 0 30px; line-height: 1.5; }
+  .figcap-wide b { color: var(--teal); font-weight: 600; }
+  [dir="rtl"] .figcap-wide { text-align: right; line-height: 1.7; }
+  /* small secondary (objects) */
+  figure.small { max-width: 320px; margin-inline: auto; }
+  figure.small img { border-radius: 6px; }
+  figure.small figcaption { text-align: center; }
+  figure.med { max-width: 470px; margin-inline: auto; }
+  figure.med figcaption { text-align: center; }
+  [dir="rtl"] figure.med figcaption, [dir="rtl"] figure.small figcaption { text-align: center; }
+  /* photographs share one calm 3:2 rhythm */
+  figure.ph img { aspect-ratio: 3 / 2; object-fit: cover; object-position: center 42%; }
+  /* screen-captures: contained on a dark card so nothing is cropped, equal heights in a row */
+  figure.shot img { aspect-ratio: 16 / 10; object-fit: contain; background: #0e1a22; border-color: #16232b; }
+  figure.med.shot { max-width: 520px; }
+  /* lead people image — a touch more presence */
+  figure.lead img { border-color: #d8cbb0; }
+
+  /* photo reels — small grouped sequences that fade one to the next */
+  .reel { margin: 30px 0; }
+  .reel .frames { position: relative; width: 100%; aspect-ratio: 3 / 2; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; background: #efe7d6; }
+  .reel .frames img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; opacity: 0; transition: opacity .9s ease; }
+  .reel .frames img.on { opacity: 1; }
+  .reel .rcount { position: absolute; top: 10px; inset-inline-end: 10px; z-index: 2; background: rgba(13,12,11,.6); color: #fff; font-family: "Hanken Grotesk","Vazirmatn",sans-serif; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; letter-spacing: .02em; }
+  .reel .dots { display: flex; gap: 7px; justify-content: center; margin-top: 11px; flex-wrap: wrap; }
+  .reel .dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: var(--line); cursor: pointer; transition: background .25s, transform .25s; }
+  .reel .dots button.on { background: var(--amber-deep); transform: scale(1.3); }
+  .reel figcaption { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+  .reel figcaption b { color: var(--teal); font-weight: 600; }
+  [dir="rtl"] .reel figcaption { text-align: right; line-height: 1.7; }
+
+  .pullquote { font-size: 27px; line-height: 1.32; font-weight: 500; letter-spacing: -.01em; color: var(--teal); border-top: 2px solid var(--teal); border-bottom: 1px solid var(--line); padding: 22px 0; margin: 34px 0; text-wrap: pretty; }
+  [dir="rtl"] .pullquote { line-height: 1.7; font-family: "Vazirmatn","B Nazanin",serif; }
+  .pullquote .mark { color: var(--amber); }
+
+  .ednote { margin: 38px 0 0; border-top: 1px solid var(--line); padding-top: 16px; font-family: "Hanken Grotesk","Vazirmatn",sans-serif; font-size: 13px; color: var(--muted); line-height: 1.62; }
+  .ednote b { color: var(--teal); font-weight: 600; }
+  [dir="rtl"] .ednote { line-height: 1.95; text-align: right; }
+
+  .colophon { margin-top: 30px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+
+  .refs { margin-top: 34px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ul { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding: 0; margin: 10px 0 0; list-style: none; }
+  .refs li { margin-bottom: 9px; padding-inline-start: 16px; position: relative; }
+  .refs li::before { content: "·"; position: absolute; inset-inline-start: 3px; color: var(--amber-deep); font-weight: 700; }
+  .refs a { word-break: break-word; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; color: var(--ink); }
+
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar, .footer { padding-left: 20px; padding-right: 20px; }
+    .wrap { padding-left: 20px; padding-right: 20px; }
+    .hero { padding: 40px 20px 44px; }
+    .hero h1 { font-size: 34px; }
+    .hero-logo { width: 168px; }
+    .hero .standfirst { font-size: 17.5px; }
+    .body { font-size: 17.5px; }
+    .figrow, .figrow.three { grid-template-columns: 1fr; gap: 22px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .pullquote { font-size: 22px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reel .frames img { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> · <span class="accent" data-en="Mathematical Culture" data-fa="فرهنگ ریاضی"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#4E8D6B;display:inline-block;flex:0 0 auto;"></span><span data-en="A report · for everyone" data-fa="گزارش · برای همه"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article data-lang-block="en">
+  <div class="hero">
+    <div class="hero-inner">
+      <img class="hero-logo" src="../assets/wim/wim-logo-full.png" alt="Women in Mathematics Event">
+      <div class="kicker">A report from the organizers</div>
+      <h1>Women in Mathematics Event</h1>
+      <p class="standfirst">You would think that marking Women in Mathematics Day — at the very faculty where Maryam Mirzakhani once studied — might be simple. Think again.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="byline">
+      <img class="avatar" src="../assets/wim/wim-logo-mark.png" alt="Women in Mathematics Event">
+      <div>
+        <div class="name">Farnaz Haj Manouchehri &amp; Bamdad Torabi</div>
+        <div class="meta">Organizing team · Hamband Scientific Association, Faculty of Mathematical Sciences, Sharif University of Technology · 1402–1404</div>
+      </div>
+    </div>
+
+    <a class="companion" href="mathematical-culture.html">
+      <img class="cico" src="../assets/wim/wim-logo-mark.png" alt="">
+      <div>
+        <div class="c-lab">In this section</div>
+        <div class="c-title">The journal's Maryam Mirzakhani gallery</div>
+      </div>
+      <span class="c-arrow"></span>
+    </a>
+
+    <div class="body">
+      <p>Perhaps the most important legacy Iran has left the world is a creative, artful mathematician who, in 2014, on winning the Fields Medal, became a name on the lips of mathematicians everywhere. Maryam Mirzakhani did mathematics in such a way that, to this day, researchers and enthusiasts plunge into the dense forest of mathematics in her memory — and, walking its winding paths, keep in mind the wonders she raised there in her lifetime. We at Sharif — one of the way-stations of this comet — decided that, by honouring her over these years, we might say a little more than the rest, and let what was in our hearts be heard.</p>
+
+      <h2 class="subhead">It began on a whiteboard</h2>
+      <p>The work began in Bahman 1402. The fever of the protests had subsided some time before, and we — in the Hamband Scientific Association of Sharif's Faculty of Mathematical Sciences — were looking for programmes that could bring students together and return a sense of common colour to the residents of this old, tired faculty. We realised that, for one reason or another — the protests, the spread of COVID, and the rest — in all these years we had never held a truly grand commemoration for Maryam. Time was short, so we quickly gathered a team of eager students and, as the event's secretaries, set to planning.</p>
+
+      <figure>
+        <img src="../assets/wim/wimr-wb1.jpg" alt="The founding whiteboard: the schedule of the days, the speakers' names, and a student doodle">
+        <figcaption><b>Where it began.</b> The founding plan — the days, the speakers' names, the doodles — on the whiteboard of the Hamband room.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-org-a.jpg" alt="The first-edition organizers on the stage">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-org-b.jpg" alt="The first-edition organizers gathered for a photo">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>The organizers of the first edition.</b></figcaption>
+      </figure>
+
+      <p>Beyond the "natural" trials — the invitation emails to prospective speakers, nine in ten of which went unanswered; the hunt for sponsors, which hit a wall about nine and a half times in ten — the constant stone-throwing by hands behind the scenes pushed us, more than once, to the very edge of abandoning the decision we had made. But in the end, with thanks to everyone you will read about in the acknowledgements, we held the first Women in Mathematics event, on the 19th, 21st and 22nd of Ordibehesht 1403 — and, more seasoned and better prepared, we held the second the next year, on the 18th to the 22nd of Ordibehesht 1404. What you are reading is the story of our efforts across those two years.</p>
+
+      <div class="filmwrap" style="margin:30px 0;">
+        <div style="position:relative;width:100%;aspect-ratio:16/9;background:var(--black);border:1px solid var(--line);border-radius:5px;overflow:hidden;">
+          <iframe src="https://drive.google.com/file/d/1GAux7anDNntcmUax7AVPWDk5F-RW-MVK/preview" allow="autoplay; fullscreen" allowfullscreen loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0;display:block;" title="Programme teaser — Women in Mathematics"></iframe>
+        </div>
+        <p class="figcap-wide"><b>The programme teaser.</b> Made to open the event.</p>
+      </div>
+
+      <h2 class="subhead">Why the 22nd of Ordibehesht</h2>
+      <p>The 22nd of Ordibehesht — Maryam Mirzakhani's birthday — is marked around the world as Women in Mathematics Day. Wherever the day is kept, the focus usually falls on a few axes: the difficulties women face in academic life; Maryam's own life, mathematics and path; and beautiful mathematics for its own sake. We tried to hold all three — but we were after something more: something that rose out of our own lived experience in the faculty of mathematics. What we felt was an unbreakable bond that drew us together — on Yalda night, in the seminars, in a dozen other programmes — regardless of gender or religion or race: a kind of connectedness. Perhaps it is no accident that our mathematics association is named Hamband — "connected." We wanted to share that experience with the world beyond the faculty, and what better occasion than Maryam's birthday — which is itself a kind of celebration of common colour and unity, for the advance of science, and of mathematics above all.</p>
+
+      <figure>
+        <img src="../assets/wim/wimr-banner-a.jpg" alt="The event banner standing on the campus grounds">
+        <figcaption>The banner, on the grounds in the lower part of the campus.</figcaption>
+      </figure>
+
+      <h2 class="subhead">Year one: three days</h2>
+      <p>The three-day event hosted a series of scientific talks and presentations, interviews and discussion panels, taking up questions of research and teaching. From well-known professors to eager students, those who came found a rare chance to trade experiences and views. The first day was held in the amphitheatre of the Institute for Research in Fundamental Sciences (IPM), in hybrid form, with talks by Dr. Amir Asghari, Dr. Sara Faridi and Dr. Tina Torkaman.</p>
+
+      <figure class="ph">
+        <img loading="lazy" decoding="async" src="../assets/wim/wimr-prep-a.jpg" alt="Lanyards and badges hung ready on the wall">
+        <figcaption><b>Getting ready.</b> The lanyards, hung and waiting.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-talk-a.jpg" alt="A speaker projected on the amphitheatre screen">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hall-c.jpg" alt="The audience during a talk">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hall-d.jpg" alt="The audience during a talk">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-bts-a.jpg" alt="A crew member at the vision-mixing console">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-bts-c.jpg" alt="A group of students posing behind the scenes">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-bts-d.jpg" alt="Students talking during a break">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>The first day — in the hall, and behind it.</b> Talks by Amir Asghari, Sara Faridi and Tina Torkaman; the audience; and the crew that kept it running.</figcaption>
+      </figure>
+
+      <figure class="lead ph">
+        <img src="../assets/wim/wimr-team1.jpg" alt="The first-year team in matching shirts before the event backdrop">
+        <figcaption><b>The first-year team.</b></figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-together-a.jpg" alt="Team members with the event trophy">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-together-b.jpg" alt="A group photo of the team on stage">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-together-c.jpg" alt="A large group photo of the participants in the hall">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>Together, year one.</b></figcaption>
+      </figure>
+
+      <p>On the second day — online — the event hosted prominent figures from Iran and abroad, among them Dr. Soheila Feyzbakhsh, Dr. Fatemeh Zare, Dr. Farzaneh Derakhshan, and Dr. Timothy Gowers, a Fields medalist.</p>
+
+      <div class="figrow three">
+        <figure class="shot"><img loading="lazy" decoding="async" src="../assets/wim/wimr-feyzbakhsh.jpg" alt="An online talk: slide reading Stability Conditions on Triangulated Categories"></figure>
+        <figure class="shot"><img loading="lazy" decoding="async" src="../assets/wim/wimr-derakhshan.jpg" alt="An online talk: slide reading Logic, Computer Science, and Powerful Women, Farzaneh Derakhshan"></figure>
+        <figure class="shot"><img loading="lazy" decoding="async" src="../assets/wim/wimr-gowers.jpg" alt="An online talk: slide reading The hidden structure of sumsets, W. T. Gowers"></figure>
+      </div>
+      <p class="figcap-wide"><b>Day two, online.</b> Soheila Feyzbakhsh (stability conditions); Farzaneh Derakhshan (logic &amp; computer science, Illinois Institute of Technology); and W. T. Gowers (the hidden structure of sumsets, Collège de France &amp; Cambridge).</p>
+
+      <p>The final day was hybrid, in the amphitheatre of Sharif University of Technology, with talks by Dr. Artan Sheshmani, Dr. Sharareh Alipour and Dr. Ramin Takloo-Bighash. It closed with a clip recorded for us by Jan Vondrák — Maryam's husband — about her life and her path, followed by live music and refreshments.</p>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-final-a.jpg" alt="The Sharif stage, the event logo projected behind the podium">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-final-b.jpg" alt="The Sharif amphitheatre, full, seen from the stage">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-final-c.jpg" alt="A talk projected on the amphitheatre screen">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>The final day, at Sharif.</b> The amphitheatre, and Maryam's likeness rendered as a lattice.</figcaption>
+      </figure>
+
+      <figure class="med shot">
+        <img loading="lazy" decoding="async" src="../assets/wim/wimr-vondrak.jpg" alt="A recorded clip of Jan Vondrak projected on the stage screen">
+        <figcaption><b>Jan Vondrák</b>, Maryam's husband, in a clip recorded for the event about her life and her path.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-music-a.jpg" alt="A musician playing the daf on stage beneath the projected logo">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-music-b.jpg" alt="The live-music ensemble on stage">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-music-c.jpg" alt="The live-music ensemble performing">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>Live music</b>, to close the first year.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-keepsakes.jpg" alt="Keepsake photographs of participants laid out on a table">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-close-a.jpg" alt="Participants gathering at the mementos table">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-close-b.jpg" alt="Hands arranging the gift boxes">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>Keepsakes.</b> Each guest was photographed with the standee; the prints were laid out to take home.</figcaption>
+      </figure>
+
+      <h2 class="subhead">And again, a second year</h2>
+      <p>In Khordad 1403, after the scientific-association elections, we both stepped back from the central council. But thanks to the new council's efforts — and for want of anyone else to run it again! — by Dey we found ourselves in familiar circumstances: a team to gather, emails to send, frantic calls to answer in search of sponsors. With great difficulty, trading in-person content for more online talks, we found room to host more guests and to hold the programme a second time — on the 18th to the 22nd of Ordibehesht 1404.</p>
+
+      <figure>
+        <img src="../assets/wim/wimr-wb2.jpg" alt="The second-year planning whiteboard, covered in notes">
+        <figcaption><b>Back to the whiteboard.</b> Planning the second year.</figcaption>
+      </figure>
+
+      <p>The first part, from the 18th to the 20th, ran online across eight talks, with speakers including Dr. Nazhla Aghaei, Fatemeh Seyyed-Salehi, Nazanin Roshandel-Tavana, Dusa McDuff, Khadijeh Nedaei-Asl, Zahra Reshadat, Claire Voisin and Marie-Françoise Roy. The second part, on the closing day — the 22nd — was held in person in the Jaber ibn Hayyan hall at Sharif. It opened with a talk by Dr. Ali Kamalinejad; live music made the room warm; and Kimia Farhani, the last guest, spoke on the gender gaps in science.</p>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-sign.jpg" alt="A student putting up a Women in Mathematics Event sign on a brick wall">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-b.jpg" alt="A phone photographing the event logo on screen">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-c.jpg" alt="Students gathering on the stairs">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>Putting it up.</b> The signs, around the faculty.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-a.jpg" alt="The podium and standee in the Jaber ibn Hayyan hall">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-d.jpg" alt="A host speaking at the podium">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-e.jpg" alt="The audience in the wood-panelled hall">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-f.jpg" alt="The closing stage with music and the projected logo">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-g.jpg" alt="The live-music ensemble on the closing day">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>The closing day, in the Jaber ibn Hayyan hall.</b></figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-spk-a.jpg" alt="A speaker at the podium with the Sharif emblem">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-spk-b.jpg" alt="Two hosts at the podium">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>At the podium.</b> The closing day's hosts and speakers.</figcaption>
+      </figure>
+
+      <p>At the end, over a modest spread of doughnuts — an embodiment of the tori so loved in Maryam's work — we doubled the sweetness of the day. All through it, many students told us how the programme was growing in quality, and we hoped to keep it as a splendid annual tradition of the faculty.</p>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-donuts-a.jpg" alt="Doughnuts arranged on trays">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-donuts-b.jpg" alt="Participants taking doughnuts">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>Doughnuts</b> — the tori so loved in Maryam's world.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-bags.jpg" alt="Women in Mathematics Event tote bags on a table">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-crowd.jpg" alt="The crowd in the brick hall">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-grp.jpg" alt="A group seated in the auditorium">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>Totes, and the hall.</b></figcaption>
+      </figure>
+
+      <h2 class="subhead">The third year</h2>
+      <p>In the third year, our strength did not match what was being imposed on us from outside the university, and with the faculty's continual closures we could not hold the programme. As we talked over how it might run in years to come — without us as secretaries — we came to see where its strengths and weaknesses lay, and, above all, why its continuation must always stay on the association's agenda. From the first year to the second we had seen the scientific quality of the talks rise; seen the executive, technical and financial machinery managed better; seen the whole thing grow more organised and more stable; and seen how the joy of making and running such a programme can spread through the coming generations of the faculty until it becomes a shared, almost universal delight. We had also come to understand, fully, how much damage a saboteur can do — from the highest administrative level down to the student level — how far one must go to kindle in friends, students and even professors the desire to take part, and how much the work of building a common language across the student body still remains.</p>
+
+      <div class="pullquote">In the third year, our strength did not match what was being imposed on us <span class="mark">from outside the university.</span></div>
+
+      <figure class="ph">
+        <img src="../assets/wim/wimr-box.jpg" alt="A battered collection box outside the mathematics faculty">
+        <figcaption><b>Outside the faculty.</b></figcaption>
+      </figure>
+      <p class="aside">It is no wonder that the box outside the mathematics faculty has ended up the way it has.</p>
+
+      <h2 class="subhead">Our thanks</h2>
+      <p>Many people, from many backgrounds, helped run these two years. Every presenter left us memories we will not have again; we are especially, endlessly grateful to the dear Amir Asghari, who in both years never once withheld his help, in matters large and small. We thank, with all our hearts, every student who stood beside us on the scientific, executive, graphic, technical and cultural committees — the air of those days still holds our best and sweetest hours, and without any one of them we could not, for a single moment, have imagined holding such a thing. And we thank the professors who backed us without expecting anything in return, the hosts who carried the sessions, and everyone, great and small, who sat with us over our programmes.</p>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-a.jpg" alt="Students setting up the water dispensers">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-b.jpg" alt="Two organizers working at a laptop">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-c.jpg" alt="The audience laughing during a talk">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-d.jpg" alt="A hand taking notes in a notebook">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-e.jpg" alt="A camera on a tripod recording the event">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-crowd.jpg" alt="A crowd of students in the hall between talks">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-f.jpg" alt="The crowd by the standee at the hall entrance">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-g.jpg" alt="A student's bandaged hand, still at work by the event backdrop">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>So many hands.</b> The people — on the scientific, executive, graphic, technical and cultural committees — who made it run.</figcaption>
+      </figure>
+
+      <p>The Women in Mathematics event is not a thing whose feeling can be put into words. It took many people to hold — and in the end it gave many more, of every kind, several times as many memories and feelings that cannot be replaced. Our human world is still far from laying down its quarrels and misreadings; there is still so much pain to cry out against before a better tomorrow can even be imagined. And yet, to see a single voice and a real unity in the middle of so vast a community is itself a force pushing the world around us toward better. Our hope is only this: that more of us — academics, mathematicians, researchers, the simply curious — will look to Maryam's storied path and hear her call, clear and whole, from the high peaks of striving; so that our tomorrow, in all our many colours, might go forward just this alive, and just this united.</p>
+
+      <figure class="lead ph">
+        <img loading="lazy" decoding="async" src="../assets/wim/wimr-team2.jpg" alt="A group photograph of the team, together, at the end">
+        <figcaption><b>Perhaps until another time.</b></figcaption>
+      </figure>
+
+      <div class="ednote">
+        <b>About this report.</b> Text and photographs by Farnaz Haj Manouchehri and Bamdad Torabi, from the organizing team. Edited by Amir Asghari — who took the “Dr.” off the front of his own name and added “the dear” to the end. :)
+      </div>
+
+      <div class="colophon">
+        <div class="roles">
+          <div class="role">
+            <div class="lab">Report</div>
+            <div class="who">Farnaz Haj Manouchehri &amp; Bamdad Torabi</div>
+            <div class="aff">Organizing team, Hamband Scientific Association, Faculty of Mathematical Sciences, Sharif University of Technology.</div>
+          </div>
+          <div class="role">
+            <div class="lab">Honouring</div>
+            <div class="who">Maryam Mirzakhani (1977–2017)</div>
+            <div class="aff">Fields Medal, 2014. Her birthday, the 22nd of Ordibehesht, is Women in Mathematics Day.</div>
+          </div>
+          <div class="role">
+            <div class="lab">Two editions</div>
+            <div class="who">Ordibehesht 1403 &amp; 1404</div>
+            <div class="aff">Spring 2024 &amp; 2025 · Tehran.</div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="subhead">On the world's calendar</h2>
+      <p>Both editions are registered with the (12&nbsp;May) Committee for Women in Mathematics — the worldwide list of Women in Mathematics Day events. Each edition's poster and listing are below.</p>
+      <div class="figrow">
+        <figure>
+          <a href="https://may12.womeninmaths.org/node/1227" target="_blank" rel="noopener"><img loading="lazy" src="https://may12.womeninmaths.org/sites/default/files/2024-05/%D9%BE%D9%88%D8%B3%D8%AA%D8%B1%20%D9%86%D9%87%D8%A7%DB%8C%DB%8C2-min.png" alt="Poster of the first Women in Mathematics event, Sharif University, 2024"></a>
+        </figure>
+        <figure>
+          <a href="https://may12.womeninmaths.org/node/1504" target="_blank" rel="noopener"><img loading="lazy" src="https://may12.womeninmaths.org/sites/default/files/2025-05/IMG_20250510_111419_585.jpg" alt="Poster of the second Women in Mathematics event, Sharif University, 2025"></a>
+        </figure>
+      </div>
+      <p class="figcap-wide"><b>The two editions on the world's calendar.</b> Left — the first edition (1403 / 2024, three days), <a href="https://may12.womeninmaths.org/node/1227">may12 · node/1227</a>. Right — the second (1404 / 2025, four days), <a href="https://may12.womeninmaths.org/node/1504">may12 · node/1504</a>.</p>
+
+      <div class="refs">
+        <h3>Links</h3>
+        <ul>
+          <li>Women in Mathematics Event — <a href="https://www.womeninmathematics.ir/">womeninmathematics.ir</a></li>
+          <li>The first edition (2024), on the (12&nbsp;May) Committee for Women in Mathematics list — <a href="https://may12.womeninmaths.org/node/1227">node/1227</a></li>
+          <li>The second edition (2025), on the same list — <a href="https://may12.womeninmaths.org/node/1504">node/1504</a></li>
+          <li>Institute for Research in Fundamental Sciences (IPM) — <a href="https://www.ipm.ac.ir/">ipm.ac.ir</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="hero">
+    <div class="hero-inner">
+      <img class="hero-logo" src="../assets/wim/wim-logo-full.png" alt="رویدادِ زن در ریاضیات">
+      <div class="kicker">گزارشی از برگزارکنندگان</div>
+      <h1>رویدادِ زن در ریاضیات</h1>
+      <p class="standfirst">اگر گمان می‌کنید برگزاریِ روزِ زن در ریاضیات در نخستین دانشکده‌ای که مریم میرزاخانی در آن درس خوانده بود کارِ آسانی است، دوباره فکر کنید.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="byline">
+      <img class="avatar" src="../assets/wim/wim-logo-mark.png" alt="رویدادِ زن در ریاضیات">
+      <div>
+        <div class="name">فرناز حاج‌منوچهری و بامداد ترابی</div>
+        <div class="meta">تیمِ برگزاری · انجمنِ علمیِ همبند، دانشکده‌ی علوم ریاضیِ دانشگاه صنعتی شریف · ۱۴۰۲ تا ۱۴۰۴</div>
+      </div>
+    </div>
+
+    <a class="companion" href="mathematical-culture.html">
+      <img class="cico" src="../assets/wim/wim-logo-mark.png" alt="">
+      <div>
+        <div class="c-lab">در همین بخش</div>
+        <div class="c-title">نگارخانه‌ی مریم میرزاخانیِ مجله</div>
+      </div>
+      <span class="c-arrow"></span>
+    </a>
+
+    <div class="body">
+      <p>شاید یکی از مهم‌ترین میراثی که ایران در جهان به‌جای گذاشته باشد، ریاضی‌دانِ خلاق و هنرمندی بود که در سالِ ۲۰۱۴، به‌سببِ بردنِ مدالِ فیلدز، بر سرِ زبانِ همه‌ی ریاضی‌کارانِ جهان افتاد. مریم میرزاخانی چنان ریاضی ورزید که تا به امروز، بسیاری از پژوهشگران و علاقه‌مندان به یادِ او به دلِ جنگلِ انبوهِ ریاضیات زده‌اند و در پیمایشِ مسیرهای پرپیچ‌وخم، به یادِ شگفتی‌هایی بوده‌اند که او در طولِ عمرش در همین جنگل پدید آورده بود. ما در دانشگاهِ شریف، یکی از توقف‌گاه‌های این ستاره‌ی دنباله‌دار، تصمیم گرفتیم با بزرگداشتِ او در این سال‌ها، حرفی بیشتر از بقیه بزنیم و حرفِ دلمان را به گوشِ بقیه برسانیم.</p>
+
+      <h2 class="subhead">همه چیز از یک تخته‌وایت شروع شد</h2>
+      <p>کار از بهمنِ سالِ ۱۴۰۲ شروع شد؛ تب‌وتابِ اعتراضات چندی بود که خوابیده بود و ما در انجمنِ علمیِ همبند، متعلق به دانشکده‌ی علوم ریاضیِ دانشگاه شریف، به دنبالِ برگزار کردنِ برنامه‌هایی بودیم که بتواند دانشجوها را گردِ هم بیاورد و بوی همرنگی را به ساکنانِ این دانشکده‌ی قدیمی و خسته برگرداند. متوجه شدیم به عللِ مختلف (اعتراضات، فراگیریِ ویروسِ کرونا و …) در تمامِ این سال‌ها هرگز بزرگداشتِ پرشکوهی برای مریم برگزار نکرده‌ایم. چون وقت هم تنگ بود، سریعاً تیمی از دانشجوهای پرشور و شوق جمع کردیم و به‌عنوانِ دبیرانِ این رویداد به برنامه‌ریزی پرداختیم.</p>
+
+      <figure>
+        <img src="../assets/wim/wimr-wb1.jpg" alt="تخته‌وایتِ آغازین: برنامه‌ی روزها، نامِ سخنرانان و یک خط‌خطیِ دانشجویی">
+        <figcaption><b>جایی که آغاز شد.</b> نقشه‌ی نخست — روزها، نامِ سخنرانان و خط‌خطی‌ها — روی تخته‌وایتِ اتاقِ همبند.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-org-a.jpg" alt="سردبیرانِ دوره‌ی نخست روی صحنه">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-org-b.jpg" alt="سردبیرانِ دوره‌ی نخست کنارِ هم">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>جمعی از سردبیرانِ اولین دوره.</b></figcaption>
+      </figure>
+
+      <p>علاوه بر امورِ «طبیعی» — از قبیلِ ای‌میل‌های دعوت به ارائه‌دهنده‌های احتمالی که از هر ده تا ۹ تا بی‌پاسخ می‌ماند، و پیدا کردنِ اسپانسر که از هر ده تا نه‌ونیم تا به سنگ می‌خورد — سنگ‌اندازی‌های فراوانِ دست‌های پشتِ پرده، بارها ما را تا مرزِ انصراف از تصمیمی که گرفته بودیم پیش برد. اما در نهایت، با سپاس از همهٔ آن‌هایی که در بخشِ سپاس‌ها خواهید خواند، اولین رویدادِ زن در ریاضیات را در تاریخ‌های ۱۹، ۲۱ و ۲۲ اردیبهشتِ ۱۴۰۳ برگزار کردیم؛ و حتی حرفه‌ای‌تر و آماده‌تر، دومین آن را هم سالِ بعد در تاریخ‌های ۱۸ تا ۲۲ اردیبهشتِ ۱۴۰۴ برگزار کردیم. شما در حالِ خواندنِ داستانِ تلاش‌های ما در این دو سال هستید.</p>
+
+      <div class="filmwrap" style="margin:30px 0;">
+        <div style="position:relative;width:100%;aspect-ratio:16/9;background:var(--black);border:1px solid var(--line);border-radius:5px;overflow:hidden;">
+          <iframe src="https://drive.google.com/file/d/1GAux7anDNntcmUax7AVPWDk5F-RW-MVK/preview" allow="autoplay; fullscreen" allowfullscreen loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0;display:block;" title="تیزرِ برنامه — رویدادِ زن در ریاضیات"></iframe>
+        </div>
+        <p class="figcap-wide"><b>تیزرِ برنامه.</b> که برای آغازِ رویداد ساخته شد.</p>
+      </div>
+
+      <h2 class="subhead">چرا ۲۲ اردیبهشت</h2>
+      <p>روزِ ۲۲ اردیبهشت — زادروزِ مریم میرزاخانی — در سراسرِ جهان روزِ «زن در ریاضیات» نام گرفته است. در اغلبِ کشورها و دانشگاه‌هایی که این بزرگداشت انجام می‌شود، تمرکز معمولاً بر چند محورِ اصلی قرار می‌گیرد: معضلات و مشکلاتِ زنان در فضای دانشگاهی؛ زندگی و ریاضیات و مسیرِ آکادمیکِ خودِ مریم؛ و مباحثِ ریاضیاتیِ جذاب. ما سعی کردیم هر سه‌ی این موضوعات را در برنامه به‌ هر نحوی داشته باشیم؛ اما ما به دنبالِ چیزی بیشتر از این بودیم — چیزی که از دلِ تجربه‌ی زیسته‌ی ما در دانشکده‌ی ریاضی برخاسته باشد. آنچه ما تجربه می‌کردیم پیوندی ناگسستنی بود که ما را در شبِ یلدا، در ارائه‌های علمی و در برنامه‌های گوناگونِ دیگر — صرف‌نظر از جنسیت یا دین یا نژاد — گردِ هم می‌آورد؛ نوعی همبندی. شاید بی‌دلیل نیست که نامِ انجمنِ ریاضی‌مان همبند است. ما به دنبالِ آن بودیم که این تجربه را با بیرون از دانشکده‌ی ریاضی به اشتراک بگذاریم؛ و چه بهانه‌ای بهتر از تولدِ مریم — که خود به‌نوعی بزرگداشتِ یکرنگی و وحدت است، برای پیش‌بردِ علم و به‌خصوص ریاضیات.</p>
+
+      <figure>
+        <img src="../assets/wim/wimr-banner-a.jpg" alt="بنرِ رویداد در محوطه‌ی دانشگاه">
+        <figcaption>بنر، در محوطه‌ی پایینِ دانشگاه.</figcaption>
+      </figure>
+
+      <h2 class="subhead">سالِ نخست: سه روز</h2>
+      <p>این رویدادِ سه‌روزه میزبانِ مجموعه‌ای از سخنرانی‌ها و ارائه‌های علمی، مصاحبه و پنل‌های گفت‌وگومحور بود که به بررسیِ موضوعاتِ پژوهشی و آموزشی می‌پرداخت. شرکت‌کنندگان، از اساتیدِ سرشناس تا دانشجویانِ مشتاق، فرصتی بی‌نظیر برای تبادلِ تجربیات و نظراتِ خود یافتند. اولین روزِ رویداد در سالنِ آمفی‌تئاترِ پژوهشگاهِ دانش‌های بنیادی (IPM) به‌صورتِ هیبرید (حضوری و مجازی) با ارائه‌های دکتر امیر اصغری، دکتر سارا فریدی و دکتر تینا ترکمان برگزار شد.</p>
+
+      <figure class="ph">
+        <img loading="lazy" decoding="async" src="../assets/wim/wimr-prep-a.jpg" alt="کارت‌ها و بندهای گردنی، آماده روی دیوار">
+        <figcaption><b>آماده‌سازی.</b> بندهای گردنی، آماده و منتظر.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-talk-a.jpg" alt="سخنرانی که روی پرده‌ی آمفی‌تئاتر تابانده شده">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hall-c.jpg" alt="تماشاگران در حینِ سخنرانی">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hall-d.jpg" alt="تماشاگران در حینِ سخنرانی">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-bts-a.jpg" alt="یکی از عوامل پشتِ میزِ تصویربرداری">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-bts-c.jpg" alt="گروهی از دانشجوها پشتِ صحنه">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-bts-d.jpg" alt="گفت‌وگوی دانشجوها در فاصله‌ی برنامه">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>روزِ نخست — در سالن و پشتِ صحنه.</b> ارائه‌های امیر اصغری، سارا فریدی و تینا ترکمان؛ تماشاگران؛ و عواملی که برنامه را می‌گرداندند.</figcaption>
+      </figure>
+
+      <figure class="lead ph">
+        <img src="../assets/wim/wimr-team1.jpg" alt="تیمِ سالِ نخست با تیشرت‌های هم‌رنگ، جلوی بک‌دراپِ رویداد">
+        <figcaption><b>تیمِ سالِ نخست.</b></figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-together-a.jpg" alt="اعضای تیم با تندیسِ رویداد">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-together-b.jpg" alt="عکسِ گروهیِ تیم روی صحنه">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-together-c.jpg" alt="عکسِ دسته‌جمعیِ بزرگ از شرکت‌کنندگان در سالن">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>کنارِ هم، سالِ نخست.</b></figcaption>
+      </figure>
+
+      <p>در دومین روز، رویداد به‌صورتِ آنلاین میزبانِ جمعی از چهره‌های مطرحِ بین‌المللی و ملی در ریاضیات بود؛ از جمله دکتر سهیلا فیض‌بخش، دکتر فاطمه زارع، دکتر فرزانه درخشان و دکتر تیموتی گاورز (برنده‌ی مدالِ فیلدز).</p>
+
+      <div class="figrow three">
+        <figure class="shot"><img loading="lazy" decoding="async" src="../assets/wim/wimr-feyzbakhsh.jpg" alt="سخنرانیِ آنلاین: اسلایدِ شرایطِ پایداری روی رسته‌های مثلثی"></figure>
+        <figure class="shot"><img loading="lazy" decoding="async" src="../assets/wim/wimr-derakhshan.jpg" alt="سخنرانیِ آنلاین: اسلایدِ منطق، علوم کامپیوتر و زنانِ توانمند، فرزانه درخشان"></figure>
+        <figure class="shot"><img loading="lazy" decoding="async" src="../assets/wim/wimr-gowers.jpg" alt="سخنرانیِ آنلاین: اسلایدِ ساختارِ پنهانِ مجموعه‌جمع‌ها، گاورز"></figure>
+      </div>
+      <p class="figcap-wide"><b>روزِ دوم، آنلاین.</b> سهیلا فیض‌بخش (شرایطِ پایداری)؛ فرزانه درخشان (منطق و علوم کامپیوتر، دانشگاهِ صنعتیِ ایلینوی)؛ و تیموتی گاورز (ساختارِ پنهانِ مجموعه‌جمع‌ها، کلژ دو فرانس و کمبریج).</p>
+
+      <p>روزِ نهاییِ همایش به‌صورتِ هیبرید در سالنِ آمفی‌تئاترِ دانشگاه صنعتی شریف با سخنرانیِ استادانی همچون دکتر آرتان ششمانی، دکتر شراره علیپور و دکتر رامین تکلوبیغش گذشت. این برنامه با پخشِ کلیپی از یان وندراک (همسرِ مریم میرزاخانی) درباره‌ی زندگی و مسیرِ مریم — که به‌صورتِ اختصاصی برای ما ضبط و ارسال کرده بود — و همچنین اجرای موسیقیِ زنده و پذیرایی از شرکت‌کنندگان به اتمام رسید.</p>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-final-a.jpg" alt="صحنه‌ی شریف، نشانِ رویداد پشتِ تریبون تابانده شده">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-final-b.jpg" alt="آمفی‌تئاترِ پرِ شریف، از صحنه">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-final-c.jpg" alt="سخنرانی که روی پرده‌ی آمفی‌تئاتر تابانده شده">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>روزِ پایانی، در شریف.</b> سالنِ آمفی‌تئاتر، و نقشِ مریم به‌شکلِ یک شبکه.</figcaption>
+      </figure>
+
+      <figure class="med shot">
+        <img loading="lazy" decoding="async" src="../assets/wim/wimr-vondrak.jpg" alt="کلیپی از یان وندراک که روی پرده‌ی صحنه پخش می‌شود">
+        <figcaption><b>یان وندراک</b>، همسرِ مریم، در کلیپی که برای رویداد درباره‌ی زندگی و مسیرِ او ضبط شد.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-music-a.jpg" alt="نوازنده‌ی دف روی صحنه، زیرِ نشانِ تابانده‌شده">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-music-b.jpg" alt="گروهِ موسیقیِ زنده روی صحنه">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-music-c.jpg" alt="اجرای گروهِ موسیقیِ زنده">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>موسیقیِ زنده</b>، برای بستنِ سالِ نخست.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-keepsakes.jpg" alt="عکس‌های یادگاریِ شرکت‌کنندگان که روی میز چیده شده‌اند">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-close-a.jpg" alt="شرکت‌کنندگان کنارِ میزِ یادگاری‌ها">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-close-b.jpg" alt="دستانی در حالِ چیدنِ جعبه‌های هدیه">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>یادگاری‌ها.</b> از هر مهمان کنارِ استند عکسی گرفته شد و چاپ‌ها روی میز چیده شدند تا با خود ببرند.</figcaption>
+      </figure>
+
+      <h2 class="subhead">و بارِ دیگر، سالِ دوم</h2>
+      <p>خردادِ ۱۴۰۳، پس از انتخاباتِ انجمن‌های علمی، هر دو از شورای مرکزیِ انجمن کنار کشیدیم؛ اما به لطفِ شورای جدید و تلاش‌های آن‌ها (و به‌علتِ فقدانِ کاندیداهای دیگر برای برگزاریِ دوباره‌ی این برنامه!) ما دوباره خودمان را در دی‌ماه با شرایطی مشابه می‌دیدیم: تیمی که باید جمع می‌شد، ایمیل‌هایی که باید زده می‌شد، زنگ‌های پرسراسیمه‌ای که برای جذبِ اسپانسرها باید جواب داده می‌شد و …! با سختیِ فراوان، و با کم‌کردنِ محتوای حضوری در ازای سخنرانی‌های مجازیِ بیشتر، فرصت پیدا کردیم تا مهمان‌های بیشتری را پذیرا باشیم و برنامه را برای سالِ دوم برگزار کنیم؛ در روزهای ۱۸ تا ۲۲ اردیبهشتِ ۱۴۰۴.</p>
+
+      <figure>
+        <img src="../assets/wim/wimr-wb2.jpg" alt="تخته‌وایتِ برنامه‌ریزیِ سالِ دوم، پر از یادداشت">
+        <figcaption><b>بازگشت به تخته!</b> برنامه‌ریزیِ سالِ دوم.</figcaption>
+      </figure>
+
+      <p>بخشِ اول، از ۱۸ تا ۲۰ اردیبهشت، با هشت سخنرانیِ علمی به‌صورتِ مجازی برگزار شد؛ با سخنرانانی همچون دکتر نژلا آقایی، فاطمه سیدصالحی، نازنین روشندلِ توانا، دوسا مک‌داف، خدیجه ندائی‌اصل، زهرا رشادت، کلر ووآزن و ماری‌فرانسواز روی. بخشِ دوم، در روزِ پایانی — ۲۲ اردیبهشت — به‌صورتِ حضوری در سالنِ جابربن‌حیانِ دانشگاه صنعتی شریف برگزار شد. این گردهمایی با سخنرانیِ دکتر علی کمالی‌نژاد آغاز شد؛ اجرای موسیقیِ زنده فضایی صمیمی ساخت؛ و خانم کیمیا فرهانی، به‌عنوانِ آخرین مهمان، سخنرانی‌اش را با موضوعِ شکاف‌های جنسیتی در علم ارائه داد.</p>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-sign.jpg" alt="دانشجویی در حالِ نصبِ بنرِ رویدادِ زن در ریاضیات روی دیوارِ آجری">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-b.jpg" alt="عکس‌گرفتن از نشانِ رویداد روی صفحه‌ی نمایش با تلفن">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-c.jpg" alt="گردِ هم آمدنِ دانشجوها روی پله‌ها">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>نصبِ بنرها</b>، در دانشکده.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-a.jpg" alt="تریبون و استند در سالنِ جابربن‌حیان">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-d.jpg" alt="مجری در حالِ صحبت پشتِ تریبون">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-e.jpg" alt="تماشاگران در سالنِ چوب‌پوش">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-f.jpg" alt="صحنه‌ی پایانی با موسیقی و نشانِ تابانده‌شده">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-g.jpg" alt="گروهِ موسیقیِ زنده در روزِ پایانی">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>روزِ پایانی، در سالنِ جابربن‌حیان.</b></figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-spk-a.jpg" alt="سخنران پشتِ تریبون، با نشانِ شریف">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-spk-b.jpg" alt="دو مجری پشتِ تریبون">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>پشتِ تریبون.</b> مجری‌ها و سخنرانانِ روزِ پایانی.</figcaption>
+      </figure>
+
+      <p>در پایان، با پذیراییِ مختصر از دونات‌ها — تجسمی از چنبره‌های محبوب در کارهای مریم — شیرینیِ این رویداد را دوچندان کردیم. در طولِ برگزاری، بسیاری از دانشجویانِ علاقه‌مند کیفیتِ فزاینده‌ی برنامه را به گوشِ ما رساندند و امیدوار بودیم که بتوانیم این رویداد را به رویدادی سالانه و باشکوه، به‌عنوانِ سنتی از دانشکده، نگه داریم.</p>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-donuts-a.jpg" alt="دونات‌ها روی سینی‌ها">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-donuts-b.jpg" alt="برداشتنِ دونات‌ها توسطِ شرکت‌کنندگان">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>دونات‌ها</b> — چنبره‌های محبوب در جهانِ مریم.</figcaption>
+      </figure>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-bags.jpg" alt="کیف‌های رویدادِ زن در ریاضیات روی میز">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-crowd.jpg" alt="جمعیت در سالنِ آجری">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-y2-grp.jpg" alt="جمعی نشسته در سالن">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>کیف‌ها، و سالن.</b></figcaption>
+      </figure>
+
+      <h2 class="subhead">سالِ سوم</h2>
+      <p>سالِ سوم زورِ ما به آنچه از خارجِ دانشگاه به ما تحمیل می‌شد نرسید و با تعطیلی‌های مدامِ دانشکده نتوانستیم این برنامه را برگزار کنیم. در این میان که برای برگزاریِ این برنامه در سال‌های آینده (بدونِ حضورِ ما به‌عنوانِ دبیرانِ برنامه) صحبت می‌کردیم، متوجه شدیم که نقاطِ قوت و ضعفِ این برنامه کجا بود و، از همه مهم‌تر، چرا تداومِ این برنامه باید همیشه در دستورِکارِ انجمن قرار بگیرد. در جهش از سالِ اول به دوم، دیدیم که کیفیتِ علمیِ ارائه‌ها همیشه می‌تواند بهتر شود؛ دیدیم که عواملِ اجرایی و فنی و مالی را می‌توان بهتر مدیریت کرد؛ دیدیم که مدیریتِ کلیِ برنامه چطور می‌تواند مدون‌تر و باثبات‌تر شود؛ و در نهایت دیدیم که چگونه ذوقِ برگزاری و همکاری در این برنامه می‌تواند به‌سرعت در نسل‌های بعدیِ دانشکده گسترش بیابد و به ذوقی جهان‌شمول تبدیل شود. از طرفِ دیگر، به‌طورِ کامل متوجه شدیم که حضورِ عواملِ خرابکار در اجرای برنامه — از سطحِ کلان و اداری تا سطحِ دانشجویی — چقدر تأثیرگذار است؛ تا چه حد باید بتوان دوستان و دانشجویان و حتی اساتید را به شوق آورد تا در برگزاری و شرکت در برنامه روی بیاورند؛ و تا چه حد هنوز گفتمانِ وحدت‌طلبی در میانِ اقشارِ مختلفِ جامعه‌ی دانشجویی به کار نیاز دارد.</p>
+
+      <div class="pullquote">سالِ سوم، زورِ ما به آنچه <span class="mark">از بیرونِ دانشگاه</span> بر ما تحمیل می‌شد نرسید.</div>
+
+      <figure class="ph">
+        <img src="../assets/wim/wimr-box.jpg" alt="صندوقِ فرسوده‌ی جلوی دانشکده‌ی ریاضی">
+        <figcaption><b>جلوی دانشکده.</b></figcaption>
+      </figure>
+      <p class="aside">بیخود نیست که صندوقِ جلوی دانشکده‌ی ریاضی به این وضع افتاده است!</p>
+
+      <h2 class="subhead">سپاسِ ما</h2>
+      <p>در این میان، بسیاری از افراد با پیش‌زمینه‌های گوناگون به اجرای برنامه‌های این دو سال کمک کردند. تک‌تکِ ارائه‌دهندگانِ این دو سال خاطراتِ تکرارنشدنی‌ای برای ما رقم زدند؛ به‌طورِ خاص از امیر اصغریِ نازنین بی‌نهایت ممنونیم که در هر دو سال در ریز و درشتِ کارها از همکاری با ما دست نگه نداشتند. از تک‌تکِ دانشجوهایی که در کمیته‌های علمی، اجرایی، گرافیکی، فنی و فرهنگیِ برنامه کنارِ ما بودند صمیمانه متشکریم؛ فضای آن روزها هنوز هم شاملِ بهترین خاطرات و خوش‌ترین لحظه‌هاست، و بی‌شک بدونِ هرکدام از آن‌ها حتی لحظه‌ای هم نمی‌توانستیم به برگزاریِ چنین برنامه‌ای فکر کنیم. از اساتیدی که ما را بی‌چشم‌داشت حمایت کردند، مجری‌هایی که برنامه‌ها را گرداندند و تمامِ افرادِ ریز و درشتی که بر سرِ برنامه‌های ما نشستند، سپاس‌گزاریم.</p>
+
+      <figure class="reel" data-reel>
+        <div class="frames">
+          <span class="rcount"></span>
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-a.jpg" alt="دانشجوها در حالِ آماده‌سازیِ آب‌سردکن‌ها">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-b.jpg" alt="دو نفر از عوامل در حالِ کار با لپ‌تاپ">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-c.jpg" alt="خنده‌ی تماشاگران در حینِ سخنرانی">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-d.jpg" alt="دستی در حالِ یادداشت‌برداری در دفترچه">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-e.jpg" alt="دوربین روی سه‌پایه در حالِ ضبطِ رویداد">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-crowd.jpg" alt="جمعیتِ دانشجویان در سالن، میانِ سخنرانی‌ها">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-f.jpg" alt="جمعیت کنارِ استند در ورودیِ سالن">
+          <img loading="lazy" decoding="async" src="../assets/wim/wimr-hands-g.jpg" alt="دستِ باندپیچی‌شده‌ی یکی از عوامل، همچنان در کار، کنارِ بک‌دراپِ رویداد">
+        </div>
+        <div class="dots"></div>
+        <figcaption><b>این‌همه دست.</b> کسانی که در کمیته‌های علمی، اجرایی، گرافیکی، فنی و فرهنگی، برنامه را به‌پیش بردند.</figcaption>
+      </figure>
+
+      <p>رویدادِ زن در ریاضیات، برنامه‌ای نیست که بتوان حس‌وحالش را به زبان بیان کرد. این برنامه افرادِ زیادی را برای برگزاری نیاز داشت، اما در نهایت چندین برابرِ آن، برای افرادِ گوناگون، خاطره و احساساتِ بی‌بدیل پدید آورد. جهانِ ما انسان‌ها هنوز بسیار با کنار گذاشتنِ نزاع‌ها و کج‌فهمی‌ها فاصله دارد، و همچنان بسیار باید از زجر و مشکلات فریاد زد تا بتوان آینده‌ی بهتری را تصور کرد. اما در این میان، دیدنِ یک‌صدایی و وحدت در میانه‌ی جامعه‌ای چنین وسیع، نیروی محرکه‌ای در راستای بهتر شدنِ وضعیتِ جامعه‌ی پیرامونِ ماست. امیدِ ما همین است که دانشگاهی‌ها، ریاضی‌دان‌ها، پژوهشگران و علاقه‌مندانِ بیشتری به مسیرِ پرآوازه‌ی مریم بنگرند و فریادِ او را بر سرِ قله‌های بلندِ همت رسا بشنوند؛ بلکه فردای ما، در عینِ رنگارنگی‌مان، تا همین حد پرشور و واحد به پیش برود.</p>
+
+      <figure class="lead ph">
+        <img loading="lazy" decoding="async" src="../assets/wim/wimr-team2.jpg" alt="عکسِ گروهیِ تیم، کنارِ هم، در پایان">
+        <figcaption><b>شاید وقتی دیگر.</b></figcaption>
+      </figure>
+
+      <div class="ednote">
+        <b>درباره‌ی این گزارش.</b> متن و عکس‌ها از فرناز حاج‌منوچهری و بامداد ترابی، از تیمِ برگزاری. ویرایش: امیر اصغری، که «دکتر» را خودش از ابتدای نامش برداشت و صفتِ «نازنین» را به انتهای آن افزود. :)
+      </div>
+
+      <div class="colophon">
+        <div class="roles">
+          <div class="role">
+            <div class="lab">گزارش</div>
+            <div class="who">فرناز حاج‌منوچهری و بامداد ترابی</div>
+            <div class="aff">تیمِ برگزاری، انجمنِ علمیِ همبند، دانشکده‌ی علوم ریاضیِ دانشگاه صنعتی شریف.</div>
+          </div>
+          <div class="role">
+            <div class="lab">بزرگداشتِ</div>
+            <div class="who">مریم میرزاخانی (۱۹۷۷–۲۰۱۷)</div>
+            <div class="aff">مدالِ فیلدز، ۲۰۱۴. زادروزِ او، ۲۲ اردیبهشت، روزِ زن در ریاضیات است.</div>
+          </div>
+          <div class="role">
+            <div class="lab">دو دوره</div>
+            <div class="who">اردیبهشتِ ۱۴۰۳ و ۱۴۰۴</div>
+            <div class="aff">بهارِ ۲۰۲۴ و ۲۰۲۵ · تهران.</div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="subhead">روی تقویمِ جهانی</h2>
+      <p>هر دو دوره در کمیته‌ی (۱۲ می) زن در ریاضیات — فهرستِ جهانیِ رویدادهای روزِ زن در ریاضیات — ثبت شده‌اند. پوستر و صفحه‌ی معرفیِ هر دوره در پایین آمده است.</p>
+      <div class="figrow">
+        <figure>
+          <a href="https://may12.womeninmaths.org/node/1227" target="_blank" rel="noopener"><img loading="lazy" src="https://may12.womeninmaths.org/sites/default/files/2024-05/%D9%BE%D9%88%D8%B3%D8%AA%D8%B1%20%D9%86%D9%87%D8%A7%DB%8C%DB%8C2-min.png" alt="پوسترِ نخستین دوره‌ی رویدادِ زن در ریاضیات، شریف، ۲۰۲۴"></a>
+        </figure>
+        <figure>
+          <a href="https://may12.womeninmaths.org/node/1504" target="_blank" rel="noopener"><img loading="lazy" src="https://may12.womeninmaths.org/sites/default/files/2025-05/IMG_20250510_111419_585.jpg" alt="پوسترِ دومین دوره‌ی رویدادِ زن در ریاضیات، شریف، ۲۰۲۵"></a>
+        </figure>
+      </div>
+      <p class="figcap-wide"><b>دو دوره روی تقویمِ جهانی.</b> راست — نخستین دوره (۱۴۰۳ / ۲۰۲۴، سه‌روزه)، <a href="https://may12.womeninmaths.org/node/1227">may12 · node/1227</a>. چپ — دومین دوره (۱۴۰۴ / ۲۰۲۵، چهارروزه)، <a href="https://may12.womeninmaths.org/node/1504">may12 · node/1504</a>.</p>
+
+      <div class="refs">
+        <h3>پیوندها</h3>
+        <ul>
+          <li>رویدادِ زن در ریاضیات — <a href="https://www.womeninmathematics.ir/">womeninmathematics.ir</a></li>
+          <li>معرفیِ نخستین دوره (۲۰۲۴) در کمیته‌ی (۱۲ می) زن در ریاضیات — <a href="https://may12.womeninmaths.org/node/1227">node/1227</a></li>
+          <li>معرفیِ دومین دوره (۲۰۲۵) در همان کمیته — <a href="https://may12.womeninmaths.org/node/1504">node/1504</a></li>
+          <li>پژوهشگاهِ دانش‌های بنیادی (IPM) — <a href="https://www.ipm.ac.ir/">ipm.ac.ir</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+function applyLabels(lang){
+  document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+    var v = el.getAttribute('data-' + lang);
+    if (v !== null) el.textContent = v;
+  });
+}
+function setLang(lang){
+  var isFa = lang === 'fa';
+  document.documentElement.lang = lang;
+  document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-lang-block]').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+  });
+  document.querySelectorAll('.langtoggle button').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+  });
+  applyLabels(lang);
+  try { localStorage.setItem('pm-lang', lang); } catch(e){}
+}
+var __startLang = 'en';
+try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') __startLang = s; } catch(e){}
+setLang(__startLang);
+
+/* Photo reels — small grouped sequences that fade one to the next */
+(function(){
+  function initReel(reel){
+    var imgs = Array.prototype.slice.call(reel.querySelectorAll('.frames img'));
+    if (!imgs.length) return;
+    var dotsWrap = reel.querySelector('.dots');
+    var countEl = reel.querySelector('.rcount');
+    var i = 0, timer = null;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (imgs.length < 2) {
+      imgs[0].classList.add('on');
+      if (countEl) countEl.remove();
+      return;
+    }
+    var dots = imgs.map(function(_, idx){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Photo ' + (idx + 1));
+      b.addEventListener('click', function(){ show(idx); restart(); });
+      dotsWrap.appendChild(b);
+      return b;
+    });
+    function show(n){
+      i = (n + imgs.length) % imgs.length;
+      imgs.forEach(function(im, idx){ im.classList.toggle('on', idx === i); });
+      dots.forEach(function(d, idx){ d.classList.toggle('on', idx === i); });
+      if (countEl) countEl.textContent = (i + 1) + ' / ' + imgs.length;
+    }
+    function next(){ show(i + 1); }
+    function stop(){ if (timer) { clearInterval(timer); timer = null; } }
+    function start(){ if (reduce) return; stop(); timer = setInterval(next, 3200); }
+    function restart(){ stop(); start(); }
+    reel.addEventListener('mouseenter', stop);
+    reel.addEventListener('mouseleave', start);
+    show(0);
+    start();
+  }
+  function initReels(){ document.querySelectorAll('.reel[data-reel]').forEach(initReel); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initReels);
+  else initReels();
+})();
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

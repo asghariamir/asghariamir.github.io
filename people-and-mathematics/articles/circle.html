@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The circle and its look-alikes · Concepts &amp; Conceptions</title>
+<meta name="description" content="A shape children meet before school and in every year of it — yet they leave unable to say what it is. An essay, with figures you can play with, on the two halves of the circle's definition and the different questions each one answers. A People and Mathematics publication.">
+
+<meta property="og:title" content="The circle and its look-alikes — Amir Asghari">
+<meta property="og:description" content="Concepts &amp; Conceptions · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/logo.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; --fill: #EADfCB; --tint: #E8C9B6; --green: #567D46; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: var(--accent); }
+  a:hover { color: var(--ink); }
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li { text-align: justify; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  /* breadcrumb sub-bar */
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb a { color: inherit; }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 47px; line-height: 1.06; font-weight: 500; letter-spacing: -.02em; margin: 16px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+  .byline .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); align-self: center; }
+
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 46px 0 14px; padding-top: 8px; }
+  .subhead .n { color: var(--accent); font-size: .8em; margin-inline-end: .4em; font-variant-numeric: lining-nums; }
+  .center-def { text-align: center; font-style: italic; color: #43392E; margin: -4px 0 20px; font-size: 20px; }
+  [dir="rtl"] .center-def { font-style: normal; font-weight: 500; }
+  .fn { font-family: "Hanken Grotesk", sans-serif; font-size: .62em; font-weight: 700; vertical-align: super; margin-inline-start: 2px; }
+  .fn a { text-decoration: none; }
+
+  /* the two-sided definition, set apart */
+  .biconditional { margin: 24px 0; border-inline-start: 3px solid var(--accent); padding: 4px 0 4px 20px; }
+  [dir="rtl"] .biconditional { padding: 4px 20px 4px 0; }
+  .biconditional p { margin: 0 0 12px; font-size: 18px; line-height: 1.5; text-align: start; }
+  .biconditional p:last-child { margin-bottom: 0; }
+
+  /* ---------- Static diagrams ---------- */
+  .figrow { display: grid; gap: 18px; margin: 26px 0 8px; }
+  .figrow.two { grid-template-columns: 1fr 1fr; }
+  .figrow.three { grid-template-columns: repeat(3, 1fr); }
+  .hero { margin: 34px 0 8px; }
+  .fig { margin: 0; background: #fff; border: 1px solid var(--line); border-radius: 3px; padding: 16px 16px 12px; box-shadow: 0 4px 16px rgba(28,24,20,.07); position: relative; }
+  .fig svg { width: 100%; height: auto; display: block; }
+  .fig .flab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; color: var(--muted); text-align: center; margin-top: 8px; line-height: 1.4; }
+  .figcap { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13.5px; line-height: 1.6; color: #6B6155; margin: 6px auto 30px; max-width: 620px; }
+  .figcap .fnum { color: var(--accent); font-weight: 700; }
+  .hero .figcap { text-align: center; }
+
+  /* ---------- Interactive figures (labs) ---------- */
+  .lab { margin: 30px 0 6px; background: #fff; border: 1px solid var(--line); border-radius: 7px; box-shadow: 0 8px 26px rgba(28,24,20,.09); overflow: hidden; }
+  .lab-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 15px 20px 2px; }
+  .lab-kick { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--accent); }
+  .lab-try { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .lab svg.stage { width: 100%; height: auto; display: block; touch-action: none; background:
+      radial-gradient(circle at 1px 1px, rgba(28,24,20,.05) 1px, transparent 0) 0 0 / 22px 22px; }
+  .lab .grab { cursor: grab; filter: drop-shadow(0 1px 2px rgba(28,24,20,.35)); }
+  .lab .grab:active { cursor: grabbing; }
+  .lab .stage { cursor: default; }
+  .lab.deflab .stage, .lab.compasslab .stage { cursor: crosshair; }
+  .lab-read { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; padding: 12px 20px 2px; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; min-height: 1.6em; }
+  .verdict { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+  .verdict.on { color: var(--green); }
+  .verdict.off { color: var(--accent); }
+  .count { font-size: 16px; font-weight: 700; color: var(--ink); }
+  .seg { display: inline-flex; margin: 10px 20px 2px; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .segbtn { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; font-weight: 600; border: 0; background: transparent; color: var(--ink); cursor: pointer; padding: 7px 15px; }
+  .segbtn + .segbtn { border-inline-start: 1px solid var(--ink); }
+  .segbtn.on { background: var(--ink); color: var(--paper); }
+  .lab-stmt { font-family: "Hanken Grotesk", "Vazirmatn", serif; font-size: 14px; color: var(--ink); font-style: italic; padding: 8px 20px 0; min-height: 1.2em; line-height: 1.5; }
+  [dir="rtl"] .lab-stmt { font-style: normal; }
+  .lab-ctl { display: flex; gap: 9px; flex-wrap: wrap; padding: 10px 20px 16px; }
+  .lab-btn { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; font-weight: 600; border: 1px solid var(--ink); background: transparent; color: var(--ink); border-radius: 999px; padding: 7px 15px; cursor: pointer; transition: background .15s, color .15s; }
+  .lab-btn:hover { background: var(--ink); color: var(--paper); }
+  .lab-note { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); padding: 4px 20px 16px; line-height: 1.55; min-height: 1em; }
+
+  /* contributor colophon */
+  .colophon { margin-top: 54px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 26px; max-width: 560px; }
+  .colophon .role .lab2 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; }
+  .refs a { text-decoration: none; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--ink); border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.1; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+  [dir="rtl"] .biconditional p { line-height: 1.9; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 20px 32px; }
+    h1.title { font-size: 33px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .lab-head { flex-direction: column; gap: 2px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="Concepts &amp; Conceptions" data-fa="مفاهیم و برداشت‌ها"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#567D46;display:inline-block;flex:0 0 auto;"></span><span data-en="School mathematics · an essay" data-fa="ریاضیِ مدرسه · جستار"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="kicker">Concepts &amp; Conceptions</div>
+  <h1 class="title">The circle and its look-alikes</h1>
+  <p class="standfirst">The circle is with us from the first days of school, and almost every year it comes back to the textbook. And yet many students finish school unable to say, with any confidence, what a circle is.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/amir.jpg" alt="Amir Asghari">
+    <span class="name">Amir Asghari</span>
+  </div>
+
+  <!-- HERO / Fig 1 -->
+  <div class="hero">
+    <div class="figrow two">
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="a circle drawn as a curve"><circle cx="90" cy="75" r="52" fill="none" stroke="#1C1814" stroke-width="2.6"/></svg>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="a filled disk"><circle cx="90" cy="75" r="52" fill="#EADfCB" stroke="#1C1814" stroke-width="2.6"/></svg>
+      </figure>
+    </div>
+    <p class="figcap"><span class="fnum">Fig. 1.</span> In many learning experiences both pictures are introduced under a single name: circle.</p>
+  </div>
+
+  <div class="body">
+    <p>The circle is in a child’s life even before school begins — in the wheel, the clock, the coin, the plate, and dozens of other things. Then, at school, from one year to the next and in many different roles, it appears again. Few geometric ideas get such a long, repeated chance to be learned. The question of this piece is a simple one: across those years, what does a student actually meet — and how well do we use the opportunity?</p>
+
+    <h2 class="subhead">What is a circle?</h2>
+
+    <p>The usual definition of a circle runs like this:</p>
+
+    <p class="center-def">a circle is the set of all points in a plane whose distance from a fixed point is a fixed amount.</p>
+
+    <p>The fixed point we call the <em>centre</em>, and the fixed distance the <em>radius</em>. In the older language of geometry books, instead of “the set of points” one said “the locus of points” — but the substance of the definition is the same.</p>
+
+    <p>This definition has to be read from both sides:</p>
+
+    <div class="biconditional">
+      <p>If the distance of a point from the centre equals the radius, then that point is on the circle.</p>
+      <p>If a point is on the circle, then its distance from the centre equals the radius.</p>
+    </div>
+
+    <p>These two sentences are not repetitions of each other. The first will not let a point with the right distance stay off the circle; the second will not let a point with the wrong distance onto it. The definition of the circle is built from setting these two directions side by side. If teaching the circle is meant to be the teaching of a concept, the student has to see both directions — and put both to work.</p>
+
+    <h2 class="subhead">From the very start</h2>
+
+    <p>In the first experiences of school, the circle is named alongside the square, the triangle and the rectangle. Usually we draw a shape, write its name beneath it, and ask the child to find it, colour it, or make a picture with it. The trouble starts right here: sometimes only a closed curve is shown, and sometimes that same curve together with the whole region inside it. We call both “a circle.”</p>
+
+    <p>For the child, these are not two nearby objects but two examples of one name. And this failure to distinguish grows sharper still when the circle is not the subject itself but a tool for teaching something else.</p>
+
+    <h2 class="subhead">When the circle is a tool</h2>
+
+    <p>In many lessons the circle is not the subject at all; it is a means to some other end. We circle the correct answer; we colour part of a round shape to teach fractions; and to show an angle, we shade a sector of a round region. In all three the word “circle” may be used — while the mathematical object is not the same.</p>
+
+    <div class="figrow three">
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="a circle drawn around a photo, marking the correct answer">
+          <defs><clipPath id="clipAmirEn"><circle cx="90" cy="73" r="40"/></clipPath></defs>
+          <image href="../assets/amir.jpg" x="46" y="29" width="88" height="88" clip-path="url(#clipAmirEn)" preserveAspectRatio="xMidYMid slice"/>
+          <circle cx="90" cy="73" r="47" fill="none" stroke="#C8633E" stroke-width="3.4"/>
+        </svg>
+        <div class="flab">circle the right answer</div>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="a disk split into quarters with some coloured">
+          <path d="M90,75 L90,23 A52,52 0 0 1 142,75 Z" fill="#C8633E"/>
+          <path d="M90,75 L38,75 A52,52 0 0 1 90,23 Z" fill="#E8C9B6"/>
+          <circle cx="90" cy="75" r="52" fill="none" stroke="#1C1814" stroke-width="2.6"/>
+          <line x1="38" y1="75" x2="142" y2="75" stroke="#1C1814" stroke-width="1.6"/>
+          <line x1="90" y1="23" x2="90" y2="127" stroke="#1C1814" stroke-width="1.6"/>
+        </svg>
+        <div class="flab">a fraction</div>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="a borderless disk with one sector shaded to show an angle">
+          <circle cx="90" cy="75" r="52" fill="#EADfCB"/>
+          <path d="M90,75 L90,23 A52,52 0 0 1 135,101 Z" fill="#C8633E"/>
+          <line x1="90" y1="75" x2="90" y2="23" stroke="#1C1814" stroke-width="1.6"/>
+          <line x1="90" y1="75" x2="135" y2="101" stroke="#1C1814" stroke-width="1.6"/>
+        </svg>
+        <div class="flab">an angle</div>
+      </figure>
+    </div>
+    <p class="figcap"><span class="fnum">Fig. 2.</span> One name in three different uses: a closed curve for marking, a partitioned disk for showing a fraction, and a shaded region for showing an angle. The teaching role of the figure changes, but its name usually stays the same — “circle.”</p>
+
+    <p>There is nothing wrong with these uses in themselves. The problem is that we do not name the differences. Sometimes the circle is a boundary, sometimes a disk, and sometimes only a familiar outline that makes some other task easier. The name stays fixed while the meaning quietly shifts.</p>
+
+    <h2 class="subhead">The compass: a real chance that gets lost</h2>
+
+    <p>When we draw a circle with a compass, a real chance appears to see it just as the definition intends: the leg of the compass stays fixed in place, its opening does not change, and the pencil tip stays, the whole way round, at one distance from the centre.</p>
+
+    <!-- INTERACTIVE 1: compass -->
+    <div class="lab compasslab" data-widget="compass" data-lang="en">
+      <div class="lab-head">
+        <span class="lab-kick">Interactive 1 · draw it with a compass</span>
+        <span class="lab-try">Swing the pencil around the centre.</span>
+      </div>
+      <svg class="stage" viewBox="0 0 360 250" role="img" aria-label="a compass; swing the pencil to trace the circle">
+        <g class="trace"></g>
+        <line class="arm" x1="180" y1="125" x2="180" y2="39" stroke="#1C1814" stroke-width="2.2"/>
+        <circle class="cen" cx="180" cy="125" r="4.2" fill="#1C1814"/>
+        <circle class="pencil grab" cx="180" cy="39" r="9" fill="#C8633E" stroke="#fff" stroke-width="2.5"/>
+      </svg>
+      <div class="lab-ctl"><button class="lab-btn clear" type="button">Start over</button></div>
+    </div>
+    <p class="figcap"><span class="fnum">Interactive 1.</span> Swing the pencil tip around the centre. As long as the centre and the compass opening stay fixed, every point of the path is at one fixed distance from the centre; all of that path — and only that path — is the circle.</p>
+
+    <p>One question added to this activity is enough to turn work with a tool into work with a concept:</p>
+
+    <p style="font-weight:600;font-size:1.05em;color:var(--ink);margin:2px 0 20px">Why is the path of the pencil tip a circle?</p>
+
+    <p>The answer takes the learner straight back to the definition: every point the tip passes through is at one fixed distance from the centre, and the set of exactly those points makes the circle.</p>
+
+    <p>But this question is usually not asked. Instead, as soon as the circle is drawn, new ideas are loaded onto it — ideas that still ignore the difference between the circle and the disk. The best known of them are the diameter, the circumference, and the area.</p>
+
+    <p>A little later, the diameter is introduced as the line that “halves the circle.” But what is halved? If the circle is the curve, the diameter divides it into two arcs. If the disk is meant, it divides it into two regions. One sentence is spoken, but two different objects can be its subject.</p>
+
+    <div class="figrow two">
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="a diameter splitting the curve into two arcs">
+          <path d="M38,75 A52,52 0 0 1 142,75" fill="none" stroke="#C8633E" stroke-width="3.4"/>
+          <path d="M38,75 A52,52 0 0 0 142,75" fill="none" stroke="#1C1814" stroke-width="3.4"/>
+          <line x1="38" y1="75" x2="142" y2="75" stroke="#94887F" stroke-width="1.4" stroke-dasharray="4 4"/>
+        </svg>
+        <div class="flab">two arcs</div>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="a diameter splitting the disk into two regions">
+          <path d="M38,75 A52,52 0 0 1 142,75 Z" fill="#E8C9B6"/>
+          <path d="M38,75 A52,52 0 0 0 142,75 Z" fill="#EADfCB"/>
+          <circle cx="90" cy="75" r="52" fill="none" stroke="#1C1814" stroke-width="2.6"/>
+          <line x1="38" y1="75" x2="142" y2="75" stroke="#1C1814" stroke-width="2"/>
+        </svg>
+        <div class="flab">two regions</div>
+      </figure>
+    </div>
+    <p class="figcap"><span class="fnum">Fig. 3.</span> What does the diameter halve — the circle into two arcs, or the disk into two regions?</p>
+
+    <p>The same ambiguity carries on into circumference and area. Circumference belongs to the curve, and area to the region inside it; yet in both we use one name: “the circumference of the circle” and “the area of the circle.” In one we take the circle as a boundary, in the other the boundary together with its interior — without ever making that shift plain.</p>
+
+    <div class="figrow two">
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="circle curve"><circle cx="90" cy="75" r="52" fill="none" stroke="#1C1814" stroke-width="2.6"/></svg>
+        <div class="flab">circumference</div>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="disk"><circle cx="90" cy="75" r="52" fill="#EADfCB" stroke="#1C1814" stroke-width="2.6"/></svg>
+        <div class="flab">area</div>
+      </figure>
+    </div>
+    <p class="figcap"><span class="fnum">Fig. 4.</span> Circumference belongs to the curve and area to the disk; but in the language of school both are attributed to “the circle.”</p>
+
+    <p>In this way, the chance the compass offered to make the concept of the circle clear is lost. The circle gets drawn, but before the circle itself becomes the subject of a question, it turns once more into a tool for teaching other ideas.</p>
+
+    <h2 class="subhead">A simple question that turns hard</h2>
+
+    <p>For years I have opened my Foundations of Mathematics course with a very simple question: the line passing through the figure below — in how many points does it meet the circle?<span class="fn"><a href="#src-monthly">1</a></span></p>
+
+    <p>If we take the figure to be the circle, the answer is two points. If we take it to be the disk, the part shared by the line and the disk is a segment, with infinitely many points. The difficulty of the question is not in the calculation; it is that the student does not know how to read the figure. School has taught both readings, and recorded both under one name.</p>
+
+    <!-- INTERACTIVE 2: line meets circle (circle vs disk) -->
+    <div class="lab linelab" data-widget="line" data-lang="en">
+      <div class="lab-head">
+        <span class="lab-kick">Interactive 2 · how many points?</span>
+        <span class="lab-try">Drag the ends of the line.</span>
+      </div>
+      <svg class="stage" viewBox="0 0 360 250" role="img" aria-label="a line and a circle; read it as a circle or as a disk">
+        <circle class="disk" cx="180" cy="125" r="86" fill="#EADfCB" style="display:none"/>
+        <circle class="locus" cx="180" cy="125" r="86" fill="none" stroke="#1C1814" stroke-width="2.6"/>
+        <circle class="cen" cx="180" cy="125" r="3.6" fill="#1C1814"/>
+        <line class="chord" x1="0" y1="0" x2="0" y2="0" stroke="#C8633E" stroke-width="6" stroke-linecap="round" style="display:none"/>
+        <line class="ln" x1="0" y1="0" x2="0" y2="0" stroke="#1C1814" stroke-width="2.4"/>
+        <g class="hits"></g>
+        <circle class="h1 grab" cx="35" cy="60" r="10" fill="#C8633E" stroke="#fff" stroke-width="2.5"/>
+        <circle class="h2 grab" cx="325" cy="180" r="10" fill="#C8633E" stroke="#fff" stroke-width="2.5"/>
+      </svg>
+      <div class="lab-read"><span class="count">meets the circle in 2 points</span></div>
+      <div class="lab-ctl"><button class="lab-btn toggle" type="button">See it as a disk</button></div>
+      <div class="lab-note"></div>
+    </div>
+    <p class="figcap"><span class="fnum">Interactive 2.</span> Move the line, and take the figure once as a circle and once as a disk. In the first reading there are two points in common; in the second, a whole segment — and so infinitely many points.</p>
+
+    <p>These answers should not simply be marked right or wrong. Each answer is a sign of the concept the student has summoned from the figure. A good question lets us see that concept, name it, and compare it with the definition.</p>
+
+    <h2 class="subhead">From the circle to the definition</h2>
+
+    <p>We cannot change a student’s educational past. This double meaning has had years to settle into the mind. But we can turn that same past into an occasion for learning — one whose subject is no longer only the circle, but the mathematical definition itself.</p>
+
+    <p>The definition of the circle is a simple example for seeing the relationship between a statement and its converse. One direction tells us a point with distance equal to the radius must be on the circle. The other tells us every point on the circle must have that same distance. One guarantees nothing has been left out; the other guarantees nothing extra has been let in.</p>
+
+    <!-- INTERACTIVE 3: the two guarantees -->
+    <div class="lab deflab" data-widget="def" data-lang="en">
+      <div class="lab-head">
+        <span class="lab-kick">Interactive 3 · the two guarantees</span>
+        <span class="lab-try"></span>
+      </div>
+      <div class="seg">
+        <button class="segbtn on" data-q="out" type="button">Nothing left out</button>
+        <button class="segbtn" data-q="extra" type="button">Nothing extra</button>
+      </div>
+      <svg class="stage" viewBox="0 0 360 250" role="img" aria-label="the two guarantees hidden in the definition of the circle">
+        <g class="dots" style="display:none"></g>
+        <circle class="locus" cx="180" cy="125" r="86" fill="none" stroke="#1C1814" stroke-width="2.6"/>
+        <circle class="cen" cx="180" cy="125" r="4.2" fill="#1C1814"/>
+        <circle class="dot grab" cx="284" cy="86" r="9" fill="#C8633E" stroke="#fff" stroke-width="2.5"/>
+      </svg>
+      <div class="lab-read"><span class="verdict"></span></div>
+      <div class="lab-stmt"></div>
+      <div class="lab-note"></div>
+    </div>
+    <p class="figcap"><span class="fnum">Interactive 3.</span> Two guarantees hide in the definition. <em>Nothing left out</em>: swing the point around the dotted ring — between the dots sit points at distance r that this shape has dropped. <em>Nothing extra</em>: move the point anywhere — only points at distance r land on the circle.</p>
+
+    <p>The line-and-circle question was, at bottom, about the definition too. The line meets the circle in two points only when we hold the circle to its boundary and refuse to count the region inside as part of it. That decision is neither a matter of taste nor of the picture; it comes from the definition.</p>
+
+    <p>So the problem is not that the student failed to memorise the definition of the circle. It is that, for years, they saw two different objects under one name, and were then asked to attach the definition of one of them to both. If a definition is to do any work in mathematics, it has to enter the work from the very first encounters: to tell which points are on the circle, to tell whether a shape is a circle at all, and to make clear whether a given sentence is about the boundary or about the region inside it.</p>
+
+    <p>The circle here is only an example. The larger question is the place we give the definition in the teaching of mathematics: something to memorise at the end of the lesson, or a tool for seeing, asking and deciding from the very beginning.</p>
+  </div>
+
+  <!-- ===== Contributor colophon ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab2">Author</div>
+        <div class="who">Amir Asghari</div>
+        <div class="aff">YouTube @asghariamir</div>
+      </div>
+      <div class="role">
+        <div class="lab2">Interactive figures</div>
+        <div class="who">Three live diagrams</div>
+        <div class="aff">Draw the circle with a compass; read a line as circle or disk; test the two guarantees hidden in the definition.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="refs">
+    <h3>Reference</h3>
+    <ol>
+      <li id="src-monthly">A. H. Asghari, “Surprises from mathematics education research: Student (mis)use of mathematical definitions,” <em>The American Mathematical Monthly</em>, published online 28 May 2026. <a href="https://doi.org/10.1080/00029890.2026.2663705" target="_blank" rel="noopener">doi:10.1080/00029890.2026.2663705</a></li>
+    </ol>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">مفاهیم و برداشت‌ها</div>
+  <h1 class="title">دایره و دایره‌نماها</h1>
+  <p class="standfirst">دایره از نخستین روزهای مدرسه همراه ماست و تقریباً هر سال دوباره به کتاب درسی بازمی‌گردد. با این همه، بسیاری از دانش‌آموزان مدرسه را به پایان می‌رسانند بی‌آنکه بتوانند با اطمینان بگویند دایره چیست.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/amir.jpg" alt="امیر اصغری">
+    <span class="name">امیر اصغری</span>
+  </div>
+
+  <!-- HERO / شکل ۱ -->
+  <div class="hero">
+    <div class="figrow two">
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="دایره به‌صورتِ منحنی"><circle cx="90" cy="75" r="52" fill="none" stroke="#1C1814" stroke-width="2.6"/></svg>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="قرصِ پُر"><circle cx="90" cy="75" r="52" fill="#EADfCB" stroke="#1C1814" stroke-width="2.6"/></svg>
+      </figure>
+    </div>
+    <p class="figcap"><span class="fnum">شکل ۱.</span> در بسیاری از تجربه‌های آموزشی هر دو تصویر با یک نام معرفی می‌شوند: دایره.</p>
+  </div>
+
+  <div class="body">
+    <p>دایره حتی پیش از آنکه کودک وارد مدرسه شود در زندگی او حضور دارد: در چرخ، ساعت، سکه، بشقاب و ده‌ها چیز دیگر. بعد هم در مدرسه، از سالی به سال دیگر و با نقش‌های گوناگون، دوباره ظاهر می‌شود. کمتر مفهوم هندسی‌ای چنین فرصت طولانی و تکرارشونده‌ای برای آموخته‌شدن دارد. پرسش این نوشته ساده است: دانش‌آموز در این سال‌ها واقعاً با چه چیزی روبه‌رو می‌شود، و ما از این فرصت چه اندازه خوب استفاده می‌کنیم؟</p>
+
+    <h2 class="subhead">دایره چیست؟</h2>
+
+    <p>تعریف معمول دایره چنین است:</p>
+
+    <p class="center-def">دایره مجموعهٔ همهٔ نقاط یک صفحه است که فاصله‌شان از نقطه‌ای ثابت، مقداری ثابت است.</p>
+
+    <p>نقطهٔ ثابت را مرکز و فاصلهٔ ثابت را شعاع می‌نامیم. در زبان قدیمی‌تر کتاب‌های هندسه، به جای «مجموعهٔ نقاط» از «مکان هندسی نقاط» استفاده می‌شد؛ اما اصل تعریف همان است.</p>
+
+    <p>این تعریف را باید از هر دو سو خواند:</p>
+
+    <div class="biconditional">
+      <p>اگر فاصلهٔ نقطه‌ای از مرکز برابر شعاع باشد، آن نقطه روی دایره است.</p>
+      <p>اگر نقطه‌ای روی دایره باشد، فاصلهٔ آن از مرکز برابر شعاع است.</p>
+    </div>
+
+    <p>این دو جمله تکرار یکدیگر نیستند. اولی اجازه نمی‌دهد نقطه‌ای با فاصلهٔ درست بیرون دایره بماند؛ دومی اجازه نمی‌دهد نقطه‌ای با فاصلهٔ نادرست وارد دایره شود. تعریف دایره از کنار هم قرارگرفتن همین دو جهت ساخته می‌شود. اگر آموزش دایره قرار است آموزش یک مفهوم باشد، دانش‌آموز باید هر دو جهت را ببیند و به کار بگیرد.</p>
+
+    <h2 class="subhead">از همان آغاز</h2>
+
+    <p>در نخستین تجربه‌های مدرسه، دایره در کنار مربع، مثلث و مستطیل نام‌گذاری می‌شود. معمولاً شکلی می‌کشیم، نامش را زیر آن می‌نویسیم و از کودک می‌خواهیم آن را پیدا کند، رنگ کند یا با آن تصویری بسازد. مشکل از همین‌جا آغاز می‌شود: گاهی فقط یک خط بسته نشان داده می‌شود و گاهی همان خط همراه با تمام ناحیهٔ درونش. هر دو را «دایره» می‌نامیم.</p>
+
+    <p>برای کودک، این دو تصویر نه دو شیء نزدیک به هم، بلکه دو نمونه از یک نام‌اند. این تمایزنگذاشتن، آنجا که دایره خود موضوع نیست بلکه ابزاری برای آموزش چیزی دیگر است، حتی پررنگ‌تر می‌شود.</p>
+
+    <h2 class="subhead">وقتی دایره ابزار است</h2>
+
+    <p>در بسیاری از درس‌ها، دایره خودِ موضوع نیست؛ وسیله‌ای است برای انجام کاری دیگر. دور پاسخ درست دایره می‌کشیم، برای آموزش کسرها بخشی از یک شکل گرد را رنگ می‌کنیم، و برای نشان‌دادن زاویه، قطاعی از یک ناحیهٔ گرد را پررنگ می‌کنیم. در هر سه مورد ممکن است واژهٔ «دایره» به کار رود، در حالی که شیء ریاضی یکسان نیست.</p>
+
+    <div class="figrow three">
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="دایره‌ای دورِ یک عکس، برای علامت‌زدنِ پاسخ درست">
+          <defs><clipPath id="clipAmirFa"><circle cx="90" cy="73" r="40"/></clipPath></defs>
+          <image href="../assets/amir.jpg" x="46" y="29" width="88" height="88" clip-path="url(#clipAmirFa)" preserveAspectRatio="xMidYMid slice"/>
+          <circle cx="90" cy="73" r="47" fill="none" stroke="#C8633E" stroke-width="3.4"/>
+        </svg>
+        <div class="flab">دور پاسخ درست دایره بکش</div>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="قرصی بخش‌بندی‌شده که بخشی از آن رنگ شده">
+          <path d="M90,75 L90,23 A52,52 0 0 1 142,75 Z" fill="#C8633E"/>
+          <path d="M90,75 L38,75 A52,52 0 0 1 90,23 Z" fill="#E8C9B6"/>
+          <circle cx="90" cy="75" r="52" fill="none" stroke="#1C1814" stroke-width="2.6"/>
+          <line x1="38" y1="75" x2="142" y2="75" stroke="#1C1814" stroke-width="1.6"/>
+          <line x1="90" y1="23" x2="90" y2="127" stroke="#1C1814" stroke-width="1.6"/>
+        </svg>
+        <div class="flab">یک کسر</div>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="قرصی بدونِ لبه که قطاعی از آن برای نمایشِ زاویه پررنگ شده">
+          <circle cx="90" cy="75" r="52" fill="#EADfCB"/>
+          <path d="M90,75 L90,23 A52,52 0 0 1 135,101 Z" fill="#C8633E"/>
+          <line x1="90" y1="75" x2="90" y2="23" stroke="#1C1814" stroke-width="1.6"/>
+          <line x1="90" y1="75" x2="135" y2="101" stroke="#1C1814" stroke-width="1.6"/>
+        </svg>
+        <div class="flab">یک زاویه</div>
+      </figure>
+    </div>
+    <p class="figcap"><span class="fnum">شکل ۲.</span> یک نام در سه کاربرد متفاوت: خط بسته‌ای برای علامت‌گذاری، قرصی بخش‌بندی‌شده برای نمایش کسر، و ناحیه‌ای رنگی برای نمایش زاویه. نقش آموزشیِ شکل عوض می‌شود، اما نام آن معمولاً همان «دایره» می‌ماند.</p>
+
+    <p>این کاربردها به خودی خود اشکالی ندارند. مسئله آن است که تفاوت‌ها را نمی‌گوییم. دایره گاهی مرز است، گاهی قرص، و گاهی فقط طرحی آشنا که کار دیگری را آسان می‌کند. نام ثابت می‌ماند و معنا بی‌سر و صدا جابه‌جا می‌شود.</p>
+
+    <h2 class="subhead">پرگار؛ فرصتی واقعی که از دست می‌رود</h2>
+
+    <p>وقتی دایره را با پرگار می‌کشیم، فرصتی واقعی پدید می‌آید تا آن را همان‌گونه ببینیم که تعریف می‌خواهد: پایهٔ پرگار در جای خود ثابت می‌ماند، دهانهٔ آن تغییر نمی‌کند و نوک مداد در تمام مسیر به یک فاصله از مرکز باقی می‌ماند.</p>
+
+    <!-- INTERACTIVE 1: compass -->
+    <div class="lab compasslab" data-widget="compass" data-lang="fa">
+      <div class="lab-head">
+        <span class="lab-kick">نمودار تعاملی ۱ · با پرگار بکش</span>
+        <span class="lab-try">نوکِ مداد را دورِ مرکز بچرخانید.</span>
+      </div>
+      <svg class="stage" viewBox="0 0 360 250" role="img" aria-label="یک پرگار؛ نوکِ مداد را بچرخانید تا دایره کشیده شود">
+        <g class="trace"></g>
+        <line class="arm" x1="180" y1="125" x2="180" y2="39" stroke="#1C1814" stroke-width="2.2"/>
+        <circle class="cen" cx="180" cy="125" r="4.2" fill="#1C1814"/>
+        <circle class="pencil grab" cx="180" cy="39" r="9" fill="#C8633E" stroke="#fff" stroke-width="2.5"/>
+      </svg>
+      <div class="lab-ctl"><button class="lab-btn clear" type="button">از نو</button></div>
+    </div>
+    <p class="figcap"><span class="fnum">نمودار تعاملی ۱.</span> نوکِ مداد را دورِ مرکز بچرخانید. تا وقتی مرکز و دهانهٔ پرگار ثابت‌اند، هر نقطه از مسیر در فاصله‌ای ثابت از مرکز قرار دارد؛ تمامِ آن مسیر، و فقط همان مسیر، دایره است.</p>
+
+    <p>کافی است یک پرسش به این فعالیت اضافه کنیم تا کار با ابزار به کار با مفهوم تبدیل شود:</p>
+
+    <p style="font-weight:700;font-size:1.05em;color:var(--ink);margin:2px 0 20px">چرا مسیر نوک مداد یک دایره است؟</p>
+
+    <p>پاسخ، یادگیرنده را مستقیماً به تعریف بازمی‌گرداند: هر نقطه‌ای که نوک مداد از آن می‌گذرد، به یک فاصلهٔ ثابت از مرکز است؛ و مجموعهٔ همین نقاط دایره را می‌سازد.</p>
+
+    <p>اما این پرسش معمولاً مطرح نمی‌شود. در عوض، به‌محض آنکه دایره رسم شد، مفاهیم تازه‌ای بر آن سوار می‌شوند؛ مفاهیمی که همچنان تفاوت میان دایره و قرص را نادیده می‌گیرند. معروف‌ترینِ آن‌ها قطر، محیط و مساحت‌اند.</p>
+
+    <p>کمی بعد، قطر به‌صورت خطی معرفی می‌شود که «دایره را نصف می‌کند». اما چه چیزی نصف می‌شود؟ اگر دایره همان منحنی باشد، قطر آن را به دو کمان تقسیم می‌کند. اگر منظور قرص باشد، آن را به دو ناحیه تقسیم می‌کند. یک جمله گفته می‌شود، اما دو شیء متفاوت می‌توانند موضوع آن باشند.</p>
+
+    <div class="figrow two">
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="قطری که منحنی را به دو کمان می‌بُرد">
+          <path d="M38,75 A52,52 0 0 1 142,75" fill="none" stroke="#C8633E" stroke-width="3.4"/>
+          <path d="M38,75 A52,52 0 0 0 142,75" fill="none" stroke="#1C1814" stroke-width="3.4"/>
+          <line x1="38" y1="75" x2="142" y2="75" stroke="#94887F" stroke-width="1.4" stroke-dasharray="4 4"/>
+        </svg>
+        <div class="flab">دو کمان</div>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="قطری که قرص را به دو ناحیه می‌بُرد">
+          <path d="M38,75 A52,52 0 0 1 142,75 Z" fill="#E8C9B6"/>
+          <path d="M38,75 A52,52 0 0 0 142,75 Z" fill="#EADfCB"/>
+          <circle cx="90" cy="75" r="52" fill="none" stroke="#1C1814" stroke-width="2.6"/>
+          <line x1="38" y1="75" x2="142" y2="75" stroke="#1C1814" stroke-width="2"/>
+        </svg>
+        <div class="flab">دو ناحیه</div>
+      </figure>
+    </div>
+    <p class="figcap"><span class="fnum">شکل ۳.</span> قطر چه چیزی را نصف می‌کند: دایره را به دو کمان، یا قرص را به دو ناحیه؟</p>
+
+    <p>همین ابهام در محیط و مساحت نیز ادامه پیدا می‌کند. محیط به منحنی مربوط است و مساحت به ناحیهٔ درون آن؛ بااین‌حال، در هر دو مورد از یک نام استفاده می‌کنیم: «محیط دایره» و «مساحت دایره». در یکی دایره را مرز می‌گیریم و در دیگری مرز را همراه با درونش، بی‌آنکه این تغییر را آشکار کنیم.</p>
+
+    <div class="figrow two">
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="منحنیِ دایره"><circle cx="90" cy="75" r="52" fill="none" stroke="#1C1814" stroke-width="2.6"/></svg>
+        <div class="flab">محیط</div>
+      </figure>
+      <figure class="fig">
+        <svg viewBox="0 0 180 150" role="img" aria-label="قرص"><circle cx="90" cy="75" r="52" fill="#EADfCB" stroke="#1C1814" stroke-width="2.6"/></svg>
+        <div class="flab">مساحت</div>
+      </figure>
+    </div>
+    <p class="figcap"><span class="fnum">شکل ۴.</span> محیط به منحنی تعلق دارد و مساحت به قرص؛ اما در زبان مدرسه هر دو به «دایره» نسبت داده می‌شوند.</p>
+
+    <p>به این ترتیب، فرصتی که پرگار برای روشن‌کردن مفهوم دایره فراهم کرده بود، از دست می‌رود. دایره رسم می‌شود، اما پیش از آنکه خودِ دایره موضوع پرسش قرار گیرد، دوباره به ابزاری برای آموزش مفاهیم دیگر تبدیل می‌شود.</p>
+
+    <h2 class="subhead">پرسشی ساده که دشوار می‌شود</h2>
+
+    <p>سال‌هاست کلاس مبانی ریاضیاتم را با پرسشی بسیار ساده آغاز می‌کنم: خطی که از شکل زیر می‌گذرد، دایره را در چند نقطه قطع می‌کند؟<span class="fn"><a href="#src-monthly-fa">۱</a></span></p>
+
+    <p>اگر شکل را دایره بدانیم، پاسخ دو نقطه است. اگر آن را قرص بدانیم، قسمت مشترک خط و قرص یک پاره‌خط است و بی‌نهایت نقطه دارد. دشواری پرسش در محاسبه نیست؛ در این است که دانشجو نمی‌داند شکل را چگونه بخواند. تجربهٔ مدرسه هر دو خوانش را به او آموخته و هر دو را با یک نام ثبت کرده است.</p>
+
+    <!-- INTERACTIVE 2: line meets circle (circle vs disk) -->
+    <div class="lab linelab" data-widget="line" data-lang="fa">
+      <div class="lab-head">
+        <span class="lab-kick">نمودار تعاملی ۲ · چند نقطه؟</span>
+        <span class="lab-try">دو سرِ خط را بکشید.</span>
+      </div>
+      <svg class="stage" viewBox="0 0 360 250" role="img" aria-label="یک خط و یک دایره؛ آن را دایره یا قرص بخوانید">
+        <circle class="disk" cx="180" cy="125" r="86" fill="#EADfCB" style="display:none"/>
+        <circle class="locus" cx="180" cy="125" r="86" fill="none" stroke="#1C1814" stroke-width="2.6"/>
+        <circle class="cen" cx="180" cy="125" r="3.6" fill="#1C1814"/>
+        <line class="chord" x1="0" y1="0" x2="0" y2="0" stroke="#C8633E" stroke-width="6" stroke-linecap="round" style="display:none"/>
+        <line class="ln" x1="0" y1="0" x2="0" y2="0" stroke="#1C1814" stroke-width="2.4"/>
+        <g class="hits"></g>
+        <circle class="h1 grab" cx="35" cy="60" r="10" fill="#C8633E" stroke="#fff" stroke-width="2.5"/>
+        <circle class="h2 grab" cx="325" cy="180" r="10" fill="#C8633E" stroke="#fff" stroke-width="2.5"/>
+      </svg>
+      <div class="lab-read"><span class="count">دایره را در ۲ نقطه قطع می‌کند</span></div>
+      <div class="lab-ctl"><button class="lab-btn toggle" type="button">آن را قرص ببین</button></div>
+      <div class="lab-note"></div>
+    </div>
+    <p class="figcap"><span class="fnum">نمودار تعاملی ۲.</span> خط را جابه‌جا کنید و شکل را یک‌بار دایره و یک‌بار قرص در نظر بگیرید. در خوانش نخست، دو نقطهٔ اشتراک داریم؛ در خوانش دوم، یک پاره‌خط و در نتیجه بی‌نهایت نقطه.</p>
+
+    <p>این پاسخ‌ها را نباید صرفاً درست و غلط کرد. هر پاسخ نشانهٔ مفهومی است که دانشجو از شکل فراخوانده است. پرسش خوب به ما اجازه می‌دهد آن مفهوم را ببینیم، نام‌گذاری کنیم و با تعریف مقایسه کنیم.</p>
+
+    <h2 class="subhead">از دایره به تعریف</h2>
+
+    <p>ما نمی‌توانیم گذشتهٔ آموزشی دانشجو را عوض کنیم. این دوگانگی سال‌ها فرصت داشته است در ذهن او جا بگیرد. اما می‌توانیم همان گذشته را به فرصتی برای یادگیری تبدیل کنیم؛ فرصتی که موضوعش دیگر فقط دایره نیست، بلکه خودِ تعریف ریاضی است.</p>
+
+    <p>تعریف دایره نمونهٔ ساده‌ای برای دیدن رابطهٔ یک گزاره و عکس آن است. یک جهت به ما می‌گوید نقطه‌ای با فاصلهٔ برابر شعاع باید روی دایره باشد. جهت دیگر می‌گوید هر نقطهٔ روی دایره باید همین فاصله را داشته باشد. یکی تضمین می‌کند چیزی از قلم نیفتاده است و دیگری تضمین می‌کند چیز اضافه‌ای وارد نشده است.</p>
+
+    <!-- INTERACTIVE 3: the two guarantees -->
+    <div class="lab deflab" data-widget="def" data-lang="fa">
+      <div class="lab-head">
+        <span class="lab-kick">نمودار تعاملی ۳ · دو تضمینِ تعریف</span>
+        <span class="lab-try"></span>
+      </div>
+      <div class="seg">
+        <button class="segbtn on" data-q="out" type="button">چیزی از قلم نیفتاده</button>
+        <button class="segbtn" data-q="extra" type="button">چیزی اضافه نشده</button>
+      </div>
+      <svg class="stage" viewBox="0 0 360 250" role="img" aria-label="دو تضمینِ نهفته در تعریفِ دایره">
+        <g class="dots" style="display:none"></g>
+        <circle class="locus" cx="180" cy="125" r="86" fill="none" stroke="#1C1814" stroke-width="2.6"/>
+        <circle class="cen" cx="180" cy="125" r="4.2" fill="#1C1814"/>
+        <circle class="dot grab" cx="284" cy="86" r="9" fill="#C8633E" stroke="#fff" stroke-width="2.5"/>
+      </svg>
+      <div class="lab-read"><span class="verdict"></span></div>
+      <div class="lab-stmt"></div>
+      <div class="lab-note"></div>
+    </div>
+    <p class="figcap"><span class="fnum">نمودار تعاملی ۳.</span> دو تضمین در تعریف پنهان است. «از قلم نیفتاده»: نقطه را دورِ حلقهٔ نقطه‌چین بچرخانید — میانِ نقطه‌ها، نقاطی به فاصلهٔ شعاع هست که این شکل جا انداخته. «اضافه نشده»: نقطه را هر جا ببرید — تنها نقاطِ به فاصلهٔ شعاع روی دایره می‌نشینند.</p>
+
+    <p>همان پرسش خط و دایره نیز در اصل دربارهٔ تعریف بود. خط فقط وقتی دایره را در دو نقطه قطع می‌کند که دایره را به مرزش محدود کنیم و ناحیهٔ درون را جزئی از آن ندانیم. این تصمیم نه سلیقه‌ای است و نه وابسته به شکل؛ از تعریف می‌آید.</p>
+
+    <p>پس مسئله این نیست که دانشجو تعریف دایره را حفظ نکرده است. مسئله این است که سال‌ها دو شیء متفاوت را با یک نام دیده و بعد از او خواسته‌ایم تعریف یکی را به هر دو نسبت دهد. اگر قرار است تعریف در ریاضیات کاری انجام دهد، باید از همان نخستین مواجهه‌ها وارد کار شود: برای تشخیص نقطه‌های روی دایره، برای تشخیص اینکه یک شکل اصلاً دایره هست یا نه، و برای روشن‌کردن اینکه هر جمله دربارهٔ مرز است یا دربارهٔ ناحیهٔ درون آن.</p>
+
+    <p>دایره در اینجا فقط یک نمونه است. مسئلهٔ بزرگ‌تر، جایگاهی است که برای تعریف در آموزش ریاضیات قائل می‌شویم: چیزی برای حفظ‌کردن در پایان درس، یا ابزاری برای دیدن، پرسیدن و تصمیم‌گرفتن از همان آغاز.</p>
+  </div>
+
+  <!-- ===== کارنامه‌ی دست‌اندرکاران ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab2">نویسنده</div>
+        <div class="who">امیر اصغری</div>
+        <div class="aff">یوتیوب ‎@asghariamir</div>
+      </div>
+      <div class="role">
+        <div class="lab2">شکل‌های تعاملی</div>
+        <div class="who">سه نمودارِ زنده</div>
+        <div class="aff">دایره را با پرگار بکشید؛ خط را دایره یا قرص بخوانید؛ دو تضمینِ نهفته در تعریف را بیازمایید.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="refs">
+    <h3>ارجاع</h3>
+    <ol>
+      <li id="src-monthly-fa">A. H. Asghari, “Surprises from mathematics education research: Student (mis)use of mathematical definitions,” <em>The American Mathematical Monthly</em>, published online 28 May 2026. <a href="https://doi.org/10.1080/00029890.2026.2663705" target="_blank" rel="noopener">doi:10.1080/00029890.2026.2663705</a></li>
+    </ol>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  }
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+</script>
+
+<!-- ===== Interactive figures ===== -->
+<script>
+(function(){
+  function toPt(svg, e){
+    var m = svg.getScreenCTM(); if (!m) return null;
+    var p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY;
+    var q = p.matrixTransform(m.inverse()); return { x: q.x, y: q.y };
+  }
+  function clamp(v, a, b){ return v < a ? a : (v > b ? b : v); }
+  function el(tag){ return document.createElementNS('http://www.w3.org/2000/svg', tag); }
+  function stageDrag(svg, onMove){
+    var active = false;
+    svg.addEventListener('pointerdown', function(e){ active = true; try { svg.setPointerCapture(e.pointerId); } catch(_){} var p = toPt(svg, e); if (p) onMove(p.x, p.y); e.preventDefault(); });
+    svg.addEventListener('pointermove', function(e){ if (!active) return; var p = toPt(svg, e); if (p) onMove(p.x, p.y); });
+    window.addEventListener('pointerup', function(){ active = false; });
+  }
+  function handleDrag(svg, handle, onMove){
+    handle.addEventListener('pointerdown', function(e){
+      e.preventDefault(); e.stopPropagation();
+      try { handle.setPointerCapture(e.pointerId); } catch(_){}
+      function mv(ev){ var p = toPt(svg, ev); if (p) onMove(p.x, p.y); }
+      function up(){ svg.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); }
+      svg.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+      var p = toPt(svg, e); if (p) onMove(p.x, p.y);
+    });
+  }
+
+  /* ---------- 1 · Compass draws the circle ---------- */
+  function initCompass(root){
+    var svg = root.querySelector('svg.stage');
+    var C = { x: 180, y: 125 }, r = 86;
+    var arm = root.querySelector('.arm'), pencil = root.querySelector('.pencil'), trace = root.querySelector('.trace');
+    var seen = {};
+    function paint(a){
+      var b = Math.round(a / (Math.PI / 90));
+      if (seen[b]) return; seen[b] = 1;
+      var x = C.x + r * Math.cos(a), y = C.y + r * Math.sin(a);
+      var c = el('circle');
+      c.setAttribute('cx', x.toFixed(1)); c.setAttribute('cy', y.toFixed(1));
+      c.setAttribute('r', '2.6'); c.setAttribute('fill', '#C8633E');
+      trace.appendChild(c);
+    }
+    function move(x, y){
+      var a = Math.atan2(y - C.y, x - C.x);
+      var px = C.x + r * Math.cos(a), py = C.y + r * Math.sin(a);
+      arm.setAttribute('x2', px.toFixed(1)); arm.setAttribute('y2', py.toFixed(1));
+      pencil.setAttribute('cx', px.toFixed(1)); pencil.setAttribute('cy', py.toFixed(1));
+      paint(a);
+    }
+    stageDrag(svg, move);
+    var clr = root.querySelector('.clear');
+    if (clr) clr.addEventListener('click', function(){ trace.innerHTML = ''; seen = {}; });
+  }
+
+  /* ---------- 2 · line meets circle (circle vs disk) ---------- */
+  function initLine(root){
+    var fa = root.dataset.lang === 'fa';
+    var svg = root.querySelector('svg.stage');
+    var C = { x: 180, y: 125 }, r = 86;
+    var disk = root.querySelector('.disk');
+    var ln = root.querySelector('.ln'), chord = root.querySelector('.chord');
+    var h1 = root.querySelector('.h1'), h2 = root.querySelector('.h2');
+    var hits = root.querySelector('.hits'), cEl = root.querySelector('.count');
+    var toggle = root.querySelector('.toggle'), noteEl = root.querySelector('.lab-note');
+    var A = { x: 35, y: 60 }, B = { x: 325, y: 180 }, asDisk = false;
+    var S = fa
+      ? { circ:function(n){ return 'دایره را در ' + (n===2?'۲':n===1?'۱':'۰') + ' نقطه قطع می‌کند'; }, inf:'قرص را در بی‌نهایت نقطه قطع می‌کند', touch:'قرص را در ۱ نقطه لمس می‌کند', miss:'برخوردی ندارد', toDisk:'آن را قرص ببین', toCirc:'آن را دایره ببین', noteD:'حالا تمامِ وترِ درون روی قرص است — بی‌نهایت نقطه.' }
+      : { circ:function(n){ return 'meets the circle in ' + n + (n === 1 ? ' point' : ' points'); }, inf:'meets the disk in infinitely many points', touch:'touches the disk at 1 point', miss:'misses the disk', toDisk:'See it as a disk', toCirc:'See it as a circle', noteD:'Now the whole chord lies inside — infinitely many points.' };
+    function setHits(list){
+      hits.innerHTML = '';
+      list.forEach(function(p){
+        var c = el('circle');
+        c.setAttribute('cx', p.x.toFixed(1)); c.setAttribute('cy', p.y.toFixed(1));
+        c.setAttribute('r', '5.5'); c.setAttribute('fill', '#C8633E'); c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', '2');
+        hits.appendChild(c);
+      });
+    }
+    function roots(){
+      var dx = B.x - A.x, dy = B.y - A.y;
+      var fx = A.x - C.x, fy = A.y - C.y;
+      var aa = dx*dx + dy*dy, bb = 2*(fx*dx + fy*dy), cc = fx*fx + fy*fy - r*r;
+      var disc = bb*bb - 4*aa*cc, out = { n:0, pts:[] };
+      if (disc < -1e-4) out.n = 0;
+      else if (disc < 1e-4){ out.n = 1; var t = -bb/(2*aa); out.pts.push({ x:A.x+t*dx, y:A.y+t*dy }); }
+      else { out.n = 2; var sd = Math.sqrt(disc), t1 = (-bb-sd)/(2*aa), t2 = (-bb+sd)/(2*aa); out.pts.push({ x:A.x+t1*dx, y:A.y+t1*dy }, { x:A.x+t2*dx, y:A.y+t2*dy }); }
+      return out;
+    }
+    function update(){
+      var dx = B.x - A.x, dy = B.y - A.y;
+      ln.setAttribute('x1', A.x - 3*dx); ln.setAttribute('y1', A.y - 3*dy);
+      ln.setAttribute('x2', B.x + 3*dx); ln.setAttribute('y2', B.y + 3*dy);
+      h1.setAttribute('cx', A.x); h1.setAttribute('cy', A.y); h2.setAttribute('cx', B.x); h2.setAttribute('cy', B.y);
+      var R = roots();
+      if (!asDisk){
+        disk.style.display = 'none'; chord.style.display = 'none';
+        setHits(R.pts); cEl.textContent = S.circ(R.n);
+      } else {
+        disk.style.display = ''; setHits([]);
+        if (R.n === 2){
+          chord.style.display = '';
+          chord.setAttribute('x1', R.pts[0].x); chord.setAttribute('y1', R.pts[0].y);
+          chord.setAttribute('x2', R.pts[1].x); chord.setAttribute('y2', R.pts[1].y);
+          cEl.textContent = S.inf;
+        } else {
+          chord.style.display = 'none';
+          cEl.textContent = R.n === 1 ? S.touch : S.miss;
+        }
+      }
+      noteEl.textContent = asDisk ? S.noteD : '';
+      toggle.textContent = asDisk ? S.toCirc : S.toDisk;
+    }
+    handleDrag(svg, h1, function(x, y){ A.x = clamp(x, 6, 354); A.y = clamp(y, 6, 244); update(); });
+    handleDrag(svg, h2, function(x, y){ B.x = clamp(x, 6, 354); B.y = clamp(y, 6, 244); update(); });
+    toggle.addEventListener('click', function(){ asDisk = !asDisk; update(); });
+    update();
+  }
+
+  /* ---------- 3 · the two guarantees (dotted ring + free point) ---------- */
+  function initDef(root){
+    var fa = root.dataset.lang === 'fa';
+    var svg = root.querySelector('svg.stage');
+    var C = { x: 180, y: 125 }, r = 86, NDOTS = 20, STEP = Math.PI * 2 / NDOTS, TOL = 4.2 * Math.PI / 180;
+    var dotsG = root.querySelector('.dots'), locus = root.querySelector('.locus');
+    var dot = root.querySelector('.dot');
+    var vEl = root.querySelector('.verdict'), stmtEl = root.querySelector('.lab-stmt'), noteEl = root.querySelector('.lab-note');
+    var btns = root.querySelectorAll('.segbtn');
+    var S = fa
+      ? { onDot:'روی حلقه — نقطه‌ای که شکل دارد', between:'میانِ دو نقطه — نقطه‌ای به فاصلهٔ شعاع که جا افتاده',
+          onCirc:'روی دایره است', offCirc:'روی دایره نیست',
+          stOut:'اگر نقطه‌ای به فاصلهٔ شعاع از مرکز باشد، آنگاه باید روی دایره باشد.',
+          stExtra:'اگر نقطه‌ای روی دایره باشد، آنگاه به فاصلهٔ شعاع از مرکز است.',
+          nOut:'نقطه را دورِ حلقه بچرخانید. میانِ هر دو نقطه، جایی به فاصلهٔ شعاع هست که این شکل آن را جا انداخته — پس دایره نیست. دایره چیزی از قلم نمی‌اندازد.',
+          nExtra:'نقطه را هر جا ببرید. هر نقطه‌ای که به فاصلهٔ شعاع نباشد کنار گذاشته می‌شود — پس چیزی که نباید، روی دایره وارد نمی‌شود.' }
+      : { onDot:'on the ring — a point the shape has', between:'between dots — a point at distance r left out',
+          onCirc:'on the circle', offCirc:'not on the circle',
+          stOut:'If a point is one radius from the centre, then it must be on the circle.',
+          stExtra:'If a point is on the circle, then it is one radius from the centre.',
+          nOut:'Swing the point around the ring. Between every two dots is a point at distance r that this shape leaves out — so it is not the circle. The circle leaves nothing out.',
+          nExtra:'Move the point anywhere. Any point not at distance r is turned away — so nothing that should not be there gets onto the circle.' };
+    for (var i = 0; i < NDOTS; i++){
+      var a0 = i * STEP, c = el('circle');
+      c.setAttribute('cx', (C.x + r * Math.cos(a0)).toFixed(1));
+      c.setAttribute('cy', (C.y + r * Math.sin(a0)).toFixed(1));
+      c.setAttribute('r', '3'); c.setAttribute('fill', '#1C1814');
+      dotsG.appendChild(c);
+    }
+    var q = 'out';
+    function updateOut(x, y){
+      var a = Math.atan2(y - C.y, x - C.x);
+      dot.setAttribute('cx', (C.x + r * Math.cos(a)).toFixed(1));
+      dot.setAttribute('cy', (C.y + r * Math.sin(a)).toFixed(1));
+      var m = a % STEP; if (m < 0) m += STEP;
+      var onDot = Math.min(m, STEP - m) <= TOL;
+      vEl.textContent = onDot ? S.onDot : S.between;
+      vEl.className = 'verdict ' + (onDot ? 'on' : 'off');
+      dot.setAttribute('fill', onDot ? '#567D46' : '#C8633E');
+    }
+    function updateExtra(x, y){
+      var px = clamp(x, 12, 348), py = clamp(y, 12, 238);
+      dot.setAttribute('cx', px); dot.setAttribute('cy', py);
+      var on = Math.abs(Math.hypot(px - C.x, py - C.y) - r) <= 5;
+      vEl.textContent = on ? S.onCirc : S.offCirc;
+      vEl.className = 'verdict ' + (on ? 'on' : 'off');
+      dot.setAttribute('fill', on ? '#567D46' : '#C8633E');
+    }
+    function dispatch(x, y){ if (q === 'out') updateOut(x, y); else updateExtra(x, y); }
+    function setQ(name){
+      q = name;
+      dotsG.style.display = name === 'out' ? '' : 'none';
+      locus.style.display = name === 'out' ? 'none' : '';
+      btns.forEach(function(b){ b.classList.toggle('on', b.dataset.q === name); });
+      stmtEl.textContent = name === 'out' ? S.stOut : S.stExtra;
+      noteEl.textContent = name === 'out' ? S.nOut : S.nExtra;
+      if (name === 'out') updateOut(284, 86); else updateExtra(284, 86);
+    }
+    var active = false;
+    svg.addEventListener('pointerdown', function(e){ active = true; try { svg.setPointerCapture(e.pointerId); } catch(_){} var p = toPt(svg, e); if (p) dispatch(p.x, p.y); e.preventDefault(); });
+    svg.addEventListener('pointermove', function(e){ if (!active) return; var p = toPt(svg, e); if (p) dispatch(p.x, p.y); });
+    window.addEventListener('pointerup', function(){ active = false; });
+    btns.forEach(function(b){ b.addEventListener('click', function(){ setQ(b.dataset.q); }); });
+    setQ('out');
+  }
+
+  function boot(){
+    document.querySelectorAll('.lab[data-widget="compass"]').forEach(initCompass);
+    document.querySelectorAll('.lab[data-widget="line"]').forEach(initLine);
+    document.querySelectorAll('.lab[data-widget="def"]').forEach(initDef);
+  }
+  if (document.readyState !== 'loading') boot(); else document.addEventListener('DOMContentLoaded', boot);
+})();
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

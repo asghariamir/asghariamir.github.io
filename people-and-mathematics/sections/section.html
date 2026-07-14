@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Section · People and Mathematics</title>
+<meta name="description" content="A section of People and Mathematics — آدم‌ها و ریاضیات, a bilingual journal.">
+<link rel="icon" href="../assets/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: "B Nazanin"; src: url("../fonts/BNazanin.woff2") format("woff2"), url("../fonts/BNazanin.woff") format("woff"), url("../fonts/BNazanin.ttf") format("truetype"); font-weight: 400 700; font-display: swap; }
+  :root { --pm-accent: #C8633E; --pm-ink: #1C1814; --pm-paper: #FBF7EF; --pm-black: #0D0C0B; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; background: var(--pm-paper); color: var(--pm-ink); -webkit-font-smoothing: antialiased; }
+  ::selection { background: var(--pm-accent); color: var(--pm-paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", "B Nazanin", sans-serif; }
+  [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  .wrap { max-width: 1280px; margin: 0 auto; }
+  .pm-img { background-color: #EAE0CC; background-image: repeating-linear-gradient(135deg, #E6DAC1 0 13px, #EFE6D2 13px 26px); }
+  .accent { color: var(--pm-accent); }
+  a { color: inherit; }
+
+  .topband { background: var(--pm-black); color: var(--pm-paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px 40px; }
+  .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; color: inherit; }
+  .brand-logo { width: 54px; height: 54px; object-fit: contain; flex: 0 0 auto; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 21px; font-weight: 600; line-height: 1.1; }
+  .brand-en { font-size: 15px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  nav.menu { display: flex; align-items: center; gap: 22px; font-size: 13.5px; font-weight: 500; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; background: transparent; color: var(--pm-paper); }
+  .langtoggle button.on { background: var(--pm-paper); color: var(--pm-black); }
+
+  .crumbbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 13px 40px; border-bottom: 1px solid var(--pm-ink); }
+  .crumbbar a { text-decoration: none; }
+  .crumb { font-size: 13px; color: #6B6155; }
+  .crumb .accent { font-weight: 600; }
+
+  .sechead { padding: 52px 40px 34px; border-bottom: 1px solid var(--pm-ink); }
+  .sec-n { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--pm-accent); font-weight: 600; }
+  .sec-title { margin: 14px 0 0; font-size: 54px; line-height: 1.02; font-weight: 500; letter-spacing: -.02em; }
+  .sec-blurb { margin: 18px 0 0; font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; max-width: 34em; }
+  [dir="rtl"] .sec-blurb { font-style: normal; }
+  .sec-count { margin-top: 20px; font-size: 13px; color: #948876; letter-spacing: .04em; text-transform: uppercase; }
+
+  .cards { padding: 44px 40px 8px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 48px; }
+  .card { display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: start; text-decoration: none; color: inherit; }
+  .card .thumb { aspect-ratio: 4 / 5; border: 1px solid #DBD0BA; border-radius: 3px; overflow: hidden; display: flex; align-items: flex-end; padding: 0; background: #0D0C0B; }
+  .card .thumb.ph { background: none; padding: 9px; }
+  .card .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .imglabel { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 10px; line-height: 1.3; letter-spacing: .03em; color: #7C7160; background: rgba(251,247,239,0.8); padding: 4px 7px; border-radius: 3px; }
+  .card .tag { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--pm-accent); }
+  .card h3 { margin: 8px 0 0; font-size: 27px; line-height: 1.12; font-weight: 500; letter-spacing: -.01em; }
+  .card .dek { margin: 12px 0 0; font-size: 16px; line-height: 1.5; color: #43392E; text-align: justify; }
+  .card .meta { display: flex; align-items: center; gap: 12px; margin-top: 16px; font-size: 12.5px; color: #6B6155; flex-wrap: wrap; }
+  .card .meta .who { font-weight: 600; color: var(--pm-ink); }
+  .card .meta .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; display: inline-block; }
+  .avatar-chip { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #DBD0BA; flex: 0 0 auto; }
+  .lvl { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .lvl .lvl-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }; margin-top: 14px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--pm-accent); border: 1px solid #E4C9B8; border-radius: 999px; padding: 3px 10px; }
+
+  .empty { padding: 60px 40px 80px; font-size: 20px; color: #948876; font-style: italic; }
+
+  .footer { padding: 40px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap; border-top: 1px solid var(--pm-ink); margin-top: 40px; }
+  .footer .fl { font-size: 13px; color: #6B6155; }
+  .back { text-decoration: none; font-weight: 600; font-size: 14px; color: var(--pm-ink); border: 1px solid var(--pm-ink); border-radius: 999px; padding: 9px 18px; transition: background .15s, color .15s; }
+  .back:hover { background: var(--pm-black); color: var(--pm-paper); }
+
+  @media (max-width: 900px) {
+    .cards { grid-template-columns: 1fr; }
+    .sec-title { font-size: 40px; }
+  }
+  @media (max-width: 560px) {
+    .topband { flex-wrap: wrap; padding: 16px 20px; gap: 14px; }
+    .crumbbar, .sechead, .cards, .footer { padding-left: 20px; padding-right: 20px; }
+    .sec-title { font-size: 32px; }
+    .card { grid-template-columns: 120px 1fr; gap: 16px; }
+    .card h3 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="../content.js"></script>
+<script>
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function pick(o, lang){ return o ? (o[lang] != null ? o[lang] : o.en) : ""; }
+function toLocal(n, isFa){ n = String(n); return isFa ? n.replace(/[0-9]/g, function(d){ return "۰۱۲۳۴۵۶۷۸۹"[+d]; }) : n; }
+function up(href){ return (!href || /^https?:/.test(href)) ? href : "../" + href; }
+
+var DATA = window.PM_CONTENT || { SECTIONS:[], WORKS:[], en:{}, fa:{} };
+var YT = DATA.youtubeUrl || "https://www.youtube.com/@asghariamir";
+
+function todayISO(){ try { return new Date().toISOString().slice(0,10); } catch(e){ return ""; } }
+function effClosed(iss){ if (!iss) return ""; if (iss.closed) return iss.closed; if (iss.closes && todayISO() >= iss.closes) return iss.closes; return ""; }
+function openIssueN(){
+  var iss = DATA.ISSUES || [];
+  for (var k = iss.length - 1; k >= 0; k--) if (!effClosed(iss[k])) return iss[k].n;
+  return iss.length ? iss[iss.length-1].n + 1 : 1;
+}
+function issueByN(n){ return (DATA.ISSUES||[]).filter(function(i){ return i.n === n; })[0] || null; }
+function issueOfWork(w){ return issueByN(w.issue != null ? w.issue : openIssueN()); }
+function levelChip(levelId, lang){
+  var L = (DATA.LEVELS||[]).filter(function(x){ return x.id === levelId; })[0];
+  if (!L) return "";
+  return '<span class="lvl sans"><span class="lvl-dot" style="background:'+esc(L.color)+';"></span><span>'+esc(pick(L.name,lang))+'</span></span>';
+}
+
+function currentId(){
+  var m = /[?&]id=([^&]+)/.exec(location.search);
+  return m ? decodeURIComponent(m[1]) : (DATA.SECTIONS[0] && DATA.SECTIONS[0].id);
+}
+
+function render(lang){
+  var c = DATA[lang] || DATA.en;
+  var isFa = lang === "fa";
+  var dir = isFa ? "rtl" : "ltr";
+  var arrow = isFa ? "←" : "→";
+  document.documentElement.lang = lang;
+  document.documentElement.dir = dir;
+
+  var id = currentId();
+  var sec = (DATA.SECTIONS||[]).filter(function(s){ return s.id === id; })[0] || (DATA.SECTIONS||[])[0] || {};
+  var works = (DATA.WORKS||[]).filter(function(w){ return w.section === sec.id; });
+  document.title = pick(sec.name, lang) + " · People and Mathematics";
+
+  var count = works.length;
+  var countTxt = count === 0 ? c.sectionEmpty
+    : (count === 1 ? c.sectionCountOne : (c.sectionCountMany||"{n}").replace("{n}", toLocal(count, isFa)));
+
+  var cardsHtml = works.map(function(w){
+    var t = w[lang] || w.en || {};
+    var ci = DATA.cardImage(w);
+    var thumb = ci
+      ? '<div class="thumb"><img src="'+esc(up(ci))+'" alt="'+esc(t.title)+'"></div>'
+      : '<div class="thumb ph pm-img"><span class="imglabel">'+esc(w.img)+'</span></div>';
+    var avatar = (w.authorImg && w.authorImg !== ci)
+      ? '<img class="avatar-chip" src="'+esc(up(w.authorImg))+'" alt="'+esc(t.author)+'" loading="lazy">' : '';
+    var iss = issueOfWork(w);
+    var issTag = (iss && effClosed(iss))
+      ? '<span class="dot"></span><span>'+esc(pick(iss.label,lang))+'</span>' : '';
+    var lvl = levelChip(w.level, lang);
+    var lvlTag = lvl ? '<span class="dot"></span>'+lvl : '';
+    var inner = thumb
+      + '<div>'
+        + '<div class="tag sans">'+esc(pick(sec.name,lang))+'</div>'
+        + '<h3>'+esc(t.title)+'</h3>'
+        + '<p class="dek">'+esc(t.dek)+'</p>'
+        + '<div class="meta sans">'+avatar+'<span class="who">'+esc(t.author)+'</span><span class="dot"></span><span>'+esc(t.meta)+'</span><span class="dot"></span><span>'+esc(w.date?pick(w.date,lang):"")+'</span>'+lvlTag+issTag+'</div>'
+        + (w.featured ? '<span class="feat sans">'+(isFa?'برگزیده':'Featured')+'</span>' : '')
+      + '</div>';
+    return w.href ? '<a class="card" href="'+esc(up(w.href))+'">'+inner+'</a>' : '<div class="card">'+inner+'</div>';
+  }).join("");
+
+  var nav = c.nav || {};
+  document.getElementById("app").innerHTML =
+    '<div class="topband">'
+      + '<a class="brand" href="../index.html"><img class="brand-logo" src="../assets/logo.jpg" alt="People and Mathematics"><div><div class="brand-fa persian">آدم‌ها و ریاضیات</div><div class="brand-en">People and Mathematics</div></div></a>'
+      + '<nav class="menu sans">'
+        + '<a href="../index.html" style="text-decoration:none;">'+esc(nav.issues)+'</a>'
+        + '<div class="langtoggle">'
+          + '<button data-lang="en" class="'+(!isFa?'on':'')+'">EN</button>'
+          + '<button data-lang="fa" class="persian '+(isFa?'on':'')+'">فارسی</button>'
+        + '</div>'
+      + '</nav>'
+    + '</div>'
+
+    + '<div class="crumbbar">'
+      + '<div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent">'+esc(pick(sec.name,lang))+'</span></div>'
+      + '<div class="crumb sans">'+esc(pick(sec.n,lang))+'</div>'
+    + '</div>'
+
+    + '<header class="sechead wrap">'
+      + '<div class="sec-n sans">'+esc(c.sectionsLabel)+' · '+esc(pick(sec.n,lang))+'</div>'
+      + '<h1 class="sec-title">'+esc(pick(sec.name,lang))+'</h1>'
+      + '<p class="sec-blurb">'+esc(pick(sec.blurb,lang))+'</p>'
+      + '<div class="sec-count sans">'+esc(countTxt)+'</div>'
+    + '</header>'
+
+    + (count ? '<section class="cards wrap">'+cardsHtml+'</section>'
+             : '<section class="empty wrap">'+(isFa?'به‌زودی مطالبی در این بخش منتشر می‌شود.':'New work will appear in this section soon.')+'</section>')
+
+    + '<footer class="footer wrap">'
+      + '<span class="fl sans">'+esc(c.pubLine).replace('mathswell.com','<a href="../index.html" style="color:inherit;">mathswell.com</a>')+'</span>'
+      + '<a class="back sans" href="../index.html">'+esc(c.backToJournal)+'</a>'
+    + '</footer>';
+
+  document.querySelectorAll(".langtoggle button").forEach(function(b){
+    b.addEventListener("click", function(){
+      var l = b.getAttribute("data-lang");
+      try { localStorage.setItem("pm-lang", l); } catch(e){}
+      render(l);
+      window.scrollTo(0, 0);
+    });
+  });
+}
+
+var startLang = "en";
+try { var saved = localStorage.getItem("pm-lang"); if (saved === "en" || saved === "fa") startLang = saved; } catch(e){}
+render(startLang);
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>People and Mathematics · آدم‌ها و ریاضیات</title>
+<meta name="description" content="A bilingual journal for teaching, thinking, and conversation in mathematics. A Mathswell publication.">
+<link rel="alternate" type="application/rss+xml" title="People and Mathematics" href="feed.xml">
+
+<!-- Social / link-preview card (shows when shared, e.g. from the mathswell.com banner) -->
+<meta property="og:title" content="People and Mathematics · آدم‌ها و ریاضیات">
+<meta property="og:description" content="A bilingual journal for teaching, thinking, and conversation in mathematics.">
+<meta property="og:image" content="assets/logo.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+
+<link rel="icon" href="assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* === Self-hosted B Nazanin (Persian) ===
+     Drop a licensed B-Nazanin web font file at  fonts/BNazanin.woff2
+     and it will be used automatically. Until then, Persian text falls
+     back to Noto Naskh Arabic (a high-quality Google web font) so the
+     site always looks correct for every visitor. */
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("fonts/BNazanin.woff2") format("woff2"),
+         url("fonts/BNazanin.woff")  format("woff"),
+         url("fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700;
+    font-display: swap;
+  }
+
+  :root { --pm-accent: #C8633E; --pm-ink: #1C1814; --pm-paper: #FBF7EF; --pm-black: #0D0C0B; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif;
+    background: var(--pm-paper); color: var(--pm-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--pm-accent); color: var(--pm-paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", "B Nazanin", sans-serif; }
+  .persian, [dir="rtl"] .persian { font-family: "Vazirmatn", "B Nazanin", "Noto Naskh Arabic", sans-serif; }
+  [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  .wrap { max-width: 1280px; margin: 0 auto; }
+  .pm-img { background-color: #EAE0CC; background-image: repeating-linear-gradient(135deg, #E6DAC1 0 13px, #EFE6D2 13px 26px); }
+  .accent { color: var(--pm-accent); }
+  a { color: inherit; }
+  button { font-family: inherit; }
+
+  /* Masthead — black top band */
+  .topband { background: var(--pm-black); color: var(--pm-paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px 40px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-logo { width: 54px; height: 54px; object-fit: contain; flex: 0 0 auto; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 21px; font-weight: 600; line-height: 1.1; }
+  .brand-en { font-size: 15px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  nav.menu { display: flex; align-items: center; gap: 24px; font-size: 13.5px; font-weight: 500; }
+  nav.menu span { cursor: pointer; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; margin-inline-start: 6px; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; background: transparent; color: var(--pm-paper); }
+  .langtoggle button.on { background: var(--pm-paper); color: var(--pm-black); }
+
+  /* Sub-bar under the band */
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 13px 40px; border-bottom: 1px solid var(--pm-ink); }
+  .subbar .kick { font-size: 12px; letter-spacing: 0.13em; text-transform: uppercase; font-weight: 600; color: var(--pm-accent); }
+  .subbar .pub { font-size: 13px; color: var(--pm-muted, #6B6155); }
+
+  /* Slim dedication line */
+  .dedline { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 11px 40px; border-bottom: 1px solid var(--pm-ink); text-decoration: none; color: var(--pm-ink); background: #F5EFE2; }
+  .dedline:hover .dedline-txt { color: var(--pm-accent); }
+  .dedline .heart { color: var(--pm-accent); font-size: 12px; }
+  .dedline .dedline-txt { font-size: 13.5px; font-style: italic; letter-spacing: .01em; transition: color .15s; }
+  .dedline .go { font-size: 12px; color: var(--pm-accent); font-weight: 600; }
+
+  /* Hero — on cream */
+  .hero { display: grid; grid-template-columns: 1fr 320px; gap: 48px; align-items: center; padding: 48px 40px; border-bottom: 1px solid var(--pm-ink); }
+  .lead { display: flex; flex-direction: column; gap: 20px; }
+  .lead h1 { margin: 0; font-size: 60px; line-height: 1.0; font-weight: 500; letter-spacing: -0.02em; max-width: 10em; }
+  .lead .dek { margin: 0; font-size: 21px; line-height: 1.45; font-style: italic; color: #43392E; max-width: 28em; }
+  .lead-img { height: 280px; border: 1px solid #DBD0BA; border-radius: 3px; display: flex; align-items: flex-end; padding: 12px; }
+  .imglabel { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: 0.03em; color: #7C7160; background: rgba(251,247,239,0.8); padding: 3px 7px; border-radius: 3px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; background: #B7AC99; display: inline-block; }
+
+  /* Sections rail */
+  .rail-label, .toc-label { padding: 16px 40px 10px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .rail { display: grid; grid-template-columns: repeat(6, 1fr); border-bottom: 1px solid var(--pm-ink); }
+  .rail-cell { padding: 18px 22px 30px; border-inline-start: 1px solid #E4DAC6; }
+
+  /* Features */
+  .features { padding: 44px 40px 8px; }
+  .features-head { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; border-bottom: 2px solid var(--pm-ink); padding-bottom: 14px; margin-bottom: 30px; }
+
+  /* Issues shelf — the journal stays open; issues close */
+  .issues-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .issue-cell { padding: 18px 22px 26px; border-inline-start: 1px solid #E4DAC6; display: flex; flex-direction: column; gap: 9px; text-decoration: none; color: inherit; }
+  .issue-cell:first-child { border-inline-start: 0; }
+  a.issue-cell:hover .issue-see { color: var(--pm-accent); }
+  .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--pm-accent); display: inline-block; margin-inline-end: 7px; animation: pmpulse 2.2s ease-in-out infinite; }
+  @keyframes pmpulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+
+  /* Author portrait chip — shows on contributions */
+  .avatar-chip { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #DBD0BA; flex: 0 0 auto; }
+  /* Maths-level chip — coloured dot + label */
+  .lvl { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .lvl .lvl-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+  /* Contributors strip */
+  .people { padding: 10px 40px 46px; display: flex; gap: 30px 38px; flex-wrap: wrap; }
+  .person { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+  .person img, .person .ph-ava { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 1px solid #DBD0BA; }
+  .person .ph-ava { display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; color: #948876; background: #EFE6D2; }
+  .person:hover .p-name { color: var(--pm-accent); }
+  .p-name { font-size: 16.5px; font-weight: 500; transition: color .15s; }
+  .p-count { font-size: 11.5px; color: #948876; margin-top: 2px; }
+  .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 48px; }
+  .feature { display: grid; grid-template-columns: 168px 1fr; gap: 22px; align-items: start; }
+  .feature .thumb { aspect-ratio: 4 / 5; border: 1px solid #DBD0BA; border-radius: 3px; display: flex; align-items: flex-end; padding: 9px; }
+  .feature h3 { margin: 8px 0 0; font-size: 25px; line-height: 1.12; font-weight: 500; letter-spacing: -0.01em; }
+  .feature p, .lead .dek, .note p, .getissue p { text-align: justify; }
+
+  /* TOC + note */
+  .lower { padding: 50px 40px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 64px; }
+  .toc-row { display: grid; grid-template-columns: 44px 1fr auto; align-items: baseline; gap: 16px; padding: 15px 0; border-bottom: 1px solid #E4DAC6; }
+  .note { background: var(--pm-black); color: var(--pm-paper); border-radius: 4px; padding: 38px 36px; align-self: start; }
+  .note h3 { margin: 16px 0 14px; font-size: 30px; font-weight: 500; line-height: 1.1; letter-spacing: -0.01em; }
+
+  /* Subscribe */
+  .subscribe { border-top: 1px solid var(--pm-ink); border-bottom: 1px solid var(--pm-ink); }
+  .subscribe-in { padding: 40px; display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+  .subscribe h3 { margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.01em; }
+  .subform { display: flex; align-items: stretch; border: 1px solid var(--pm-ink); border-radius: 999px; overflow: hidden; min-width: 360px; }
+  .subform input { border: 0; outline: none; background: transparent; padding: 14px 22px; font-size: 15px; flex: 1; color: var(--pm-ink); }
+  .subform button { border: 0; background: var(--pm-black); color: var(--pm-paper); padding: 14px 26px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+  /* Footer */
+  .footer { padding: 36px 40px 56px; display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+  .footer-brand { display: flex; align-items: center; gap: 14px; }
+  .footer-logo { width: 40px; height: 40px; border-radius: 6px; overflow: hidden; background: var(--pm-black); }
+  .footer-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; }
+  .footer-links { display: flex; gap: 26px; font-size: 13px; color: #43392E; }
+  .footer-links span { cursor: pointer; }
+  .yt { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; font-size: 13px; font-weight: 600; color: var(--pm-ink); border: 1px solid var(--pm-ink); border-radius: 999px; padding: 8px 16px; white-space: nowrap; transition: background .15s, color .15s; }
+  .yt:hover { background: var(--pm-black); color: var(--pm-paper); }
+  .yt .play { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 14px; background: var(--pm-accent); border-radius: 3px; color: #fff; font-size: 8px; }
+
+  /* Get-the-issue band (free PDF + pay-what-you-like) */
+  .getissue { background: var(--pm-black); color: var(--pm-paper); border-top: 1px solid var(--pm-ink); }
+  .getissue-in { padding: 56px 40px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 48px; }
+  .getissue .kicker { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; color: var(--pm-accent); }
+  .getissue h3 { margin: 14px 0 12px; font-size: 36px; line-height: 1.05; font-weight: 500; letter-spacing: -0.015em; max-width: 13em; }
+  .getissue p { margin: 0; font-size: 17px; line-height: 1.6; color: #D9D0C0; max-width: 34em; }
+  .getissue-actions { display: flex; flex-direction: column; gap: 14px; min-width: 248px; }
+  .btn-pdf { display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; background: var(--pm-paper); color: var(--pm-ink); border-radius: 999px; padding: 16px 26px; font-size: 16px; font-weight: 600; transition: transform .12s; }
+  .btn-pdf:hover { transform: translateY(-1px); }
+  .btn-donate { display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; background: transparent; color: var(--pm-paper); border: 1px solid #4A443B; border-radius: 999px; padding: 15px 26px; font-size: 16px; font-weight: 600; transition: border-color .12s; }
+  .btn-donate:hover { border-color: var(--pm-accent); }
+  .btn-meta { text-align: center; font-size: 12px; color: #8C8474; margin-top: -4px; }
+  .btn-heart { color: var(--pm-accent); }
+
+  /* ---------- TABLET ---------- */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 28px; }
+    .lead h1 { font-size: 48px; }
+    .rail { grid-template-columns: repeat(3, 1fr); }
+    .rail-cell:nth-child(3n+1) { border-inline-start: 0; }
+    .features-grid { grid-template-columns: 1fr; gap: 32px; }
+    .lower { grid-template-columns: 1fr; gap: 36px; }
+    .getissue-in { grid-template-columns: 1fr; gap: 28px; }
+  }
+
+  /* ---------- PHONE ---------- */
+  @media (max-width: 560px) {
+    .topband { flex-wrap: wrap; padding: 16px 20px; gap: 14px; }
+    .subbar { flex-wrap: wrap; padding: 12px 20px; gap: 6px; }
+    .subbar .pub { display: none; }
+    nav.menu { gap: 16px; font-size: 12.5px; flex-wrap: wrap; }
+    .hero { padding: 28px 20px; }
+    .lead h1 { font-size: 38px; }
+    .lead .dek { font-size: 18px; }
+    .lead-img { height: 220px; }
+    .rail-label, .toc-label, .features, .lower, .subscribe-in, .footer { padding-left: 20px; padding-right: 20px; }
+    .rail { grid-template-columns: repeat(2, 1fr); }
+    .rail-cell { padding: 16px 16px 24px; }
+    .rail-cell:nth-child(3n+1) { border-inline-start: 1px solid #E4DAC6; }
+    .rail-cell:nth-child(2n+1) { border-inline-start: 0; }
+    .features { padding-top: 32px; }
+    .feature { grid-template-columns: 110px 1fr; gap: 16px; }
+    .feature h3 { font-size: 21px; }
+    .getissue-in { grid-template-columns: 1fr; gap: 28px; padding: 40px 20px; }
+    .getissue h3 { font-size: 28px; }
+    .getissue-actions { min-width: 0; }
+    .subscribe-in { padding: 28px 20px; }
+    .subform { min-width: 0; width: 100%; }
+    .footer { padding: 28px 20px 44px; }
+    .footer-right { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- Your wording lives in content.js — edit that file, not this one. -->
+<script src="content.js"></script>
+<script>
+/* ---- Built-in fallback so the page never goes blank if content.js has a typo ---- */
+var FALLBACK = { SECTIONS:[], WORKS:[], FLAGSHIP:{}, en: { nav:{}, footerLinks:[] }, fa: { nav:{}, footerLinks:[] } };
+var DATA = (window.PM_CONTENT && window.PM_CONTENT.en && window.PM_CONTENT.fa) ? window.PM_CONTENT : FALLBACK;
+var YT = (window.PM_CONTENT && window.PM_CONTENT.youtubeUrl) || "https://www.youtube.com/@asghariamir";
+
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function pick(o, lang){ return o ? (o[lang] != null ? o[lang] : o.en) : ""; }
+function toLocal(n, isFa){ n = String(n); return isFa ? n.replace(/[0-9]/g, function(d){ return "۰۱۲۳۴۵۶۷۸۹"[+d]; }) : n; }
+function worksIn(id){ return (DATA.WORKS||[]).filter(function(w){ return w.section === id; }); }
+function featuredOf(id){ var l = worksIn(id); return l.filter(function(w){ return w.featured; })[0] || l[l.length-1] || null; }
+
+/* ---- Issues: the journal stays open, issues close ---- */
+function openIssueN(){
+  var iss = DATA.ISSUES || [];
+  for (var k = iss.length - 1; k >= 0; k--) if (!effClosed(iss[k])) return iss[k].n;
+  return iss.length ? iss[iss.length-1].n + 1 : 1;   /* all closed → works without a home fall past the last */
+}
+function issueByN(n){ return (DATA.ISSUES||[]).filter(function(i){ return i.n === n; })[0] || null; }
+function issueOfWork(w){ return issueByN(w.issue != null ? w.issue : openIssueN()); }
+function todayISO(){ try { return new Date().toISOString().slice(0,10); } catch(e){ return ""; } }
+/* effective closed date: an explicit  closed:  OR a scheduled  closes:  that has arrived */
+function effClosed(iss){ if (!iss) return ""; if (iss.closed) return iss.closed; if (iss.closes && todayISO() >= iss.closes) return iss.closes; return ""; }
+
+/* ---- Maths-level chip: coloured dot + label ---- */
+function levelChip(levelId, lang){
+  var L = (DATA.LEVELS||[]).filter(function(x){ return x.id === levelId; })[0];
+  if (!L) return "";
+  return '<span class="lvl sans" title="'+esc(pick((DATA[lang]||DATA.en).levelLabel ? {en:DATA.en.levelLabel,fa:DATA.fa.levelLabel} : {}, lang))+'"><span class="lvl-dot" style="background:'+esc(L.color)+';"></span><span>'+esc(pick(L.name,lang))+'</span></span>';
+}
+
+function render(lang){
+  var c = DATA[lang] || DATA.en;
+  var isFa = lang === "fa";
+  var dir = isFa ? "rtl" : "ltr";
+  var arrow = isFa ? "←" : "→";
+  var fg = DATA.FLAGSHIP || {};
+  var fgt = fg[lang] || fg.en || {};
+  document.documentElement.lang = lang;
+  document.documentElement.dir = dir;
+
+  var sectionsHtml = (DATA.SECTIONS||[]).map(function(s){
+    var works = worksIn(s.id);
+    var count = works.length;
+    var countTxt = count === 0 ? c.sectionEmpty
+      : (count === 1 ? c.sectionCountOne : (c.sectionCountMany||"{n}").replace("{n}", toLocal(count, isFa)));
+    var live = count > 0;
+    var inner = '<div class="sans accent" style="font-size:12px;font-weight:600;">'+esc(pick(s.n,lang))+'</div>'
+      + '<div style="font-size:19px;font-weight:500;margin-top:10px;line-height:1.15;">'+esc(pick(s.name,lang))+(live?' <span class="accent" style="font-weight:600;">'+arrow+'</span>':'')+'</div>'
+      + '<div class="sans" style="font-size:13px;color:#6B6155;margin-top:8px;line-height:1.4;">'+esc(pick(s.blurb,lang))+'</div>'
+      + '<div class="sans" style="font-size:11.5px;letter-spacing:.04em;color:'+(live?'#948876':'#B7AC99')+';margin-top:12px;text-transform:uppercase;">'+esc(countTxt)+'</div>';
+    return live
+      ? '<a class="rail-cell" href="sections/section.html?id='+esc(s.id)+'" style="text-decoration:none;color:inherit;">'+inner+'</a>'
+      : '<div class="rail-cell">'+inner+'</div>';
+  }).join("");
+
+  function workCard(w){
+    var t = w[lang] || w.en || {};
+    var sec = (DATA.SECTIONS||[]).filter(function(s){ return s.id === w.section; })[0] || {};
+    var ci = DATA.cardImage(w);
+    var thumb = ci
+      ? '<div class="thumb" style="padding:0;overflow:hidden;background:#0D0C0B;"><img src="'+esc(ci)+'" alt="'+esc(t.title)+'" style="width:100%;height:100%;object-fit:cover;display:block;"></div>'
+      : '<div class="thumb pm-img"><span class="imglabel" style="font-size:9.5px;line-height:1.3;">'+esc(w.img)+'</span></div>';
+    var avatar = (w.authorImg && w.authorImg !== ci)
+      ? '<img class="avatar-chip" src="'+esc(w.authorImg)+'" alt="'+esc(t.author)+'" loading="lazy">' : '';
+    var iss = issueOfWork(w);
+    var issTag = (iss && effClosed(iss))
+      ? '<span class="dot" style="width:3px;height:3px;"></span><span>'+esc(pick(iss.label,lang))+'</span>' : '';
+    var lvl = levelChip(w.level, lang);
+    var lvlTag = lvl ? '<span class="dot" style="width:3px;height:3px;"></span>'+lvl : '';
+    var inner = thumb
+      + '<div>'
+        + '<div class="sans accent" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;">'+esc(pick(sec.name,lang))+'</div>'
+        + '<h3>'+esc(t.title)+'</h3>'
+        + '<p style="margin:10px 0 0;font-size:15.5px;line-height:1.5;color:#43392E;">'+esc(t.dek)+'</p>'
+        + '<div class="sans" style="display:flex;align-items:center;gap:10px;margin-top:14px;font-size:12.5px;color:#6B6155;">'
+          + avatar
+          + '<span style="font-weight:600;color:var(--pm-ink);">'+esc(t.author)+'</span><span class="dot" style="width:3px;height:3px;"></span><span>'+esc(t.meta)+'</span>'+lvlTag+issTag
+          + (w.href?'<span class="accent" style="font-weight:600;">'+arrow+'</span>':'')
+        + '</div>'
+      + '</div>';
+    return w.href
+      ? '<a class="feature" href="'+esc(w.href)+'" style="text-decoration:none;color:inherit;">'+inner+'</a>'
+      : '<article class="feature">'+inner+'</article>';
+  }
+
+  var featuredWorks = (DATA.SECTIONS||[]).map(function(s){ return featuredOf(s.id); }).filter(Boolean);
+  var featuresHtml = featuredWorks.map(workCard).join("");
+
+  var alsoWorks = (DATA.WORKS||[]).filter(function(w){ return featuredOf(w.section) !== w; });
+  var alsoHtml = alsoWorks.map(function(w, i){
+    var t = w[lang] || w.en || {};
+    var sec = (DATA.SECTIONS||[]).filter(function(s){ return s.id === w.section; })[0] || {};
+    var iss = issueOfWork(w);
+    var issTxt = (iss && effClosed(iss)) ? ' · ' + esc(pick(iss.label,lang)) : '';
+    var lvl = levelChip(w.level, lang);
+    var titleHtml = w.href
+      ? '<a href="'+esc(w.href)+'" style="font-size:19px;font-weight:500;line-height:1.2;text-decoration:none;color:inherit;">'+esc(t.title)+' <span class="accent">'+arrow+'</span></a>'
+      : '<span style="font-size:19px;font-weight:500;line-height:1.2;">'+esc(t.title)+'</span>';
+    return '<div class="toc-row">'
+      + '<span class="sans accent" style="font-size:14px;font-weight:600;">'+esc(toLocal(String(i+1).padStart(2,"0"), isFa))+'</span>'
+      + '<div>'+titleHtml+'<div class="sans" style="display:flex;align-items:center;gap:10px;font-size:12px;color:#948876;margin-top:4px;flex-wrap:wrap;"><span>'+esc(w.date?pick(w.date,lang):"")+issTxt+'</span>'+lvl+'</div></div>'
+      + '<span class="sans" style="font-size:12px;color:#6B6155;text-transform:uppercase;letter-spacing:.06em;">'+esc(pick(sec.name,lang))+'</span>'
+      + '</div>';
+  }).join("");
+
+  var contactEmail = (window.PM_CONTENT && window.PM_CONTENT.contactEmail) || "amir@mathswell.com";
+  var subscribeUrl = (window.PM_CONTENT && window.PM_CONTENT.subscribeUrl) || "";
+  var footerLinksHtml = (c.footerLinks||[]).map(function(l){
+    if (/contact|تماس/i.test(l)) return '<a href="mailto:'+esc(contactEmail)+'" style="text-decoration:none;">'+esc(l)+'</a>';
+    if (/rss/i.test(l)) return '<a href="feed.xml" style="text-decoration:none;">'+esc(l)+'</a>';
+    if (/contributor|نویسندگان/i.test(l)) return '<a href="sections/contributors.html" style="text-decoration:none;">'+esc(l)+'</a>';
+    if (/sections|بخش/i.test(l)) return '<a href="#sections" style="text-decoration:none;">'+esc(l)+'</a>';
+    return '<span>'+esc(l)+'</span>';
+  }).join("");
+  var nav = c.nav || {};
+
+  var pdfUrl = (window.PM_CONTENT && window.PM_CONTENT.issuePdfUrl) || "";
+  var donateUrl = (window.PM_CONTENT && window.PM_CONTENT.donateUrl) || "";
+
+  /* ---- the issues shelf: the live/launch issue, plus any that have closed ---- */
+  var openN = openIssueN();
+  var issuesShelf = "";
+  if ((DATA.ISSUES||[]).some(function(i){ return !!effClosed(i) || !!i.closes; })){
+    var cells = (DATA.ISSUES||[]).slice().reverse().map(function(iss){
+      var ecl = effClosed(iss);
+      var isOpen = !ecl;
+      var count = (DATA.WORKS||[]).filter(function(w){ return (w.issue != null ? w.issue : openN) === iss.n; }).length;
+      var countTxt = count === 0 ? c.sectionEmpty : (count === 1 ? c.sectionCountOne : (c.sectionCountMany||"{n}").replace("{n}", toLocal(count, isFa)));
+      var closesHint = (isOpen && iss.closes) ? '<span style="color:#8C8474;font-weight:500;"> · '+esc(c.issueClosesWord)+' '+esc(pick(iss.closedLabel,lang)||iss.closes)+'</span>' : '';
+      var status = isOpen
+        ? '<span class="sans" style="font-size:12.5px;color:var(--pm-accent);font-weight:600;"><span class="pulse"></span>'+esc(c.issueOpenStatus)+closesHint+'</span>'
+        : '<span class="sans" style="font-size:12.5px;color:#43392E;font-weight:600;">'+esc(c.issueClosedWord)+' · '+esc(pick(iss.closedLabel,lang)||ecl)+'</span>';
+      var metaLine = '<span class="sans" style="font-size:11.5px;letter-spacing:.05em;color:#948876;text-transform:uppercase;">'+esc(c.issueOpenedWord)+' '+esc(pick(iss.openedLabel,lang))+' · '+esc(countTxt)+'</span>';
+      var inner =
+        '<span style="font-size:30px;font-weight:500;letter-spacing:-.01em;line-height:1;">'+esc(pick(iss.title||iss.label,lang))+'</span>'
+        + status + metaLine
+        + '<span class="issue-see sans" style="font-size:12.5px;font-weight:600;">'+esc(c.issueSee)+' '+arrow+'</span>';
+      return '<a class="issue-cell" href="sections/issue.html?n='+esc(iss.n)+'">'+inner+'</a>';
+    }).join("");
+    issuesShelf =
+      '<section class="wrap" id="issues" style="border-bottom:1px solid var(--pm-ink);">'
+      + '<div class="rail-label sans" style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;"><span>'+esc(c.issuesLabel)+'</span><span style="font-size:11px;letter-spacing:.04em;color:#B7AC99;text-transform:none;">'+esc(c.issuesTag)+'</span></div>'
+      + '<div class="issues-row">'+cells+'</div>'
+      + '</section>';
+  }
+  /* ---- the contributors strip: every author, portrait + name ---- */
+  var seenAuthors = {};
+  var authors = [];
+  (DATA.WORKS||[]).forEach(function(w){
+    var key = (w.en && w.en.author) || "";
+    if (!key || !w.authorImg) return;
+    if (!seenAuthors[key]) { seenAuthors[key] = { img: w.authorImg, en: key, fa: (w.fa && w.fa.author) || key, count: 0 }; authors.push(seenAuthors[key]); }
+    seenAuthors[key].count++;
+  });
+  var peopleHtml = authors.map(function(a){
+    var nm = isFa ? a.fa : a.en;
+    var cnt = a.count === 1 ? c.contributorWorksOne : (c.contributorWorksMany||"{n}").replace("{n}", toLocal(a.count, isFa));
+    return '<a class="person" href="sections/contributors.html#'+encodeURIComponent(a.en.replace(/\s+/g,"-").toLowerCase())+'">'
+      + '<img src="'+esc(a.img)+'" alt="'+esc(nm)+'" loading="lazy">'
+      + '<span><span class="p-name" style="display:block;">'+esc(nm)+'</span><span class="p-count sans" style="display:block;">'+esc(cnt)+'</span></span>'
+      + '</a>';
+  }).join("");
+  var contributorsStrip = authors.length
+    ? '<section class="wrap" id="contributors" style="border-bottom:1px solid var(--pm-ink);">'
+      + '<div class="rail-label sans" style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;"><span>'+esc(c.contributorsLabel)+'</span><span style="font-size:11px;letter-spacing:.04em;color:#B7AC99;text-transform:none;">'+esc(c.contributorsTag)+'</span>'
+      + '<a class="sans" href="sections/contributors.html" style="margin-inline-start:auto;text-decoration:none;font-size:12px;font-weight:600;color:var(--pm-accent);text-transform:none;letter-spacing:.02em;">'+esc(c.contributorsAll)+' '+arrow+'</a></div>'
+      + '<div class="people">'+peopleHtml+'</div>'
+      + '</section>'
+    : "";
+
+  var dedUrl = (window.PM_CONTENT && window.PM_CONTENT.dedicationUrl) || "";
+  var dedHtml = (dedUrl && c.dedication)
+    ? '<a class="dedline sans" href="'+esc(dedUrl)+'"><span class="heart">♦</span><span class="dedline-txt">'+esc(c.dedication)+'</span><span class="go">'+arrow+'</span></a>'
+    : '';
+  var heart = isFa ? "♥" : "♥";
+  var aboutCardHtml =
+    '<section class="getissue" id="about"><div class="getissue-in wrap" style="grid-template-columns:1fr;">'
+      + '<div>'
+        + '<div class="kicker sans">'+esc(c.noteLabel)+'</div>'
+        + '<h3>'+esc(c.noteTitle)+'</h3>'
+        + '<p>'+esc(c.noteBody)+'</p>'
+        + '<div class="sans" style="margin-top:18px;font-size:14px;color:#8C8474;">— '+esc(c.noteSign)+'</div>'
+      + '</div>'
+    + '</div></section>';
+  var getIssueHtml =
+    '<section class="getissue" id="why-donate"><div class="getissue-in wrap">'
+      + '<div>'
+        + '<div class="kicker sans">'+esc(c.getKicker)+'</div>'
+        + '<h3>'+esc(c.getTitle)+'</h3>'
+        + '<p>'+esc(c.getBody)+'</p>'
+      + '</div>'
+      + '<div class="getissue-actions">'
+        + (donateUrl ? '<a class="btn-pdf sans" href="'+esc(donateUrl)+'" target="_blank" rel="noopener"><span class="btn-heart">'+heart+'</span><span>'+esc(c.donateCta)+'</span></a><div class="btn-meta sans">'+esc(c.donateMeta)+'</div>' : '')
+      + '</div>'
+    + '</div></section>';
+
+  document.getElementById("app").innerHTML =
+    '<div class="topband">'
+      + '<div class="brand">'
+        + '<img class="brand-logo" src="assets/logo.jpg" alt="People and Mathematics · آدم‌ها و ریاضیات">'
+        + '<div><div class="brand-fa persian">آدم‌ها و ریاضیات</div><div class="brand-en">People and Mathematics</div></div>'
+      + '</div>'
+      + '<nav class="menu sans">'
+        + '<a href="#sections" style="text-decoration:none;color:inherit;">'+esc(nav.issues)+'</a><a href="sections/contributors.html" style="text-decoration:none;color:inherit;">'+esc(c.contributorsLabel)+'</a><a href="#about" style="text-decoration:none;color:inherit;">'+esc(nav.about)+'</a><a href="#why-donate" style="text-decoration:none;color:inherit;">'+esc(nav.donate)+'</a><a href="mailto:'+esc(contactEmail)+'?subject='+encodeURIComponent(isFa?"مشارکت در آدم‌ها و ریاضیات":"Contributing to People and Mathematics")+'" style="text-decoration:none;color:inherit;">'+esc(nav.submit)+'</a>'
+        + '<div class="langtoggle">'
+          + '<button data-lang="en" class="'+(!isFa?'on':'')+'">EN</button>'
+          + '<button data-lang="fa" class="persian '+(isFa?'on':'')+'">فارسی</button>'
+        + '</div>'
+      + '</nav>'
+    + '</div>'
+
+    + '<div class="subbar">'
+      + '<div class="kick sans accent">'+esc(c.issueKicker)+'</div>'
+      + '<div class="pub sans">'+esc(c.subtitle)+'</div>'
+    + '</div>'
+
+    + dedHtml
+
+    + (fg.href ? '<a class="hero wrap" href="'+esc(fg.href)+'" style="text-decoration:none;color:inherit;">' : '<section class="hero wrap">')
+      + '<div class="lead">'
+        + '<div class="sans accent" style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;">'+esc(fgt.eyebrow)+'</div>'
+        + '<h1>'+esc(fgt.title)+'</h1>'
+        + '<p class="dek">'+esc(fgt.dek)+'</p>'
+        + '<div class="sans" style="display:flex;align-items:center;gap:18px;font-size:13.5px;color:#6B6155;flex-wrap:wrap;">'
+          + '<span style="font-weight:600;">'+esc(fgt.cta)+' '+arrow+'</span><span class="dot"></span><span>'+esc(fgt.byline)+'</span>'+(fg.level?'<span class="dot"></span>'+levelChip(fg.level,lang):'')
+        + '</div>'
+      + '</div>'
+      + (fg.imgSrc
+          ? '<div class="lead-img" style="padding:0;overflow:hidden;background:#0D0C0B;"><img src="'+esc(fg.imgSrc)+'" alt="'+esc(fgt.title)+'" style="width:100%;height:100%;object-fit:cover;display:block;"></div>'
+          : '<div class="lead-img pm-img"><span class="imglabel">'+esc(fg.imgLabel)+'</span></div>')
+    + (fg.href ? '</a>' : '</section>')
+
+    + '<section class="wrap" id="sections" style="border-bottom:1px solid var(--pm-ink);">'
+      + '<div class="rail-label sans">'+esc(c.sectionsLabel)+'</div>'
+      + '<div class="rail">'+sectionsHtml+'</div>'
+    + '</section>'
+
+    + issuesShelf
+
+    + '<section class="features wrap">'
+      + '<div class="features-head"><h2 style="margin:0;font-size:30px;font-weight:500;letter-spacing:-.01em;">'+esc(c.featuresLabel)+'</h2><span class="sans" style="font-size:13px;color:#6B6155;">'+esc(c.featuresTag)+'</span></div>'
+      + '<div class="features-grid">'+featuresHtml+'</div>'
+    + '</section>'
+
+    + contributorsStrip
+
+    + getIssueHtml
+
+    + '<section class="subscribe"><div class="subscribe-in wrap">'
+      + '<div><h3>'+esc(c.subTitle)+'</h3><p class="sans" style="margin:8px 0 0;font-size:14px;color:#6B6155;">'+esc(c.subNote)+'</p></div>'
+      + '<form class="subform" id="pm-subform">'
+        + '<input class="sans" name="name" placeholder="'+esc(c.subNamePlaceholder)+'" style="max-width:38%;">'
+        + '<span aria-hidden="true" style="width:1px;align-self:stretch;background:var(--pm-ink);opacity:.22;"></span>'
+        + '<input class="sans" name="email" type="email" required placeholder="'+esc(c.subPlaceholder)+'">'
+        + '<button class="sans" type="submit">'+esc(c.subCta)+'</button>'
+      + '</form>'
+    + '</div></section>'
+
+    + '<footer class="footer wrap">'
+      + '<div class="footer-brand"><div class="footer-logo"><img src="assets/logo.jpg" alt=""></div><div style="line-height:1.1;"><div style="font-size:17px;font-weight:600;">People and Mathematics · آدم‌ها و ریاضیات</div><div class="sans" style="font-size:12.5px;color:#6B6155;margin-top:3px;">'+esc(c.pubLine).replace('mathswell.com','<a href="index.html" style="color:inherit;">mathswell.com</a>')+'</div></div></div>'
+      + '<div class="footer-right">'
+        + '<div class="footer-links sans">'+footerLinksHtml+'</div>'
+        + '<a class="yt sans" href="'+esc(YT)+'" target="_blank" rel="noopener"><span class="play">▶</span><span>'+esc(c.youtubeLabel)+'</span></a>'
+      + '</div>'
+    + '</footer>'
+
+    + aboutCardHtml;
+
+  // wire the subscribe form: post to a connected service if set, else open the visitor's email app
+  var sf = document.getElementById("pm-subform");
+  if (sf){
+    sf.addEventListener("submit", function(e){
+      if (subscribeUrl){ sf.setAttribute("action", subscribeUrl); sf.setAttribute("method", "post"); return; }
+      e.preventDefault();
+      var nm = (sf.querySelector('[name=name]')||{}).value || "";
+      var em = (sf.querySelector('[name=email]')||{}).value || "";
+      var subj = isFa ? "عضویت در آدم‌ها و ریاضیات" : "Subscribe: People and Mathematics";
+      var body = (nm ? ((isFa?"نام: ":"Name: ")+nm+"\n") : "") + (isFa?"ایمیل: ":"Email: ")+em;
+      window.location.href = "mailto:"+contactEmail+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(body);
+    });
+  }
+
+  // wire language toggle + remember choice
+  document.querySelectorAll(".langtoggle button").forEach(function(b){
+    b.addEventListener("click", function(){
+      var l = b.getAttribute("data-lang");
+      try { localStorage.setItem("pm-lang", l); } catch(e){}
+      render(l);
+      window.scrollTo(0, 0);
+    });
+  });
+}
+
+var startLang = "en";
+try { var saved = localStorage.getItem("pm-lang"); if (saved === "en" || saved === "fa") startLang = saved; } catch(e){}
+render(startLang);
+</script>
+<script src="counter.js"></script>
+</body>
+</html>

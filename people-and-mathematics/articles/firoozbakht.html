@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Farideh Firoozbakht and a Conjecture About Primes — People and Mathematics</title>
+<meta name="description" content="Amir Asghari on Farideh Firoozbakht, the Isfahan pharmacist-turned-mathematician behind one of the boldest unproven statements about the prime numbers. With a guest essay by Ian Stewart. The lead feature of People and Mathematics.">
+
+<meta property="og:title" content="Farideh Firoozbakht and a Conjecture About Primes">
+<meta property="og:description" content="Lead feature · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/farideh.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX for crisp typeset mathematics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>/* KaTeX inside RTL text — keep formulas LTR & bidi-isolated so exponents/coefficients stay put */
+.katex, .katex-display { direction: ltr; unicode-bidi: isolate; }
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); font-family: "Hanken Grotesk","Vazirmatn",sans-serif; }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  /* breadcrumb sub-bar */
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 50px; line-height: 1.06; font-weight: 500; letter-spacing: -.022em; margin: 16px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; text-wrap: pretty; }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+  .byline .meta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .byline .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; align-self: center; }
+  .dedication { font-style: italic; color: var(--muted); font-size: 16px; margin: 22px 0 0; }
+
+  /* lead portrait */
+  .portrait { max-width: 420px; margin: 32px auto 6px; }
+  .portrait img { width: 100%; display: block; border-radius: 4px; filter: saturate(1.02); }
+  .portrait figcaption { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 11px; line-height: 1.5; padding-top: 10px; border-top: 1px solid var(--line); }
+  .portrait figcaption b { color: var(--ink); font-weight: 600; }
+
+  .byline .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); align-self: center; }
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 42px 0 14px; padding-top: 8px; }
+  .body.nodrop p:first-of-type:first-letter { font-size: inherit; float: none; padding: 0; color: inherit; font-weight: inherit; }
+
+  .eq { text-align: center; margin: 20px 0; font-size: 20px; }
+  .eq.tight { margin: 12px 0; }
+
+  /* prime-tile figure */
+  .tilefig { margin: 30px 0; padding: 28px 24px 24px; background: #F4ECDC; border-radius: 6px; border: 1px solid var(--line); }
+  .tilefig-row { display: flex; align-items: flex-start; justify-content: center; gap: 30px; flex-wrap: wrap; }
+  .tileset { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+  .tilegrid { display: grid; gap: 5px; }
+  .tile { width: 28px; height: 28px; background: var(--accent); border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.20), 0 1px 2px rgba(0,0,0,.12); }
+  .tile.dim { background: #C9B79A; box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+  .tcap { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13.5px; color: var(--ink); text-align: center; }
+  .tcap em { color: var(--accent); font-style: italic; font-weight: 600; }
+  .tdiv { align-self: stretch; width: 1px; background: #DCCDB2; }
+  .tilefig figcaption { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); margin-top: 22px; padding-top: 16px; border-top: 1px solid #DCCDB2; text-align: center; line-height: 1.55; }
+
+  /* big number callout */
+  .bignum { text-align: center; margin: 28px 0; padding: 24px 16px; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); }
+  .bignum .num { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-weight: 600; letter-spacing: -.01em; font-variant-numeric: tabular-nums; font-size: clamp(20px, 4.6vw, 33px); line-height: 1.1; overflow-wrap: anywhere; }
+  .bignum .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 11px; }
+
+  /* image placeholder (original blog screenshots) */
+  .ph { background-color: #EAE0CC; background-image: repeating-linear-gradient(135deg, #E6DAC1 0 13px, #EFE6D2 13px 26px); border: 1px solid #DBD0BA; border-radius: 4px; display: flex; align-items: flex-end; padding: 12px; margin: 28px 0; min-height: 150px; }
+  .ph span { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: .02em; color: #7C7160; background: #FBF7EFcc; padding: 4px 8px; border-radius: 3px; line-height: 1.4; }
+
+  /* screenshot figures (original blog images) */
+  .shot { margin: 30px auto; }
+  .shot img { display: block; width: 100%; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+  .shot figcaption { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line); text-align: center; line-height: 1.5; text-wrap: pretty; }
+
+  .pullquote { font-size: 26px; line-height: 1.32; font-weight: 500; letter-spacing: -.01em; color: var(--ink); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); padding: 20px 0; margin: 30px 0; text-wrap: pretty; }
+
+  /* memorial poem */
+  .poem { text-align: center; font-style: italic; font-size: 22px; line-height: 1.65; color: var(--ink); margin: 32px auto; max-width: 28em; }
+  .poem .who { display: block; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-style: normal; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; margin-top: 16px; }
+
+  /* guest essay band */
+  .guest { margin-top: 50px; }
+  .guest-head { background: var(--black); color: var(--paper); border-radius: 5px; padding: 30px 32px; }
+  .guest-head .gk { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  .guest-head h2 { margin: 12px 0 0; font-size: 33px; font-weight: 500; letter-spacing: -.015em; line-height: 1.08; }
+  .guest-head .gby { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 14px; color: #D9D0C0; margin-top: 14px; }
+  .guest-head .gby b { color: var(--paper); font-weight: 600; }
+
+  /* contributor colophon */
+  .colophon { margin-top: 46px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; }
+  .refs li { margin-bottom: 10px; }
+  .refs a { color: var(--accent); word-break: break-word; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead, [dir="rtl"] .guest-head h2 { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+  [dir="rtl"] .poem { font-style: normal; font-size: 23px; line-height: 1.95; }
+  [dir="rtl"] .dedication { font-style: normal; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 22px 32px; }
+    h1.title { font-size: 33px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .pullquote { font-size: 21px; }
+    .guest-head h2 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#567D46;display:inline-block;flex:0 0 auto;"></span><span data-en="School maths · Lead feature · June 2026" data-fa="ریاضیِ مدرسه · مقاله‌ی اصلی · خرداد ۱۴۰۵"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <h1 class="title">Farideh Firoozbakht and a Conjecture About Primes</h1>
+  <p class="standfirst">She left almost no trace of herself — no photographs, barely a line of biography. What she left instead was one of the boldest unproven statements ever made about the prime numbers. The story of a pharmacy student from Isfahan who could not put the primes down.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/amir.jpg" alt="Amir Asghari">
+    <span class="name">Amir Asghari</span>
+  </div>
+  <p class="dedication">In memory of Farideh Firoozbakht, who would have preferred that we talk about the primes.</p>
+
+  <figure class="portrait">
+    <img src="../assets/farideh.jpg" alt="Farideh Firoozbakht at the University of Isfahan">
+    <figcaption><b>Farideh Firoozbakht (1962–2019)</b>, University of Isfahan. The only known photograph of her.</figcaption>
+  </figure>
+
+  <div class="body">
+    <p>The story begins at the very beginning, when there was no one but God and God was still deciding whether or not to create human beings. He realised that, if humans were to be created, something else would have to be created too: something to stop them from becoming too self-important, something that would make them say, every now and then, “This one only God knows.” So God created the prime numbers.</p>
+
+    <h2 class="subhead">Prime numbers</h2>
+
+    <p>Suppose you have six square tiles and want to arrange them into a solid rectangle. You can make a row of six tiles, or two rows of three. But if you have seven tiles, then, surprisingly, there is only one rectangular arrangement: a single row of seven.</p>
+
+    <figure class="tilefig">
+      <div class="tilefig-row">
+        <div class="tileset">
+          <div class="tilegrid" style="grid-template-columns: repeat(3, 28px);">
+            <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+            <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+          </div>
+          <div class="tilegrid" style="grid-template-columns: repeat(6, 28px);">
+            <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+          </div>
+          <div class="tcap">6 — a full rectangle, two ways<br>(2 × 3 and 1 × 6)</div>
+        </div>
+        <div class="tdiv"></div>
+        <div class="tileset">
+          <div class="tilegrid" style="grid-template-columns: repeat(7, 28px);">
+            <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+          </div>
+          <div class="tcap">7 — only a single line.<br><em>That makes it prime.</em></div>
+        </div>
+      </div>
+      <figcaption>A number is prime when its tiles refuse to form any rectangle but a single row.</figcaption>
+    </figure>
+
+    <p>The same is true for five tiles, and for thirteen tiles. Numbers like these are called prime numbers. Looking at them a little more systematically, the first few are <span class="sans">2, 3, 5, 7, 11</span>, and the next one I leave to you. For a small technical reason, <span class="sans">1</span> is not counted as a prime.</p>
+
+    <p>Now suppose someone asks whether, say, <span class="sans">386429</span> is prime. You have to go away and check. And if you ask whether there is some quick, revolutionary formula that tells you immediately whether any given number is prime, the answer is: that one only God knows — if, indeed, God knows.</p>
+
+    <p>That is why mathematicians’ eyes light up whenever prime numbers are mentioned. God had not counted on that part. Many wonderful stories in mathematics are built around a mathematician struggling with a problem about primes. One of the best known is <em>Uncle Petros and Goldbach’s Conjecture</em>, which has also been translated into Persian. Goldbach’s conjecture says that every even number greater than <span class="sans">2</span> can be written as the sum of two prime numbers. For example:</p>
+
+    <div class="eq tight">\( 4 = 2 + 2 \qquad 20 = 7 + 13 \)</div>
+
+    <p>Why is it called a conjecture? Because nobody yet knows whether it is always true, or whether it merely happens to be true for all the even numbers we have checked so far.</p>
+
+    <p>Uncle Petros is a fictional mathematician, first presented as someone who does not really mix with people and who has buried himself in his studies — his studies being, of course, an attempt to prove Goldbach’s conjecture. Seen from outside, he seems mysterious. I know many mathematicians, but I have to admit that none of them reminds me of Uncle Petros as much as the mathematician I want to write about here: Farideh Firoozbakht.</p>
+
+    <h2 class="subhead">The network of prime lovers</h2>
+
+    <p>When a friend from Isfahan wrote to me, “Could you also research and write about women mathematicians — for example, Ms Firoozbakht?” I had no idea how hard it would be to write about a mathematician who was only five years older than me and who, sadly, died on 24 December 2019, at the age of fifty-eight.</p>
+
+    <p>There are only a handful of Persian links that mention her name, and most say no more than one sentence: <em>Farideh Firoozbakht, Iranian mathematician and proposer of Firoozbakht’s conjecture on prime numbers, has died.</em> That is all.</p>
+
+    <p>Thankfully, the English Wikipedia page adds a little more: that she was from Isfahan, that she first studied pharmacy and later mathematics, and that she became a professor of mathematics at the University of Isfahan. Still: that is almost all. No photograph, no substantial account of her life, almost nothing. If it were not for a few lines written by Firoozbakht herself, the story might have ended there.</p>
+
+    <p>Those lines lead to a website called <span class="sans">primepuzzles.net</span>, a site for prime lovers: people for whom prime numbers are not merely an object of study, but a way of life. Members share problems, solutions, ideas, and numerical curiosities. It is a small, compact site, still active, still publishing a weekly problem.</p>
+
+    <p>Why dwell on this site? Because Firoozbakht seems to have lived there, mathematically speaking. In a ranking published about a year and four months after her death, she was still second among its puzzle contributors. It is not hard to imagine that, before her death, she had been first.</p>
+
+    <figure class="shot" style="max-width: 440px;">
+      <img src="../assets/pp-ranking.png" alt="Prime Puzzles contributor ranking — Firoozbakht second with 485 mentions">
+      <figcaption>Prime Puzzles, ranked by mentions on the site (May 2021) — Firoozbakht still second, more than a year after her death.</figcaption>
+    </figure>
+
+    <p>Another daily ranking, based on numerical curiosities shared by members, still places her among the top ten. To get a feeling for the kind of curiosity involved, consider <span class="sans">1962</span>, the year of Firoozbakht’s birth. It is not the sort of thing that occurs to most people that:</p>
+
+    <div class="eq">\[ 1962 = (1 \times 9 \times 6 \times 2 + 1)(1 + 9 + 6 + 2) \]</div>
+
+    <p>You have to live with numbers, in an Uncle Petros sort of way, to notice something like that. The site clearly mattered to Firoozbakht. She introduced herself there in her own words.</p>
+
+    <figure class="shot" style="max-width: 640px;">
+      <img src="../assets/pp-puzzlers.png" alt="Firoozbakht’s self-introduction on Prime Puzzles">
+      <figcaption>Her own introduction on Prime Puzzles — a biography, but no photograph. “My favourite field is ‘The Gap between Prime Numbers.’”</figcaption>
+    </figure>
+
+    <p>A small detail is that even there she avoided sending a photograph: the site asked for a biography and a photo; she sent only the biography. The essential point, however, is the date at which her conjecture first came to her: <span class="sans">1982</span>, when she was twenty years old and in her second year as a pharmacy student.</p>
+
+    <p>Imagine being a second-year pharmacy student and spending your mornings and nights with prime numbers. Imagine, too, the worry this may have caused her family, and the thickness of skin it must have required from Farideh. I say this from experience. But the conjecture she discovered was astonishing enough to convince her that she had to leave pharmacy and study mathematics.</p>
+
+    <h2 class="subhead">Firoozbakht’s conjecture</h2>
+
+    <p>Recall the family of prime numbers: the first is <span class="sans">2</span>, the second is <span class="sans">3</span>, the third is <span class="sans">5</span>, the fourth is <span class="sans">7</span>, the fifth is <span class="sans">11</span>, and the sixth I again leave to you.</p>
+
+    <p>Now take the square root of the second prime, <span class="sans">3</span>. Then take the cube root of the third prime, <span class="sans">5</span>. Then the fourth root of the fourth prime, <span class="sans">7</span>. Then the fifth root of the fifth prime, <span class="sans">11</span>, and so on. The number <span class="sans">2</span>, being the first prime, can sit quietly in its corner for the moment. Firoozbakht’s conjecture says that these numbers keep getting smaller:</p>
+
+    <div class="eq">\[ 2 \;>\; \sqrt{3} \;>\; \sqrt[3]{5} \;>\; \sqrt[4]{7} \;>\; \sqrt[5]{11} \;>\; \cdots \]</div>
+
+    <p>At first glance, one is tempted to say: surely that is obvious. Especially at the beginning, where <span class="sans">2</span> is greater than the square root of <span class="sans">3</span>, we are quickly lulled into thinking that the rest must follow in the same way. But to see how remarkable the conjecture is, let us climb a little higher.</p>
+
+    <p>The number <span class="sans">113</span> is the 30th prime, and the next prime is <span class="sans">127</span>. If Firoozbakht’s conjecture is true, we expect \( \sqrt[30]{113} > \sqrt[31]{127} \). And this is indeed true, since approximately:</p>
+
+    <div class="eq tight">\[ \sqrt[30]{113} \approx 1.170673 \qquad \sqrt[31]{127} \approx 1.169134 \]</div>
+
+    <p>This means that the 30th root of <span class="sans">113</span> is larger than all the 31st roots of the numbers from <span class="sans">114</span> up to <span class="sans">127</span>. Seen from the point of view of the 30th root of <span class="sans">113</span>, the story becomes more dramatic. Suppose you are trying to beat it using 31st roots. You begin with the 31st root of <span class="sans">114</span>: not enough. Then <span class="sans">115</span>: still not enough. The 31st roots keep getting larger, but the 30th root of <span class="sans">113</span> is still stronger than all of them.</p>
+
+    <p>If Firoozbakht’s conjecture is true, this dominance continues up to the 31st root of <span class="sans">127</span>. For the 31st root of <span class="sans">128</span>, however, it is a matter of luck:</p>
+
+    <div class="eq tight">\[ \sqrt[30]{113} \approx 1.170673 \qquad \sqrt[31]{128} \approx 1.169430 \]</div>
+
+    <p>What luck for the 30th root of <span class="sans">113</span>. It narrowly survives several more numbers, and we have to wait until the 31st root of <span class="sans">133</span> before it is finally beaten:</p>
+
+    <div class="eq tight">\[ \sqrt[30]{113} \approx 1.170673 \qquad \sqrt[31]{133} \approx 1.170877 \]</div>
+
+    <p>Looked at this way, it becomes clear why Firoozbakht wrote in her profile for Prime Puzzles that her favourite topic was the gaps between prime numbers. The larger the gap, the more one feels that the power of the earlier prime might run out before the next prime arrives. If the conjecture is ever to fail, it is likely to fail where such a gap is exceptionally large.</p>
+
+    <h2 class="subhead">Do not trouble yourself</h2>
+
+    <p>I hope that by now you have rushed to a calculator and checked Firoozbakht’s conjecture for a few numbers, just to get a better feeling for it. But if you are doing this in the hope of finding a counterexample, I should warn you: not likely. Mathematicians have already verified it for all primes up to:</p>
+
+    <div class="bignum">
+      <div class="num">18,400,000,000,000,000,000</div>
+      <div class="lab">checked — about 1.84 × 10¹⁹</div>
+    </div>
+
+    <p>If a counterexample exists, finding it is not a job for an ordinary computer. What is especially striking is that Farideh herself, at the age of twenty, checked her conjecture up to:</p>
+
+    <div class="bignum">
+      <div class="num">4,444,000,000,000</div>
+      <div class="lab">Firoozbakht, c. 1982 — by hand and by punched card</div>
+    </div>
+
+    <p>Think about what that means. We are talking about around forty years ago, when there was only one computer in the whole University of Isfahan. Farideh would have had to prepare her program on punched cards, all the while hoping that she had not made a single wrong hole on a single card. I can almost feel the shining eyes, the sudden drop of the heart from joy.</p>
+
+    <h2 class="subhead">Who was Farideh Firoozbakht?</h2>
+
+    <p>One of Firoozbakht’s colleagues at the Isfahan House of Mathematics wrote to me: “She did not pay much attention to her appearance and regarded anything other than research as pointless.” One of her students wrote: “She was in her own world.” Yet this person, so often in her own world, was naturally generous in sharing her feeling for mathematics with her students.</p>
+
+    <p>Farideh Firoozbakht did not want us to know more about her private life than she herself chose to share. I respect that wish, and so I end this story with the poem that appeared on her memorial notice. I do not know who chose it, but whoever it was could hardly have chosen better:</p>
+
+    <div class="poem">
+      It is not exile when people do not know you;<br>
+      exile is when friends let you fade from memory.
+      <span class="who">— from her memorial notice</span>
+    </div>
+
+    <h2 class="subhead">And her story will continue</h2>
+
+    <p>The following text was written, at my request, by Ian Stewart about Firoozbakht’s conjecture. I dedicate it to Farideh and to her students. She will live on in her conjecture, and she will never again be forgotten.</p>
+  </div>
+
+  <!-- ===== Guest essay ===== -->
+  <div class="guest">
+    <div class="guest-head">
+      <div class="gk">Guest essay</div>
+      <h2>Firoozbakht’s Conjecture</h2>
+      <div class="gby"><b>Ian Stewart</b> &nbsp;·&nbsp; University of Warwick</div>
+    </div>
+    <div class="body">
+      <p>Prime numbers are among the most important, but also the most puzzling, concepts in the whole of mathematics. Their definition is simple: a whole number is prime if it cannot be obtained by multiplying two smaller whole numbers together. For example, <span class="sans">5</span> is prime, but <span class="sans">6 = 2 × 3</span> is not. Prime numbers are basic to many areas of mathematics, both pure and applied. They form the basis of some of the codes used to ensure Internet security. They are puzzling because they do not follow any simple pattern — unlike, say, squares or powers of two.</p>
+
+      <p>On the other hand, primes are not merely random. Some patterns can be found. An obvious one is that every prime except <span class="sans">2</span> is an odd number. Every prime of the form \(4k + 1\) is a sum of two perfect squares; no prime of the form \(4k + 3\) is a sum of two perfect squares. There are also useful approximate formulas related to the distribution of primes: roughly how many primes occur in a given range of numbers. In 1792 the great mathematician Carl Friedrich Gauss noticed that the number of primes less than a given number \(x\) is approximately \(x / \log x\), that is, \(x\) divided by its natural logarithm. Proofs that this is correct were finally found in 1896 by Jacques Hadamard and Charles Jean de la Vallée Poussin, using advanced methods from complex analysis. One interpretation is that the size of the \(n\)th prime is roughly \(n \log n\).</p>
+
+      <p>The Iranian mathematician Farideh Firoozbakht is famous for a conjecture about the relation between the sizes of consecutive primes. It states that the \(n\)th root of the \(n\)th prime forms a strictly decreasing sequence. In symbols, if \(p_n\) is the \(n\)th prime, then</p>
+
+      <div class="eq">\[ p_{n+1}^{\,1/(n+1)} \;<\; p_n^{\,1/n}. \]</div>
+
+      <p>Using a table of the largest gaps between consecutive primes, Firoozbakht discovered that this inequality is true for all \(n\) up to <span class="sans">4,444,000,000,000</span>. Later work by the mathematician Alexei Kourbatov has verified it up to <span class="sans">1.84 × 10¹⁹</span>, but to date, no complete proof or disproof has been found.</p>
+
+      <p>Many similar conjectures have been proposed. Firoozbakht’s Conjecture is one of the strongest, placing closer limits on the distribution of primes than many others. Luan Alberto Ferreira and Hugo Luiz Mariano, surveying results implied by the conjecture, describe it as “the boldest (and reasonable) known statement about prime gaps.” They observe that its truth would imply the truth of many other famous conjectures about primes. Using a recent breakthrough on the gaps between consecutive primes by Yitang Zhang, it has also been proved that the sequence of \(n\)th roots of the \(n\)th prime decreases infinitely many times.</p>
+
+      <p>Firoozbakht’s mathematical legacy is an intriguing and important contribution to the centuries-long puzzle of the distribution of prime numbers. It poses a fascinating challenge for future mathematicians to solve. If it is true, many long-sought theorems will follow. If it is false, mathematicians will be led to develop new insights into the sizes of gaps between consecutive primes.</p>
+    </div>
+  </div>
+
+  <!-- ===== Among others (addendum) ===== -->
+  <div class="body nodrop">
+    <h2 class="subhead">Among others</h2>
+    <p>Ian Stewart points out that Firoozbakht’s conjecture is a bold one: if it turns out to be true, many other famous conjectures about primes will follow from it; and if it turns out to be false, it will open the way to new insights into the gaps between prime numbers. So let us end by looking at Firoozbakht among others.</p>
+    <p>Let us return to the example of <span class="sans">113</span>. We said that <span class="sans">113</span> is the 30th prime, and the next prime is <span class="sans">127</span>. So the actual gap between these two primes is</p>
+    <div class="eq">\[ 127-113=14. \]</div>
+    <p>Now let us see what ceiling Firoozbakht’s conjecture puts on the next prime. The conjecture says that</p>
+    <div class="eq">\[ p_{31}<113^{\frac{31}{30}}, \]</div>
+    <p>and since</p>
+    <div class="eq">\[ 113^{\frac{31}{30}}\approx 132.286, \]</div>
+    <p>the next prime must appear before we reach about <span class="sans">132</span>.</p>
+    <p>To say this in the language of gaps, write the gap between the \(n\)th prime and the next one as</p>
+    <div class="eq">\[ g_n=p_{n+1}-p_n. \]</div>
+    <p>So in this example \(g_{30}\) is the gap between the 30th prime and the 31st. Firoozbakht’s conjecture gives</p>
+    <div class="eq">\[ g_{30}<132.286-113\approx 19.286. \]</div>
+    <p>In other words, the gap between the 30th and the 31st primes must be less than <span class="sans">19.286</span> — or, more simply, less than <span class="sans">20</span>.</p>
+    <p>Now let us compare this with another famous conjecture: Andrica’s. It says that</p>
+    <div class="eq">\[ \sqrt{p_{31}}-\sqrt{113}<1. \]</div>
+    <p>Rearranging gives</p>
+    <div class="eq">\[ p_{31}<(\sqrt{113}+1)^2, \]</div>
+    <p>and since</p>
+    <div class="eq">\[ (\sqrt{113}+1)^2\approx 135.260, \]</div>
+    <p>Andrica’s conjecture allows the next prime to go up to about <span class="sans">135</span>. In the language of gaps, this gives</p>
+    <div class="eq">\[ g_{30}<135.260-113\approx 22.260. \]</div>
+    <p>So even in this small example, Firoozbakht’s conjecture offers the smaller worst-case window for finding the next prime:</p>
+    <div class="eq">\[ 19.286<22.260. \]</div>
+    <p>The next prime is in fact <span class="sans">127</span>, and the actual gap is <span class="sans">14</span>. Both conjectures are consistent with this example, but Firoozbakht makes the more optimistic prediction of where the next prime must appear.</p>
+    <p>This is why Firoozbakht’s conjecture is so strong. If this optimistic gap always works, then the less optimistic gaps work automatically too. That is why Firoozbakht’s conjecture implies conjectures such as Andrica’s, Legendre’s, Oppermann’s, and Brocard’s. Each of these, in its own language, says that the primes cannot drift too far apart; Firoozbakht’s is among the most optimistic and boldest of them all.</p>
+    <p>There are, of course, conjectures even more optimistic than Firoozbakht’s — the Nicholson and Farhadian conjectures among them. But the beauty of Firoozbakht’s conjecture is that it can be stated in very simple, almost school-level language, while still opening a rare window onto the complexity of the gaps between consecutive primes.</p>
+    <p>So whenever you come across a conjecture about the gaps between consecutive primes that looks rather complicated, you can always begin with one simple question: what does it predict for the gap between the 30th prime and the 31st?</p>
+    <p>Remember: the gap Firoozbakht predicts is less than <span class="sans">20</span>.</p>
+  </div>
+
+
+  <!-- ===== Colophon ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Essay</div>
+        <div class="who">Amir Asghari</div>
+      </div>
+      <div class="role">
+        <div class="lab">Guest contribution</div>
+        <div class="who">Ian Stewart</div>
+        <div class="aff">University of Warwick</div>
+      </div>
+      <div class="role">
+        <div class="lab">Photograph</div>
+        <div class="who">Courtesy of the family</div>
+        <div class="aff">The only known image of Farideh Firoozbakht.</div>
+      </div>
+    </div>
+    <div class="origin">The lead feature of <em>People and Mathematics</em>. The guest essay was written specially for the journal.</div>
+  </div>
+
+  <div class="refs">
+    <h3>References &amp; further reading</h3>
+    <ol>
+      <li>Firoozbakht’s conjecture. <em>Wikipedia.</em> <a href="https://en.wikipedia.org/wiki/Firoozbakht%27s_conjecture">en.wikipedia.org/wiki/Firoozbakht's_conjecture</a></li>
+      <li>The Prime Puzzles &amp; Problems Connection. <a href="https://www.primepuzzles.net/">primepuzzles.net</a></li>
+      <li>Alexei Kourbatov (2015). Verification of the Firoozbakht conjecture for primes up to four quintillion. <em>International Mathematical Forum.</em></li>
+      <li>Alexei Kourbatov (2015). Upper bounds for prime gaps related to Firoozbakht’s conjecture. <em>Journal of Integer Sequences, 18</em>, Article 15.11.2.</li>
+      <li>Luan Alberto Ferreira &amp; Hugo Luiz Mariano (2018). Prime gaps and the Firoozbakht conjecture. <em>São Paulo Journal of Mathematical Sciences.</em></li>
+      <li>Matt Visser (2019). Verifying the Firoozbakht, Nicholson, and Farhadian conjectures up to the 81st maximal prime gap. <em>Mathematics, 7</em>(8), 691.</li>
+      <li>Apostolos Doxiadis (2000). <em>Uncle Petros and Goldbach’s Conjecture.</em> Faber &amp; Faber.</li>
+    </ol>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <h1 class="title">فریده فیروزبخت و حدسی درباره‌ی اعداد اول</h1>
+  <p class="standfirst">از خودش تقریباً هیچ نشانی به جا نگذاشت — نه عکسی، نه شرحِ زندگی‌ای. آنچه به جا گذاشت یکی از جسورانه‌ترین گزاره‌های اثبات‌نشده درباره‌ی اعداد اول بود. داستانِ دانشجوی داروسازی‌ای از اصفهان که نتوانست دل از اعداد اول بکَند.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/amir.jpg" alt="امیر اصغری">
+    <span class="name">امیر اصغری</span>
+  </div>
+  <p class="dedication">به یادِ فریده فیروزبخت، که ترجیح می‌داد درباره‌ی اعداد اول حرف بزنیم.</p>
+
+  <figure class="portrait">
+    <img src="../assets/farideh.jpg" alt="فریده فیروزبخت در دانشگاه اصفهان">
+    <figcaption><b>فریده فیروزبخت (۱۹۶۲–۲۰۱۹)</b>، دانشگاه اصفهان. تنها عکسِ شناخته‌شده از او.</figcaption>
+  </figure>
+
+  <div class="body">
+    <p>داستان از جایی شروع شد که، آن اول که جز خدا هیچ‌کس نبود و خدا تازه داشت فکر می‌کرد که آدم‌ها را خلق کند یا نه، به این نتیجه رسید که اگر آدم را خلق کند، باید چیز دیگری هم خلق کند تا آدم‌ها زیادی پررو نشوند و هرازگاهی بگویند: این یکی را فقط خدا می‌داند. این شد که اعداد اول را هم خلق کرد.</p>
+
+    <h2 class="subhead">اعداد اول</h2>
+
+    <p>اگر شش کاشیِ مربع‌شکل داشته باشید و بخواهید با آن‌ها یک مستطیلِ پُر بسازید، آن‌ها را دست‌کم به دو شکل می‌توانید کنار هم بگذارید: یک ردیفِ شش‌تایی، یا دو ردیفِ سه‌تایی. اما اگر به جای شش کاشی، هفت کاشی داشته باشید، با کمالِ تعجب فقط یک جور می‌توانید مستطیل بسازید: یک ردیفِ هفت‌تایی.</p>
+
+    <figure class="tilefig">
+      <div class="tilefig-row">
+        <div class="tileset">
+          <div class="tilegrid" style="grid-template-columns: repeat(3, 28px);">
+            <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+            <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+          </div>
+          <div class="tilegrid" style="grid-template-columns: repeat(6, 28px);">
+            <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+          </div>
+          <div class="tcap">۶ — یک مستطیلِ پُر، به دو شکل<br>(۲ × ۳ و ۱ × ۶)</div>
+        </div>
+        <div class="tdiv"></div>
+        <div class="tileset">
+          <div class="tilegrid" style="grid-template-columns: repeat(7, 28px);">
+            <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+          </div>
+          <div class="tcap">۷ — فقط یک ردیف.<br><em>پس عددی اول است.</em></div>
+        </div>
+      </div>
+      <figcaption>عددی اول است که کاشی‌هایش جز یک ردیفِ تنها، تن به هیچ مستطیلِ دیگری نمی‌دهند.</figcaption>
+    </figure>
+
+    <p>برای پنج کاشی هم همین‌طور است؛ برای سیزده کاشی هم همین‌طور. این جور عددها را عددِ اول می‌گوییم. کمی منظم‌تر که نگاه کنیم، می‌توانیم چندتای نخست را به ترتیب بنویسیم. به یک دلیلِ فنیِ کوچک، عددِ <span class="sans">۱</span> را اول حساب نمی‌کنیم: <span class="sans">۲، ۳، ۵، ۷، ۱۱</span>، و بعدی با شما.</p>
+
+    <p>حالا اگر یک از خدا بی‌خبر بپرسد آیا مثلاً <span class="sans">۳۸۶۴۲۹</span> اول است یا نه، باید بروید و بررسی کنید. اگر هم بپرسید آیا فرمولی چیزی نیست که آدم تند و سریع و انقلابی بگوید فلان عدد اول هست یا نیست، جواب می‌شنوید: آن را فقط خدا می‌داند؛ تازه اگر واقعاً خدا بداند.</p>
+
+    <p>برای همین تا اسمِ اعداد اول می‌آید، چشمِ ریاضی‌دان‌ها برق می‌زند؛ خدا روی این قسمت دیگر حساب نکرده بود. داستان‌های زیادی هست که محورشان جدالِ یک ریاضی‌دان با مسئله‌ای درباره‌ی اعداد اول است. یکی از معروف‌ترینشان داستانِ «عمو پتروس و حدسِ گلدباخ» است که به فارسی هم ترجمه شده. حدسِ گلدباخ می‌گوید هر عددِ زوجِ بزرگ‌تر از <span class="sans">۲</span> را می‌توان به صورتِ مجموعِ دو عددِ اول نوشت. مثلاً:</p>
+
+    <div class="eq tight">\( 4 = 2 + 2 \qquad 20 = 7 + 13 \)</div>
+
+    <p>چرا به آن می‌گویند حدس؟ چون هنوز هیچ‌کس نمی‌داند همیشه درست است یا فقط برای عددهای زوجی که تا امروز بررسی کرده‌ایم درست از آب درآمده است.</p>
+
+    <p>عمو پتروس ریاضی‌دانی خیالی است که در داستان، نخستین بار این‌طور معرفی می‌شود: با کسی نشست‌وبرخاست ندارد و خودش را غرقِ مطالعاتش کرده است؛ مطالعاتی که، البته، اثباتِ حدسِ گلدباخ است. از بیرون که نگاهش می‌کنید، آدمِ مرموزی به نظر می‌رسد. من ریاضی‌دانِ زیادی می‌شناسم، اما راستش باید اعتراف کنم هیچ‌کدام به اندازه‌ی ریاضی‌دانی که امروز می‌خواهم درباره‌اش بنویسم مرا یادِ عمو پتروس نمی‌اندازد: فریده فیروزبخت.</p>
+
+    <h2 class="subhead">شبکه‌ی اول‌بازها</h2>
+
+    <p>وقتی یکی از دوستانِ اصفهانی برایم نوشت: «می‌شود درباره‌ی ریاضی‌دان‌های زن هم تحقیق کنی و بنویسی؛ مثلاً خانم فیروزبخت؟» اصلاً فکر نمی‌کردم نوشتن درباره‌ی ریاضی‌دانی که فقط پنج سال از خودِ من بزرگ‌تر بوده و متأسفانه در سومِ دیِ ۱۳۹۸، برابر با ۲۴ دسامبرِ ۲۰۱۹، در سنِ ۵۸ سالگی درگذشته است، این‌قدر سخت باشد.</p>
+
+    <p>تقریباً فقط چند لینکِ فارسی هست که به نامِ او اشاره می‌کنند و بیشترشان چیزی بیش از یک جمله نمی‌گویند: <em>فریده فیروزبخت، ریاضی‌دانِ ایرانی و صاحبِ حدسِ فیروزبخت درباره‌ی اعداد اول، درگذشت.</em> همین.</p>
+
+    <p>باز هم خدا پدرِ ویکی‌پدیای انگلیسی را بیامرزد که دو خط اضافه دارد: او اصفهانی بوده، نخست داروسازی خوانده، بعد ریاضی، و سپس استادِ ریاضیِ دانشگاهِ اصفهان شده است. همین. نه عکسی، نه روایتِ دقیقی از زندگی، نه چیزِ دیگری. یعنی اگر چند خطی که خودش نوشته نبود، شاید داستان همین‌جا تمام می‌شد.</p>
+
+    <p>آن چند خط ما را به سایتی می‌برد به نامِ <span class="sans">primepuzzles.net</span>؛ سایتی برای اول‌بازها، یعنی آدم‌هایی که حالِ زندگی‌شان اعداد اول است. در آنجا مسئله، راه‌حل، ایده و کنجکاویِ عددی به اشتراک می‌گذارند. سایتی کوچک و جمع‌وجور که هنوز فعال است و همچنان مسئله‌ی هفتگی منتشر می‌کند.</p>
+
+    <p>چرا این‌قدر درباره‌ی این سایت می‌نویسم؟ چون فیروزبخت رسماً در آن زندگی می‌کرد. در آماری که حدودِ یک سال و چهار ماه پس از مرگِ او روی سایت منتشر شده، او هنوز نفرِ دومِ فهرستِ اول‌بازهاست. به‌سادگی می‌شود تصور کرد که پیش از درگذشتش، نفرِ اول بوده است.</p>
+
+    <figure class="shot" style="max-width: 440px;">
+      <img src="../assets/pp-ranking.png" alt="رتبه‌بندیِ مشارکت‌کنندگانِ Prime Puzzles">
+      <figcaption>رتبه‌بندیِ Prime Puzzles بر پایه‌ی شمارِ ارجاع‌ها (اردیبهشت ۱۴۰۰) — فیروزبخت هنوز نفرِ دوم، بیش از یک سال پس از درگذشتش.</figcaption>
+    </figure>
+
+    <p>در آماری دیگر هم، مربوط به کنجکاوی‌های عددیِ اعضا، هنوز جزوِ ده نفرِ اول است. برای اینکه حسی از این کنجکاوی‌ها بگیرید، عددِ <span class="sans">۱۹۶۲</span>، سالِ تولدِ فیروزبخت، را در نظر بگیرید. بعید است این رابطه به ذهنِ هر کسی برسد:</p>
+
+    <div class="eq">\[ 1962 = (1 \times 9 \times 6 \times 2 + 1)(1 + 9 + 6 + 2) \]</div>
+
+    <p>یعنی باید عموپتروس‌وار با اعداد زندگی کنید تا به چنین چیزی فکر کنید. این سایت آن‌قدر برای فیروزبخت عزیز بود که خودش را به قلمِ خودش در آن معرفی کرده بود.</p>
+
+    <figure class="shot" style="max-width: 640px;">
+      <img src="../assets/pp-puzzlers.png" alt="معرفی‌نامه‌ی فیروزبخت در Prime Puzzles">
+      <figcaption>معرفی‌نامه‌ی او در Prime Puzzles — یک بیوگرافی، اما بدونِ عکس. «موضوعِ موردِ علاقه‌ام فاصله‌ی میانِ اعداد اول است.»</figcaption>
+    </figure>
+
+    <p>نکته‌ی کوچک این است که حتی آنجا هم از فرستادنِ عکس طفره رفته است. سایت از اعضا بیوگرافی و عکس می‌خواهد، اما او فقط بیوگرافی فرستاده است. نکته‌ی مهم‌تر، تاریخی است که حدسش به ذهنش رسیده: سالِ <span class="sans">۱۹۸۲</span>؛ یعنی در بیست‌سالگی و زمانی که دانشجوی سالِ دومِ داروسازی بوده است.</p>
+
+    <p>فکرش را بکنید: سالِ دومِ داروسازی باشید و صبح و شب‌تان را با اعداد اول بگذرانید. در واقع باید به این فکر کنید که خانواده چه حرص و جوشی خورده‌اند و فریده چه پوست‌کلفتی داشته است؛ تجربه کرده‌ام که می‌گویم. اما حدسی که به ذهنش رسید آن‌قدر شگفت‌انگیز بود که قانعش کند داروسازی را رها کند و سراغِ ریاضی برود.</p>
+
+    <h2 class="subhead">حدسِ فیروزبخت</h2>
+
+    <p>خانواده‌ی محترمِ اعداد اول را که یادتان هست: نخستینشان <span class="sans">۲</span> است، دومی <span class="sans">۳</span>، سومی <span class="sans">۵</span>، چهارمی <span class="sans">۷</span>، پنجمی <span class="sans">۱۱</span>، و ششمی را باز هم به عهده‌ی شما می‌گذاریم.</p>
+
+    <p>حالا چون دومی <span class="sans">۳</span> است، ریشه‌ی دومِ <span class="sans">۳</span> را می‌سازیم. چون سومی <span class="sans">۵</span> است، ریشه‌ی سومِ <span class="sans">۵</span> را می‌سازیم. چون چهارمی <span class="sans">۷</span> است، ریشه‌ی چهارمِ <span class="sans">۷</span> را می‌سازیم. چون پنجمی <span class="sans">۱۱</span> است، ریشه‌ی پنجمِ <span class="sans">۱۱</span> را می‌سازیم، و همین‌طور ادامه می‌دهیم. عددِ <span class="sans">۲</span> هم که نخستین عددِ اول است، فعلاً دارد ماستِ خودش را می‌خورد. حدسِ فیروزبخت این است که این عددها مرتب کوچک‌تر و کوچک‌تر می‌شوند:</p>
+
+    <div class="eq">\[ 2 \;>\; \sqrt{3} \;>\; \sqrt[3]{5} \;>\; \sqrt[4]{7} \;>\; \sqrt[5]{11} \;>\; \cdots \]</div>
+
+    <p>آدم در نگاهِ اول فکر می‌کند: خب، معلوم است دیگر. مخصوصاً همان اول که <span class="sans">۲</span> بزرگ‌تر از ریشه‌ی دومِ <span class="sans">۳</span> است، آدم زود گول می‌خورد و خیال می‌کند بقیه هم حتماً همین‌طورند. اما برای اینکه ببینیم حدس چقدر شگفت‌انگیز است، کمی از این پایین‌ها برویم جلوتر و ببینیم آن بالاها چه خبر است.</p>
+
+    <p>عددِ <span class="sans">۱۱۳</span>، سی‌اُمین عددِ اول است و عددِ اولِ بعدی، <span class="sans">۱۲۷</span>. اگر حدسِ فیروزبخت درست باشد، انتظار داریم \( \sqrt[30]{113} > \sqrt[31]{127} \). و درست هم هست، چون تقریباً داریم:</p>
+
+    <div class="eq tight">\[ \sqrt[30]{113} \approx 1.170673 \qquad \sqrt[31]{127} \approx 1.169134 \]</div>
+
+    <p>این یعنی ریشه‌ی سی‌اُمِ <span class="sans">۱۱۳</span> از همه‌ی ریشه‌های سی‌ویکمِ عددهای <span class="sans">۱۱۴</span> تا <span class="sans">۱۲۷</span> بزرگ‌تر است. اگر از طرفِ ریشه‌ی سی‌اُمِ <span class="sans">۱۱۳</span> به ماجرا نگاه کنیم، هیجان‌انگیزتر می‌شود. فرض کنید می‌خواهید با ریشه‌های سی‌ویکم به آن برسید. با ریشه‌ی سی‌ویکمِ <span class="sans">۱۱۴</span> شروع می‌کنید؛ جواب نمی‌دهد. سراغِ <span class="sans">۱۱۵</span> می‌روید که کمی بزرگ‌تر است؛ آن هم جواب نمی‌دهد. ریشه‌های سی‌ویکم بزرگ‌تر و بزرگ‌تر می‌شوند، اما هنوز ریشه‌ی سی‌اُمِ <span class="sans">۱۱۳</span> به همه‌ی آن‌ها می‌چربد.</p>
+
+    <p>اگر حدسِ فیروزبخت درست باشد، مطمئنیم این قلدری تا ریشه‌ی سی‌ویکمِ <span class="sans">۱۲۷</span> ادامه دارد. اما درباره‌ی ریشه‌ی سی‌ویکمِ <span class="sans">۱۲۸</span> دیگر کار به شانسِ ریشه‌ی سی‌اُمِ <span class="sans">۱۱۳</span> بستگی دارد:</p>
+
+    <div class="eq tight">\[ \sqrt[30]{113} \approx 1.170673 \qquad \sqrt[31]{128} \approx 1.169430 \]</div>
+
+    <p>عجب خوش‌شانسی است این ریشه‌ی سی‌اُمِ <span class="sans">۱۱۳</span>. چند عددِ بعدی را هم لبِ مرزی رد می‌کند و باید تا ریشه‌ی سی‌ویکمِ <span class="sans">۱۳۳</span> صبر کنیم تا رویش کم شود:</p>
+
+    <div class="eq tight">\[ \sqrt[30]{113} \approx 1.170673 \qquad \sqrt[31]{133} \approx 1.170877 \]</div>
+
+    <p>این‌طور که به ماجرا نگاه کنید، می‌بینید چرا فیروزبخت در معرفیِ خودش برای سایتِ اول‌بازها نوشته بود که موضوعِ موردِ علاقه‌اش فاصله‌ی بینِ اعداد اول است. آدم حس می‌کند هرچه این فاصله بزرگ‌تر باشد، ممکن است پیش از رسیدن به عددِ اولِ بعدی، زورِ عددِ اولِ قبلی تمام شود؛ و اگر قرار باشد حدس جایی شکست بخورد، احتمالاً همان‌جاست که این فاصله خیلی بزرگ است.</p>
+
+    <h2 class="subhead">به خودتان زحمت ندهید</h2>
+
+    <p>امیدوارم تا اینجا دویده باشید و یک ماشین‌حساب برداشته باشید و حدسِ فیروزبخت را برای چند عدد چک کرده باشید تا حسِ بهتری از آن بگیرید. اما اگر این کار را با امیدِ پیدا کردنِ یک مثالِ نقض انجام می‌دهید، باید بگویم زهی خیالِ باطل. ریاضی‌دان‌ها درستیِ آن را برای همه‌ی اعداد اول تا این عدد بررسی کرده‌اند:</p>
+
+    <div class="bignum">
+      <div class="num">18,400,000,000,000,000,000</div>
+      <div class="lab">بررسی‌شده — حدودِ ۱٫۸۴ × ۱۰¹⁹</div>
+    </div>
+
+    <p>اگر شانسی برای پیدا کردنِ مثالِ نقض وجود داشته باشد، با کامپیوترهای معمولی شدنی نیست. نکته‌ی جالب‌تر این است که خودِ فریده، در همان بیست‌سالگی، حدسِ خودش را تا این عدد بررسی کرده بود:</p>
+
+    <div class="bignum">
+      <div class="num">4,444,000,000,000</div>
+      <div class="lab">فیروزبخت، حدودِ ۱۹۸۲ — با دست و با کارتِ سوراخ‌دار</div>
+    </div>
+
+    <p>فکرش را بکنید: داریم درباره‌ی چهل سالِ پیش حرف می‌زنیم؛ زمانی که فقط یک کامپیوتر در کلِ دانشگاهِ اصفهان وجود داشته است. فریده باید برنامه‌اش را روی کارت‌های سوراخ‌دار آماده می‌کرده و مدام دعا می‌کرده که مبادا روی یکی از کارت‌ها سوراخی اشتباه زده باشد. برقِ چشم‌ها و آن لحظه‌ای که قلبِ آدم از شادی فرو می‌ریزد را همین حالا هم می‌شود حس کرد.</p>
+
+    <h2 class="subhead">فریده فیروزبخت که بود؟</h2>
+
+    <p>یکی از همکارانِ فریده در خانه‌ی ریاضیاتِ اصفهان برایم نوشت: «خیلی به ظاهرش نمی‌رسید و هر چیزی را جز تحقیق بیهوده می‌دانست.» یکی از شاگردهایش هم نوشت: «توی عالمِ خودش بود.» اما همین آدمی که این‌قدر در عالمِ خودش بود، برای به اشتراک گذاشتنِ حسش نسبت به ریاضیات با شاگردهایش، به‌طورِ طبیعی دست‌ودلباز بود.</p>
+
+    <p>فریده فیروزبخت نمی‌خواست ما از زندگیِ شخصیِ او بیش از آنچه خودش با ما در میان گذاشته است بدانیم. به این خواسته احترام می‌گذارم و داستان را با شعری به پایان می‌برم که بر آگهیِ ترحیمِ او آمده بود. نمی‌دانم چه کسی آن را انتخاب کرده، اما هر که بوده، نمی‌توانست انتخابِ درست‌تری کرده باشد:</p>
+
+    <div class="poem">
+      اینکه مردم نشناسند تو را غربت نیست<br>
+      غربت آن است که یاران ببرندت از یاد
+      <span class="who">— از آگهیِ ترحیمِ او</span>
+    </div>
+
+    <h2 class="subhead">و داستانِ او ادامه خواهد داشت</h2>
+
+    <p>متنِ زیر را به خواهشِ من، یان استوارت درباره‌ی حدسِ فیروزبخت نوشته است. آن را به فریده و شاگردهایش تقدیم می‌کنم. او در حدسش زنده خواهد ماند و دیگر هرگز غربت را تجربه نخواهد کرد.</p>
+  </div>
+
+  <!-- ===== متنِ مهمان ===== -->
+  <div class="guest">
+    <div class="guest-head">
+      <div class="gk">متنِ مهمان</div>
+      <h2>حدسِ فیروزبخت</h2>
+      <div class="gby"><b>یان استوارت</b> &nbsp;·&nbsp; دانشگاه واریک</div>
+    </div>
+    <div class="body">
+      <p>اعداد اول از مهم‌ترین و در عینِ حال گیج‌کننده‌ترین مفاهیم در سراسرِ ریاضیات‌اند. تعریفشان ساده است: یک عددِ صحیحِ مثبت وقتی اول است که نتوان آن را از ضربِ دو عددِ صحیحِ کوچک‌تر به دست آورد. برای مثال، <span class="sans">۵</span> عددی اول است، اما <span class="sans">۶ = ۲ × ۳</span> اول نیست. اعداد اول در بسیاری از شاخه‌های ریاضیات، هم محض و هم کاربردی، نقشی بنیادی دارند. برخی از رمزهایی که برای امنیتِ اینترنت به کار می‌روند بر پایه‌ی آن‌ها ساخته شده‌اند. با این همه، اعداد اول گیج‌کننده‌اند، زیرا از الگوی ساده‌ای پیروی نمی‌کنند؛ برخلافِ، مثلاً، مربع‌ها یا توان‌های <span class="sans">۲</span>.</p>
+
+      <p>از سوی دیگر، اعداد اول صرفاً تصادفی هم نیستند. می‌توان در میانشان الگوهایی پیدا کرد. یک نمونه‌ی آشکار این است که هر عددِ اول، به جز <span class="sans">۲</span>، فرد است. هر عددِ اولی که به صورتِ \(4k + 1\) باشد، مجموعِ دو مربعِ کامل است؛ اما هیچ عددِ اولی که به صورتِ \(4k + 3\) باشد، مجموعِ دو مربعِ کامل نیست. فرمول‌های تقریبیِ مفیدی هم درباره‌ی توزیعِ اعداد اول وجود دارد: اینکه تقریباً چند عددِ اول در یک بازه‌ی معین از اعداد پیدا می‌شود. در سالِ ۱۷۹۲، ریاضی‌دانِ بزرگ کارل فریدریش گاوس متوجه شد که تعدادِ اعداد اولِ کوچک‌تر از یک عددِ \(x\) تقریباً برابر است با \(x / \log x\)؛ یعنی \(x\) تقسیم بر لگاریتمِ طبیعیِ آن. اثباتِ این تقریب سرانجام در سالِ ۱۸۹۶، به دستِ ژاک آدامار و شارل ژان دو لا واله پوسن، با استفاده از روش‌های پیشرفته‌ی آنالیزِ مختلط به دست آمد. یک برداشت از این نتیجه آن است که اندازه‌ی \(n\)اُمین عددِ اول تقریباً \(n \log n\) است.</p>
+
+      <p>فریده فیروزبخت، ریاضی‌دانِ ایرانی، به خاطرِ حدسی درباره‌ی رابطه‌ی اندازه‌ی اعداد اولِ متوالی شناخته می‌شود. این حدس می‌گوید ریشه‌ی \(n\)اُمِ \(n\)اُمین عددِ اول، دنباله‌ای اکیداً نزولی می‌سازد. اگر \(n\)اُمین عددِ اول را \(p_n\) بنامیم، حدس به زبانِ نمادین می‌گوید:</p>
+
+      <div class="eq">\[ p_{n+1}^{\,1/(n+1)} \;<\; p_n^{\,1/n}. \]</div>
+
+      <p>فیروزبخت با استفاده از جدولی از بزرگ‌ترین فاصله‌های میانِ اعداد اولِ متوالی کشف کرد که این نابرابری برای همه‌ی \(n\)ها تا <span class="sans">۴٬۴۴۴٬۰۰۰٬۰۰۰٬۰۰۰</span> درست است. کارهای بعدیِ الکسی کورباتوف درستیِ آن را تا <span class="sans">۱٫۸۴ × ۱۰¹⁹</span> بررسی کرده است. با این حال، تا امروز نه اثباتی کامل برای آن پیدا شده و نه مثالِ نقضی.</p>
+
+      <p>حدس‌های مشابهِ بسیاری پیشنهاد شده‌اند. حدسِ فیروزبخت یکی از قوی‌ترینِ آن‌هاست و نسبت به بسیاری از حدس‌های دیگر، محدودیت‌های تنگ‌تری بر توزیعِ اعداد اول می‌گذارد. لوان آلبرتو فریرا و هوگو لوییز ماریانو، در مروری بر نتایجی که از این حدس نتیجه می‌شوند، آن را «جسورانه‌ترین گزاره‌ی شناخته‌شده‌ی معقول درباره‌ی فاصله‌های اعداد اول» توصیف کرده‌اند. آنان یادآور می‌شوند که اگر این حدس درست باشد، بسیاری از حدس‌های مشهورِ دیگر درباره‌ی اعداد اول نیز درست خواهند بود. همچنین با استفاده از پیشرفتِ مهمِ ییتانگ ژانگ درباره‌ی فاصله‌های میانِ اعداد اولِ متوالی، ثابت شده است که دنباله‌ی ریشه‌های \(n\)اُمِ \(n\)اُمین عددِ اول، بی‌نهایت بار کاهش می‌یابد.</p>
+
+      <p>میراثِ ریاضیِ فریده فیروزبخت سهمی مهم و برانگیزاننده در معمای چندصدساله‌ی توزیعِ اعداد اول است. حدسِ او چالشی جذاب برای ریاضی‌دان‌های آینده پدید آورده است. اگر درست باشد، بسیاری از قضیه‌هایی که مدت‌ها در انتظارشان بوده‌ایم از آن نتیجه خواهند شد. اگر نادرست باشد، ریاضی‌دان‌ها ناچار خواهند شد بینش‌های تازه‌ای درباره‌ی اندازه‌ی فاصله‌های اعداد اولِ متوالی به دست آورند.</p>
+    </div>
+  </div>
+
+  <!-- ===== در میان دیگران ===== -->
+  <div class="body nodrop">
+    <h2 class="subhead">در میانِ دیگران</h2>
+    <p>یان استوارت اشاره می‌کند که حدسِ فیروزبخت حدسی جسورانه است: اگر درست از کار دربیاید، درستیِ بسیاری از حدس‌های مشهورِ دیگر از آن نتیجه خواهد شد، و اگر اشتباه باشد، راه را برای بینش‌های تازه‌ای درباره‌ی فاصله‌ی اعداد اول باز خواهد کرد. پس اجازه دهید نوشته را با نگاهی به فیروزبخت در میانِ دیگران به پایان برسانیم.</p>
+    <p>برگردیم به همان مثالِ عددِ <span class="sans">۱۱۳</span>. گفتیم <span class="sans">۱۱۳</span> سی‌اُمین عددِ اول است و عددِ اولِ بعدی، <span class="sans">۱۲۷</span>. یعنی فاصله‌ی واقعیِ این دو عددِ اول برابر است با</p>
+    <div class="eq">\[ 127-113=14. \]</div>
+    <p>حالا ببینیم حدسِ فیروزبخت چه سقفی برای عددِ اولِ بعدی می‌گذارد. حدسِ فیروزبخت می‌گوید</p>
+    <div class="eq">\[ p_{31}<113^{\frac{31}{30}}, \]</div>
+    <p>و چون</p>
+    <div class="eq">\[ 113^{\frac{31}{30}}\approx 132.286, \]</div>
+    <p>پس طبقِ حدسِ فیروزبخت، عددِ اولِ بعدی باید پیش از رسیدن به حدودِ <span class="sans">۱۳۲</span> پیدا شود.</p>
+    <p>برای اینکه این را به زبانِ فاصله‌ها بگوییم، فاصله‌ی عددِ اولِ \(n\)اُم تا عددِ اولِ بعدی را با</p>
+    <div class="eq">\[ g_n=p_{n+1}-p_n \]</div>
+    <p>نشان می‌دهیم. پس در این مثال، \(g_{30}\) یعنی فاصله‌ی عددِ اولِ سی‌اُم تا عددِ اولِ سی‌ویکم. حدسِ فیروزبخت می‌گوید</p>
+    <div class="eq">\[ g_{30}<132.286-113\approx 19.286. \]</div>
+    <p>یعنی فاصله‌ی عددِ اولِ سی‌ویکم از عددِ اولِ سی‌اُم باید کمتر از <span class="sans">۱۹٫۲۸۶</span> باشد؛ یا ساده‌تر بگوییم، کمتر از <span class="sans">۲۰</span>.</p>
+    <p>حالا همین مثال را با یک حدسِ معروفِ دیگر مقایسه کنیم: حدسِ آندریکا. این حدس می‌گوید</p>
+    <div class="eq">\[ \sqrt{p_{31}}-\sqrt{113}<1. \]</div>
+    <p>اگر این را کمی جابه‌جا کنیم، به دست می‌آید که</p>
+    <div class="eq">\[ p_{31}<(\sqrt{113}+1)^2, \]</div>
+    <p>و چون</p>
+    <div class="eq">\[ (\sqrt{113}+1)^2\approx 135.260, \]</div>
+    <p>حدسِ آندریکا اجازه می‌دهد عددِ اولِ بعدی تا حدودِ <span class="sans">۱۳۵</span> جلو برود. یعنی به زبانِ فاصله‌ها:</p>
+    <div class="eq">\[ g_{30}<135.260-113\approx 22.260. \]</div>
+    <p>پس در همین مثالِ کوچک، حدسِ فیروزبخت بدترین حالتِ کوچک‌تری را برای یافتنِ عددِ اولِ بعدی پیشنهاد می‌کند:</p>
+    <div class="eq">\[ 19.286<22.260. \]</div>
+    <p>عددِ اولِ بعدی واقعاً <span class="sans">۱۲۷</span> است و فاصله‌ی واقعی، <span class="sans">۱۴</span>. هر دو حدس با این مثال سازگارند، اما فیروزبخت پیش‌بینیِ خوش‌بینانه‌تری از جایِ پیدا شدنِ عددِ اولِ بعدی به دست می‌دهد.</p>
+    <p>برای همین است که حدسِ فیروزبخت این‌قدر قوی است. اگر این فاصله‌ی خوش‌بینانه همیشه جواب بدهد، فاصله‌های کمتر خوش‌بینانه هم خودبه‌خود جواب می‌دهند. به همین دلیل است که از حدسِ فیروزبخت می‌توان به حدس‌هایی مثلِ آندریکا، لژاندر، اوپرمان و بروکار رسید. همه‌ی آن‌ها، هر کدام به زبانِ خودشان، درباره‌ی این حرف می‌زنند که عددهای اول بیش از حد از هم دور نمی‌شوند؛ اما حدسِ فیروزبخت یکی از خوش‌بینانه‌ترین و جسورانه‌ترینِ آن‌هاست.</p>
+    <p>البته حدس‌هایی حتی خوش‌بینانه‌تر از فیروزبخت هم وجود دارند، از جمله حدس‌های نیکلسون و فرهادیان. اما زیباییِ حدسِ فیروزبخت در این است که با زبانی بسیار ساده و دبیرستانی بیان می‌شود، و در عینِ حال پنجره‌ای کم‌نظیر به پیچیدگیِ فاصله‌ی بینِ اعداد اولِ متوالی باز می‌کند.</p>
+    <p>پس اگر جایی حدسی درباره‌ی فاصله‌ی بینِ اعداد اولِ متوالی دیدید که بسیار پیچیده به نظر می‌رسید، می‌توانید همیشه با این پرسشِ ساده شروع کنید: پیش‌بینیِ این حدس درباره‌ی فاصله‌ی عددِ اولِ سی‌ویکم از عددِ اولِ سی‌اُم چقدر است؟</p>
+    <p>یادتان باشد فاصله‌ای که فیروزبخت پیشنهاد می‌کند، کمتر از <span class="sans">۲۰</span> است.</p>
+  </div>
+
+
+  <!-- ===== کارنامه‌ی دست‌اندرکاران ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">جستار</div>
+        <div class="who">امیر اصغری</div>
+      </div>
+      <div class="role">
+        <div class="lab">متنِ مهمان</div>
+        <div class="who">یان استوارت</div>
+        <div class="aff">دانشگاه واریک</div>
+      </div>
+      <div class="role">
+        <div class="lab">عکس</div>
+        <div class="who">با سپاس از خانواده</div>
+        <div class="aff">تنها تصویرِ شناخته‌شده از فریده فیروزبخت.</div>
+      </div>
+    </div>
+    <div class="origin">مقاله‌ی اصلیِ «آدم‌ها و ریاضیات». متنِ مهمان به‌طورِ ویژه برای مجله نوشته شده است.</div>
+  </div>
+
+  <div class="refs">
+    <h3>مراجع و خواندنِ بیشتر</h3>
+    <ol>
+      <li>Firoozbakht’s conjecture. <em>Wikipedia.</em> <a href="https://en.wikipedia.org/wiki/Firoozbakht%27s_conjecture">en.wikipedia.org/wiki/Firoozbakht's_conjecture</a></li>
+      <li>The Prime Puzzles &amp; Problems Connection. <a href="https://www.primepuzzles.net/">primepuzzles.net</a></li>
+      <li>Alexei Kourbatov (2015). Verification of the Firoozbakht conjecture for primes up to four quintillion. <em>International Mathematical Forum.</em></li>
+      <li>Alexei Kourbatov (2015). Upper bounds for prime gaps related to Firoozbakht’s conjecture. <em>Journal of Integer Sequences, 18</em>, Article 15.11.2.</li>
+      <li>Luan Alberto Ferreira &amp; Hugo Luiz Mariano (2018). Prime gaps and the Firoozbakht conjecture. <em>São Paulo Journal of Mathematical Sciences.</em></li>
+      <li>Matt Visser (2019). Verifying the Firoozbakht, Nicholson, and Farhadian conjectures up to the 81st maximal prime gap. <em>Mathematics, 7</em>(8), 691.</li>
+      <li>آپوستولوس دوکسیادیس (۲۰۰۰). <em>عمو پتروس و حدسِ گلدباخ.</em></li>
+    </ol>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  }
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+
+  function renderMath(){
+    if (!window.renderMathInElement) { setTimeout(renderMath, 60); return; }
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+  renderMath();
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

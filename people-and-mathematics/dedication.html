@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In memoriam — Safoura Jafari &amp; David Tall · People and Mathematics</title>
+<meta name="description" content="People and Mathematics is dedicated to the memory of Safoura Jafari and of David Tall (1941–2024), a great mathematics educator — marked on the second anniversary of his passing.">
+
+<meta property="og:title" content="In memoriam — Safoura Jafari &amp; David Tall">
+<meta property="og:description" content="People and Mathematics — آدم‌ها و ریاضیات — is dedicated to the memory of Safoura Jafari and David Tall.">
+<meta property="og:image" content="assets/safoura-jafari.png">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500;1,6..72,600&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("fonts/BNazanin.woff2") format("woff2"),
+         url("fonts/BNazanin.woff")  format("woff"),
+         url("fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb a { text-decoration: none; }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Memorial ---------- */
+  .memoriam { max-width: 1000px; margin: 0 auto; padding: 84px 40px 40px; text-align: center; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 56px; margin-top: 40px; align-items: start; }
+  .person { margin: 0; }
+  .person .portrait { margin-top: 0; }
+  .person .name { margin-top: 22px; }
+  .person .tribute { margin: 20px auto 0; text-align: center; max-width: 25em; }
+  @media (max-width: 760px) { .pair { grid-template-columns: 1fr; gap: 54px; } }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  [dir="rtl"] .kicker { letter-spacing: .05em; }
+
+  .portrait { width: 220px; height: 220px; margin: 30px auto 0; border-radius: 50%; overflow: hidden; border: 1px solid var(--line); background: #0D0C0B; box-shadow: 0 1px 0 rgba(255,255,255,.5), 0 18px 44px -22px rgba(28,24,20,.55); }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.02); }
+
+  .name { font-size: 40px; font-weight: 500; letter-spacing: -.015em; line-height: 1.1; margin: 26px 0 0; }
+  [dir="rtl"] .name { font-family: "Vazirmatn", "B Nazanin", serif; }
+  .dates { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 14px; letter-spacing: .04em; color: var(--muted); margin: 12px 0 0; }
+  .dates .sep { color: var(--accent); margin: 0 .5em; }
+
+  .rule { width: 44px; height: 1px; background: var(--accent); margin: 34px auto; opacity: .8; }
+
+  blockquote.quote { margin: 0; font-size: 27px; line-height: 1.5; font-weight: 400; color: #33291F; max-width: 20em; margin-left: auto; margin-right: auto; }
+  blockquote.quote em { font-style: italic; color: var(--accent); }
+  [data-lang-block="fa"] blockquote.quote { font-family: "Vazirmatn", "B Nazanin", serif; font-size: 26px; line-height: 1.85; }
+  [data-lang-block="en"] blockquote.quote { font-style: italic; font-size: 25px; }
+  .attrib { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: #948876; margin-top: 20px; font-weight: 600; }
+
+  .tribute { font-size: 19px; line-height: 1.72; color: #43392E; max-width: 30em; margin: 40px auto 0; }
+  [data-lang-block="fa"] .tribute { font-size: 18px; line-height: 1.95; }
+
+  .signoff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13.5px; color: var(--muted); margin: 30px 0 0; font-style: normal; }
+
+  .footer { border-top: 1px solid var(--ink); margin-top: 70px; padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin-left: auto; margin-right: auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 560px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .memoriam { padding: 56px 22px 30px; }
+    .portrait { width: 176px; height: 176px; }
+    .name { font-size: 32px; }
+    blockquote.quote { font-size: 22px; }
+    [data-lang-block="en"] blockquote.quote { font-size: 22px; }
+    [data-lang-block="fa"] blockquote.quote { font-size: 22px; }
+    .tribute { font-size: 17px; }
+  }
+
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="index.html">
+    <img src="assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="Dedication" data-fa="تقدیم"></span></div>
+  <div class="crumb sans" data-en="In memoriam" data-fa="به یاد"></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<section class="memoriam" data-lang-block="en">
+  <div class="kicker">This journal is dedicated to</div>
+  <div class="pair">
+    <figure class="person">
+      <div class="portrait"><img src="assets/safoura-jafari.png" alt="Safoura Jafari"></div>
+      <div class="name">Safoura Jafari</div>
+      <div class="dates">17 January 2004 <span class="sep">—</span> 9 January 2026</div>
+      <p class="tribute">Had she lived, she might have been one of this journal's contributors — and she remains, in every sense, a proud citizen of the world of mathematics.</p>
+    </figure>
+    <figure class="person">
+      <div class="portrait"><img src="assets/david-tall.png" alt="David Tall"></div>
+      <div class="name">David Tall</div>
+      <div class="dates">15 May 1941 <span class="sep">—</span> 15 July 2024</div>
+      <p class="tribute">A great mathematics educator; a supportive, thoughtful, talkative supervisor; and, above all, a unique human being.</p>
+    </figure>
+  </div>
+
+  <div class="rule"></div>
+  <p class="signoff">— The Editors</p>
+</section>
+
+<!-- =================== فارسی =================== -->
+<section class="memoriam" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">این مجله تقدیم می‌شود به</div>
+  <div class="pair">
+    <figure class="person">
+      <div class="portrait"><img src="assets/safoura-jafari.png" alt="صفورا جعفری"></div>
+      <div class="name">صفورا جعفری</div>
+      <div class="dates">۲۷ دی ۱۳۸۲ <span class="sep">—</span> ۱۹ دی ۱۴۰۴</div>
+      <p class="tribute">اگر زنده بود، شاید یکی از نویسندگانِ این مجله می‌شد — و او، به هر معنا، شهروندی سربلند از جهانِ ریاضیات است.</p>
+    </figure>
+    <figure class="person">
+      <div class="portrait"><img src="assets/david-tall.png" alt="دیوید تال"></div>
+      <div class="name">دیوید تال</div>
+      <div class="dates">۲۵ اردیبهشت ۱۳۲۰ <span class="sep">—</span> ۲۵ تیر ۱۴۰۳</div>
+      <p class="tribute">آموزگارِ بزرگِ ریاضی؛ استادِ راهنمایی پشتیبان، ژرف‌اندیش و خوش‌صحبت؛ و بیش از همه، انسانی بی‌همتا.</p>
+    </figure>
+  </div>
+
+  <div class="rule"></div>
+  <p class="signoff">— سردبیران</p>
+</section>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="index.html">mathswell.com</a></span>
+  <a class="back" href="index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  }
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+</script>
+<script src="counter.js"></script>
+</body>
+</html>

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure Is in Your Gaze — Amir Asghari · Classroom Ideas</title>
+<meta name="description" content="The way we look at a figure changes its mathematics. A parallelogram set on a circle, a sentence read with a different rhythm — small shifts of gaze open or close the path to understanding. A Classroom Ideas piece, with things to try, in People and Mathematics.">
+
+<meta property="og:title" content="Structure Is in Your Gaze — Amir Asghari">
+<meta property="og:description" content="Classroom Ideas · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/logo.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX for crisp typeset mathematics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>/* KaTeX inside RTL text — keep formulas LTR & bidi-isolated so exponents/coefficients stay put */
+.katex, .katex-display { direction: ltr; unicode-bidi: isolate; }
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; --tint: #F1E7D4; --disc: #F4ECDC; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  /* breadcrumb sub-bar */
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 46px; line-height: 1.08; font-weight: 500; letter-spacing: -.02em; margin: 16px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+  .byline .meta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .byline .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; align-self: center; }
+
+  .byline .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); align-self: center; }
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 44px 0 14px; padding-top: 8px; }
+
+  /* principle callout */
+  .principle { border-inline-start: 3px solid var(--accent); background: #F4ECDC; padding: 18px 22px; margin: 26px 0; border-radius: 0 4px 4px 0; }
+  .principle .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-bottom: 7px; }
+  .principle .txt { font-size: 18px; line-height: 1.55; }
+
+  .pullquote { font-size: 25px; line-height: 1.34; font-weight: 500; letter-spacing: -.01em; color: var(--ink); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); padding: 22px 0; margin: 32px 0; }
+  .pullquote .fr { font-style: italic; color: #43392E; display: block; }
+  .pullquote .src { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .02em; margin-top: 12px; }
+
+  .eq { text-align: center; margin: 22px 0; font-size: 20px; }
+  .body a:not(.cref) { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(200,99,62,.4); }
+  .body a:not(.cref):hover { border-bottom-color: var(--accent); }
+  .cref { font-family: "Hanken Grotesk","Vazirmatn",sans-serif; font-size: .78em; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; }
+  .cref:hover { text-decoration: underline; }
+  .refs ol li { scroll-margin-top: 90px; }
+  .refs ol li:target { background: #F4ECDC; }
+
+  /* ---------- Figures & interactives ---------- */
+  figure.fig { margin: 30px 0; }
+  .fig .frame { background: #FCFBF6; border: 1px solid var(--line); border-radius: 7px; padding: 16px 16px 12px; }
+  .fig.ia .frame { background: #FBFAF4; }
+  .fig .frame svg { display: block; width: 100%; height: auto; touch-action: none; }
+  figure.fig figcaption { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13.5px; color: var(--muted); margin-top: 11px; line-height: 1.55; }
+  figure.fig figcaption .fnum { color: var(--accent); font-weight: 700; letter-spacing: .04em; }
+
+  .iacontrols { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; }
+  .iacontrols .grp { display: flex; align-items: center; gap: 9px; }
+  .iacontrols label.cap { color: var(--muted); white-space: nowrap; }
+  .iaseg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .iaseg button { border: 0; background: transparent; padding: 7px 13px; font: inherit; cursor: pointer; color: var(--muted); }
+  .iaseg button.on { background: var(--accent); color: var(--paper); }
+  .iabtn { border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 7px 14px; font: inherit; cursor: pointer; color: var(--ink); }
+  .iabtn:hover { border-color: var(--accent); color: var(--accent); }
+  .iachk { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; color: var(--muted); user-select: none; }
+  .iachk input { accent-color: var(--accent); width: 15px; height: 15px; }
+  input[type=range].ia { accent-color: var(--accent); width: 128px; vertical-align: middle; }
+  .iaread { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--ink); }
+  .iaread b { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .ialegend { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); }
+  .ialegend .sw { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+  [dir="rtl"] input[type=range].ia { direction: ltr; }
+
+  /* contributor colophon */
+  .colophon { margin-top: 48px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; }
+  .refs li { margin-bottom: 10px; }
+  .refs a { color: var(--accent); word-break: break-word; }
+  .fnote { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); line-height: 1.6; margin: 6px 0 0; }
+  sup.fn a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+  [dir="rtl"] .pullquote .fr { font-style: normal; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 22px 32px; }
+    h1.title { font-size: 33px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .pullquote { font-size: 20px; }
+    input[type=range].ia { width: 108px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="Classroom Ideas" data-fa="ایده‌های کلاسی"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#567D46;display:inline-block;flex:0 0 auto;"></span><span data-en="School maths · July 2026" data-fa="ریاضیِ مدرسه · تیر ۱۴۰۵"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="kicker">Classroom Ideas</div>
+  <h1 class="title">Structure Is in Your Gaze</h1>
+  <p class="standfirst">The way we look at whatever we are about to mathematise changes the mathematics of the problem — and can make the path to understanding either hard or easy. A few classroom moves, now interactive, where a shift of the gaze does the teaching.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/amir.jpg" alt="Amir Asghari">
+    <span class="name">Amir Asghari</span>
+  </div>
+
+  <div class="body">
+    <p>I was invigilating an exam for water-engineering students when the following formula, printed on the formula sheet they had been given, caught my attention.</p>
+
+    <figure class="fig">
+      <div class="frame"><div data-widget="water-channel"></div></div>
+      <figcaption><span class="fnum">Fig. 1</span> — The cross-section of an open channel: \(A = (b + zy)\,y\). On the wall, the <em>1</em> is vertical: for one unit of depth, the wall opens by \(z\).</figcaption>
+    </figure>
+
+    <p>What interested me, even before the formula itself, was the diagram. It drew my attention because the number <em>1</em> was not where I had expected it to be. In the familiar school reading, we read an oblique line through <em>slope</em>: we measure the change in height relative to one unit of forward movement. Here, however, the focus is on <em>opening</em>: for one unit of change in depth, how much does the wall of the channel open? In effect, the school habit of placing the value of a function on the vertical axis and the independent variable on the horizontal axis imposes slope on our gaze, not opening.</p>
+
+    <p>This observation can lead in several directions. One might ask how choices in mathematics have taken shape: how far they have been deliberate, how far they have simply travelled from one generation to the next, and how far they have become so attached to mathematical structure that we can no longer question them or easily change them <a class="cref" href="#ref1">[1]</a>. We might even ask: if our first experience of an oblique line had been not a slide going up or down, but a water channel and the opening of its walls, would today's textbooks — instead of being full of examples of slope — be full of examples of opening?</p>
+
+    <p>But the direction that interests me in this piece, and that can be taken into the classroom, is this:</p>
+
+    <div class="principle">
+      <div class="lab">The idea in one line</div>
+      <div class="txt">The way we look at whatever we are about to mathematise changes the mathematics of the problem, and can make the path to understanding either hard or easy.</div>
+    </div>
+
+    <h2 class="subhead">A Correct Formula, but No Structure</h2>
+
+    <p>I begin with an example that, on the surface, has nothing to do with ways of looking — precisely in order to show the danger of <em>not</em> looking. Suppose we defined the area of a parallelogram like this:</p>
+
+    <div class="eq">\[ \text{area of the parallelogram} \;=\; \cfrac{\,a - h\,}{\dfrac{1}{h} - \dfrac{1}{a}}. \]</div>
+
+    <figure class="fig">
+      <div class="frame"><div data-widget="invented-formula"></div></div>
+      <figcaption><span class="fnum">Fig. 2</span> — This invented formula, though it looks strange, simplifies to the correct value.</figcaption>
+    </figure>
+
+    <p>Notice that if we simplify this invented formula, we get</p>
+
+    <div class="eq">\[ \cfrac{\,a - h\,}{\dfrac{1}{h} - \dfrac{1}{a}} \;=\; ah. \]</div>
+
+    <p>So this invented formula really does give the area of the parallelogram; yet it has no connection at all with the <em>structure</em> of the parallelogram. Unfortunately, even the usual formula is, in many classrooms, not connected to that structure; and even when it is, the connection may remain artificial and procedural.</p>
+
+    <h2 class="subhead">When the Structure Is There, but Only as a Procedure</h2>
+
+    <p>One of the best observations of this kind is reported by Wertheimer <a class="cref" href="#ref2">[2]</a>. Students who know how to obtain the area formula for a parallelogram using the familiar diagram below do not always see the same structure when they are faced with a different arrangement.</p>
+
+    <figure class="fig">
+      <div class="frame"><div data-widget="wert-rect"></div></div>
+      <figcaption><span class="fnum">Fig. 3</span> — In the familiar diagram, the triangle on one side of the parallelogram is cut off and moved to the other side, producing a rectangle of equal area.</figcaption>
+    </figure>
+
+    <figure class="fig">
+      <div class="frame"><div data-widget="wert-oblique"></div></div>
+      <figcaption><span class="fnum">Fig. 4</span> — Can you see the same idea in this figure too?</figcaption>
+    </figure>
+
+    <p>When faced with the second figure, some students respond that their teacher has not taught them this one. The question is how we can help a learner see the useful structure. There is no general formula for doing so — but being aware of the aim often opens up ways forward.</p>
+
+    <p>In this same case of the parallelogram, something I learned from <a href="https://fa.wikipedia.org/wiki/%D8%A7%D9%85%DB%8C%D8%AF%D8%B9%D9%84%DB%8C_%D8%B4%D9%87%D9%86%DB%8C_%DA%A9%D8%B1%D9%85%E2%80%8C%D8%B2%D8%A7%D8%AF%D9%87" target="_blank" rel="noopener">Omid-Ali Karamzadeh</a> — a well-known Iranian mathematician, and one of the few mathematicians who still genuinely love Euclidean geometry — is to draw the parallelogram on a circular sheet and give it to students. Karamzadeh had learned this from his own geometry teacher, who used the same device to lead them to the delightful discovery that, in a triangle, the product of base and height is invariant. The main idea is to detach the learner's gaze from the parallelism of the base with the bottom edge of the paper, and to draw it toward the internal structure of the figure.</p>
+
+    <figure class="fig ia">
+      <div class="frame"><div data-widget="para-circle"></div></div>
+      <figcaption><span class="fnum">Fig. 5 · interactive</span> — On a circular sheet there is no “bottom of the page” for the base to lean on, so the gaze returns to the figure itself.</figcaption>
+    </figure>
+
+    <h2 class="subhead">Covering in Order to See</h2>
+
+    <p>Karamzadeh's solution is very much his own — and perhaps very much his childhood teacher's. Fortunately, many such devices are more familiar. Consider the equality of vertically opposite angles <a class="cref" href="#ref3">[3]</a>. One can prove it without looking, through a sequence of algebraic statements:</p>
+
+    <div class="eq">\( a + c = 180^\circ, \quad b + c = 180^\circ \;\Rightarrow\; a = b. \)</div>
+
+    <p>Of course this can be done. But the learner does not see <em>why</em> this algebra rests on the geometric structure of the problem: which equalities should be written, which parts of the figure should be named, and why these relations lead to the result. By contrast, we can help the student see the structure that is then algebraised. One way is to cover part of the figure temporarily, so that attention is focused on the angles and relations the argument actually needs.</p>
+
+    <figure class="fig ia">
+      <div class="frame"><div data-widget="vertical-angles"></div></div>
+      <figcaption><span class="fnum">Fig. 6 · interactive</span> — <b>c</b> is the shared angle, coloured from the outset. Cover so that only <b>a</b> and <b>c</b> show — two parts of one straight angle — then only <b>b</b> and <b>c</b>. Each is the supplement of <b>c</b>, so \(a = b\). <b>Switch the cover</b> with the buttons.</figcaption>
+    </figure>
+
+    <h2 class="subhead">Reading and Directing the Gaze</h2>
+
+    <p>Examples are abundant. In fact, one way of directing a learner's gaze is simply through <em>reading</em> — knowing where to pause and where to place emphasis. In this way, the very same sentence can make different structures become visible. The following example is quite specific, but it points to a more general idea.</p>
+
+    <p>Consider the sentence: <em>"For every \(x\) and for every \(y\), the ordered pair \((x, y)\) goes to \((y, x)\)."</em> Read it with two different rhythms. The first draws attention to <em>every \(x\)</em> and <em>every \(y\)</em> — meaning that every point is considered together with its reflection in the line \(y = x\). Read it again, placing more weight on <em>"for every \(x\)"</em>: now a particular \(x\) becomes fixed in the mind, and for that fixed \(x\) we choose several different values of \(y\). A vertical line of chosen points answers with a horizontal line of their reflections.</p>
+
+    <figure class="fig ia">
+      <div class="frame"><div data-widget="symmetry"></div></div>
+      <figcaption><span class="fnum">Fig. 7–8 · interactive</span> — Two readings of one sentence. In <b>Every point</b>, choose points freely and watch each one mirror across \(y = x\). In <b>Fix \(x\)</b>, you may choose only \(y\): the points fill a vertical line, their mirrors a horizontal one.</figcaption>
+    </figure>
+
+    <p>If your aim is for the learner to see <em>symmetry</em>, the first reading is probably better, because it unstructures the points you choose. Although this example may seem rather specific, it is not artificial — it comes from two different readings, by learners, of one and the same sentence <a class="cref" href="#ref4">[4]</a>.</p>
+
+    <p>Examples are as wide-ranging as any interaction with a learner. The next time you enter a classroom and, in response to a student's uncertainty, try to phrase your sentence differently, or cover part of a figure with your hand so that the student looks at what they need to look at — and not at what they do not need in that moment <a class="cref" href="#ref5">[5]</a> — it may be worth thanking André Gide for this:</p>
+
+    <div class="pullquote">
+      <span class="fr">Nathanaël — que l'importance soit dans ton regard, non dans la chose regardée.</span>
+      Nathanaël — may the importance be in your gaze, not in the thing looked at.
+      <span class="src">André Gide · Les Nourritures terrestres</span>
+    </div>
+  </div>
+
+  <!-- ===== Colophon ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Author</div>
+        <div class="who">Amir Asghari</div>
+      </div>
+      <div class="role">
+        <div class="lab">Section</div>
+        <div class="who">Classroom Ideas</div>
+        <div class="aff">Things to try on Monday.</div>
+      </div>
+      <div class="role">
+        <div class="lab">Interactives</div>
+        <div class="who">A parallelogram on a circle · covering vertical angles · reflection in y = x</div>
+      </div>
+    </div>
+    <div class="origin">The examples of the parallelogram and of vertically opposite angles first appeared in the author's 1388/2009 article «a che sāket ast!» ("How silent is <em>a</em>!") in Roshd Mathematics Education. Written for <em>People and Mathematics</em>.</div>
+  </div>
+
+  <div class="refs">
+    <h3>References</h3>
+    <ol>
+      <li id="ref1">Boas, H. P. (2026). The history of three wrong definitions. <em>The Mathematical Intelligencer</em>, 1–11.</li>
+      <li id="ref2">Wertheimer, M. (1945). <em>Productive Thinking.</em> Harper.</li>
+      <li id="ref3">Asghari, A. (1388/2009). «a che sāket ast!» ["How silent is <em>a</em>!"]. <em>Roshd Mathematics Education</em>, Vol. 27, No. 2, Winter 1388.</li>
+      <li id="ref4">Asghari, A. H. (2005). <em>Equivalence</em> (Doctoral dissertation, University of Warwick).</li>
+      <li id="ref5">Katona, G. (1940). <em>Organizing and Memorizing: Studies in the Psychology of Learning and Teaching.</em> Columbia University Press. — a book that played a serious role in shaping the author's educational outlook.</li>
+    </ol>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">ایده‌های کلاسی</div>
+  <h1 class="title">ساختار در نگاه تو است</h1>
+  <p class="standfirst">نوعِ نگاهِ ما به هر آنچه قرار است ریاضی‌وارش کنیم، ریاضیاتِ مسئله را تغییر می‌دهد و می‌تواند مسیرِ فهمیدن را سخت یا آسان کند — چند مثالِ کلاسی، این‌بار تعاملی، که در آن‌ها جابه‌جاییِ نگاه خودْ آموزش می‌دهد.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/amir.jpg" alt="امیر اصغری">
+    <span class="name">امیر اصغری</span>
+  </div>
+
+  <div class="body">
+    <p>مراقبِ جلسه‌ی امتحانِ دانشجویانِ مهندسیِ آب بودم که فرمولِ زیر، روی برگه‌ی فرمول‌هایی که در اختیارشان قرار داده شده بود، توجهم را جلب کرد.</p>
+
+    <figure class="fig">
+      <div class="frame"><div data-widget="water-channel"></div></div>
+      <figcaption><span class="fnum">شکل ۱</span> — مقطعِ یک کانالِ باز: \(A = (b + zy)\,y\). روی دیواره، عددِ ۱ عمودی است: به‌ازای یک واحد عمق، دیواره به‌اندازه‌ی \(z\) باز می‌شود.</figcaption>
+    </figure>
+
+    <p>چیزی که برایم جالب بود، پیش از خودِ فرمول، خودِ شکل بود. شکل ناگهان توجهِ مرا به خودش جلب کرد، چون عددِ <em>۱</em> آن‌جایی نبود که انتظار داشتم باشد. در نگاهِ آشنای مدرسه‌ای، خطِ مایل را معمولاً از راهِ <em>شیب</em> می‌خوانیم: یعنی تغییرِ ارتفاع را نسبت به یک واحد پیشروی می‌سنجیم. اما در این‌جا تمرکز بر <em>میزانِ بازشدن</em> است: به‌ازای یک واحد تغییر در عمق، دیواره‌ی کانال چه اندازه باز می‌شود. در واقع، این‌که در آموزشِ مدرسه‌ای معمولاً مقدارِ تابع را روی محورِ عمودی و متغیرِ مستقل را روی محورِ افقی نشان می‌دهیم، شیب را به نگاهِ ما تحمیل می‌کند، نه بازشدگی را.</p>
+
+    <p>از این مشاهده می‌توان به چند جهت رفت. می‌توان پرسید انتخاب‌ها در ریاضیات چگونه شکل گرفته‌اند: چقدر آگاهانه بوده‌اند، چقدر خودبه‌خود از نسلی به نسلِ دیگر رسیده‌اند، و چقدر چنان به ساختارِ ریاضی پیوند خورده‌اند که دیگر نه می‌توان آن‌ها را به پرسش گرفت و نه به‌آسانی تغییرشان داد <a class="cref" href="#fref1">[۱]</a>. شاید حتی بتوان پرسید اگر تجربه‌ی آغازینِ ما از خطِ مایل، نه سرسره و بالا و پایین رفتن، بلکه کانالِ آب و بازشدنِ دیواره‌ها بود، آیا کتاب‌های درسیِ امروزِ ما به‌جای این‌همه مثال از شیب، پُر از مثال‌هایی از بازشدگی نبود؟</p>
+
+    <p>اما جهتی که در این نوشته به آن علاقه‌مندم و می‌توان آن را به کلاسِ درس بُرد این است:</p>
+
+    <div class="principle">
+      <div class="lab">ایده در یک جمله</div>
+      <div class="txt">نوعِ نگاهِ ما به هر آنچه قرار است ریاضی‌وارش کنیم، ریاضیاتِ مسئله را تغییر می‌دهد و می‌تواند مسیرِ فهمیدن را سخت یا آسان کند.</div>
+    </div>
+
+    <h2 class="subhead">فرمولِ درست، بی‌ساختار</h2>
+
+    <p>با مثالی شروع می‌کنم که در ظاهر هیچ ربطی به نوعِ نگاه ندارد، تا خطرِ نبودِ نگاه را نشان دهد. فرض کنید مساحتِ متوازی‌الاضلاع را به صورتِ زیر تعریف کنیم:</p>
+
+    <div class="eq" style="font-size:17px;margin-bottom:2px;">مساحتِ متوازی‌الاضلاع برابر است با</div>
+    <div class="eq" style="margin-top:4px;">\[ \cfrac{\,a - h\,}{\dfrac{1}{h} - \dfrac{1}{a}}. \]</div>
+
+    <figure class="fig">
+      <div class="frame"><div data-widget="invented-formula"></div></div>
+      <figcaption><span class="fnum">شکل ۲</span> — این فرمولِ ساختگی، اگرچه ظاهراً عجیب است، پس از ساده‌سازی همان مقدارِ درست را می‌دهد.</figcaption>
+    </figure>
+
+    <p>توجه کنید که اگر این فرمولِ ساختگی را ساده کنیم، برابر خواهد بود با</p>
+
+    <div class="eq">\[ \cfrac{\,a - h\,}{\dfrac{1}{h} - \dfrac{1}{a}} \;=\; ah. \]</div>
+
+    <p>بنابراین این فرمولِ ساختگی واقعاً مساحتِ متوازی‌الاضلاع را می‌دهد؛ اما هیچ‌گونه ارتباطی با <em>ساختارِ</em> متوازی‌الاضلاع ندارد. متأسفانه حتی فرمولِ اصلی هم در بسیاری از کلاس‌های درس به ساختارِ متوازی‌الاضلاع وصل نمی‌شود؛ و حتی وقتی هم که می‌شود، ممکن است این اتصال تصنعی و رویه‌ای باشد.</p>
+
+    <h2 class="subhead">وقتی ساختار هست، اما رویه است</h2>
+
+    <p>یکی از بهترین مشاهداتِ از این دست را ورتهایمر گزارش می‌کند <a class="cref" href="#fref2">[۲]</a>: دانش‌آموزانی که نحوه‌ی به‌دست‌آوردنِ فرمولِ مساحتِ متوازی‌الاضلاع را با استفاده از شکلِ آشنای زیر می‌دانند، وقتی با شکلی دیگر روبه‌رو می‌شوند، همیشه همان ساختار را نمی‌بینند.</p>
+
+    <figure class="fig">
+      <div class="frame"><div data-widget="wert-rect"></div></div>
+      <figcaption><span class="fnum">شکل ۳</span> — در شکلِ آشنا، مثلثِ یک سویِ متوازی‌الاضلاع بریده و به سویِ دیگر منتقل می‌شود؛ به این ترتیب مستطیلی هم‌مساحت به دست می‌آید.</figcaption>
+    </figure>
+
+    <figure class="fig">
+      <div class="frame"><div data-widget="wert-oblique"></div></div>
+      <figcaption><span class="fnum">شکل ۴</span> — آیا آن ایده را در این شکل هم می‌بینید؟</figcaption>
+    </figure>
+
+    <p>در مواجهه با این شکل، پاسخِ بعضی از دانش‌آموزان این است که معلم این را به آن‌ها آموزش نداده است. سؤال این است که چگونه می‌توان به یادگیرنده کمک کرد که ساختارِ به‌دردبخور را ببیند. متأسفانه فرمولِ کلی‌ای وجود ندارد؛ ولی آگاهی از این هدف، در بسیاری از موارد راه‌حل‌هایی پیشِ رویِ ما می‌گذارد.</p>
+
+    <p>مثلاً در همین موردِ متوازی‌الاضلاع، چیزی که من از <a href="https://fa.wikipedia.org/wiki/%D8%A7%D9%85%DB%8C%D8%AF%D8%B9%D9%84%DB%8C_%D8%B4%D9%87%D9%86%DB%8C_%DA%A9%D8%B1%D9%85%E2%80%8C%D8%B2%D8%A7%D8%AF%D9%87" target="_blank" rel="noopener">امیدعلی کرمزاده</a> — ریاضی‌دانِ شناخته‌شده‌ی ایرانی و از معدود ریاضی‌دانانی که همچنان عاشقِ هندسه‌ی اقلیدسی‌اند — یاد گرفته‌ام این است که متوازی‌الاضلاع را روی یک صفحه‌ی دایره‌ای بکشیم و در اختیارِ دانش‌آموزان قرار دهیم. خودِ کرمزاده هم آن را از معلمِ هندسه‌ی خودش یاد گرفته بود؛ معلمی که با همین ترفند آن‌ها را به این اکتشافِ لذت‌بخش رسانده بود که در یک مثلث، حاصل‌ضربِ قاعده در ارتفاع ناورداست. ایده‌ی اصلی این است که نگاهِ یادگیرنده از توازیِ قاعده با پایینِ صفحه‌ی کاغذ بریده شود و به ساختارِ درونیِ شکل جلب شود.</p>
+
+    <figure class="fig ia">
+      <div class="frame"><div data-widget="para-circle"></div></div>
+      <figcaption><span class="fnum">شکل ۵ · تعاملی</span> — روی صفحه‌ای دایره‌ای «پایینِ کاغذی» نیست که قاعده به آن تکیه کند، پس نگاه به خودِ شکل بازمی‌گردد.</figcaption>
+    </figure>
+
+    <h2 class="subhead">پوشاندن برای دیدن</h2>
+
+    <p>این راه‌حلِ کرمزاده بسیار خاصِ خودِ اوست، و البته شاید بشود گفت خاصِ معلمِ کودکی‌اش. خوشبختانه بسیاری از این راه‌ها آشناترند. مثلاً مسئله‌ی برابریِ زاویه‌های متقابل به رأس را در نظر بگیرید <a class="cref" href="#fref3">[۳]</a>. می‌توان آن را بی‌نگاه و با دنباله‌ای از جمله‌های جبری اثبات کرد:</p>
+
+    <div class="eq">\[ a + c = 180^\circ, \qquad b + c = 180^\circ \;\Rightarrow\; a = b. \]</div>
+
+    <p>البته که می‌شود چنین کرد. ولی یادگیرنده نمی‌بیند <em>چرا</em> این جبر بر ساختارِ هندسیِ مسئله سوار شده است؛ این‌که کدام تساوی‌ها را باید بنویسد، کدام قسمتِ شکل را نام‌گذاری کند، و اصلاً چرا همین روابط قرار است ما را به نتیجه برسانند. در مقابل، می‌توان به دانش‌آموز کمک کرد که ساختاری را که جبری می‌شود ببیند. یکی از راه‌ها این است که بخشی از شکل را موقتاً بپوشانیم تا توجهِ او روی زاویه‌ها و روابطی متمرکز شود که برای استدلال به کار می‌آیند.</p>
+
+    <figure class="fig ia">
+      <div class="frame"><div data-widget="vertical-angles"></div></div>
+      <figcaption><span class="fnum">شکل ۶ · تعاملی</span> — <b>c</b> زاویه‌ی مشترک است و از آغاز رنگی است. یک‌بار طوری بپوشانید که فقط <b>a</b> و <b>c</b> دیده شوند — دو بخش از یک زاویه‌ی نیم‌صفحه — و بارِ دیگر فقط <b>b</b> و <b>c</b>. چون هر کدام مکمّلِ <b>c</b> است، پس \(a = b\). پوشش را با دکمه‌ها عوض کنید.</figcaption>
+    </figure>
+
+    <h2 class="subhead">خواندن و جهت دادن به نگاه</h2>
+
+    <p>مثال‌ها فراوان‌اند. در واقع، یکی از راه‌های جهت دادن به نگاهِ یادگیرنده همین خواندن است: این‌که بدانیم کجا مکث کنیم و کجا را با تأکید بخوانیم. در این صورت، با همان جمله نیز می‌توان به دیده‌شدنِ ساختارهای متفاوت کمک کرد. مثالِ زیر خاص است، اما ایده‌ای کلی‌تر را نشان می‌دهد.</p>
+
+    <p>به جمله‌ی زیر توجه کنید: <em>«برای هر \(x\) و برای هر \(y\)، زوجِ مرتبِ \((x, y)\) به \((y, x)\) می‌رود.»</em> بهتر است بگویم به همین جمله توجه کنید که می‌توان با دو ضرب‌آهنگِ متفاوت آن را خواند. نسخه‌ی اول در تلاش است که توجه را به <em>«هر \(x\)»</em> و <em>«هر \(y\)»</em> جلب کند؛ یعنی به این‌که جمله می‌گوید هر نقطه، همراه با قرینه‌اش نسبت به خطِ \(y = x\)، در نظر گرفته می‌شود.</p>
+
+    <p>اگر همان جمله را این‌بار با ضرب‌آهنگی دیگر بخوانیم و روی <em>«برای هر \(x\)»</em> وزنِ بیشتری بگذاریم، یک \(x\)ِ خاص در ذهنِ ما ثابت می‌شود. اکنون برای این \(x\)ِ خاص، چند \(y\)ِ مختلف انتخاب می‌کنیم.</p>
+
+    <figure class="fig ia">
+      <div class="frame"><div data-widget="symmetry"></div></div>
+      <figcaption><span class="fnum">شکل ۷ و ۸ · تعاملی</span> — دو خوانش از یک جمله. در حالتِ <b>هر نقطه</b> آزادانه نقطه بگذارید و ببینید هر یک نسبت به \(y = x\) قرینه می‌شود. در حالتِ <b>x ثابت</b> فقط می‌توانید \(y\) را انتخاب کنید: نقطه‌ها روی خطی عمودی و قرینه‌هایشان روی خطی افقی ظاهر می‌شوند.</figcaption>
+    </figure>
+
+    <p>اگر هدفِ شما این است که یادگیرنده <em>تقارن</em> را ببیند، احتمالاً خوانشِ اول بهتر خواهد بود؛ چراکه از نقاطی که انتخاب می‌کنید ساختارزدایی می‌کند. این مثال، اگرچه به نظر خاص می‌رسد، ساختگی نیست و از دو خوانشِ متفاوتِ یادگیرندگان از جمله‌ای یکسان حاصل شده است <a class="cref" href="#fref4">[۴]</a>.</p>
+
+    <p>در واقع، مثال‌ها به گستردگیِ هر تعامل با یادگیرنده‌اند. دفعه‌ی بعد که قدم در کلاسِ درس می‌گذارید و در مواجهه با ابهامِ یک دانش‌آموز یا دانشجو تلاش می‌کنید جمله‌ی خودتان را به گونه‌ای دیگر بیان کنید، یا با حرکتِ دست بخشی از شکل را بپوشانید تا او به آنچه باید نگاه کند — نه به آنچه در آن لحظه نباید <a class="cref" href="#fref5">[۵]</a> — شاید بد نباشد از آندره ژید به خاطرِ جمله‌ی زیر تشکر کنید:</p>
+
+    <div class="pullquote">
+      <span class="fr" style="direction:ltr; text-align:left; font-style:italic;">Nathanaël — que l'importance soit dans ton regard, non dans la chose regardée.</span>
+      <span style="display:block; direction:ltr; text-align:left; font-family:'Hanken Grotesk',sans-serif; font-size:14px; color:var(--muted); margin-top:6px;">André Gide, <em>Les Nourritures terrestres</em></span>
+      <span style="display:block; margin-top:16px;">ناتانائیل! ای کاش عظمت در نگاهِ تو باشد، نه در آنچه بدان می‌نگری.</span>
+      <span class="src">ترجمه‌ی پرویز شایگان و جلال آل‌احمد</span>
+    </div>
+  </div>
+
+  <!-- ===== کارنامه‌ی دست‌اندرکاران ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">نویسنده</div>
+        <div class="who">امیر اصغری</div>
+      </div>
+      <div class="role">
+        <div class="lab">بخش</div>
+        <div class="who">ایده‌های کلاسی</div>
+        <div class="aff">چیزهایی برای امتحان در کلاس.</div>
+      </div>
+      <div class="role">
+        <div class="lab">بخش‌های تعاملی</div>
+        <div class="who">متوازی‌الاضلاع روی دایره · پوشاندنِ زاویه‌های متقابل · قرینه نسبت به y = x</div>
+      </div>
+    </div>
+    <div class="origin">مثال‌های متوازی‌الاضلاع و زاویه‌های متقابل به‌رأس نخستین‌بار در مقاله‌ی «a چه ساکت است!» (۱۳۸۸) در مجله‌ی رشدِ آموزشِ ریاضی آمده بودند. نوشته‌شده برای «آدم‌ها و ریاضیات».</div>
+  </div>
+
+  <div class="refs">
+    <h3>مراجع</h3>
+    <ol style="list-style:none; padding-inline-start:0;">
+      <li id="fref1">[۱] &nbsp; Boas, H. P. (2026). The history of three wrong definitions. <em>The Mathematical Intelligencer</em>, 1–11.</li>
+      <li id="fref2">[۲] &nbsp; Wertheimer, M. (1945). <em>Productive Thinking.</em> Harper.</li>
+      <li id="fref3">[۳] &nbsp; اصغری، امیر. (۱۳۸۸). «a چه ساکت است!». <em>رشدِ آموزشِ ریاضی</em>، دوره‌ی ۲۷، شماره‌ی ۲، زمستانِ ۱۳۸۸.</li>
+      <li id="fref4">[۴] &nbsp; Asghari, A. H. (2005). <em>Equivalence</em> (Doctoral dissertation, University of Warwick).</li>
+      <li id="fref5">[۵] &nbsp; Katona, G. (1940). <em>Organizing and Memorizing: Studies in the Psychology of Learning and Teaching.</em> Columbia University Press. — کتابی که در شکل‌گیریِ نگاهِ آموزشیِ نویسنده نقشی جدی داشت.</li>
+    </ol>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  }
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+
+  // Render math once KaTeX is ready
+  function renderMath(){
+    if (!window.renderMathInElement) { setTimeout(renderMath, 60); return; }
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+  renderMath();
+</script>
+
+<!-- ===== Interactive figures ===== -->
+<script>
+(function(){
+  "use strict";
+  var NS = "http://www.w3.org/2000/svg";
+  var C = { ink:"#1C1814", paper:"#FBF7EF", accent:"#C8633E", line:"#D9CDB6", muted:"#6B6155",
+            tint:"#F1E7D4", disc:"#F3EAD8", soft:"#EFE6D3", rag:"#B7402A", grid:"#E7DCC6" };
+
+  function s(tag, a){ var e = document.createElementNS(NS, tag); if(a) for(var k in a) e.setAttribute(k, a[k]); return e; }
+  function h(tag, a, txt){ var e = document.createElement(tag); if(a) for(var k in a){ if(k==="class") e.className=a[k]; else if(k==="html") e.innerHTML=a[k]; else e.setAttribute(k, a[k]); } if(txt!=null) e.textContent = txt; return e; }
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+  function pt(svg, ev){ var p = svg.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY; var m = svg.getScreenCTM(); if(!m) return {x:0,y:0}; var q = p.matrixTransform(m.inverse()); return {x:q.x, y:q.y}; }
+  function txtEl(x,y,str,opt){ var o = {x:x, y:y, "font-family":"Hanken Grotesk, Vazirmatn, sans-serif", "font-size":13, fill:C.ink, "text-anchor":"middle"}; if(opt) for(var k in opt) o[k]=opt[k]; var t = s("text", o); t.textContent = str; return t; }
+
+  var STR = {
+    en: {
+      rotate:"Rotate", reset:"Reset", page:"page edge",
+      vaFull:"Full figure", vaAC:"a + c", vaBC:"b + c",
+      vaHint:"Cover so only a and c are seen — two parts of one straight angle; then only b and c. Each is the supplement of c, so a = b.",
+      mFree:"Every point", mFixed:"Fix x, choose y", clear:"Clear",
+      hintFree:"Click anywhere to drop a point — its mirror in y = x appears at once.",
+      hintFixed:"Drag the vertical line to set x. Now you may choose only y: click to drop points along it, and their mirrors line up horizontally.",
+      yours:"your point", mirror:"its mirror"
+    },
+    fa: {
+      rotate:"چرخش", reset:"از نو", page:"لبه‌ی کاغذ",
+      vaFull:"شکلِ کامل", vaAC:"a + c", vaBC:"b + c",
+      vaHint:"طوری بپوشانید که فقط a و c دیده شوند — دو بخش از یک زاویه‌ی نیم‌صفحه؛ سپس فقط b و c. هر کدام مکمّلِ c است، پس a = b.",
+      mFree:"هر نقطه", mFixed:"x ثابت، y دلخواه", clear:"پاک‌کردن",
+      hintFree:"هرجای صفحه کلیک کنید تا نقطه‌ای بگذارید؛ قرینه‌اش نسبت به y = x بی‌درنگ ظاهر می‌شود.",
+      hintFixed:"خطِ عمودی را بکشید تا x را تعیین کنید. حالا فقط می‌توانید y را برگزینید: کلیک کنید تا نقطه‌ها روی آن بنشینند و قرینه‌هایشان روی خطی افقی ردیف شوند.",
+      yours:"نقطه‌ی شما", mirror:"قرینه‌اش"
+    }
+  };
+
+  /* ---------- controls helpers ---------- */
+  function controls(node){ var d = h("div",{class:"iacontrols"}); node.appendChild(d); return d; }
+  function grp(bar){ var g = h("div",{class:"grp"}); bar.appendChild(g); return g; }
+  function range(min,max,val,step){ var r = h("input",{type:"range", class:"ia", min:min, max:max, step:step||1}); r.value = val; return r; }
+  function seg(labels, active, onPick){
+    var wrap = h("div",{class:"iaseg"}); var btns = [];
+    labels.forEach(function(lab,i){
+      var b = h("button", i===active?{class:"on"}:null, null); b.innerHTML = lab;
+      b.addEventListener("click", function(){ btns.forEach(function(x){x.classList.remove("on");}); b.classList.add("on"); onPick(i); });
+      wrap.appendChild(b); btns.push(b);
+    });
+    return wrap;
+  }
+
+  /* =====================================================================
+     Fig 1 — water channel cross-section (static)
+     ===================================================================== */
+  function figWater(node, lang){
+    var svg = s("svg",{viewBox:"0 0 360 240"});
+    // channel trapezoid: bottom (120,180)-(240,180); walls run out 45 over depth 90
+    var BL=[120,180], BR=[240,180], TL=[75,90], TR=[285,90];
+    var water = s("polygon",{points:TL+" "+BL+" "+BR+" "+TR, fill:"#E6EFEE", stroke:"none"});
+    svg.appendChild(water);
+    // walls + bottom (open top)
+    svg.appendChild(s("polyline",{points:TL+" "+BL+" "+BR+" "+TR, fill:"none", stroke:C.ink, "stroke-width":2, "stroke-linejoin":"round"}));
+    // unit triangle on right wall at base corner BR
+    var A=[240,180], up=[240,150], out=[255,150];
+    svg.appendChild(s("line",{x1:A[0],y1:A[1], x2:up[0], y2:up[1], stroke:C.accent, "stroke-width":1.6}));
+    svg.appendChild(s("line",{x1:up[0],y1:up[1], x2:out[0], y2:out[1], stroke:C.accent, "stroke-width":1.6}));
+    svg.appendChild(s("line",{x1:A[0],y1:A[1], x2:out[0], y2:out[1], stroke:C.accent, "stroke-width":1.6, "stroke-dasharray":"1 0"}));
+    svg.appendChild(txtEl(232,168,"1",{fill:C.rag,"font-style":"italic","text-anchor":"end"}));
+    svg.appendChild(txtEl(249,145,"z",{fill:C.rag,"font-style":"italic"}));
+    // depth y (left)
+    svg.appendChild(s("line",{x1:100,y1:90,x2:100,y2:180,stroke:C.muted,"stroke-width":1}));
+    svg.appendChild(s("line",{x1:96,y1:90,x2:104,y2:90,stroke:C.muted,"stroke-width":1}));
+    svg.appendChild(s("line",{x1:96,y1:180,x2:104,y2:180,stroke:C.muted,"stroke-width":1}));
+    svg.appendChild(txtEl(89,138,"y",{fill:C.muted,"font-style":"italic","text-anchor":"end"}));
+    // bottom b
+    svg.appendChild(s("line",{x1:120,y1:202,x2:240,y2:202,stroke:C.muted,"stroke-width":1}));
+    svg.appendChild(s("line",{x1:120,y1:198,x2:120,y2:206,stroke:C.muted,"stroke-width":1}));
+    svg.appendChild(s("line",{x1:240,y1:198,x2:240,y2:206,stroke:C.muted,"stroke-width":1}));
+    svg.appendChild(txtEl(180,216,"b",{fill:C.muted,"font-style":"italic"}));
+    node.appendChild(svg);
+  }
+
+  /* =====================================================================
+     Fig 2 — invented-formula parallelogram (static)
+     ===================================================================== */
+  function figInvented(node, lang){
+    var svg = s("svg",{viewBox:"0 0 300 200"});
+    var BL=[70,150], BR=[210,150], TR=[260,60], TL=[120,60];
+    svg.appendChild(s("polygon",{points:BL+" "+BR+" "+TR+" "+TL, fill:C.tint, stroke:C.ink, "stroke-width":2, "stroke-linejoin":"round"}));
+    // height h (dashed vertical from TL down)
+    svg.appendChild(s("line",{x1:120,y1:60,x2:120,y2:150, stroke:C.accent, "stroke-width":1.5, "stroke-dasharray":"5 4"}));
+    svg.appendChild(s("path",{d:"M120 138 L132 138 L132 150", fill:"none", stroke:C.accent, "stroke-width":1}));
+    svg.appendChild(txtEl(112,108,"h",{fill:C.rag,"font-style":"italic","text-anchor":"end"}));
+    // base a
+    svg.appendChild(txtEl(140,170,"a",{fill:C.ink,"font-style":"italic"}));
+    node.appendChild(svg);
+  }
+
+  /* =====================================================================
+     Fig 3 — Wertheimer cut & slide → rectangle (static)
+     ===================================================================== */
+  function figWertRect(node, lang){
+    var svg = s("svg",{viewBox:"0 0 340 210"});
+    var BL=[70,160], BR=[210,160], TR=[260,70], TL=[120,70];        // parallelogram
+    var RBL=[70,160], RBR=[210,160], RTR=[210,70], RTL=[70,70];      // equal rectangle
+    // two congruent triangles (left gap + right stick)
+    svg.appendChild(s("polygon",{points:RTL+" "+TL+" "+RBL, fill:C.tint, stroke:"none"}));
+    svg.appendChild(s("polygon",{points:RTR+" "+TR+" "+BR, fill:C.tint, stroke:"none"}));
+    // rectangle (dashed accent)
+    svg.appendChild(s("polygon",{points:RBL+" "+RBR+" "+RTR+" "+RTL, fill:"none", stroke:C.accent, "stroke-width":1.4, "stroke-dasharray":"6 4"}));
+    // parallelogram (solid)
+    svg.appendChild(s("polygon",{points:BL+" "+BR+" "+TR+" "+TL, fill:"none", stroke:C.ink, "stroke-width":2, "stroke-linejoin":"round"}));
+    // arrow: right triangle -> left gap
+    svg.appendChild(s("path",{d:"M250 96 C 210 30, 110 30, 92 96", fill:"none", stroke:C.rag, "stroke-width":1.5, "marker-end":"url(#ah3)"}));
+    var defs = s("defs"); var mk = s("marker",{id:"ah3", markerWidth:9, markerHeight:9, refX:6, refY:3, orient:"auto"});
+    mk.appendChild(s("path",{d:"M0 0 L6 3 L0 6 Z", fill:C.rag})); defs.appendChild(mk); svg.appendChild(defs);
+    node.appendChild(svg);
+  }
+
+  /* =====================================================================
+     Fig 4 — the SAME parallelogram, drawn tall with a horizontal base
+     (base shorter than the slanted side). This is what makes the
+     circular-sheet idea interesting. No cut/height helpers.
+     ===================================================================== */
+  function figWertOblique(node, lang){
+    var svg = s("svg",{viewBox:"0 0 300 260"});
+    function X(v){ return 118 + v*80; } function Y(v){ return 210 - v*80; }
+    // A(-0.80,0) B(0.45,0) C(1.60,2.05) D(0.35,2.05): base 100px < side 188px
+    var A=[X(-0.80),Y(0)], B=[X(0.45),Y(0)], Cc=[X(1.60),Y(2.05)], D=[X(0.35),Y(2.05)];
+    svg.appendChild(s("polygon",{points:A+" "+B+" "+Cc+" "+D, fill:C.soft, stroke:C.ink, "stroke-width":2, "stroke-linejoin":"round"}));
+    node.appendChild(svg);
+  }
+
+  /* =====================================================================
+     Fig 5 — parallelogram on a circular sheet (INTERACTIVE)
+     ===================================================================== */
+  function widgetParaCircle(node, lang){
+    var T = STR[lang];
+    var W=440, H=380, cx=220, cy=190, R=150, sc=80;
+    var st = { deg:0 };
+    var svg = s("svg",{viewBox:"0 0 "+W+" "+H});
+    // circular sheet (static)
+    svg.appendChild(s("circle",{cx:cx, cy:cy, r:R, fill:C.disc, stroke:C.line, "stroke-width":1.4}));
+    var g = s("g"); svg.appendChild(g);
+    node.appendChild(svg);
+
+    // Exactly the Fig-4 parallelogram, centred on the sheet: horizontal base,
+    // base shorter than the slanted side, slant ≠ base (so it does not split
+    // into two equal right triangles). Pure black outline — nothing else.
+    var V = [[-1.20,-1.025],[0.05,-1.025],[1.20,1.025],[-0.05,1.025]];
+    function P(v){ return (cx+v[0]*sc).toFixed(1)+","+(cy-v[1]*sc).toFixed(1); }
+    function render(){
+      while(g.firstChild) g.removeChild(g.firstChild);
+      g.appendChild(s("polygon",{points:V.map(P).join(" "), fill:"none", stroke:C.ink, "stroke-width":2, "stroke-linejoin":"round"}));
+      g.setAttribute("transform","rotate("+st.deg+" "+cx+" "+cy+")");
+    }
+    render();
+
+    // drag anywhere on the sheet to rotate
+    var dragging=false, grab=0;
+    function pointerAngle(ev){ var p=pt(svg,ev); return Math.atan2(p.y-cy, p.x-cx)*180/Math.PI; }
+    svg.addEventListener("pointerdown", function(ev){
+      var p=pt(svg,ev); var dx=p.x-cx, dy=p.y-cy;
+      if(dx*dx+dy*dy > (R+18)*(R+18)) return;
+      dragging=true; grab = pointerAngle(ev) - st.deg;
+      try{ svg.setPointerCapture(ev.pointerId); }catch(e){}
+      ev.preventDefault();
+    });
+    svg.addEventListener("pointermove", function(ev){
+      if(!dragging) return;
+      st.deg = pointerAngle(ev) - grab;
+      var d = ((st.deg%360)+360)%360; rot.value = Math.round(d);
+      render();
+    });
+    function endDrag(){ dragging=false; }
+    svg.addEventListener("pointerup", endDrag);
+    svg.addEventListener("pointercancel", endDrag);
+    svg.style.cursor="grab";
+
+    // controls — rotate only
+    var bar = controls(node);
+    var g1 = grp(bar); g1.appendChild(h("label",{class:"cap"}, T.rotate));
+    var rot = range(0,360, ((st.deg%360)+360)%360); g1.appendChild(rot);
+    rot.addEventListener("input", function(){ st.deg = +rot.value; render(); });
+    var rb = h("button",{class:"iabtn"}, T.reset); bar.appendChild(rb);
+    rb.addEventListener("click", function(){ st.deg=0; rot.value=0; render(); });
+  }
+
+  /* =====================================================================
+     Fig 6 — vertical angles, cover to see (INTERACTIVE)
+     ===================================================================== */
+  function widgetVerticalAngles(node, lang){
+    var T = STR[lang];
+    var W=380, H=300, cx=190, cy=150, R=120, XL=16, XR=364;
+    var TH1=22, TH2=158;                 // ascending / descending crossing lines
+    var st = { view:0 };                 // 0 full · 1 (a+c) · 2 (b+c)
+    var svg = s("svg",{viewBox:"0 0 "+W+" "+H});
+    var gBase=s("g"), gCover=s("g"), gTop=s("g");
+    svg.appendChild(gBase); svg.appendChild(gCover); svg.appendChild(gTop);
+    node.appendChild(svg);
+
+    function D(deg,r){ var a=deg*Math.PI/180; return [cx+r*Math.cos(a), cy-r*Math.sin(a)]; }
+    function endsX(deg){ var a=deg*Math.PI/180, c=Math.cos(a), sn=Math.sin(a);
+      return [[XL, cy-((XL-cx)/c)*sn],[XR, cy-((XR-cx)/c)*sn]]; }
+    function wedge(f,t,r){ if(t<f) t+=360; var d="M "+cx+" "+cy, n=Math.max(2,Math.round((t-f)/4));
+      for(var i=0;i<=n;i++){ var a=(f+(t-f)*i/n)*Math.PI/180;
+        d+=" L "+(cx+r*Math.cos(a)).toFixed(1)+" "+(cy-r*Math.sin(a)).toFixed(1); }
+      return d+" Z"; }
+    function lineOn(g,deg,w,col){ var e=endsX(deg);
+      g.appendChild(s("line",{x1:e[0][0].toFixed(1),y1:e[0][1].toFixed(1),x2:e[1][0].toFixed(1),y2:e[1][1].toFixed(1),
+        stroke:col||C.ink, "stroke-width":w||2, "stroke-dasharray":(col===C.accent?"2 5":"0")})); }
+    function label(g,txt,ang,col){ var p=D(ang, R*0.60);
+      g.appendChild(txtEl(p[0], p[1]+5, txt, {fill:col||C.ink, "font-style":"italic", "font-size":16})); }
+
+    function render(){
+      [gBase,gCover,gTop].forEach(function(gg){ while(gg.firstChild) gg.removeChild(gg.firstChild); });
+      lineOn(gBase, TH1, 2); lineOn(gBase, TH2, 2);
+      if(st.view===0){
+        gBase.appendChild(s("path",{d:wedge(TH2,180+TH1,R), fill:C.tint, "fill-opacity":.85}));      // a (left)
+        gBase.appendChild(s("path",{d:wedge(360-TH1,360+TH1,R), fill:C.tint, "fill-opacity":.85}));   // b (right)
+        gBase.appendChild(s("path",{d:wedge(TH1,TH2,R), fill:C.accent, "fill-opacity":.42}));         // c (top, shared)
+        label(gBase,"a",180); label(gBase,"b",0); label(gBase,"c",90,C.accent);
+        gBase.appendChild(s("circle",{cx:cx, cy:cy, r:2.6, fill:C.ink}));
+      } else {
+        var edge = (st.view===1) ? TH1 : TH2, e = endsX(edge);
+        // paper covering the lower half-plane below the straight edge
+        gCover.appendChild(s("polygon",{points:e[0][0].toFixed(1)+","+e[0][1].toFixed(1)+" "+e[1][0].toFixed(1)+","+e[1][1].toFixed(1)+" "+XR+","+H+" "+XL+","+H,
+          fill:"#EAE1CF", stroke:C.line, "stroke-width":1}));
+        gTop.appendChild(s("path",{d:wedge(TH1,TH2,R), fill:C.accent, "fill-opacity":.42}));           // c
+        if(st.view===1) gTop.appendChild(s("path",{d:wedge(TH2,180+TH1,R), fill:C.tint, "fill-opacity":.85}));      // a
+        else            gTop.appendChild(s("path",{d:wedge(360-TH1,360+TH1,R), fill:C.tint, "fill-opacity":.85}));   // b
+        lineOn(gTop, edge, 2.6);                 // crisp straight edge (one straight angle)
+        lineOn(gTop, edge, 1.2, C.accent);       // accent dashes emphasising the straight line
+        label(gTop,"c",90,C.accent);
+        if(st.view===1) label(gTop,"a",180); else label(gTop,"b",0);
+        gTop.appendChild(s("circle",{cx:cx, cy:cy, r:2.6, fill:C.ink}));
+      }
+    }
+    render();
+
+    var bar = controls(node);
+    bar.appendChild(seg([T.vaFull, T.vaAC, T.vaBC], 0, function(i){ st.view=i; render(); }));
+    var hintBar = h("div",{class:"iacontrols"}); hintBar.style.borderTop="none"; hintBar.style.paddingTop="0"; hintBar.style.marginTop="8px"; node.appendChild(hintBar);
+    var hint = h("div",{class:"iaread"}); hint.style.color=C.muted; hint.textContent=T.vaHint; hintBar.appendChild(hint);
+  }
+
+  /* =====================================================================
+     Fig 7-8 — reflection in y = x (INTERACTIVE, two modes)
+     ===================================================================== */
+  function widgetSymmetry(node, lang){
+    var T = STR[lang];
+    var W=360, H=360, cx=180, cy=180, sc=30, LIM=5;   // domain [-5,5]
+    function SX(x){ return cx + x*sc; } function SY(y){ return cy - y*sc; }
+    function MX(px){ return (px-cx)/sc; } function MY(py){ return (cy-py)/sc; }
+    var st = { mode:"free", x0:2, pts:[] };
+
+    var svg = s("svg",{viewBox:"0 0 "+W+" "+H});
+    // grid
+    var gg = s("g");
+    for(var i=-LIM;i<=LIM;i++){
+      gg.appendChild(s("line",{x1:SX(i),y1:SY(-LIM),x2:SX(i),y2:SY(LIM), stroke:C.grid, "stroke-width":i===0?0:1}));
+      gg.appendChild(s("line",{x1:SX(-LIM),y1:SY(i),x2:SX(LIM),y2:SY(i), stroke:C.grid, "stroke-width":i===0?0:1}));
+    }
+    svg.appendChild(gg);
+    // axes
+    svg.appendChild(s("line",{x1:SX(-LIM),y1:SY(0),x2:SX(LIM),y2:SY(0), stroke:C.muted, "stroke-width":1.4}));
+    svg.appendChild(s("line",{x1:SX(0),y1:SY(-LIM),x2:SX(0),y2:SY(LIM), stroke:C.muted, "stroke-width":1.4}));
+    svg.appendChild(txtEl(SX(LIM)-6, SY(0)-8, "x", {fill:C.muted, "font-style":"italic", "text-anchor":"end"}));
+    svg.appendChild(txtEl(SX(0)+10, SY(LIM)+12, "y", {fill:C.muted, "font-style":"italic", "text-anchor":"start"}));
+    // mirror line y = x
+    svg.appendChild(s("line",{x1:SX(-LIM),y1:SY(-LIM),x2:SX(LIM),y2:SY(LIM), stroke:C.accent, "stroke-width":1.8}));
+    svg.appendChild(txtEl(SX(LIM)-20, SY(LIM)+20, "y = x", {fill:C.accent, "font-style":"italic", "font-size":13, "text-anchor":"end", "font-weight":600}));
+    var gDyn = s("g"); svg.appendChild(gDyn);
+    node.appendChild(svg);
+
+    function draw(){
+      while(gDyn.firstChild) gDyn.removeChild(gDyn.firstChild);
+      if(st.mode==="fixed"){
+        // vertical guide x = x0 (draggable) and horizontal guide y = x0
+        gDyn.appendChild(s("line",{x1:SX(st.x0),y1:SY(-LIM),x2:SX(st.x0),y2:SY(LIM), stroke:C.ink, "stroke-width":1.6, "stroke-dasharray":"3 4"}));
+        gDyn.appendChild(s("line",{x1:SX(-LIM),y1:SY(st.x0),x2:SX(LIM),y2:SY(st.x0), stroke:C.accent, "stroke-width":1.2, "stroke-dasharray":"3 4", "stroke-opacity":.7}));
+        // grab handle at top of vertical line
+        gDyn.appendChild(s("circle",{cx:SX(st.x0), cy:SY(LIM)+2, r:7, fill:C.paper, stroke:C.ink, "stroke-width":1.6, "data-grab":"1"}));
+        gDyn.appendChild(s("path",{d:"M"+(SX(st.x0)-3)+" "+(SY(LIM)-1)+" l3 -4 l3 4", fill:"none", stroke:C.ink, "stroke-width":1.4}));
+      }
+      st.pts.forEach(function(p){
+        var x=p.x, y=p.y, rx=y, ry=x; // reflection across y = x
+        gDyn.appendChild(s("line",{x1:SX(x),y1:SY(y),x2:SX(rx),y2:SY(ry), stroke:C.muted, "stroke-width":1, "stroke-dasharray":"3 3"}));
+        gDyn.appendChild(s("circle",{cx:SX(rx), cy:SY(ry), r:5, fill:C.accent}));
+        gDyn.appendChild(s("circle",{cx:SX(x), cy:SY(y), r:5, fill:C.ink}));
+      });
+    }
+    draw();
+
+    var draggingLine=false;
+    svg.addEventListener("pointerdown", function(ev){
+      var p = pt(svg, ev), mx = MX(p.x), my = MY(p.y);
+      if(st.mode==="fixed" && Math.abs(mx-st.x0) < 0.45){
+        draggingLine=true; try{ svg.setPointerCapture(ev.pointerId); }catch(e){}; ev.preventDefault(); return;
+      }
+      if(mx<-LIM||mx>LIM||my<-LIM||my>LIM) return;
+      if(st.mode==="fixed") st.pts.push({x:st.x0, y:clamp(my,-LIM,LIM)});
+      else st.pts.push({x:clamp(mx,-LIM,LIM), y:clamp(my,-LIM,LIM)});
+      draw();
+    });
+    svg.addEventListener("pointermove", function(ev){
+      if(!draggingLine) return;
+      var p = pt(svg, ev); st.x0 = clamp(Math.round(MX(p.x)*2)/2, -4.5, 4.5); draw();
+    });
+    function endDrag(){ draggingLine=false; }
+    svg.addEventListener("pointerup", endDrag);
+    svg.addEventListener("pointercancel", endDrag);
+
+    // controls
+    var bar = controls(node);
+    var segEl = seg([T.mFree, T.mFixed], 0, function(i){
+      st.mode = i===0 ? "free" : "fixed"; st.pts=[]; hint.textContent = st.mode==="free"?T.hintFree:T.hintFixed; draw();
+    });
+    bar.appendChild(segEl);
+    var clr = h("button",{class:"iabtn"}, T.clear); bar.appendChild(clr);
+    clr.addEventListener("click", function(){ st.pts=[]; draw(); });
+    var leg = grp(bar);
+    var l1 = h("span",{class:"ialegend"}); l1.appendChild(h("span",{class:"sw"})); l1.lastChild.style.background=C.ink; l1.appendChild(h("span",null,T.yours)); leg.appendChild(l1);
+    var l2 = h("span",{class:"ialegend"}); l2.appendChild(h("span",{class:"sw"})); l2.lastChild.style.background=C.accent; l2.appendChild(h("span",null,T.mirror)); leg.appendChild(l2);
+    var bar2 = h("div",{class:"iacontrols"}); bar2.style.borderTop="none"; bar2.style.paddingTop="0"; bar2.style.marginTop="8px"; node.appendChild(bar2);
+    var hint = h("div",{class:"iaread"}); hint.style.color=C.muted; hint.textContent = T.hintFree; bar2.appendChild(hint);
+  }
+
+  var REG = {
+    "water-channel": figWater,
+    "invented-formula": figInvented,
+    "wert-rect": figWertRect,
+    "wert-oblique": figWertOblique,
+    "para-circle": widgetParaCircle,
+    "vertical-angles": widgetVerticalAngles,
+    "symmetry": widgetSymmetry
+  };
+
+  function init(){
+    document.querySelectorAll("[data-lang-block]").forEach(function(block){
+      var lang = block.getAttribute("data-lang-block");
+      block.querySelectorAll("[data-widget]").forEach(function(nd){
+        if(nd.__done) return; nd.__done = true;
+        var f = REG[nd.getAttribute("data-widget")];
+        if(f) try { f(nd, lang); } catch(err){ console.error("widget", nd.getAttribute("data-widget"), err); }
+      });
+    });
+  }
+  if(document.readyState !== "loading") init();
+  else document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

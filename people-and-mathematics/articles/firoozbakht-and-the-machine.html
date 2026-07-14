@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Machine She Didn't Have — Behrooz Parhami · People and Mathematics</title>
+<meta name="description" content="Behrooz Parhami on Farideh Firoozbakht's conjecture about the primes — from what a prime is, to the bounds it beats, to a reckoning of what it would truly have taken to test it on a 1982 mainframe. With three interactive playgrounds. A companion to the journal's lead feature.">
+
+<meta property="og:title" content="The Machine She Didn't Have — Behrooz Parhami">
+<meta property="og:description" content="History of Mathematics · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/behrooz-parhami.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX for crisp typeset mathematics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>/* KaTeX inside RTL text — keep formulas LTR & bidi-isolated so exponents/coefficients stay put */
+.katex, .katex-display { direction: ltr; unicode-bidi: isolate; }
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+  .ltr { direction: ltr; unicode-bidi: isolate; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); font-family: "Hanken Grotesk","Vazirmatn",sans-serif; }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  /* breadcrumb sub-bar */
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 50px; line-height: 1.06; font-weight: 500; letter-spacing: -.022em; margin: 14px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; text-wrap: pretty; }
+  .byline { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+  .byline .meta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .byline .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; }
+
+  /* companion cross-link to the lead feature */
+  .companion { display: flex; align-items: stretch; gap: 0; margin: 30px 0 2px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #F4ECDC; text-decoration: none; color: inherit; }
+  .companion:hover { border-color: var(--accent); }
+  .companion img { width: 92px; object-fit: cover; flex: 0 0 auto; filter: saturate(1.02); }
+  .companion .c-body { padding: 15px 18px; }
+  .companion .c-lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  .companion .c-title { font-family: "Newsreader", "Vazirmatn", serif; font-size: 19px; font-weight: 500; line-height: 1.2; margin-top: 5px; }
+  .companion .c-note { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .companion .c-arrow { color: var(--accent); font-weight: 700; }
+  [dir="rtl"] .companion .c-arrow::before { content: "\2190"; }
+  [dir="ltr"] .companion .c-arrow::after { content: "\2192"; }
+
+  /* author note / disclaimer */
+  .note { border: 1px solid var(--line); background: #F7F1E3; padding: 20px 24px; border-radius: 4px; margin-top: 26px; }
+  .note .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+  .note .txt { font-size: 16px; line-height: 1.66; color: #43392E; }
+  [dir="rtl"] .note .txt { line-height: 1.95; }
+
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 44px 0 14px; padding-top: 8px; }
+  .body.nodrop p:first-of-type:first-letter { font-size: inherit; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+
+  .eq { text-align: center; margin: 20px 0; font-size: 20px; }
+  .eq.tight { margin: 12px 0; }
+
+  /* quoted self-introduction */
+  .selfquote { border-inline-start: 3px solid var(--accent); background: #F7F1E3; padding: 20px 24px; margin: 26px 0; font-size: 17.5px; line-height: 1.7; color: #372f26; border-radius: 0 4px 4px 0; }
+  [dir="rtl"] .selfquote { border-radius: 4px 0 0 4px; line-height: 1.95; }
+  .selfquote .src { display: block; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .04em; color: #948876; margin-top: 12px; font-style: normal; }
+
+  .pullquote { font-size: 26px; line-height: 1.32; font-weight: 500; letter-spacing: -.01em; color: var(--ink); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); padding: 20px 0; margin: 30px 0; text-wrap: pretty; }
+  [dir="rtl"] .pullquote { line-height: 1.6; }
+
+  /* ---------- Interactive playgrounds ---------- */
+  .playground { border: 1px solid var(--ink); border-radius: 5px; background: #F7F1E3; margin: 32px 0; overflow: hidden; direction: ltr; }
+  .pg-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .pg-title { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  .pg-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pg-btn { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; font-weight: 500; border: 1px solid #D6C9AE; background: var(--paper); border-radius: 999px; padding: 6px 13px; cursor: pointer; color: var(--ink); }
+  .pg-btn:hover { border-color: var(--accent); }
+  .pg-btn.on { background: var(--black); color: var(--paper); border-color: var(--black); }
+  .pg-canvas-wrap { position: relative; background: #FDFAF3; }
+  .pg-canvas-wrap canvas { display: block; width: 100%; }
+  .pg-controls { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+  .pg-controls label.sldlab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+  .pg-controls input[type=range] { flex: 1; min-width: 140px; accent-color: var(--accent); }
+  .pg-read { display: flex; gap: 16px 20px; flex-wrap: wrap; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); padding: 12px 16px; border-top: 1px solid var(--line); }
+  .pg-read .rd { display: flex; flex-direction: column; gap: 2px; }
+  .pg-read .rd .k { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #948876; }
+  .pg-read .rd b { font-size: 18px; color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 700; }
+  .pg-read .rd.big b { font-size: 21px; }
+  .sym { font-style: italic; text-transform: none; font-family: Newsreader, "B Nazanin", serif; direction: ltr; unicode-bidi: isolate; }
+  .sym sub, .sym sup { font-style: normal; }
+  .pg-legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 11px 16px; border-top: 1px solid var(--line); font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; }
+  .pg-legend .lg { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; user-select: none; color: var(--ink); }
+  .pg-legend .lg .sw { width: 16px; height: 3px; border-radius: 2px; }
+  .pg-legend .lg.off { opacity: .38; }
+  .pg-hint { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); padding: 12px 16px 14px; line-height: 1.6; border-top: 1px solid var(--line); }
+  .pg-hint[dir="rtl"] { text-align: right; }
+
+  /* contributor colophon */
+  .colophon { margin-top: 50px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; direction: ltr; text-align: left; }
+  .refs li { margin-bottom: 10px; }
+  .refs a { color: var(--accent); word-break: break-word; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 22px 32px; }
+    h1.title { font-size: 33px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .pullquote { font-size: 21px; }
+    .companion img { width: 74px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> · <span class="accent" data-en="History of Mathematics" data-fa="تاریخ ریاضیات"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#B08A2E;display:inline-block;flex:0 0 auto;"></span><span data-en="Undergraduate maths · July 2026" data-fa="ریاضیِ کارشناسی · تیر ۱۴۰۵"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="kicker">Behrooz Parhami · on Firoozbakht's conjecture</div>
+  <h1 class="title">The Machine She Didn't Have</h1>
+  <p class="standfirst">A conjecture found at twenty, in Isfahan, in 1982 — and a computer engineer's reckoning of what it would truly have taken to test it. From what a prime is, to the bounds it beats, to why brute force was never an option.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/behrooz-parhami.jpg" alt="Behrooz Parhami">
+    <span class="name">Behrooz Parhami</span>
+  </div>
+
+  <a class="companion" href="firoozbakht.html">
+    <img src="../assets/farideh.jpg" alt="Farideh Firoozbakht">
+    <div class="c-body">
+      <div class="c-lab">The lead feature · her story</div>
+      <div class="c-title">Farideh Firoozbakht and a Conjecture About Primes</div>
+      <div class="c-note">Amir Asghari tells who she was, with a guest essay by Ian Stewart. This piece is its companion — the mathematics and the machine. <span class="c-arrow"></span></div>
+    </div>
+  </a>
+
+  <div class="note">
+    <div class="lab">A note from the author</div>
+    <div class="txt">This essay is about Farideh Firoozbakht (1962–2019), the Iranian mathematician who at age twenty came up with a remarkable conjecture about prime numbers that remains unresolved to this day. A thorough discussion of primes would fill many books; my aim is only to tell you enough that her conjecture and its importance can be properly appreciated. This being an essay rather than a technical paper, I cite no references — Wikipedia's articles on <em>Prime gap</em> and <em>Firoozbakht's conjecture</em> lead to the relevant sources. As an amateur in number theory, I have done my best to state deep results accurately, and I apologise for any missteps. Throughout, <span class="ltr">log</span> denotes the natural (base-<span class="ltr">e</span>) logarithm.</div>
+  </div>
+
+  <div class="body">
+    <p>A prime number is a whole number that cannot be divided evenly by any integer other than 1 and itself. A number that isn't prime is <em>composite</em>, and it can be factored into a product of primes. The sequence of primes — <span class="sans">2, 3, 5, 7, 11, 13, 17, 19, 23, 29, …</span> — has been studied endlessly. You can index them: <span class="sans">2</span> is the first prime, <span class="sans">3</span> the second, <span class="sans">5</span> the third, and so on. The <span class="ltr">\(n\)</span>th prime is written <span class="ltr">\(p_n\)</span>.</p>
+
+    <h2 class="subhead">Primes in a nutshell</h2>
+
+    <p>That simple indexing raises immediate questions. <em>Is the sequence infinite?</em> Yes — by Euclid's theorem, given any prime we can always find a larger one. <em>How large is the <span class="ltr">\(n\)</span>th prime?</em> Roughly <span class="ltr">\(n \log n\)</span>, so <span class="ltr">\(p_n\)</span> grows faster than <span class="ltr">\(n\)</span> but slower than <span class="ltr">\(n^2\)</span>; for instance <span class="ltr">\(p_{100}=541\)</span> and <span class="ltr">\(p_{10{,}000}=104{,}729\)</span>. <em>How many primes lie below a given <span class="ltr">\(x\)</span>?</em> By the Prime Number Theorem, the counting function <span class="ltr">\(\pi(x)\)</span> is asymptotically <span class="ltr">\(x/\log x\)</span>.</p>
+
+    <p>Apart from the anomaly at the start — <span class="sans">2</span> being the only even prime — primes are odd and their gaps are even. The gap between successive primes can be as small as <span class="sans">2</span> (twin primes) and can grow arbitrarily large. I use the common definition <span class="ltr">\(g_n = p_{n+1} - p_n\)</span>. A superficial glance suggests the gaps have no pattern; in truth, primes are far from randomly distributed. The Prime Number Theorem even hands us the average gap between consecutive primes up to <span class="ltr">\(p_n\)</span>, namely <span class="ltr">\(\log n\)</span>.</p>
+
+    <p>What it does <em>not</em> hand us is the <em>maximum</em> gap. No one has found a formula for the largest gap <span class="ltr">\(G_n\)</span> up to <span class="ltr">\(p_n\)</span>; the best we can do is bound this non-decreasing function from above, and the closer the bound, the better. Below is a live version of the little table I would otherwise print here — the first primes, their gaps <span class="ltr">\(g_n\)</span>, the running maximum <span class="ltr">\(G_n\)</span>, and the quantity whose significance will soon be clear: the <span class="ltr">\(n\)</span>th root of the <span class="ltr">\(n\)</span>th prime, <span class="ltr">\(p_n^{1/n}\)</span>, a strictly decreasing quantity that converges to <span class="sans">1</span>.</p>
+
+    <!-- INTERACTIVE 1 -->
+    <div class="playground" id="pg-roots">
+      <div class="pg-head">
+        <span class="pg-title" data-en="Interactive · the nth root of the nth prime" data-fa="تعاملی · ریشه‌ی nاُمِ nاُمین عددِ اول"></span>
+        <span class="pg-presets">
+          <button class="pg-btn" data-n="10" data-en="First 10" data-fa="۱۰ تای اول"></button>
+          <button class="pg-btn" data-n="30" data-en="n = 30" data-fa="n = ۳۰"></button>
+          <button class="pg-btn" data-n="100" data-en="n = 100" data-fa="n = ۱۰۰"></button>
+        </span>
+      </div>
+      <div class="pg-canvas-wrap"><canvas id="rootsCanvas" height="300"></canvas></div>
+      <div class="pg-controls">
+        <label class="sldlab"><span data-en="index n" data-fa="اندیسِ n"></span></label>
+        <input type="range" id="rootsN" min="1" max="120" value="30">
+      </div>
+      <div class="pg-read">
+        <span class="rd"><span class="k">index <i class="sym">n</i></span><b id="rd-n">30</b></span>
+        <span class="rd"><span class="k">prime <i class="sym">p<sub>n</sub></i></span><b id="rd-pn">113</b></span>
+        <span class="rd"><span class="k">gap <i class="sym">g<sub>n</sub></i></span><b id="rd-gn">14</b></span>
+        <span class="rd"><span class="k">max gap <i class="sym">G<sub>n</sub></i></span><b id="rd-Gn">14</b></span>
+        <span class="rd big"><span class="k">nth root of <i class="sym">p<sub>n</sub></i></span><b id="rd-root">1.170673</b></span>
+      </div>
+      <div class="pg-hint">Drag the slider or hover the curve. Every step down is Firoozbakht's claim in action: <i class="sym">p<sub>n</sub><sup>1/n</sup></i> never rises — the curve dips hardest exactly where a large gap appears.</div>
+    </div>
+
+    <p>Primes are not mere curiosities: they appear across mathematics and underpin the security of computers and communications. Their study goes back at least 2,300 years, to Euclid's proof by contradiction that there are infinitely many. Around 240 BCE, Eratosthenes gave a sieve — still bearing his name — for finding every prime up to a given <span class="ltr">\(x\)</span>. We will return to that sieve at the end, because it sits at the heart of the puzzle this essay is really about.</p>
+
+    <h2 class="subhead">Who was Farideh Firoozbakht?</h2>
+
+    <p>I will let her introduce herself. What follows is an undated e-mail she sent to <em>The Prime Puzzles &amp; Problems Connection</em>, lightly edited for language. (In later discussions of her conjecture, some writers used masculine pronouns for her — her Persian name concealed from many that she was a woman.)</p>
+
+    <div class="selfquote">
+      "I was born in 1962 in Isfahan, Iran. Because of my deep affection for animals, I became a vegetarian at 17. After high school I went to the University of Isfahan to study pharmacology — one of the most favoured disciplines in Iran. But since I was very fond of mathematics, especially number theory, I changed my major to mathematics in my third year, and graduated in 1987. I then went to Isfahan University of Technology for graduate studies. Since 1992 I have taught mathematics at Iranian universities; I am now at the University of Isfahan. My favourite research topic is the gap between prime numbers. I thought of Conjecture No. 30 in 1982, while studying the proof of the Prime Number Theorem. I believe it is the most important conjecture related to primes, because it shows one of their most beautiful behaviours, and I believe working on it could guide us to important results in number theory."
+      <span class="src">— Farideh Firoozbakht, on primepuzzles.net</span>
+    </div>
+
+    <p>She did not live long enough to pursue a proof or to trace all that her conjecture implies. Others have since noted how many results in number theory would follow from it. To understand why that matters, we need a short word about conjectures themselves. <em>(For the fuller story of her life — the site she practically lived on, the memorial poem, the photograph she never sent — see Amir Asghari's <a href="firoozbakht.html">lead feature</a>, of which this essay is the companion.)</em></p>
+
+    <h2 class="subhead">What a conjecture is</h2>
+
+    <p>Mathematics advances by proof: once a result is proved and checked by peers, it becomes permanent, and only rarely is it overturned. But a mathematician may be convinced of a relationship without being able to prove it. If it seems important, they publish it as a <em>conjecture</em> — a guess offered to the community in the hope that someone will construct a proof, or a disproof by counterexample.</p>
+
+    <p>The mother of all conjectures about primes is the Riemann hypothesis. I will not state it here; suffice it to say that if it is ever proved — a $1&nbsp;million prize awaits — it would show that primes are distributed with near-perfect regularity beneath their apparent randomness, ruling out large, erratic deviations in how many primes lie below <span class="ltr">\(x\)</span>. The best-known conjecture of a smaller kind is that there are infinitely many <em>twin primes</em>, pairs separated by a gap of <span class="sans">2</span>. A remarkable recent result is that for at least one even number not exceeding <span class="sans">246</span>, there are infinitely many prime pairs with that gap. That number may yet turn out to be <span class="sans">2</span>.</p>
+
+    <h2 class="subhead">Firoozbakht's conjecture</h2>
+
+    <p>Now to the conjecture itself. At twenty, a student at the University of Isfahan, Firoozbakht proposed that the function <span class="ltr">\(h(n)=p_n^{1/n}\)</span> — the <span class="ltr">\(n\)</span>th root of the <span class="ltr">\(n\)</span>th prime — is <em>strictly decreasing</em>. In other words,</p>
+
+    <div class="eq">\[ p_n^{1/n} \;>\; p_{n+1}^{1/(n+1)} \qquad\text{for every } n. \]</div>
+
+    <p>Rearranged, this says <span class="ltr">\(p_{n+1} < p_n^{\,1 + 1/n}\)</span>, or in terms of the gap, <span class="ltr">\(g_n < p_n\bigl(p_n^{1/n}-1\bigr)\)</span>. If we define the <em>relative</em> gap <span class="ltr">\(r_n = p_{n+1}/p_n\)</span>, the conjecture says simply that <span class="ltr">\(r_n\)</span> is bounded above by <span class="ltr">\(p_n^{1/n}\)</span>. What makes it striking is how it compares to other proposed bounds on the maximum gap. The figure below — which I would normally reproduce from Wikipedia as a static image — is here alive: three conjectured bounds due to Firoozbakht, Cramér and Granville, drawn against the actual record gaps.</p>
+
+    <!-- INTERACTIVE 2 -->
+    <div class="playground" id="pg-bounds">
+      <div class="pg-head">
+        <span class="pg-title" data-en="Interactive · prime gaps and their bounds" data-fa="تعاملی · فاصله‌های اعداد اول و کران‌هایشان"></span>
+        <span class="pg-presets">
+          <button class="pg-btn" id="bnd-markers" data-en="Verification marks" data-fa="نشانه‌های بررسی"></button>
+        </span>
+      </div>
+      <div class="pg-canvas-wrap"><canvas id="boundsCanvas" height="440"></canvas></div>
+      <div class="pg-legend" id="bnd-legend"></div>
+      <div class="pg-hint" data-en="Axes follow the original figure: gap size across, prime size (log scale) up. A point (g, p) means a gap of g first opens at prime p. Hover the chart to read every series at a given gap. Firoozbakht's bound (green) sits highest — for a given gap it demands the largest prime, which is why it is the tightest ceiling on how far primes can drift apart." data-fa="محورها مطابقِ شکلِ اصلی‌اند: اندازه‌ی فاصله در افق، اندازه‌ی عددِ اول (مقیاسِ لگاریتمی) در قائم. نقطه‌ی (g, p) یعنی فاصله‌ای به بزرگیِ g نخستین‌بار نزدِ عددِ اولِ p باز می‌شود. برای خواندنِ همه‌ی خط‌ها در یک فاصله، روی نمودار بایستید. کرانِ فیروزبخت (سبز) بالاتر از همه است — برای یک فاصله‌ی معین بزرگ‌ترین عددِ اول را می‌طلبد، و به همین دلیل تنگ‌ترین سقف بر دورشدنِ اعداد اول از هم است."></div>
+    </div>
+
+    <p>These three are not the only bounds, of course. Bertrand's postulate — that there is always a prime between <span class="ltr">\(x\)</span> and <span class="ltr">\(2x\)</span>, conjectured in 1845 and proved by Chebyshev in 1852 — already gives <span class="ltr">\(g_n < p_n\)</span>, but that is far looser than Firoozbakht's and the others now available.</p>
+
+    <p>We can only speculate how she arrived at it. Having confirmed it for small primes by hand, perhaps with a calculator, she likely then hunted for a counterexample — and that hunt carried her verification up to</p>
+
+    <div class="pullquote">4,444,000,000,000 &nbsp;≈&nbsp; <span class="ltr">4.44 × 10<sup>12</sup></span> — checked by Firoozbakht herself, around 1982.</div>
+
+    <p>An immense number; but set against an infinite sequence, no proof at all. Others have since pushed the verification to <span class="ltr">\(2^{64} \approx 1.84\times10^{19}\)</span>. History warns us to stay humble: the Pólya conjecture, the Mertens conjecture, Euler's sum-of-powers conjecture and the least-prime-factor conjecture were all confirmed in enormous numbers of cases before collapsing. Firoozbakht's may one day fall too — though several mathematicians say their intuition tells them it won't.</p>
+
+    <h2 class="subhead">Testing a conjecture by machine</h2>
+
+    <p>Computational number theory develops efficient algorithms for problems about integers and primes. It underpins modern cybersecurity, powering RSA and elliptic-curve cryptography. Two of its central tasks are <em>primality testing</em> (is this number prime, and if not, what are its factors?) and solving Diophantine equations. The crudest primality test for a number <span class="ltr">\(x\)</span> is to divide it by every integer from <span class="sans">2</span> up to <span class="ltr">\(\sqrt{x}\)</span> — no further, since a composite's smallest factor cannot exceed its square root. For very large numbers both testing and factoring are hard, and that hardness is exactly what secures our communications.</p>
+
+    <p>Primality tests come in two kinds: <em>deterministic</em> (guaranteed correct, but slower) and <em>probabilistic</em> (fast, correct with high probability). To <em>verify</em> a conjecture with certainty you need the deterministic kind; to <em>break</em> one a probabilistic method may do, since a single counterexample suffices. There are hints in the record that Firoozbakht used published tables of maximal gaps to confirm her conjecture up to <span class="ltr">\(4.44\times10^{12}\)</span> — meaning she may not have relied on direct primality testing at all. Which is just as well, because, as I will now show, brute force was not available to her.</p>
+
+    <h2 class="subhead">Computing with punched cards</h2>
+
+    <p>To find every prime up to <span class="ltr">\(x\)</span> you can use the sieve of Eratosthenes. Make a list of the numbers up to <span class="ltr">\(x\)</span>; start at <span class="sans">2</span> and strike out all its multiples; move to the next surviving number, <span class="sans">3</span>, and strike out its multiples; then <span class="sans">5</span> (since <span class="sans">4</span> is already gone), and so on up to <span class="ltr">\(\sqrt{x}\)</span>. What remains are the primes. On a computer you would use a bit-vector of length <span class="ltr">\(x\)</span> instead of the list — one bit per number — reducing storage to <span class="ltr">\(x/8\)</span> bytes. Try it:</p>
+
+    <!-- INTERACTIVE 3a -->
+    <div class="playground" id="pg-sieve">
+      <div class="pg-head">
+        <span class="pg-title" data-en="Interactive · the sieve of Eratosthenes" data-fa="تعاملی · غربالِ اراتوستن"></span>
+        <span class="pg-presets">
+          <button class="pg-btn" id="sv-step" data-en="Step" data-fa="یک گام"></button>
+          <button class="pg-btn" id="sv-run" data-en="Run" data-fa="اجرا"></button>
+          <button class="pg-btn" id="sv-reset" data-en="Reset" data-fa="از نو"></button>
+        </span>
+      </div>
+      <div class="pg-canvas-wrap"><canvas id="sieveCanvas" height="240"></canvas></div>
+      <div class="pg-controls">
+        <label class="sldlab"><span data-en="sieve up to x =" data-fa="غربال تا x ="></span> <b id="sv-xval" class="sans" style="color:var(--accent)">120</b></label>
+        <input type="range" id="sv-x" min="30" max="300" value="120" step="1">
+      </div>
+      <div class="pg-read">
+        <span class="rd"><span class="k" data-en="striking out multiples of" data-fa="در حالِ حذفِ مضرب‌های"></span><b id="sv-cur">—</b></span>
+        <span class="rd"><span class="k" data-en="candidates remaining" data-fa="نامزدهای باقی‌مانده"></span><b id="sv-primes">0</b></span>
+        <span class="rd"><span class="k" data-en="elimination operations" data-fa="عملیاتِ حذف"></span><b id="sv-ops">0</b></span>
+      </div>
+      <div class="pg-hint" data-en="Click the ringed square — the next number still standing, which is always the next prime — to strike out its multiples yourself; or press Step to take one prime at a time, or Run to let it finish. Accent squares are primes; faded squares have been struck out as multiples. The real cost is never the arithmetic — it is the memory the vector needs, and the alternative if you have none, as the next panel makes plain." data-fa="روی مربعِ حلقه‌دار — نخستین عددِ هنوز ایستاده، که همواره عددِ اولِ بعدی است — کلیک کنید تا خودتان مضرب‌هایش را حذف کنید؛ یا «یک گام» را بزنید تا هر بار یک عددِ اول پیش برود، یا «اجرا» تا کار تمام شود. مربع‌های پررنگ عددِ اول‌اند و مربع‌های کم‌رنگ به‌عنوانِ مضرب حذف شده‌اند. دردسرِ واقعی هرگز خودِ محاسبه نیست؛ حافظه‌ای است که بردار می‌طلبد، و راهِ جایگزین اگر حافظه‌ای در کار نباشد — که پنل بعدی آن را روشن می‌کند."></div>
+    </div>
+
+    <p>The number of strike-outs is <span class="ltr">\(x\bigl(\tfrac12+\tfrac13+\tfrac15+\tfrac17+\cdots\bigr)\)</span>, and Euler showed the sum in brackets grows only double-logarithmically — so the sieve's running time is nearly linear in <span class="ltr">\(x\)</span>. Cheap. But there are two catches, and both were fatal in 1982. The first is memory: the bit-vector needs <span class="ltr">\(x/8\)</span> bytes. The second is that <em>verifying primality by brute force</em> — dividing each candidate by the primes up to its square root, which is what you must do if you have no table — costs about <span class="ltr">\(x\cdot \pi(\sqrt{x}) \approx x\sqrt{x}/\log\sqrt{x}\)</span> operations. Dial <span class="ltr">\(x\)</span> up to Firoozbakht's limit and see what her one computer in all of the University of Isfahan would have faced:</p>
+
+    <!-- INTERACTIVE 3b -->
+    <div class="playground" id="pg-reckon">
+      <div class="pg-head">
+        <span class="pg-title" data-en="Interactive · the 1982 reckoning" data-fa="تعاملی · حساب‌وکتابِ ۱۹۸۲"></span>
+        <span class="pg-presets">
+          <button class="pg-btn on" id="rk-1982" data-en="1982 mainframe" data-fa="مِین‌فریمِ ۱۹۸۲"></button>
+          <button class="pg-btn" id="rk-modern" data-en="A modern laptop" data-fa="لپ‌تاپِ امروزی"></button>
+        </span>
+      </div>
+      <div class="pg-controls">
+        <label class="sldlab"><span data-en="verify all primes up to x =" data-fa="بررسیِ همه‌ی اعداد اول تا x ="></span> <b id="rk-xval" class="ltr" style="color:var(--accent)">4.44 × 10¹²</b></label>
+        <input type="range" id="rk-x" min="2" max="12.647" value="12.647" step="0.001">
+      </div>
+      <div class="pg-read">
+        <span class="rd big"><span class="k" data-en="brute-force verification time" data-fa="زمانِ بررسیِ سرراست (brute-force)"></span><b id="rk-time">—</b></span>
+        <span class="rd big"><span class="k" data-en="sieve memory needed" data-fa="حافظه‌ی موردِ نیازِ غربال"></span><b id="rk-mem">—</b></span>
+        <span class="rd"><span class="k" data-en="elimination operations" data-fa="عملیاتِ حذف"></span><b id="rk-ops">—</b></span>
+      </div>
+      <div class="pg-hint" id="rk-hint" data-en="At Firoozbakht's limit on a 1982 machine, brute-force verification runs to about 2,400 centuries and the sieve alone needs over half a terabyte — where mainframes then held megabytes, a million times too little. The conclusion is inescapable: she cannot have brute-forced it. She must have read the primes from published tables of maximal gaps. Switch to a modern laptop to feel how completely the ground has shifted." data-fa="نزدِ مرزِ فیروزبخت و روی ماشینی از ۱۹۸۲، بررسیِ سرراست به حدودِ ۲٬۴۰۰ قرن می‌رسد و تنها غربال به بیش از نیم ترابایت حافظه نیاز دارد — جایی که مِین‌فریم‌های آن روزگار مگابایت داشتند، یک‌میلیون‌بار کمتر از آنچه لازم بود. نتیجه گریزناپذیر است: او نمی‌توانسته سرراست حساب کرده باشد. حتماً اعداد اول را از جدول‌های منتشرشده‌ی بیشینه‌ی فاصله‌ها خوانده است. به لپ‌تاپِ امروزی سوئیچ کنید تا ببینید زمین چه اندازه زیرِ پا جابه‌جا شده است."></div>
+    </div>
+
+    <p>Once the vector exists, the rest is easy: reading the primes off it and taking successive differences is quick. So the whole weight of the task falls on producing the vector — and in 1982, at an Iranian university still feeding programs to a single machine on punched cards, that weight could not be lifted. Even granting Firoozbakht a super-programmer's flawless first run, the brute-force route was some 2,400 centuries long. Brute force is simply out for confirming a conjecture about primes at this scale. She did something cleverer, and quieter: she looked it up, and she looked carefully.</p>
+
+    <h2 class="subhead">Concluding thoughts</h2>
+
+    <p>I am grateful to Dr Amir Asghari for introducing me to Farideh Firoozbakht and her remarkable conjecture. Writing this essay was a learning experience. Every time I discover an outstanding talent previously unknown to me, I cannot help wondering how many other prodigies are around us whose gifts go undetected and unappreciated. Having recently retired after 53 years in academia, I often wonder whether I missed unusual talents among my own students. It is a scary thought — each missed one a loss for science, and for humanity.</p>
+  </div>
+
+  <!-- ===== Colophon ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Essay</div>
+        <div class="who">Behrooz Parhami</div>
+        <div class="aff">University of California, Santa Barbara · recently retired after 53 years in academia.</div>
+      </div>
+      <div class="role">
+        <div class="lab">Interactives</div>
+        <div class="who">People and Mathematics</div>
+        <div class="aff">Prime data, bounds and the 1982 reckoning computed live in the browser.</div>
+      </div>
+      <div class="role">
+        <div class="lab">Companion to</div>
+        <div class="who">The lead feature</div>
+        <div class="aff"><a href="firoozbakht.html">Firoozbakht and a Conjecture About Primes</a>, by Amir Asghari.</div>
+      </div>
+    </div>
+    <div class="origin">Contributed to <em>People and Mathematics</em> under the title "Farideh Firoozbakht &amp; Her Conjecture About Primes." The bounds figure is redrawn, interactively, after the one on Wikipedia.</div>
+  </div>
+
+  <div class="refs">
+    <h3>References &amp; further reading</h3>
+    <ol>
+      <li>Firoozbakht's conjecture. <em>Wikipedia.</em> <a href="https://en.wikipedia.org/wiki/Firoozbakht%27s_conjecture">en.wikipedia.org/wiki/Firoozbakht's_conjecture</a></li>
+      <li>Prime gap. <em>Wikipedia.</em> <a href="https://en.wikipedia.org/wiki/Prime_gap">en.wikipedia.org/wiki/Prime_gap</a></li>
+      <li>The Prime Puzzles &amp; Problems Connection. <a href="https://www.primepuzzles.net/">primepuzzles.net</a></li>
+      <li>Alexei Kourbatov (2015). Verification of the Firoozbakht conjecture for primes up to four quintillion. <em>International Mathematical Forum.</em></li>
+      <li>Luan Alberto Ferreira &amp; Hugo Luiz Mariano (2018). Prime gaps and the Firoozbakht conjecture. <em>São Paulo Journal of Mathematical Sciences.</em></li>
+      <li>Matt Visser (2019). Verifying the Firoozbakht, Nicholson, and Farhadian conjectures up to the 81st maximal prime gap. <em>Mathematics, 7</em>(8), 691.</li>
+      <li>Thomas R. Nicely. Tables of prime gaps &amp; maximal gaps. <a href="https://faculty.lynchburg.edu/~nicely/gaps/">faculty.lynchburg.edu/~nicely/gaps</a></li>
+    </ol>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">بهروز پرهامی · درباره‌ی حدسِ فیروزبخت</div>
+  <h1 class="title">ماشینی که نداشت</h1>
+  <p class="standfirst">حدسی که در بیست‌سالگی، در اصفهانِ ۱۹۸۲، به ذهنش رسید — و حساب‌وکتابِ یک مهندسِ کامپیوتر از اینکه آزمودنِ آن به‌راستی چه می‌طلبید. از اینکه عددِ اول چیست، تا کران‌هایی که پشتِ سر می‌گذارد، تا اینکه چرا راهِ سرراست هرگز در دسترسِ او نبود.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/behrooz-parhami.jpg" alt="بهروز پرهامی">
+    <span class="name">بهروز پرهامی</span>
+  </div>
+
+  <a class="companion" href="firoozbakht.html">
+    <img src="../assets/farideh.jpg" alt="فریده فیروزبخت">
+    <div class="c-body">
+      <div class="c-lab">مقاله‌ی اصلی · داستانِ او</div>
+      <div class="c-title">فریده فیروزبخت و حدسی درباره‌ی اعداد اول</div>
+      <div class="c-note">امیر اصغری می‌گوید او که بود، همراه با متنی مهمان از یان استوارت. این نوشته همراهِ آن است — ریاضیات و ماشین. <span class="c-arrow"></span></div>
+    </div>
+  </a>
+
+  <div class="note">
+    <div class="lab">یادداشتِ نویسنده</div>
+    <div class="txt">این نوشته درباره‌ی فریده فیروزبخت (۱۹۶۲–۲۰۱۹) است؛ ریاضی‌دانِ ایرانی‌ای که در بیست‌سالگی حدسی چشمگیر درباره‌ی اعداد اول مطرح کرد که تا امروز حل‌نشده مانده است. بحثی کامل درباره‌ی اعداد اول کتاب‌ها را پر می‌کند؛ هدفِ من فقط این است که آن‌قدر بگویم که حدسِ او و اهمیتش درست درک شود. چون این یک جستار است نه مقاله‌ای فنی، هیچ مرجعی نمی‌آورم — مقاله‌های ویکی‌پدیا درباره‌ی <em>فاصله‌ی اعداد اول</em> و <em>حدسِ فیروزبخت</em> به منابعِ مربوط راه می‌برند. من در نظریه‌ی اعداد آماتورم و تا جای ممکن کوشیده‌ام نتایجِ ژرف را درست بیان کنم؛ بابتِ هر لغزشی پوزش می‌خواهم. در سراسرِ متن، <span class="ltr">log</span> یعنی لگاریتمِ طبیعی (بر پایه‌ی <span class="ltr">e</span>).</div>
+  </div>
+
+  <div class="body">
+    <p>عددِ اول عددی درست است که جز بر ۱ و بر خودش، بر هیچ عددِ صحیحِ دیگری بخش‌پذیر نیست. عددی که اول نباشد <em>مرکب</em> است و می‌توان آن را به حاصل‌ضربِ چند عددِ اول تجزیه کرد. دنباله‌ی اعداد اول — <span class="sans">۲، ۳، ۵، ۷، ۱۱، ۱۳، ۱۷، ۱۹، ۲۳، ۲۹، …</span> — بی‌پایان مطالعه شده است. می‌توان به آن‌ها اندیس داد: <span class="sans">۲</span> نخستین عددِ اول است، <span class="sans">۳</span> دومی، <span class="sans">۵</span> سومی، و همین‌طور. <span class="ltr">\(n\)</span>اُمین عددِ اول را <span class="ltr">\(p_n\)</span> می‌نویسیم.</p>
+
+    <h2 class="subhead">اعداد اول، به‌اختصار</h2>
+
+    <p>همین اندیس‌گذاریِ ساده پرسش‌هایی فوری پیش می‌کشد. <em>آیا دنباله بی‌نهایت است؟</em> بله — طبقِ قضیه‌ی اقلیدس، به‌ازای هر عددِ اول همیشه می‌توان عددِ اولِ بزرگ‌تری یافت. <em><span class="ltr">\(n\)</span>اُمین عددِ اول چقدر بزرگ است؟</em> تقریباً <span class="ltr">\(n \log n\)</span>؛ پس <span class="ltr">\(p_n\)</span> تندتر از <span class="ltr">\(n\)</span> اما کندتر از <span class="ltr">\(n^2\)</span> رشد می‌کند؛ برای نمونه <span class="ltr"><i class="sym">p</i><sub>۱۰۰</sub> = ۵۴۱</span> و <span class="ltr"><i class="sym">p</i><sub>۱۰,۰۰۰</sub> = ۱۰۴,۷۲۹</span>. <em>چند عددِ اول کوچک‌تر از عددِ <span class="ltr">\(x\)</span> وجود دارد؟</em> طبقِ قضیه‌ی اعداد اول، تابعِ شمارنده‌ی <span class="ltr">\(\pi(x)\)</span> به‌طورِ مجانبی برابرِ <span class="ltr">\(x/\log x\)</span> است.</p>
+
+    <p>جز ناهنجاریِ آغازِ دنباله — که <span class="sans">۲</span> تنها عددِ اولِ زوج است — اعداد اول فردند و فاصله‌هایشان زوج. فاصله‌ی میانِ دو عددِ اولِ متوالی می‌تواند به کوچکیِ <span class="sans">۲</span> باشد (اعداد اولِ دوقلو) و می‌تواند هر اندازه بزرگ شود. من از تعریفِ رایج استفاده می‌کنم: <span class="ltr">\(g_n = p_{n+1} - p_n\)</span>. نگاهی سطحی می‌گوید فاصله‌ها الگویی ندارند؛ اما در حقیقت اعداد اول به‌هیچ‌رو تصادفی توزیع نشده‌اند. قضیه‌ی اعداد اول حتی میانگینِ فاصله‌ی اعداد اولِ متوالی تا <span class="ltr">\(p_n\)</span> را هم به دستمان می‌دهد: <span class="ltr">\(\log n\)</span>.</p>
+
+    <p>اما آنچه به دستمان <em>نمی‌دهد</em> بیشینه‌ی فاصله است. هیچ‌کس فرمولی برای بزرگ‌ترین فاصله‌ی <span class="ltr">\(G_n\)</span> تا <span class="ltr">\(p_n\)</span> نیافته است؛ بهترین کاری که می‌توانیم بکنیم این است که این تابعِ ناکاهشی را از بالا کران بزنیم، و هرچه کران تنگ‌تر، بهتر. در پایین نسخه‌ای زنده از همان جدولِ کوچکی است که وگرنه اینجا چاپش می‌کردم — نخستین اعداد اول، فاصله‌هایشان <span class="ltr">\(g_n\)</span>، بیشینه‌ی جاری <span class="ltr">\(G_n\)</span>، و کمیّتی که اهمیتش به‌زودی روشن می‌شود: ریشه‌ی <span class="ltr">\(n\)</span>اُمِ <span class="ltr">\(n\)</span>اُمین عددِ اول، یعنی <span class="ltr">\(p_n^{1/n}\)</span>، کمیّتی اکیداً کاهشی که به <span class="sans">۱</span> میل می‌کند.</p>
+
+    <!-- INTERACTIVE 1 (fa mirror) -->
+    <div class="playground" id="pg-roots-fa">
+      <div class="pg-head">
+        <span class="pg-title">تعاملی · ریشه‌ی nاُمِ nاُمین عددِ اول</span>
+        <span class="pg-presets">
+          <button class="pg-btn" data-n="10">۱۰ تای اول</button>
+          <button class="pg-btn" data-n="30">n = ۳۰</button>
+          <button class="pg-btn" data-n="100">n = ۱۰۰</button>
+        </span>
+      </div>
+      <div class="pg-canvas-wrap"><canvas id="rootsCanvasFa" height="300"></canvas></div>
+      <div class="pg-controls">
+        <label class="sldlab">اندیسِ n</label>
+        <input type="range" id="rootsNFa" min="1" max="120" value="30">
+      </div>
+      <div class="pg-read">
+        <span class="rd"><span class="k">اندیس <i class="sym">n</i></span><b id="rd-n-fa">۳۰</b></span>
+        <span class="rd"><span class="k">عددِ اول <i class="sym">p<sub>n</sub></i></span><b id="rd-pn-fa">۱۱۳</b></span>
+        <span class="rd"><span class="k">فاصله <i class="sym">g<sub>n</sub></i></span><b id="rd-gn-fa">۱۴</b></span>
+        <span class="rd"><span class="k">بیشینه <i class="sym">G<sub>n</sub></i></span><b id="rd-Gn-fa">۱۴</b></span>
+        <span class="rd big"><span class="k">ریشه‌ی nاُمِ <i class="sym">p<sub>n</sub></i></span><b id="rd-root-fa">۱٫۱۷۰۶۷۳</b></span>
+      </div>
+      <div class="pg-hint" dir="rtl">لغزنده را بکشید یا روی نمودار بایستید. هر پله‌ی روبه‌پایین، همان حدسِ فیروزبخت است در عمل: <i class="sym">p<sub>n</sub><sup>۱/n</sup></i> دیگر هرگز بالا نمی‌رود. ببینید که نمودار درست همان‌جا که فاصله‌ای بزرگ پیدا می‌شود، بیشترین افت را دارد.</div>
+    </div>
+
+    <p>اعداد اول صرفاً کنجکاوی‌های بی‌مصرف نیستند: در سراسرِ ریاضیات ظاهر می‌شوند و امنیتِ کامپیوترها و ارتباطات را پشتیبانی می‌کنند. مطالعه‌شان دستِ‌کم به ۲٬۳۰۰ سال پیش بازمی‌گردد، به اثباتِ اقلیدس — به‌روشِ برهانِ خلف — که بی‌نهایت عددِ اول وجود دارد. حدودِ ۲۴۰ پیش از میلاد، اراتوستن غربالی ساخت — که هنوز نامش را بر خود دارد — برای یافتنِ همه‌ی اعداد اولِ کوچک‌تر از عددِ <span class="ltr">\(x\)</span>. در پایان به آن غربال بازمی‌گردیم، چون درست در دلِ معمایی نشسته است که این نوشته به‌راستی درباره‌ی آن است.</p>
+
+    <h2 class="subhead">فریده فیروزبخت که بود؟</h2>
+
+    <p>می‌گذارم خودش، خودش را معرفی کند. آنچه در پی می‌آید ایمیلی بی‌تاریخ است که او به سایتِ <em>پازل‌ها و مسائلِ اعداد اول</em> فرستاده، با ویرایشی اندک در زبان. (در بحث‌های بعدی درباره‌ی حدسِ او، برخی نویسندگان ضمیرِ مذکر برایش به کار بردند — نامِ فارسی‌اش از بسیاری پنهان کرده بود که او یک زن است.)</p>
+
+    <div class="selfquote">
+      «در سالِ ۱۹۶۲ در اصفهانِ ایران به دنیا آمدم. به‌سببِ علاقه‌ی عمیقم به حیوانات، در ۱۷سالگی گیاه‌خوار شدم. پس از دبیرستان به دانشگاهِ اصفهان رفتم تا داروسازی بخوانم — یکی از پرطرفدارترین رشته‌ها در ایران. اما چون به ریاضیات، به‌ویژه نظریه‌ی اعداد، بسیار علاقه داشتم، در سالِ سوم رشته‌ام را به ریاضی تغییر دادم و در ۱۹۸۷ فارغ‌التحصیل شدم. سپس برای تحصیلاتِ تکمیلی به دانشگاهِ صنعتیِ اصفهان رفتم. از ۱۹۹۲ در دانشگاه‌های ایران ریاضی تدریس کرده‌ام؛ اکنون در دانشگاهِ اصفهانم. موضوعِ موردِ علاقه‌ام در پژوهش، فاصله‌ی میانِ اعداد اول است. حدسِ شماره‌ی ۳۰ در ۱۹۸۲ به ذهنم رسید، هنگامی که اثباتِ قضیه‌ی اعداد اول را می‌خواندم. باور دارم مهم‌ترین حدسِ مربوط به اعداد اول است، چون یکی از زیباترین رفتارهای آن‌ها را نشان می‌دهد، و باور دارم کار روی آن می‌تواند ما را به نتایجِ مهمی در نظریه‌ی اعداد راه ببرد.»
+      <span class="src">— فریده فیروزبخت، در primepuzzles.net</span>
+    </div>
+
+    <p>او آن‌قدر زنده نماند که در پیِ اثبات برود یا همه‌ی آنچه را حدسش در پی دارد ردیابی کند. دیگران بعدها نشان داده‌اند چه بسیار نتایجی در نظریه‌ی اعداد از آن پیروی می‌کند. برای اینکه بفهمیم چرا این مهم است، به توضیحی کوتاه درباره‌ی خودِ «حدس» نیاز داریم. <em>(برای داستانِ کامل‌ترِ زندگیِ او — سایتی که عملاً در آن زندگی می‌کرد، شعرِ آگهیِ ترحیم، عکسی که هرگز نفرستاد — به <a href="firoozbakht.html">مقاله‌ی اصلیِ</a> امیر اصغری نگاه کنید، که این نوشته همراهِ آن است.)</em></p>
+
+    <h2 class="subhead">حدس چیست</h2>
+
+    <p>ریاضیات با اثبات پیش می‌رود: همین که نتیجه‌ای اثبات و به‌دستِ همتایان بازبینی شد، ماندگار می‌شود و تنها به‌ندرت واژگون می‌گردد. اما ممکن است ریاضی‌دانی به درستیِ رابطه‌ای مطمئن باشد بی‌آنکه بتواند اثباتش کند. اگر آن رابطه مهم به نظر برسد، آن را به‌عنوانِ یک <em>حدس</em> منتشر می‌کند — گمانه‌ای که به جامعه‌ی ریاضی عرضه می‌شود، به این امید که کسی اثباتی بسازد، یا با یافتنِ مثالِ نقض آن را رد کند.</p>
+
+    <p>مادرِ همه‌ی حدس‌ها درباره‌ی اعداد اول، فرضیه‌ی ریمان است. اینجا بیانش نمی‌کنم؛ همین بس که اگر روزی اثبات شود — جایزه‌ای یک‌میلیون‌دلاری در انتظارِ آن است — نشان می‌دهد که اعداد اول، زیرِ ظاهرِ تصادفی‌شان، با نظمی کمابیش کامل توزیع شده‌اند و انحراف‌های بزرگ و نامنظم در شمارِ اعداد اولِ کوچک‌تر از <span class="ltr">\(x\)</span> را کنار می‌گذارد. شناخته‌شده‌ترین حدس از گونه‌ی کوچک‌تر این است که بی‌نهایت <em>عددِ اولِ دوقلو</em> وجود دارد؛ جفت‌هایی که با فاصله‌ی <span class="sans">۲</span> از هم جدا افتاده‌اند. نتیجه‌ی چشمگیرِ اخیر این است که برای دستِ‌کم یک عددِ زوجِ کوچک‌تر یا مساوی <span class="sans">۲۴۶</span>، بی‌نهایت جفتِ عددِ اول با آن فاصله وجود دارد. آن عدد شاید سرانجام همان <span class="sans">۲</span> از آب دربیاید.</p>
+
+    <h2 class="subhead">حدسِ فیروزبخت</h2>
+
+    <p>حالا به خودِ حدس برسیم. فیروزبخت در بیست‌سالگی، دانشجوی دانشگاهِ اصفهان، پیشنهاد کرد که تابعِ <span class="ltr">\(h(n)=p_n^{1/n}\)</span> — ریشه‌ی <span class="ltr">\(n\)</span>اُمِ <span class="ltr">\(n\)</span>اُمین عددِ اول — <em>اکیداً کاهشی</em> است. به‌بیانِ دیگر،</p>
+
+    <div class="eq">\[ p_n^{1/n} \;>\; p_{n+1}^{1/(n+1)} \]<div style="font-size:14px;color:#6B6155;margin-top:4px;">برای هر \(n\)</div></div>
+
+    <p>با جابه‌جایی، این می‌گوید <span class="ltr">\(p_{n+1} < p_n^{\,1 + 1/n}\)</span>، یا به زبانِ فاصله، <span class="ltr">\(g_n < p_n\bigl(p_n^{1/n}-1\bigr)\)</span>. اگر فاصله‌ی <em>نسبی</em> را <span class="ltr">\(r_n = p_{n+1}/p_n\)</span> تعریف کنیم، حدس به‌سادگی می‌گوید <span class="ltr">\(r_n\)</span> از بالا با <span class="ltr">\(p_n^{1/n}\)</span> کران خورده است. آنچه حدس را چشمگیر می‌کند، مقایسه‌ی آن با دیگر کران‌های پیشنهادی برای بیشینه‌ی فاصله است. شکلِ زیر — که معمولاً آن را همچون تصویری ثابت از ویکی‌پدیا می‌آوردم — اینجا زنده است: سه کرانِ حدسیِ فیروزبخت، کرامِر و گرانویل، در برابرِ فاصله‌های رکوردِ واقعی رسم شده‌اند.</p>
+
+    <!-- INTERACTIVE 2 (fa mirror) -->
+    <div class="playground" id="pg-bounds-fa">
+      <div class="pg-head">
+        <span class="pg-title">تعاملی · فاصله‌های اعداد اول و کران‌هایشان</span>
+        <span class="pg-presets">
+          <button class="pg-btn" id="bnd-markers-fa">نشانه‌های بررسی</button>
+        </span>
+      </div>
+      <div class="pg-canvas-wrap"><canvas id="boundsCanvasFa" height="440"></canvas></div>
+      <div class="pg-legend" id="bnd-legend-fa"></div>
+      <div class="pg-hint" dir="rtl">محورها مطابقِ شکلِ اصلی‌اند: اندازه‌ی فاصله در افق، اندازه‌ی عددِ اول (مقیاسِ لگاریتمی) در قائم. نقطه‌ی (g, p) یعنی فاصله‌ای به بزرگیِ g نخستین‌بار نزدِ عددِ اولِ p باز می‌شود. برای خواندنِ همه‌ی خط‌ها در یک فاصله، روی نمودار بایستید. کرانِ فیروزبخت (سبز) بالاتر از همه است — برای یک فاصله‌ی معین بزرگ‌ترین عددِ اول را می‌طلبد، و به همین دلیل تنگ‌ترین سقف بر دورشدنِ اعداد اول از هم است.</div>
+    </div>
+
+    <p>البته این سه، تنها کران‌ها نیستند. اصلِ برتراند — که همیشه میانِ <span class="ltr"><i class="sym">x</i></span> و <span class="ltr">۲<i class="sym">x</i></span> عددی اول هست، در ۱۸۴۵ حدس زده شد و در ۱۸۵۲ به‌دستِ چِبیشُف اثبات شد — همین حالا <span class="ltr">\(g_n < p_n\)</span> را می‌دهد، اما این بسیار سست‌تر از کرانِ فیروزبخت و دیگر کران‌های در دسترسِ امروز است.</p>
+
+    <p>تنها می‌توانیم گمانه بزنیم که او چگونه به آن رسید. پس از آنکه حدس را برای اعداد اولِ کوچک با دست — شاید به کمکِ ماشین‌حساب — تأیید کرد، احتمالاً در پیِ مثالِ نقض گشت؛ و همان جست‌وجو بررسیِ او را تا این عدد پیش برد:</p>
+
+    <div class="pullquote"><span class="ltr">۴,۴۴۴,۰۰۰,۰۰۰,۰۰۰</span> &nbsp;≈&nbsp; <span class="ltr">۴٫۴۴ × ۱۰<sup>۱۲</sup></span> — که خودِ فیروزبخت، حدودِ ۱۹۸۲، بررسی کرد.</div>
+
+    <p>عددی سِتُرگ؛ اما در برابرِ دنباله‌ای بی‌نهایت، هیچ اثباتی نیست. دیگران از آن پس بررسی را تا <span class="ltr">۲<sup>۶۴</sup> ≈ ۱٫۸۴ × ۱۰<sup>۱۹</sup></span> پیش برده‌اند. تاریخ به ما هشدار می‌دهد که فروتن بمانیم: حدسِ پولیا، حدسِ مِرتِنس، حدسِ مجموعِ توان‌های اویلر و حدسِ کوچک‌ترین عاملِ اول، همگی در شمارِ عظیمی از موارد تأیید شدند و سپس فروریختند. شاید حدسِ فیروزبخت هم روزی بیفتد — هرچند چند ریاضی‌دان می‌گویند شهودشان می‌گوید نخواهد افتاد.</p>
+
+    <h2 class="subhead">آزمودنِ یک حدس با ماشین</h2>
+
+    <p>نظریه‌ی محاسباتیِ اعداد، الگوریتم‌های کارآمد برای مسائلِ مربوط به اعداد صحیح و اعداد اول می‌سازد. این شاخه زیربنای امنیتِ سایبریِ امروز است و به RSA و رمزنگاریِ خمِ بیضوی نیرو می‌دهد. دو کارِ محوریِ آن <em>آزمونِ اول‌بودن</em> است (آیا این عدد اول است، و اگر نه، عامل‌هایش چیست؟) و حلِ معادلاتِ دیوفانتی. خام‌ترین آزمونِ اول‌بودن برای عددِ <span class="ltr">\(x\)</span> این است که آن را بر هر عددِ صحیح از <span class="sans">۲</span> تا <span class="ltr">\(\sqrt{x}\)</span> تقسیم کنیم — نه بیشتر، چون کوچک‌ترین عاملِ یک عددِ مرکب نمی‌تواند از ریشه‌ی دومش بزرگ‌تر باشد. برای اعدادِ بسیار بزرگ، هم آزمون و هم تجزیه دشوارند، و همین دشواری است که ارتباطاتِ ما را ایمن نگه می‌دارد.</p>
+
+    <p>آزمون‌های اول‌بودن دو گونه‌اند: <em>قطعی</em> (درستی‌شان تضمین‌شده اما کندترند) و <em>احتمالاتی</em> (سریع، با احتمالِ بالا درست). برای <em>تأییدِ</em> یک حدس با یقین به گونه‌ی قطعی نیاز دارید؛ برای <em>شکستنِ</em> یک حدس شاید روشی احتمالاتی کافی باشد، چون یک مثالِ نقض بس است. در اسناد نشانه‌هایی هست که فیروزبخت از جدول‌های منتشرشده‌ی بیشینه‌ی فاصله‌ها استفاده کرده تا حدسش را تا <span class="ltr">۴٫۴۴ × ۱۰<sup>۱۲</sup></span> تأیید کند — یعنی شاید اصلاً به آزمونِ مستقیمِ اول‌بودن تکیه نکرده باشد. و چه بهتر، چون همان‌طور که اکنون نشان می‌دهم، راهِ سرراست در دسترسِ او نبود.</p>
+
+    <h2 class="subhead">محاسبه با کارتِ سوراخ‌دار</h2>
+
+    <p>برای یافتنِ همه‌ی اعداد اولِ تا <span class="ltr">\(x\)</span> می‌توان از غربالِ اراتوستن استفاده کرد. فهرستی از اعدادِ تا <span class="ltr">\(x\)</span> بسازید؛ از <span class="sans">۲</span> آغاز کنید و همه‌ی مضرب‌هایش را خط بزنید؛ به عددِ باقی‌مانده‌ی بعدی، یعنی <span class="sans">۳</span>، بروید و مضرب‌هایش را خط بزنید؛ سپس <span class="sans">۵</span> (چون <span class="sans">۴</span> پیش‌تر رفته)، و همین‌طور تا <span class="ltr">\(\sqrt{x}\)</span>. آنچه می‌ماند اعداد اول‌اند. روی کامپیوتر، به‌جای فهرست از یک بردارِ بیتی به طولِ <span class="ltr">\(x\)</span> استفاده می‌کنید — یک بیت برای هر عدد — که فضای موردِ نیاز را به <span class="ltr"><i class="sym">x</i>/۸</span> بایت می‌رساند. امتحانش کنید:</p>
+
+    <!-- INTERACTIVE 3a (fa mirror) -->
+    <div class="playground" id="pg-sieve-fa">
+      <div class="pg-head">
+        <span class="pg-title">تعاملی · غربالِ اراتوستن</span>
+        <span class="pg-presets">
+          <button class="pg-btn" id="sv-step-fa">یک گام</button>
+          <button class="pg-btn" id="sv-run-fa">اجرا</button>
+          <button class="pg-btn" id="sv-reset-fa">از نو</button>
+        </span>
+      </div>
+      <div class="pg-canvas-wrap"><canvas id="sieveCanvasFa" height="240"></canvas></div>
+      <div class="pg-controls">
+        <label class="sldlab">غربال تا x = <b id="sv-xval-fa" class="sans" style="color:var(--accent)">۱۲۰</b></label>
+        <input type="range" id="sv-x-fa" min="30" max="300" value="120" step="1">
+      </div>
+      <div class="pg-read">
+        <span class="rd"><span class="k">در حالِ حذفِ مضرب‌های</span><b id="sv-cur-fa">—</b></span>
+        <span class="rd"><span class="k">نامزدهای باقی‌مانده</span><b id="sv-primes-fa">۰</b></span>
+        <span class="rd"><span class="k">عملیاتِ حذف</span><b id="sv-ops-fa">۰</b></span>
+      </div>
+      <div class="pg-hint" dir="rtl">روی مربعِ حلقه‌دار — نخستین عددِ هنوز ایستاده، که همواره عددِ اولِ بعدی است — کلیک کنید تا خودتان مضرب‌هایش را حذف کنید؛ یا «یک گام» را بزنید تا هر بار یک عددِ اول پیش برود، یا «اجرا» تا کار تمام شود. مربع‌های پررنگ عددِ اول‌اند و مربع‌های کم‌رنگ به‌عنوانِ مضرب حذف شده‌اند. دردسرِ واقعی هرگز خودِ محاسبه نیست؛ حافظه‌ای است که بردار می‌طلبد، و راهِ جایگزین اگر حافظه‌ای در کار نباشد — که پنل بعدی آن را روشن می‌کند.</div>
+    </div>
+
+    <p>شمارِ خط‌زدن‌ها برابرِ <span class="ltr">\(x\bigl(\tfrac12+\tfrac13+\tfrac15+\tfrac17+\cdots\bigr)\)</span> است، و اویلر نشان داد که مجموعِ داخلِ پرانتز تنها دولگاریتمی رشد می‌کند — پس زمانِ اجرای غربال تقریباً خطی نسبت به <span class="ltr">\(x\)</span> است. ارزان. اما دو گیر وجود دارد، و هر دو در ۱۹۸۲ کُشنده بودند. نخست حافظه: بردارِ بیتی به <span class="ltr"><i class="sym">x</i>/۸</span> بایت نیاز دارد. دوم اینکه <em>تأییدِ اول‌بودن به‌روشِ سرراست</em> — تقسیمِ هر نامزد بر اعداد اولِ تا ریشه‌ی دومش، که اگر جدولی نداشته باشید ناچار به آن هستید — حدودِ <span class="ltr">\(x\cdot \pi(\sqrt{x}) \approx x\sqrt{x}/\log\sqrt{x}\)</span> عملیات می‌طلبد. <span class="ltr">\(x\)</span> را تا مرزِ فیروزبخت بالا ببرید و ببینید تنها کامپیوترِ کلِ دانشگاهِ اصفهان با چه چیزی روبه‌رو می‌شد:</p>
+
+    <!-- INTERACTIVE 3b (fa mirror) -->
+    <div class="playground" id="pg-reckon-fa">
+      <div class="pg-head">
+        <span class="pg-title">تعاملی · حساب‌وکتابِ ۱۹۸۲</span>
+        <span class="pg-presets">
+          <button class="pg-btn on" id="rk-1982-fa">مِین‌فریمِ ۱۹۸۲</button>
+          <button class="pg-btn" id="rk-modern-fa">لپ‌تاپِ امروزی</button>
+        </span>
+      </div>
+      <div class="pg-controls">
+        <label class="sldlab">بررسیِ همه‌ی اعداد اول تا x = <b id="rk-xval-fa" class="ltr" style="color:var(--accent)">۴٫۴۴ × ۱۰<sup>۱۲</sup></b></label>
+        <input type="range" id="rk-x-fa" min="2" max="12.647" value="12.647" step="0.001">
+      </div>
+      <div class="pg-read">
+        <span class="rd big"><span class="k">زمانِ بررسیِ سرراست</span><b id="rk-time-fa">—</b></span>
+        <span class="rd big"><span class="k">حافظه‌ی موردِ نیازِ غربال</span><b id="rk-mem-fa">—</b></span>
+        <span class="rd"><span class="k">عملیاتِ حذف</span><b id="rk-ops-fa">—</b></span>
+      </div>
+      <div class="pg-hint" id="rk-hint-fa" dir="rtl">نزدِ مرزِ فیروزبخت و روی ماشینی از ۱۹۸۲، بررسیِ سرراست به حدودِ ۲٬۴۰۰ قرن می‌رسد و تنها غربال به بیش از نیم ترابایت حافظه نیاز دارد — جایی که مِین‌فریم‌های آن روزگار مگابایت داشتند، یک‌میلیون‌بار کمتر از آنچه لازم بود. نتیجه گریزناپذیر است: او نمی‌توانسته سرراست حساب کرده باشد. حتماً اعداد اول را از جدول‌های منتشرشده‌ی بیشینه‌ی فاصله‌ها خوانده است. به لپ‌تاپِ امروزی سوئیچ کنید تا ببینید زمین چه اندازه زیرِ پا جابه‌جا شده است.</div>
+    </div>
+
+    <p>همین که بردار ساخته شد، بقیه‌اش آسان است: خواندنِ اعداد اول از رویش و گرفتنِ تفاضل‌های متوالی کاری سریع است. پس تمامِ وزنِ کار بر دوشِ ساختنِ بردار می‌افتد — و در ۱۹۸۲، در دانشگاهی ایرانی که هنوز برنامه‌ها را با کارتِ سوراخ‌دار به یک ماشینِ واحد می‌داد، آن وزن برداشتنی نبود. حتی اگر فیروزبخت را برنامه‌نویسی بی‌نقص بدانیم که برنامه‌اش بارِ اول درست اجرا شد، راهِ سرراست حدودِ ۲٬۴۰۰ قرن طول می‌کشید. راهِ سرراست، برای تأییدِ حدسی درباره‌ی اعداد اول در این مقیاس، به‌سادگی از دور خارج است. او کارِ هوشمندانه‌تر و بی‌سروصداتری کرد: نگاه کرد — و با دقت نگاه کرد.</p>
+
+    <h2 class="subhead">سخنِ پایانی</h2>
+
+    <p>از دکتر امیر اصغری سپاسگزارم که مرا با فریده فیروزبخت و حدسِ چشمگیرش آشنا کرد. نوشتنِ این جستار برایم تجربه‌ای آموزنده بود. هر بار که استعدادی برجسته را کشف می‌کنم که پیش‌تر نمی‌شناختمش، بی‌اختیار به این فکر می‌افتم که چه بسیار نابغه‌ی دیگری پیرامونِ ما هست که استعدادش ناشناخته و ناسپاس می‌ماند. حالا که پس از ۵۳ سال از دانشگاه بازنشسته شده‌ام، بارها از خود می‌پرسم آیا در میانِ شاگردانِ خودم استعدادهایی کم‌یاب را از دست داده‌ام. فکرِ ترسناکی است — هر یک که از دست رفته باشد، زیانی است برای علم، و برای بشریت.</p>
+  </div>
+
+  <!-- ===== کارنامه‌ی دست‌اندرکاران ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">جستار</div>
+        <div class="who">بهروز پرهامی</div>
+        <div class="aff">دانشگاه کالیفرنیا، سانتا باربارا · به‌تازگی پس از ۵۳ سال از دانشگاه بازنشسته شده است.</div>
+      </div>
+      <div class="role">
+        <div class="lab">بخش‌های تعاملی</div>
+        <div class="who">آدم‌ها و ریاضیات</div>
+        <div class="aff">داده‌ی اعداد اول، کران‌ها و حساب‌وکتابِ ۱۹۸۲، همه زنده در مرورگر محاسبه می‌شوند.</div>
+      </div>
+      <div class="role">
+        <div class="lab">همراهِ</div>
+        <div class="who">مقاله‌ی اصلی</div>
+        <div class="aff"><a href="firoozbakht.html">فیروزبخت و حدسی درباره‌ی اعداد اول</a>، نوشته‌ی امیر اصغری.</div>
+      </div>
+    </div>
+    <div class="origin">برای «آدم‌ها و ریاضیات» با عنوانِ «Farideh Firoozbakht &amp; Her Conjecture About Primes» نوشته شده است. شکلِ کران‌ها، به‌شکلِ تعاملی، بر پایه‌ی شکلِ ویکی‌پدیا بازرسم شده است.</div>
+  </div>
+
+  <div class="refs">
+    <h3>مراجع و خواندنِ بیشتر</h3>
+    <ol>
+      <li>Firoozbakht's conjecture. <em>Wikipedia.</em> <a href="https://en.wikipedia.org/wiki/Firoozbakht%27s_conjecture">en.wikipedia.org/wiki/Firoozbakht's_conjecture</a></li>
+      <li>Prime gap. <em>Wikipedia.</em> <a href="https://en.wikipedia.org/wiki/Prime_gap">en.wikipedia.org/wiki/Prime_gap</a></li>
+      <li>The Prime Puzzles &amp; Problems Connection. <a href="https://www.primepuzzles.net/">primepuzzles.net</a></li>
+      <li>Alexei Kourbatov (2015). Verification of the Firoozbakht conjecture for primes up to four quintillion. <em>International Mathematical Forum.</em></li>
+      <li>Luan Alberto Ferreira &amp; Hugo Luiz Mariano (2018). Prime gaps and the Firoozbakht conjecture. <em>São Paulo Journal of Mathematical Sciences.</em></li>
+      <li>Matt Visser (2019). Verifying the Firoozbakht, Nicholson, and Farhadian conjectures up to the 81st maximal prime gap. <em>Mathematics, 7</em>(8), 691.</li>
+      <li>Thomas R. Nicely. Tables of prime gaps &amp; maximal gaps. <a href="https://faculty.lynchburg.edu/~nicely/gaps/">faculty.lynchburg.edu/~nicely/gaps</a></li>
+    </ol>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+/* ============================ language ============================ */
+function applyLabels(lang){
+  document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+    var v = el.getAttribute('data-' + lang);
+    if (v !== null) el.textContent = v;
+  });
+}
+function setLang(lang){
+  var isFa = lang === 'fa';
+  document.documentElement.lang = lang;
+  document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-lang-block]').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+  });
+  document.querySelectorAll('.langtoggle button').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+  });
+  applyLabels(lang);
+  try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  if (window.__PG && window.__PG.relang) window.__PG.relang(lang);
+}
+var __startLang = 'en';
+try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') __startLang = s; } catch(e){}
+
+/* ============================ helpers ============================ */
+var FA_DIGITS = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+function curLang(){ return document.documentElement.lang === 'fa' ? 'fa' : 'en'; }
+function faDigits(s){ return String(s).replace(/[0-9]/g, function(d){ return FA_DIGITS[+d]; }); }
+function locNum(s){ return curLang()==='fa' ? faDigits(String(s).replace('.', '٫')) : String(s); }
+function groupInt(n){ return n.toLocaleString('en-US'); }
+
+/* first primes, computed once (enough for n up to 200) */
+var PRIMES = (function(limit){
+  var sieve = new Uint8Array(limit+1), out=[];
+  for (var i=2;i<=limit;i++){ if(!sieve[i]){ out.push(i); for(var j=i*i;j<=limit;j+=i) sieve[j]=1; } }
+  return out;
+})(2000);
+
+/* ============================ shared canvas dpi ============================ */
+function fitCanvas(cv, cssH){
+  var dpr = window.devicePixelRatio || 1;
+  var w = cv.parentElement.clientWidth;
+  cv.style.height = cssH + 'px';
+  cv.width = Math.round(w*dpr); cv.height = Math.round(cssH*dpr);
+  var ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return { ctx: ctx, w: w, h: cssH };
+}
+
+var COL = { paper:'#FDFAF3', ink:'#1C1814', accent:'#C8633E', line:'#E4DAC6', muted:'#6B6155',
+  green:'#4B7A3F', blue:'#2F6DB0', yellow:'#D8A72E', grid:'#EbE1CE', dim:'#CDBFA3' };
+
+/* =====================================================================
+   INTERACTIVE 1 — nth root of nth prime
+   ===================================================================== */
+(function(){
+  function build(canvasId, sliderId, ids, presetSel){
+    var cv = document.getElementById(canvasId); if(!cv) return null;
+    var slider = document.getElementById(sliderId);
+    var NMAX = 120;
+    var hoverN = null;
+
+    function pnRoot(n){ return Math.pow(PRIMES[n-1], 1/n); } // n is 1-indexed
+    function maxGapUpTo(n){ var m=0; for(var i=1;i<n;i++){ var g=PRIMES[i]-PRIMES[i-1]; if(g>m)m=g; } if(n>=1){/*G includes gap after? use running max of gaps g_1..*/} return m; }
+
+    function readout(n){
+      var pn = PRIMES[n-1];
+      var gn = PRIMES[n] - PRIMES[n-1];
+      var Gn = 0; for (var i=0;i<n;i++){ var g = PRIMES[i+1]-PRIMES[i]; if(g>Gn) Gn=g; }
+      var root = pnRoot(n);
+      set(ids.n, n); set(ids.pn, groupInt(pn)); set(ids.gn, gn); set(ids.Gn, Gn);
+      set(ids.root, root.toFixed(6));
+    }
+    function set(id, v){ var el=document.getElementById(id); if(el) el.textContent = locNum(v); }
+
+    function draw(){
+      var f = fitCanvas(cv, 300), ctx=f.ctx, W=f.w, H=f.h;
+      var padL=44, padR=14, padT=18, padB=28;
+      var x0=padL, x1=W-padR, y0=H-padB, y1=padT;
+      ctx.clearRect(0,0,W,H);
+      // y range from min root (at NMAX) to 2.0
+      var ymin = pnRoot(NMAX)-0.02, ymax = 2.02;
+      function X(n){ return x0 + (n-1)/(NMAX-1)*(x1-x0); }
+      function Y(v){ return y0 + (v-ymin)/(ymax-ymin)*(y1-y0); }
+      // grid
+      ctx.strokeStyle=COL.grid; ctx.fillStyle=COL.muted; ctx.font='11px Hanken Grotesk, sans-serif';
+      ctx.lineWidth=1;
+      for (var v=1.0; v<=2.0; v+=0.2){
+        var yy=Y(v); ctx.beginPath(); ctx.moveTo(x0,yy); ctx.lineTo(x1,yy); ctx.stroke();
+        ctx.textAlign='right'; ctx.textBaseline='middle'; ctx.fillText(locNum(v.toFixed(1)), x0-6, yy);
+      }
+      ctx.textAlign='center'; ctx.textBaseline='top';
+      [1,20,40,60,80,100,120].forEach(function(n){ ctx.fillText(locNum(n), X(n), y0+7); });
+      // curve
+      ctx.strokeStyle=COL.accent; ctx.lineWidth=2.2; ctx.beginPath();
+      for (var n=1;n<=NMAX;n++){ var px=X(n), py=Y(pnRoot(n)); if(n===1)ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+      ctx.stroke();
+      // points (sparse)
+      ctx.fillStyle=COL.accent;
+      for (var n2=1;n2<=NMAX;n2++){ if(NMAX<=12 || n2%4===0 || n2===1){ ctx.beginPath(); ctx.arc(X(n2),Y(pnRoot(n2)),2.1,0,7); ctx.fill(); } }
+      // current n marker
+      var cn = hoverN || +slider.value;
+      var mx=X(cn), my=Y(pnRoot(cn));
+      ctx.strokeStyle='rgba(200,99,62,0.35)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(mx,y1); ctx.lineTo(mx,y0); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle=COL.ink; ctx.beginPath(); ctx.arc(mx,my,4.5,0,7); ctx.fill();
+      ctx.fillStyle=COL.paper; ctx.beginPath(); ctx.arc(mx,my,1.8,0,7); ctx.fill();
+    }
+
+    function render(){ readout(hoverN || +slider.value); draw(); }
+
+    slider.addEventListener('input', function(){ hoverN=null; render(); });
+    cv.addEventListener('mousemove', function(e){
+      var r=cv.getBoundingClientRect(); var W=r.width; var padL=44,padR=14;
+      var frac=(e.clientX-r.left-padL)/(W-padL-padR);
+      var n=Math.round(1+frac*(NMAX-1)); n=Math.max(1,Math.min(NMAX,n));
+      hoverN=n; render();
+    });
+    cv.addEventListener('mouseleave', function(){ hoverN=null; render(); });
+    presetSel.forEach(function(b){ b.addEventListener('click', function(){ slider.value=b.getAttribute('data-n'); hoverN=null; render(); }); });
+    return { render: render };
+  }
+
+  var en = build('rootsCanvas','rootsN',{n:'rd-n',pn:'rd-pn',gn:'rd-gn',Gn:'rd-Gn',root:'rd-root'},
+    Array.prototype.slice.call(document.querySelectorAll('#pg-roots .pg-btn')));
+  var fa = build('rootsCanvasFa','rootsNFa',{n:'rd-n-fa',pn:'rd-pn-fa',gn:'rd-gn-fa',Gn:'rd-Gn-fa',root:'rd-root-fa'},
+    Array.prototype.slice.call(document.querySelectorAll('#pg-roots-fa .pg-btn')));
+  window.__ROOTS = { render:function(){ if(en)en.render(); if(fa)fa.render(); } };
+})();
+
+/* =====================================================================
+   INTERACTIVE 2 — prime gaps & their bounds
+   ===================================================================== */
+(function(){
+  // maximal prime gaps: [gap g, prime p at which g first occurs]  (OEIS A005250 / A002386)
+  var MAXGAPS = [[1,2],[2,3],[4,7],[6,23],[8,89],[14,113],[18,523],[20,887],[22,1129],[34,1327],
+    [36,9551],[44,15683],[52,19609],[72,31397],[86,155921],[96,360653],[112,370261],[114,492113],
+    [118,1349533],[132,1357201],[148,2010733],[154,4652353],[180,17051707],[210,20831323],[220,47326693],
+    [222,122164747],[234,189695659],[248,191912783],[250,387096133],[282,436273009],[288,1294268491],
+    [292,1453168141],[320,2300942549],[336,3842610773],[354,4302407359],[382,10726904659],[384,20678048297],
+    [394,22367084959],[456,25056082087],[464,42652618343],[468,127976334671],[474,182226896239],
+    [486,241160624143],[490,297501075799],[500,303371455241],[514,304599508537],[516,416608695821],
+    [532,461690510011],[534,614487453523],[540,738832927927],[582,1346294310749],[588,1408695493609],
+    [602,1968188556461],[652,2614941710599],[674,7177162611713],[716,13829048559701],[766,19581334192423],
+    [778,42842283925351],[804,90874329411493],[806,171231342420521],[906,218209405436543],
+    [916,1189459969825483],[924,1686994940955803],[1132,1693182318746371],[1184,43841547845541059],
+    [1198,55350776431903243],[1220,80873624627234849],[1224,203986478517455989],[1248,218034721194214273],
+    [1272,305405826521087869],[1328,352521223451364323],[1356,401429925999153707],[1370,418032645936712127],
+    [1442,804212830686677669],[1476,1425172824437699411]];
+
+  var GMAX=1600, LOGMAX=20; // y: 10^0..10^20
+  // bound curves: for a gap g, the largest prime consistent with each bound (log10 p)
+  function firoozbakht(g){ var L=(1+Math.sqrt(1+4*g))/2; return L/Math.LN10; }   // g < (log p)^2 - log p
+  function cramer(g){ return Math.sqrt(g)/Math.LN10; }                            // g ~ (log p)^2
+  function granville(g){ return Math.sqrt(g/1.1229)/Math.LN10; }                  // g ~ 1.1229 (log p)^2
+
+  var SERIES = [
+    { key:'actual', col:COL.ink,    en:'Actual max gap', fa:'بیشینه‌ی فاصله‌ی واقعی', on:true, step:true },
+    { key:'firoo',  col:COL.green,  en:'Firoozbakht',    fa:'فیروزبخت', on:true, fn:firoozbakht },
+    { key:'cramer', col:COL.blue,   en:'Cramér',         fa:'کرامِر',   on:true, fn:cramer },
+    { key:'granv',  col:COL.yellow, en:'Granville',      fa:'گرانویل',  on:true, fn:granville }
+  ];
+  var showMarks = false;
+
+  function build(canvasId, legendId, markBtnId){
+    var cv=document.getElementById(canvasId); if(!cv) return null;
+    var legend=document.getElementById(legendId);
+    var hoverG=null;
+
+    function draw(){
+      var f=fitCanvas(cv,440), ctx=f.ctx, W=f.w, H=f.h;
+      var padL=52, padR=16, padT=16, padB=40;
+      var x0=padL, x1=W-padR, y0=H-padB, y1=padT;
+      ctx.clearRect(0,0,W,H);
+      function X(g){ return x0 + g/GMAX*(x1-x0); }
+      function Y(log10p){ return y0 + Math.min(log10p,LOGMAX)/LOGMAX*(y1-y0); }
+      // grid + axis labels
+      ctx.font='11px Hanken Grotesk, sans-serif'; ctx.lineWidth=1;
+      ctx.strokeStyle=COL.grid; ctx.fillStyle=COL.muted;
+      for (var e=0;e<=LOGMAX;e+=2){
+        var yy=Y(e); ctx.beginPath(); ctx.moveTo(x0,yy); ctx.lineTo(x1,yy); ctx.stroke();
+        ctx.textAlign='right'; ctx.textBaseline='middle';
+        ctx.fillText(e===0?(curLang()==='fa'?'۱':'1'):((curLang()==='fa'?'۱۰':'10')+sup(e)), x0-6, yy);
+      }
+      ctx.textAlign='center'; ctx.textBaseline='top';
+      for (var g=0; g<=GMAX; g+=200){ var xx=X(g); ctx.beginPath(); ctx.strokeStyle=COL.grid; ctx.moveTo(xx,y1); ctx.lineTo(xx,y0); ctx.stroke(); ctx.fillStyle=COL.muted; ctx.fillText(locNum(g), xx, y0+7); }
+      // axis titles
+      ctx.fillStyle=COL.muted; ctx.font='11px Hanken Grotesk, sans-serif';
+      ctx.textAlign='center'; ctx.fillText(curLang()==='fa'?'اندازه‌ی فاصله':'gap size', (x0+x1)/2, H-15);
+      ctx.save(); ctx.translate(13,(y0+y1)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center';
+      ctx.fillText(curLang()==='fa'?'اندازه‌ی عددِ اول':'prime size', 0, 0); ctx.restore();
+
+      // verification marker lines
+      if (showMarks){
+        [[Math.log10(4.44e12), curLang()==='fa'?'فیروزبخت: ۴٫۴۴×۱۰¹²':'Firoozbakht 4.44×10¹²'],
+         [Math.log10(1.84e19), curLang()==='fa'?'بررسی‌شده تا ۱٫۸۴×۱۰¹⁹':'verified 1.84×10¹⁹']].forEach(function(m){
+          var yy=Y(m[0]); ctx.strokeStyle='rgba(200,99,62,0.5)'; ctx.setLineDash([5,4]); ctx.lineWidth=1.2;
+          ctx.beginPath(); ctx.moveTo(x0,yy); ctx.lineTo(x1,yy); ctx.stroke(); ctx.setLineDash([]);
+          ctx.fillStyle=COL.accent; ctx.textAlign= curLang()==='fa'?'right':'left'; ctx.textBaseline='bottom';
+          ctx.fillText(m[1], curLang()==='fa'? x1-4 : x0+6, yy-3);
+        });
+      }
+
+      // smooth bound curves
+      SERIES.forEach(function(s){
+        if(!s.on || s.step) return;
+        ctx.strokeStyle=s.col; ctx.lineWidth=2.4; ctx.beginPath(); var started=false;
+        for (var g=1; g<=GMAX; g+=4){ var lp=s.fn(g); if(lp>LOGMAX){ continue; } var px=X(g),py=Y(lp); if(!started){ctx.moveTo(px,py);started=true;} else ctx.lineTo(px,py); }
+        ctx.stroke();
+      });
+      // actual staircase
+      var act = SERIES[0];
+      if (act.on){
+        ctx.strokeStyle=act.col; ctx.lineWidth=1.6; ctx.beginPath();
+        for (var i=0;i<MAXGAPS.length;i++){ var g=MAXGAPS[i][0], lp=Math.log10(MAXGAPS[i][1]); var px=X(g),py=Y(lp); if(i===0)ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+        ctx.stroke();
+        ctx.fillStyle=act.col;
+        for (var j=0;j<MAXGAPS.length;j++){ if(j%2===0||j>60){ ctx.beginPath(); ctx.arc(X(MAXGAPS[j][0]),Y(Math.log10(MAXGAPS[j][1])),1.7,0,7); ctx.fill(); } }
+      }
+
+      // hover readout
+      if (hoverG!==null){
+        var xx=X(hoverG);
+        ctx.strokeStyle='rgba(28,24,20,0.28)'; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(xx,y1); ctx.lineTo(xx,y0); ctx.stroke(); ctx.setLineDash([]);
+        // build tooltip lines
+        var lines=[]; lines.push((curLang()==='fa'?'فاصله ':'gap ')+locNum(hoverG));
+        SERIES.forEach(function(s){ if(!s.on) return;
+          if(s.step){ // nearest actual record <= hoverG
+            var rec=MAXGAPS[0]; for(var k=0;k<MAXGAPS.length;k++){ if(MAXGAPS[k][0]<=hoverG) rec=MAXGAPS[k]; }
+            lines.push(['●',(curLang()==='fa'?s.fa:s.en),'~10'+sup(Math.round(Math.log10(rec[1]))), s.col]);
+          } else { var lp=s.fn(hoverG); lines.push(['●',(curLang()==='fa'?s.fa:s.en),'10'+sup(Math.round(lp)), s.col]); }
+        });
+        // draw box
+        ctx.font='11px Hanken Grotesk, sans-serif';
+        var bw=150, bh=16+lines.length*15, bx=Math.min(xx+10, x1-bw), by=y1+8;
+        if (curLang()==='fa') bx=Math.max(xx-10-bw, x0);
+        ctx.fillStyle='rgba(253,250,243,0.96)'; ctx.strokeStyle=COL.line; ctx.lineWidth=1;
+        roundRect(ctx,bx,by,bw,bh,5); ctx.fill(); ctx.stroke();
+        ctx.textBaseline='middle'; var ty=by+14;
+        ctx.fillStyle=COL.ink; ctx.textAlign='left'; ctx.fillText(lines[0], bx+9, ty); ty+=16;
+        for (var L=1;L<lines.length;L++){ var ln=lines[L]; ctx.fillStyle=ln[3]; ctx.fillText('●', bx+9, ty); ctx.fillStyle=COL.ink; ctx.fillText(ln[1], bx+22, ty); ctx.textAlign='right'; ctx.fillText(ln[2], bx+bw-9, ty); ctx.textAlign='left'; ty+=15; }
+      }
+    }
+    function onMove(e){ var r=cv.getBoundingClientRect(); var padL=52,padR=16; var frac=(e.clientX-r.left-padL)/(r.width-padL-padR); var g=Math.round(frac*GMAX); if(g<1||g>GMAX){hoverG=null;} else hoverG=g; draw(); }
+    cv.addEventListener('mousemove', onMove);
+    cv.addEventListener('mouseleave', function(){ hoverG=null; draw(); });
+
+    function buildLegend(){
+      legend.innerHTML='';
+      SERIES.forEach(function(s){
+        var el=document.createElement('span'); el.className='lg'+(s.on?'':' off');
+        el.innerHTML='<span class="sw" style="background:'+s.col+(s.step?';height:2px':'')+'"></span>'+(curLang()==='fa'?s.fa:s.en);
+        el.addEventListener('click', function(){ s.on=!s.on; el.classList.toggle('off',!s.on); draw(); });
+        legend.appendChild(el);
+      });
+    }
+    var mb=document.getElementById(markBtnId);
+    if(mb) mb.addEventListener('click', function(){ showMarks=!showMarks; mb.classList.toggle('on',showMarks); draw(); });
+    return { render:function(){ buildLegend(); draw(); }, syncMark:function(){ if(mb) mb.classList.toggle('on',showMarks); } };
+  }
+  function sup(n){ var m={'-':'⁻',0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹'}; return String(n).split('').map(function(c){return m[c]||c;}).join(''); }
+  function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+  var en=build('boundsCanvas','bnd-legend','bnd-markers');
+  var fa=build('boundsCanvasFa','bnd-legend-fa','bnd-markers-fa');
+  window.__BOUNDS={ render:function(){ if(en){en.render();en.syncMark();} if(fa){fa.render();fa.syncMark();} } };
+})();
+
+/* =====================================================================
+   INTERACTIVE 3a — sieve of Eratosthenes
+   ===================================================================== */
+(function(){
+  function build(ids){
+    var cv=document.getElementById(ids.canvas); if(!cv) return null;
+    var x=+document.getElementById(ids.x).value;
+    var state, primeIdx, timer=null, rafId=null, nudgeUntil=0;
+
+    function geom(){
+      var cols=Math.ceil(Math.sqrt(x*2.2)); cols=Math.max(cols,15);
+      var pad=10; var wrapW=cv.parentElement.clientWidth;
+      var cell=Math.floor((wrapW-pad*2)/cols);
+      return { cols:cols, cell:cell, pad:pad };
+    }
+    function reset(){
+      x=+document.getElementById(ids.x).value;
+      state=new Uint8Array(x+1); // 0 unknown, 1 prime, 2 composite
+      for(var i=2;i<=x;i++) state[i]=1;
+      state[0]=2; state[1]=2;
+      primeIdx=2; nudgeUntil=0;
+      set(ids.xval, x); set(ids.cur,'—'); set(ids.ops,0); countPrimes(); draw(); startPulse();
+    }
+    function countPrimes(){ var c=0; for(var i=2;i<=x;i++) if(state[i]===1)c++; set(ids.primes,c); return c; }
+    var ops=0;
+    // the next standing number to process — always the next prime, taken in order
+    function target(){ var p=primeIdx; while(2*p<=x && state[p]!==1) p++; return (2*p<=x)? p : 0; }
+    // strike every multiple of p from 2p up to x. Numbers already crossed out (e.g. 6, met again
+    // via 3) are eliminated redundantly, and each elimination is an operation — so it is counted.
+    // Total strike-outs = x(1/2+1/3+1/5+...).
+    function strike(p){
+      set(ids.cur, p);
+      for(var m=2*p; m<=x; m+=p){ ops++; if(state[m]===1) state[m]=2; }
+      set(ids.ops, ops);
+      primeIdx=p+1; countPrimes();
+    }
+    function step(){
+      var t=target();
+      if(!t){ set(ids.cur, curLang()==='fa'?'تمام':'done'); countPrimes(); draw(); stop(); return false; }
+      strike(t); draw(); return true;
+    }
+    function run(){ if(timer){ stop(); return; } var btn=document.getElementById(ids.run); if(btn)btn.classList.add('on'); stopPulse(); timer=setInterval(function(){ if(!step()) stop(); }, 420); }
+    function stop(){ if(timer){ clearInterval(timer); timer=null; } var btn=document.getElementById(ids.run); if(btn)btn.classList.remove('on'); startPulse(); }
+
+    // a gentle pulse on the square the reader should pick next
+    function startPulse(){ if(rafId==null && !timer && target()) rafId=requestAnimationFrame(pulseTick); }
+    function stopPulse(){ if(rafId!=null){ cancelAnimationFrame(rafId); rafId=null; } }
+    function pulseTick(){ rafId=null; draw(); if(!timer && (target() || performance.now()<nudgeUntil)) rafId=requestAnimationFrame(pulseTick); }
+
+    function draw(){
+      var g=geom(), cols=g.cols, cell=g.cell, pad=g.pad;
+      var rows=Math.ceil((x-1)/cols);
+      var H=rows*cell+pad*2;
+      var f=fitCanvas(cv,H), ctx=f.ctx, W=f.w;
+      ctx.clearRect(0,0,W,H);
+      ctx.font=Math.max(8,Math.min(12,cell*0.42))+'px Hanken Grotesk, sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      for(var n=2;n<=x;n++){
+        var idx=n-2; var r=Math.floor(idx/cols), c=idx%cols;
+        var cx=pad+c*cell, cy=pad+r*cell;
+        var st=state[n];
+        ctx.fillStyle = st===1? COL.accent : (st===2? '#EDE3CF' : COL.paper);
+        roundRect(ctx,cx+1,cy+1,cell-2,cell-2,3); ctx.fill();
+        ctx.fillStyle = st===1? '#fff' : COL.dim;
+        if(cell>=14) ctx.fillText(locNum(n), cx+cell/2, cy+cell/2+0.5);
+      }
+      // ring the next pick so the reader knows where to click
+      var tg=target();
+      if(tg && !timer){
+        var now=performance.now(), ph=(now%1400)/1400, nudging=now<nudgeUntil;
+        var a=nudging? 1 : 0.35+0.5*(0.5+0.5*Math.sin(ph*Math.PI*2));
+        var i2=tg-2, r2=Math.floor(i2/cols), c2=i2%cols;
+        var bx=pad+c2*cell, by=pad+r2*cell;
+        ctx.save();
+        ctx.strokeStyle=COL.ink; ctx.globalAlpha=a; ctx.lineWidth=nudging?3:2.2;
+        roundRect(ctx,bx+1.5,by+1.5,cell-3,cell-3,3); ctx.stroke();
+        ctx.restore();
+      }
+    }
+    function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+    function set(id,v){ var el=document.getElementById(id); if(el) el.textContent = (v==='—'||v==='done'||v==='تمام')? v : locNum(v); }
+
+    cv.style.cursor='pointer';
+    cv.addEventListener('click', function(e){
+      if(timer) return; // let the auto-run finish before hand control resumes
+      var g=geom(), rect=cv.getBoundingClientRect();
+      var cc=Math.floor((e.clientX-rect.left-g.pad)/g.cell), rr=Math.floor((e.clientY-rect.top-g.pad)/g.cell);
+      if(cc<0||cc>=g.cols||rr<0) return;
+      var n=rr*g.cols+cc+2;
+      if(n<2||n>x) return;
+      if(n===target()){ strike(n); draw(); startPulse(); }
+      else { nudgeUntil=performance.now()+650; startPulse(); } // wrong pick: flash the right one
+    });
+
+    document.getElementById(ids.step).addEventListener('click', function(){ stop(); step(); });
+    document.getElementById(ids.run).addEventListener('click', run);
+    document.getElementById(ids.reset).addEventListener('click', function(){ stop(); ops=0; reset(); });
+    document.getElementById(ids.x).addEventListener('input', function(){ stop(); ops=0; reset(); });
+    reset();
+    return { render:function(){ set(ids.xval,x); countPrimes(); set(ids.ops,ops); draw(); } };
+  }
+  var en=build({canvas:'sieveCanvas',x:'sv-x',xval:'sv-xval',cur:'sv-cur',primes:'sv-primes',ops:'sv-ops',step:'sv-step',run:'sv-run',reset:'sv-reset'});
+  var fa=build({canvas:'sieveCanvasFa',x:'sv-x-fa',xval:'sv-xval-fa',cur:'sv-cur-fa',primes:'sv-primes-fa',ops:'sv-ops-fa',step:'sv-step-fa',run:'sv-run-fa',reset:'sv-reset-fa'});
+  window.__SIEVE={ render:function(){ if(en)en.render(); if(fa)fa.render(); } };
+})();
+
+/* =====================================================================
+   INTERACTIVE 3b — the 1982 reckoning
+   ===================================================================== */
+(function(){
+  var SEC_PER_CENTURY=3.15576e9, SEC_PER_YEAR=3.15576e7, SEC_PER_DAY=86400;
+  function humanTime(s){
+    var en=curLang()==='en';
+    function u(val,word,wordFa){ var v=val<10?val.toFixed(1):Math.round(val).toLocaleString('en-US'); return en? (v+' '+word) : (faDigits(v)+' '+wordFa); }
+    if(s<1e-3) return en?'< a millisecond':'کمتر از یک هزارم‌ثانیه';
+    if(s<1) return u(s*1000,'milliseconds','هزارم‌ثانیه');
+    if(s<90) return u(s,'seconds','ثانیه');
+    if(s<5400) return u(s/60,'minutes','دقیقه');
+    if(s<2*SEC_PER_DAY) return u(s/3600,'hours','ساعت');
+    if(s<2*SEC_PER_YEAR) return u(s/SEC_PER_DAY,'days','روز');
+    if(s<2*SEC_PER_CENTURY) return u(s/SEC_PER_YEAR,'years','سال');
+    return u(s/SEC_PER_CENTURY,'centuries','قرن');
+  }
+  function humanBytes(b){
+    var en=curLang()==='en';
+    function u(val,word,wordFa){ var v=val<10?val.toFixed(2):(val<100?val.toFixed(1):Math.round(val).toLocaleString('en-US')); return en?(v+' '+word):(faDigits(v)+' '+wordFa); }
+    if(b<1e3) return u(b,'bytes','بایت');
+    if(b<1e6) return u(b/1e3,'KB','کیلوبایت');
+    if(b<1e9) return u(b/1e6,'MB','مگابایت');
+    if(b<5e11) return u(b/1e9,'GB','گیگابایت');
+    return u(b/1e12,'TB','ترابایت');
+  }
+  function sci(x){
+    var e=Math.floor(Math.log10(x)); var m=x/Math.pow(10,e);
+    var fa = curLang()==='fa';
+    var mm = fa? faDigits(m.toFixed(2)).replace('.', '٫') : m.toFixed(2);
+    var ten = fa? '۱۰' : '10';
+    var ex = fa? faDigits(String(e)) : String(e);
+    return mm+' × '+ten+'<sup>'+ex+'</sup>';
+  }
+
+  function build(ids){
+    var slider=document.getElementById(ids.x); if(!slider) return null;
+    var machine='1982'; // or 'modern'
+    function params(){ return machine==='1982'? {instr:12, sec:1e-6} : {instr:12, sec:1e-9}; }
+    function compute(){
+      var logx=+slider.value;            // slider is log10(x)
+      var x=Math.pow(10,logx);
+      var sq=Math.sqrt(x);
+      var piSqrt = sq/Math.log(sq);      // ~ number of primes up to sqrt(x)
+      var ops = x*piSqrt;                 // brute-force verification operations (Parhami's count)
+      var p=params();
+      var seconds = ops*p.instr*p.sec;
+      var mem = x/8;                      // sieve bit-vector bytes
+      setHTML(ids.xval, sci(x));
+      set(ids.time, humanTime(seconds));
+      set(ids.mem, humanBytes(mem));
+      setHTML(ids.ops, sci(ops));
+    }
+    function set(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
+    function setHTML(id,v){ var el=document.getElementById(id); if(el) el.innerHTML=v; }
+    slider.addEventListener('input', compute);
+    var b82=document.getElementById(ids.b1982), bmod=document.getElementById(ids.bmodern);
+    b82.addEventListener('click', function(){ machine='1982'; b82.classList.add('on'); bmod.classList.remove('on'); compute(); });
+    bmod.addEventListener('click', function(){ machine='modern'; bmod.classList.add('on'); b82.classList.remove('on'); compute(); });
+    compute();
+    return { render:compute };
+  }
+  var en=build({x:'rk-x',xval:'rk-xval',time:'rk-time',mem:'rk-mem',ops:'rk-ops',b1982:'rk-1982',bmodern:'rk-modern'});
+  var fa=build({x:'rk-x-fa',xval:'rk-xval-fa',time:'rk-time-fa',mem:'rk-mem-fa',ops:'rk-ops-fa',b1982:'rk-1982-fa',bmodern:'rk-modern-fa'});
+  window.__RECKON={ render:function(){ if(en)en.render(); if(fa)fa.render(); } };
+})();
+
+/* ============================ relang + boot ============================ */
+window.__PG = { relang: function(){
+  if(window.__ROOTS) window.__ROOTS.render();
+  if(window.__BOUNDS) window.__BOUNDS.render();
+  if(window.__SIEVE) window.__SIEVE.render();
+  if(window.__RECKON) window.__RECKON.render();
+}};
+
+function renderMath(){
+  if (!window.renderMathInElement) { setTimeout(renderMath, 60); return; }
+  renderMathInElement(document.body, {
+    delimiters: [ {left:'\\[',right:'\\]',display:true}, {left:'\\(',right:'\\)',display:false} ],
+    throwOnError:false
+  });
+}
+
+// boot
+setLang(__startLang);
+window.__PG.relang();
+renderMath();
+window.addEventListener('resize', function(){ window.__PG.relang(); });
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>

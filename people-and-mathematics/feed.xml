@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>People and Mathematics · آدم‌ها و ریاضیات</title>
+    <link>https://mathswell.com/</link>
+    <atom:link href="https://mathswell.com/feed.xml" rel="self" type="application/rss+xml" />
+    <description>A bilingual journal for teaching, thinking, and conversation in mathematics.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 12 Jul 2026 10:43:50 GMT</lastBuildDate>
+    <item>
+      <title>Counting Like a Beginner · موقعیت مشابه</title>
+      <link>https://mathswell.com/articles/counting-like-a-beginner.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/counting-like-a-beginner.html</guid>
+      <category>WikiLetter</category>
+      <dc:creator>Zohreh Pandi</dc:creator>
+      <pubDate>Sun, 12 Jul 2026 09:00:00 GMT</pubDate>
+      <description>Zohreh Pandi puts the teacher in the child's shoes: count with the words of a rhyme to feel what a beginner feels, then read a ten-frame without counting. In English for the first time, now interactive. Originally WikiLetter No. 15. — Zohreh Pandi</description>
+    </item>
+    <item>
+      <title>Long-term sense making in arithmetic and algebra · مسیر طولانی ملموس‌شدن حساب و جبر</title>
+      <link>https://mathswell.com/articles/long-term-sense-making.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/long-term-sense-making.html</guid>
+      <category>Concepts &amp; Conceptions</category>
+      <dc:creator>David Tall</dc:creator>
+      <pubDate>Sun, 12 Jul 2026 09:00:00 GMT</pubDate>
+      <description>David Tall on how a spoken pause carries meaning: slide the gap in 2 + 2 × 2 — and hear each reading aloud — to watch the answer change. First published as WikiLetter No. 5. — David Tall</description>
+    </item>
+    <item>
+      <title>The Machine She Didn’t Have · ماشینی که نداشت</title>
+      <link>https://mathswell.com/articles/firoozbakht-and-the-machine.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/firoozbakht-and-the-machine.html</guid>
+      <category>History of Mathematics</category>
+      <dc:creator>Behrooz Parhami</dc:creator>
+      <pubDate>Fri, 10 Jul 2026 09:00:00 GMT</pubDate>
+      <description>A companion to the lead feature: Behrooz Parhami takes Firoozbakht’s conjecture from what a prime is to the bounds it beats — then reckons what testing it on a 1982 mainframe would truly have cost, and proves brute force was never an option. With three interactive playgrounds. — Behrooz Parhami</description>
+    </item>
+    <item>
+      <title>Women's Week in Mathematics · رویدادِ زن در ریاضیات</title>
+      <link>https://mathswell.com/articles/women-in-mathematics.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/women-in-mathematics.html</guid>
+      <category>Mathematical Culture</category>
+      <dc:creator>Farnaz Haj Manouchehri &amp; Bamdad Torabi</dc:creator>
+      <pubDate>Fri, 10 Jul 2026 09:00:00 GMT</pubDate>
+      <description>How students at Sharif built a two-year celebration of Maryam Mirzakhani — and everything it took to hold it. A report kept for the record, in the organizers' own words. — Farnaz Haj Manouchehri &amp; Bamdad Torabi</description>
+    </item>
+    <item>
+      <title>Graphs on Donuts · گراف‌ها روی دونات‌ها</title>
+      <link>https://mathswell.com/articles/topological-graph-theory.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/topological-graph-theory.html</guid>
+      <category>Face to Face with Mathematics</category>
+      <dc:creator>Aryan Hemmati</dc:creator>
+      <pubDate>Thu, 09 Jul 2026 09:00:00 GMT</pubDate>
+      <description>Euler’s formula counts vertices, edges and regions, and always lands on 2 — until the graph refuses to be drawn flat. Aryan Hemmati follows the count onto donuts and beyond, where the answer belongs to the surface itself. An invitation to topological graph theory, with interactive experiments. — Aryan Hemmati</description>
+    </item>
+    <item>
+      <title>From a Plane That Is Not a Plane to a Code That Is a Code · از صفحه‌ای که صفحه نیست تا کدی که کد است</title>
+      <link>https://mathswell.com/articles/fano-plane.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/fano-plane.html</guid>
+      <category>Face to Face with Mathematics</category>
+      <dc:creator>Kianoosh Shokri</dc:creator>
+      <pubDate>Tue, 07 Jul 2026 09:00:00 GMT</pubDate>
+      <description>The Fano plane has seven points and seven lines — and, hiding inside it, block designs, orthogonal arrays, covering arrays and error-correcting codes. Kianoosh Shokri follows the connections, with interactive explorers along the way. — Kianoosh Shokri</description>
+    </item>
+    <item>
+      <title>When Topology Tames Data! · وقتی توپولوژی داده‌ها را رام می‌کند!</title>
+      <link>https://mathswell.com/articles/topological-data-analysis.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/topological-data-analysis.html</guid>
+      <category>Face to Face with Mathematics</category>
+      <dc:creator>Mahdis Emami</dc:creator>
+      <pubDate>Sun, 05 Jul 2026 09:00:00 GMT</pubDate>
+      <description>A dataset is not just a table — it is a cloud of points with a shape. Mahdis Emami introduces topological data analysis: clusters, loops, and the structures that persist. With a persistent-homology playground to play with. — Mahdis Emami</description>
+    </item>
+    <item>
+      <title>Structure Is in Your Gaze · ساختار در نگاه است</title>
+      <link>https://mathswell.com/articles/structure-in-your-gaze.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/structure-in-your-gaze.html</guid>
+      <category>Classroom Ideas</category>
+      <dc:creator>Amir Asghari</dc:creator>
+      <pubDate>Fri, 03 Jul 2026 09:00:00 GMT</pubDate>
+      <description>The way we look at a figure changes its mathematics. Rotate a parallelogram on a circle, cover an angle, read one sentence two ways — small classroom moves, now interactive, where a shift of the gaze does the teaching. — Amir Asghari</description>
+    </item>
+    <item>
+      <title>Sheaf · بافه</title>
+      <link>https://mathswell.com/articles/mathematical-conversations.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/mathematical-conversations.html</guid>
+      <category>Face to Face with Mathematics</category>
+      <dc:creator>Artan Sheshmani</dc:creator>
+      <pubDate>Wed, 01 Jul 2026 09:00:00 GMT</pubDate>
+      <description>One idea — how local pieces are glued into something global — met in a short film. Artan Sheshmani made it in Persian and, himself, in English; watch both and each carries something the other doesn’t. — Artan Sheshmani</description>
+    </item>
+    <item>
+      <title>What Shape Student Are You? · چه نوع دانشجویی هستید؟</title>
+      <link>https://mathswell.com/articles/wikiletter-stewart.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/wikiletter-stewart.html</guid>
+      <category>WikiLetter</category>
+      <dc:creator>Ian Stewart</dc:creator>
+      <pubDate>Mon, 15 Jun 2026 09:00:00 GMT</pubDate>
+      <description>Ian Stewart, in memory of David Tall, on “path-dependent logic” — how a student can follow every step faithfully and still reach a contradiction. — Ian Stewart</description>
+    </item>
+    <item>
+      <title>A model for recreating a spinner · مدلی برای بازآفرینی یک چرخنده</title>
+      <link>https://mathswell.com/articles/spinner.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/spinner.html</guid>
+      <category>Classroom Ideas</category>
+      <dc:creator>Zohreh Pandi</dc:creator>
+      <pubDate>Mon, 15 Jun 2026 09:00:00 GMT</pubDate>
+      <description>A class rebuilt a probability spinner from a box of beads — and, without being told, uncovered the structure hiding inside the answers. — Zohreh Pandi</description>
+    </item>
+    <item>
+      <title>The symbol x for the unknown · علامتِ x به‌جای مجهول</title>
+      <link>https://mathswell.com/articles/letter-x.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/letter-x.html</guid>
+      <category>History of Mathematics</category>
+      <dc:creator>Abbas Eqbal Āshtiāni</dc:creator>
+      <pubDate>Mon, 15 Jun 2026 09:00:00 GMT</pubDate>
+      <description>Where did the sign x, the word algebra, and the “Arabic” numerals come from? A short history from a 1930 Tehran journal — given here in full. — Abbas Eqbal Āshtiāni</description>
+    </item>
+    <item>
+      <title>The Silver Matrix · ماتریسِ نقره‌ای</title>
+      <link>https://mathswell.com/articles/history-corner-silver-matrix.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/history-corner-silver-matrix.html</guid>
+      <category>History of Mathematics</category>
+      <dc:creator>Yahya Tabesh</dc:creator>
+      <pubDate>Mon, 15 Jun 2026 09:00:00 GMT</pubDate>
+      <description>How four problems from Tehran travelled to the International Mathematical Olympiad — and how one of them reached the Silver Sea. — Yahya Tabesh</description>
+    </item>
+    <item>
+      <title>What is a circle? · دایره چیست؟</title>
+      <link>https://mathswell.com/articles/circle.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/circle.html</guid>
+      <category>Concepts &amp; Conceptions</category>
+      <dc:creator>Amir Asghari</dc:creator>
+      <pubDate>Mon, 15 Jun 2026 09:00:00 GMT</pubDate>
+      <description>It enters school in the first grade and returns every year after — yet a student can reach the end of school still unable to say what a circle is. A walk through nine years of textbooks. — Amir Asghari</description>
+    </item>
+    <item>
+      <title>Maryam Mirzakhani, in Your Own Hand · مریم میرزاخانی، به دستِ شما</title>
+      <link>https://mathswell.com/articles/mathematical-culture.html</link>
+      <guid isPermaLink="true">https://mathswell.com/articles/mathematical-culture.html</guid>
+      <category>Mathematical Culture</category>
+      <dc:creator>A gallery</dc:creator>
+      <pubDate>Mon, 15 Jun 2026 09:00:00 GMT</pubDate>
+      <description>A 1946 newspaper clipping set against Maryam Mirzakhani on the cover of the Notices, followed by portraits of her from artists around the world. The section stays open. — A gallery</description>
+    </item>
+  </channel>
+</rss>

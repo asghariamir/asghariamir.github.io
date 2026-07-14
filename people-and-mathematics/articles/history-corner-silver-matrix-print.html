@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Silver Matrix — History Corner · People and Mathematics</title>
+<meta name="description" content="History Corner: Yahya Tabesh on how, in 1997, four problems from Tehran were sent to the International Mathematical Olympiad — and how the Silver Matrix reached the Silver Sea of Mar del Plata. A People and Mathematics publication.">
+
+<meta property="og:title" content="The Silver Matrix — History Corner">
+<meta property="og:description" content="History of Mathematics · People and Mathematics — آدم‌ها و ریاضیات. Told by Yahya Tabesh.">
+<meta property="og:image" content="../assets/logo.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX for crisp typeset mathematics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>/* KaTeX inside RTL text — keep formulas LTR & bidi-isolated so exponents/coefficients stay put */
+.katex, .katex-display { direction: ltr; unicode-bidi: isolate; }
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 44px 28px 40px; }
+
+  /* History Corner masthead badge */
+  .corner { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .corner .badge { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; color: var(--paper); background: var(--accent); padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+  .corner .cnote { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 46px; line-height: 1.08; font-weight: 500; letter-spacing: -.02em; margin: 6px 0 0; }
+  h1.title em { font-style: italic; color: #43392E; font-weight: 400; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+
+  .byline .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); align-self: center; }
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+
+  /* shortened parenthetical, as a quiet aside */
+  .aside { font-size: 16px; line-height: 1.62; color: #5A5044; font-style: italic; border-inline-start: 2px solid var(--line); padding: 2px 0 2px 16px; padding-inline-start: 16px; margin: 22px 0; }
+
+  .pullquote { font-size: 25px; line-height: 1.34; font-weight: 500; letter-spacing: -.01em; color: var(--ink); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); padding: 20px 0; margin: 30px 0; }
+  .pullquote em { color: var(--accent); font-style: italic; }
+
+  /* ---------- The four problems ---------- */
+  .plates-head { display: flex; align-items: center; gap: 16px; margin: 44px 0 20px; }
+  .plates-head .t { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); white-space: nowrap; }
+  .plates-head .rule { height: 1px; background: var(--line); flex: 1; }
+
+  .problems { display: grid; gap: 16px; }
+  .problem { border: 1px solid var(--line); border-radius: 4px; padding: 18px 22px; background: #F6EFDF; }
+  .problem .ph { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 9px; }
+  .problem .pn { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: #948876; }
+  .problem .by { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .problem .pt { font-size: 17px; line-height: 1.68; color: #2A241B; }
+  .problem .pt .lead { display: block; }
+  .problem.sel { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); background: #F4E9D4; }
+  [dir="rtl"] .problem.sel { box-shadow: inset -3px 0 0 var(--accent); }
+  .problem.sel .pn { color: var(--accent); }
+  .problem .tag { display: inline-block; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; color: var(--paper); background: var(--accent); padding: 2px 8px; border-radius: 999px; margin-inline-start: 8px; vertical-align: middle; }
+
+  .eq { text-align: center; margin: 12px 0; font-size: 19px; }
+
+  /* contributor colophon */
+  .colophon { margin-top: 46px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .colophon .role .who + .who { margin-top: 8px; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.1; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+  [dir="rtl"] .aside { font-style: normal; }
+  [dir="rtl"] .problem .pt { font-size: 16.5px; line-height: 1.95; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 30px 22px 32px; }
+    h1.title { font-size: 32px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .pullquote { font-size: 21px; }
+  }
+</style>
+<style>
+  @media print {
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    @page { size: A4; margin: 0; }
+    html, body { background: #FBF7EF; }
+    body { padding: 0.5in 0.6in; }
+    .langtoggle, .footer a.back { display: none !important; }
+    [data-lang-block="en"] { display: none !important; }
+    [data-lang-block="fa"] { display: block !important; }
+    .topband { background: #0D0C0B !important; }
+    .article { max-width: none; padding: 24px 0 0; }
+    .problem, .pullquote, .plates-head, figure, .colophon .role, .aside, .corner { break-inside: avoid; }
+    h1.title, .plates-head, .subhead { break-after: avoid; }
+    .body p { orphans: 3; widows: 3; }
+    a { text-decoration: none; }
+    *, *::before, *::after {
+      animation-delay: -99s !important; animation-duration: .001s !important;
+      animation-iteration-count: 1 !important; animation-fill-mode: both !important;
+      animation-play-state: running !important; transition-duration: 0s !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="History of Mathematics" data-fa="تاریخِ ریاضیات"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#567D46;display:inline-block;flex:0 0 auto;"></span><span data-en="School maths · History Corner" data-fa="ریاضیِ مدرسه · گوشهٔ تاریخ"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="corner">
+    <span class="badge">History Corner</span>
+    <span class="cnote">A recurring corner for short, telling pieces of mathematical history — a name we owe to Yahya Tabesh.</span>
+  </div>
+  <div class="kicker">Iran · The IMO · 1997</div>
+  <h1 class="title">The Silver Matrix</h1>
+  <p class="standfirst">How four problems from Tehran travelled to the International Mathematical Olympiad — and how one of them reached the Silver Sea.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/yahya-tabesh.webp" alt="Yahya Tabesh">
+    <span class="name">Yahya Tabesh</span>
+  </div>
+
+  <div class="body">
+    <p>In 1996 I travelled with Iran&rsquo;s team to the International Mathematical Olympiad for the first time, and came to know the people who run it. The IMO had no website yet; its rules and working methods were not easy to come by. That year, among other things, I learned how a country proposes problems for the Olympiad.</p>
+
+    <div class="aside">In brief: each participating country — the host aside — may send up to six original problems; a committee shortlists about thirty across algebra, geometry, number theory and combinatorics; and the international Jury, one vote per country, chooses the final six through long, careful debate — Problem 6, by tradition, the hardest.</div>
+
+    <p>Back home, we put out a call for problems among those who love them, with prizes for the best. I no longer remember how many arrived, but in the end we chose four to send, as Iran&rsquo;s proposals, for the 1997 Olympiad.</p>
+
+    <p>One of them was an idea of my own: a two-colouring of the points of the plane with integer coordinates. I showed it to Maryam to see what she thought — and before long she had generalised it to points with <em>rational</em> coordinates, which made it far lovelier. The four problems went to the committee by fax. Perhaps today&rsquo;s readers won&rsquo;t even know what a fax is; and yet, remarkably, email then was still not common.</p>
+
+    <p>Of our four, the problem of Mahmoudian and Mahdian was chosen by the committee, reached the shortlist, and there the Jury selected it as one of the six problems of the year. In their text the proposers had first called their matrix a <em>Magic Matrix</em>; the committee renamed it the <em>Silver Matrix</em> — a happy touch, for the Olympiad was held in Mar del Plata, Argentina, and <em>Mar del Plata</em> means the Sea of Silver.</p>
+
+    <div class="pullquote">They had written <em>Magic Matrix</em>. The committee crossed it out and wrote <em>Silver Matrix</em> — because the Olympiad was going to the Silver Sea.</div>
+
+    <p>That year our team came third, with four golds, two silvers and a perfect score. Ever since, we have proposed problems every year — beautiful ones, more than once among those finally chosen.</p>
+
+    <div class="plates-head"><span class="t">The four problems · Tehran, 1997</span><span class="rule"></span></div>
+
+    <div class="problems">
+      <div class="problem sel">
+        <div class="ph"><span class="pn">Problem 1 · the Silver Matrix<span class="tag">Chosen for IMO 1997</span></span><span class="by">Abdollah Mahmoudian &middot; Mohammad Mahdian</span></div>
+        <div class="pt">An \(n\times n\) matrix whose entries come from the set \(S = \{1, 2, \dots, 2n-1\}\) is called a <em>silver matrix</em> if, for each \(i = 1, \dots, n\), the \(i\)-th row and the \(i\)-th column together contain all elements of \(S\). Show that: <span class="lead">(a) there is no silver matrix for \(n = 1997\);</span> <span class="lead">(b) silver matrices exist for infinitely many values of \(n\).</span></div>
+      </div>
+      <div class="problem">
+        <div class="ph"><span class="pn">Problem 2</span><span class="by">Omidali Karamzadeh</span></div>
+        <div class="pt">Find all rational solutions of the system
+          <div class="eq">\( x^2 + y^2 + 61\,(z^2 + t^2) = \dfrac{1997}{4}, \qquad xt + yz = 11. \)</div>
+        </div>
+      </div>
+      <div class="problem">
+        <div class="ph"><span class="pn">Problem 3</span><span class="by">Saeed Akbari</span></div>
+        <div class="pt">Let \(X\) be a set of size \(n\) and \(P_3(X)\) the family of all 3-element subsets of \(X\). Call four members \(\{A_1, A_2, A_3, A_4\}\) of \(P_3(X)\) a <em>quadruple</em> if \(\lvert A_1 \cup A_2 \cup A_3 \cup A_4\rvert = 6\) and \(\lvert A_i \cap A_j\rvert = 1\) for all \(1 \le i < j \le 4\). Let \(f(n)\) be the largest size of a subfamily of \(P_3(X)\) containing no quadruple. Prove that, for \(n \ge 7\), \( f(n) \le \dfrac{2}{7}\dbinom{n}{3}. \)</div>
+      </div>
+      <div class="problem">
+        <div class="ph"><span class="pn">Problem 4</span><span class="by">Yahya Tabesh &middot; Maryam Mirzakhani</span></div>
+        <div class="pt">Let \(a\) be a real number with \(a^2 = r^2 + s^2\), where \(r\) and \(s\) are rational. Prove that the points of the plane with rational coordinates can be coloured with two colours so that any two points at distance \(a\) receive different colours.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Told by</div>
+        <div class="who">Yahya Tabesh</div>
+        <div class="aff">Sharif University of Technology</div>
+      </div>
+      <div class="role">
+        <div class="lab">The proposers</div>
+        <div class="who">A. Mahmoudian · M. Mahdian</div>
+        <div class="who">O. Karamzadeh · S. Akbari</div>
+        <div class="who">Y. Tabesh · M. Mirzakhani</div>
+      </div>
+      <div class="role">
+        <div class="lab">Recorded by</div>
+        <div class="who">Amir Asghari</div>
+      </div>
+    </div>
+    <div class="origin">The four problems are reproduced from <em>Nashr-e Riyāzi</em>, Year 8, No. 2 (&ldquo;Four Problems&rdquo;). The account is Yahya Tabesh&rsquo;s, told to the editors, who also owe to him the name of this corner.</div>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="corner">
+    <span class="badge">گوشهٔ تاریخ</span>
+    <span class="cnote">گوشه‌ای همیشگی برای تکه‌های کوتاه اما گویا از تاریخِ ریاضیات — نامی که وامدارِ یحیی تابش‌ایم.</span>
+  </div>
+  <div class="kicker">ایران · المپیادِ جهانی · ۱۹۹۷</div>
+  <h1 class="title">ماتریسِ نقره‌ای</h1>
+  <p class="standfirst">چهار مسئله چگونه از تهران به المپیادِ جهانیِ ریاضی رسید — و یکی از آن‌ها چگونه سر از دریای نقره درآورد.</p>
+  <div class="byline">
+    <img class="avatar" src="../assets/yahya-tabesh.webp" alt="یحیی تابش">
+    <span class="name">یحیی تابش</span>
+  </div>
+
+  <div class="body">
+    <p>سالِ ۱۹۹۶ برای نخستین‌بار همراهِ تیمِ المپیادِ ریاضی در المپیادِ جهانی شرکت کردم و با برگزارکنندگانِ المپیاد از نزدیک آشنا شدم. در آن ایام هنوز IMO وب‌سایت نداشت و دسترسی به قوانین و مقررات و روش‌های کار آسان نبود. در آن سال، از جمله، با چگونگیِ ارسالِ مسئله‌های پیشنهادی برای المپیادِ جهانی آشنا شدم.</p>
+
+    <div class="aside">به‌کوتاهی: هر کشورِ شرکت‌کننده — جز کشورِ میزبان — می‌تواند تا شش مسئلهٔ اصیل بفرستد؛ کمیتهٔ علمی حدودِ سی مسئله را در همهٔ موضوعات (جبر، هندسه، نظریهٔ اعداد و ترکیبیات) به فهرستِ کوتاه می‌آورد؛ و ژوریِ بین‌المللی، با یک رأی برای هر کشور و پس از بحث‌های کارشناسیِ فشرده، شش مسئلهٔ نهایی را برمی‌گزیند — که به‌رسم، مسئلهٔ ۶ سخت‌ترین است.</div>
+
+    <p>پس از بازگشت از المپیاد، فراخوانی برای طرحِ مسئله بینِ علاقه‌مندان پخش کردیم و جوایزی هم برای مسئله‌های برگزیده در نظر گرفتیم. دقیق یادم نیست چند مسئله دریافت کردیم، ولی به‌هر روی چهار مسئله را به‌عنوانِ مسئله‌های پیشنهادیِ خودمان انتخاب کردیم و برای المپیادِ ۱۹۹۷ فرستادیم.</p>
+
+    <p>یکی از آن‌ها ایدهٔ خودم بود: رنگ‌آمیزیِ نقاطِ صفحه با مختصاتِ صحیح. آن را با مریم در میان گذاشتم تا ببینم نظرش چیست؛ پس از مدتِ کوتاهی مریم مسئله را به نقاطِ با مختصاتِ <em>گویا</em> تعمیم داد و مسئله بسیار جالب‌تر شد. چهار مسئله با فکس برای کمیتهٔ علمی فرستاده شد! شاید امروزی‌ها اصلاً ندانند فکس چیست؛ و جالب است که آن‌زمان هنوز ایمیل به‌اندازهٔ کافی همگانی نشده بود.</p>
+
+    <p>از میانِ این چهار مسئله، مسئلهٔ پیشنهادیِ دکتر محمودیان و مهدیان توسطِ کمیتهٔ علمی برگزیده شد و به شورت‌لیست راه یافت؛ در جلساتِ ژوری نیز همین مسئله به‌عنوانِ یکی از شش مسئلهٔ آن سال انتخاب شد. طراحان در متنِ مسئله، ماتریسِ موردِ نظر را نخست «ماتریسِ جادویی» (Magic Matrix) نامیده بودند، که کمیته آن را به «ماتریسِ نقره‌ای» تغییرِ نام داد — و لطفِ این نام از آن‌جا بود که محلِ برگزاریِ المپیاد، شهرِ ماردل‌پلاتا در آرژانتین بود؛ و ماردل‌پلاتا یعنی دریای نقره!</p>
+
+    <div class="pullquote">نوشته بودند «ماتریسِ جادویی». کمیته خط زد و نوشت «ماتریسِ <em>نقره‌ای</em>» — چون المپیاد به دریای نقره می‌رفت.</div>
+
+    <p>آن سال تیمِ ما با ۴ طلا و ۲ نقره و یک نمرهٔ کامل، سوم شد. پس از آن نیز طرح و ارسالِ مسئله از طرفِ ما همه‌ساله ادامه یافته است، و همیشه مسئله‌های جالب و زیبایی فرستاده شده که بارها میانِ مسئله‌های برگزیده ظاهر شده‌اند.</p>
+
+    <div class="plates-head"><span class="t">چهار مسئله · تهران، ۱۹۹۷</span><span class="rule"></span></div>
+
+    <div class="problems">
+      <div class="problem sel">
+        <div class="ph"><span class="pn">مسئلهٔ ۱ · ماتریسِ نقره‌ای<span class="tag">برگزیدهٔ المپیاد ۱۹۹۷</span></span><span class="by">عبدالله محمودیان &middot; محمد مهدیان</span></div>
+        <div class="pt">ماتریسِ \(n\times n\) ای را که درایه‌هایش از مجموعهٔ \(S = \{1, 2, \dots, 2n-1\}\) برگزیده شده‌اند «نقره‌ای» می‌نامیم، هرگاه به‌ازای هر \(i = 1, \dots, n\)، سطرِ \(i\)اُم و ستونِ \(i\)اُم با هم همهٔ اعضای \(S\) را در بر بگیرند. نشان دهید: <span class="lead">(الف) هیچ ماتریسِ نقره‌ای برای \(n = 1997\) وجود ندارد؛</span> <span class="lead">(ب) برای بی‌نهایت مقدارِ \(n\)، ماتریسِ نقره‌ای وجود دارد.</span></div>
+      </div>
+      <div class="problem">
+        <div class="ph"><span class="pn">مسئلهٔ ۲</span><span class="by">امیدعلی کرمزاده</span></div>
+        <div class="pt">همهٔ جواب‌های گویای دستگاهِ زیر را بیابید:
+          <div class="eq">\( x^2 + y^2 + 61\,(z^2 + t^2) = \dfrac{1997}{4}, \qquad xt + yz = 11. \)</div>
+        </div>
+      </div>
+      <div class="problem">
+        <div class="ph"><span class="pn">مسئلهٔ ۳</span><span class="by">سعید اکبری</span></div>
+        <div class="pt">فرض کنید \(X\) مجموعه‌ای \(n\)عضوی و \(P_3(X)\) خانوادهٔ همهٔ زیرمجموعه‌های سه‌عضویِ \(X\) باشد. چهار عضوِ \(\{A_1, A_2, A_3, A_4\}\) از \(P_3(X)\) را یک «چهارگان» می‌نامیم اگر \(\lvert A_1 \cup A_2 \cup A_3 \cup A_4\rvert = 6\) و برای هر \(1 \le i < j \le 4\) داشته باشیم \(\lvert A_i \cap A_j\rvert = 1\). اگر \(f(n)\) بزرگ‌ترین اندازهٔ زیرخانواده‌ای از \(P_3(X)\) بدونِ هیچ چهارگان باشد، ثابت کنید برای \(n \ge 7\): \( f(n) \le \dfrac{2}{7}\dbinom{n}{3}. \)</div>
+      </div>
+      <div class="problem">
+        <div class="ph"><span class="pn">مسئلهٔ ۴</span><span class="by">یحیی تابش &middot; مریم میرزاخانی</span></div>
+        <div class="pt">فرض کنید \(a\) عددی حقیقی با \(a^2 = r^2 + s^2\) باشد که در آن \(r\) و \(s\) گویا هستند. ثابت کنید نقاطِ صفحه با مختصاتِ گویا را می‌توان با دو رنگ چنان رنگ کرد که هر دو نقطهٔ به‌فاصلهٔ \(a\)، رنگِ متفاوت داشته باشند.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">به روایتِ</div>
+        <div class="who">یحیی تابش</div>
+        <div class="aff">دانشگاه صنعتی شریف</div>
+      </div>
+      <div class="role">
+        <div class="lab">طراحانِ مسئله‌ها</div>
+        <div class="who">ع. محمودیان · م. مهدیان</div>
+        <div class="who">ا. کرمزاده · س. اکبری</div>
+        <div class="who">ی. تابش · م. میرزاخانی</div>
+      </div>
+      <div class="role">
+        <div class="lab">به ثبتِ</div>
+        <div class="who">امیر اصغری</div>
+      </div>
+    </div>
+    <div class="origin">چهار مسئله از «نشرِ ریاضی»، سالِ ۸، شمارهٔ ۲ («چهار مسأله») بازنشر شده است. روایت از آنِ یحیی تابش است که برای سردبیران بازگفته؛ نامِ این گوشه را نیز از او داریم.</div>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    /* no-op in print copy — do not mutate the reader's shared language preference */
+  }
+  var start = 'fa';
+  setLang(start);
+
+  function renderMath(){
+    if (!window.renderMathInElement) { setTimeout(renderMath, 60); return; }
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+  renderMath();
+</script>
+<script>
+addEventListener('load', () => {
+  (async () => {
+    try { await document.fonts.ready; } catch (e) {}
+    const imgs = Array.from(document.images).filter((i) => !i.complete);
+    await Promise.race([
+      Promise.allSettled(imgs.map((i) => i.decode())),
+      new Promise((r) => setTimeout(r, 8000)),
+    ]);
+    setTimeout(() => window.print(), 900);
+  })();
+});
+</script>
+</body>
+</html>

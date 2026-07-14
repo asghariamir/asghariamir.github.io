@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counting Like a Beginner — Zohreh Pandi · People and Mathematics</title>
+<meta name="description" content="Zohreh Pandi on understanding children who struggle with “how many?”. Stand in a beginner’s shoes — count with the words of a rhyme, then read a ten-frame without counting. Interactive; originally WikiLetter No. 15 (2022), in English for the first time.">
+
+<meta property="og:title" content="Counting Like a Beginner — Zohreh Pandi">
+<meta property="og:description" content="WikiLetter · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/logo.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX for crisp typeset mathematics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>/* KaTeX inside RTL text — keep formulas LTR & bidi-isolated so exponents/coefficients stay put */
+.katex, .katex-display { direction: ltr; unicode-bidi: isolate; }
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  /* breadcrumb sub-bar */
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 46px; line-height: 1.08; font-weight: 500; letter-spacing: -.02em; margin: 16px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+  .byline .meta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .byline .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; align-self: center; }
+
+  .dedication { font-style: italic; color: var(--muted); font-size: 16px; margin: 22px 0 0; }
+
+  /* in-memoriam ribbon — REMOVE if not wanted */
+  .memoriam { display: flex; align-items: center; gap: 12px; margin: 26px 0 0; padding: 14px 18px; background: var(--black); color: var(--paper); border-radius: 4px; }
+  .memoriam .mk { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 600; white-space: nowrap; }
+  .memoriam .mt { font-size: 15px; color: #E7DFD2; }
+
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 40px 0 14px; padding-top: 8px; }
+
+  /* principle callout */
+  .principle { border-inline-start: 3px solid var(--accent); background: #F4ECDC; padding: 18px 22px; margin: 26px 0; border-radius: 0 4px 4px 0; }
+  .principle .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-bottom: 7px; }
+  .principle .txt { font-size: 18px; line-height: 1.55; }
+
+  .pullquote { font-size: 26px; line-height: 1.32; font-weight: 500; letter-spacing: -.01em; color: var(--ink); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); padding: 20px 0; margin: 30px 0; }
+
+  .eq { text-align: center; margin: 22px 0; font-size: 20px; }
+  /* articulation gap marker */
+  .artic { font-family: "Newsreader", serif; font-size: 1.05em; }
+  .gap { color: var(--accent); font-weight: 700; padding: 0 .15em; }
+
+  /* contributor colophon (Option A) */
+  .colophon { margin-top: 46px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .colophon .who + .who { margin-top: 9px; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; }
+  .refs li { margin-bottom: 10px; }
+  .refs a { color: var(--accent); word-break: break-word; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 22px 32px; }
+    h1.title { font-size: 33px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .pullquote { font-size: 21px; }
+  }
+</style>
+<style>
+  /* ===== Pandi interactive activities ===== */
+  .rhyme-slot, .frame-slot { margin: 30px 0; }
+  .lab { border: 1px solid var(--line); background: #FCF8F0; border-radius: 8px; padding: 22px 22px 20px; box-shadow: 0 1px 0 rgba(255,255,255,.6), 0 16px 34px -26px rgba(28,24,20,.5); }
+  .lab-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .lab-kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; color: var(--accent); }
+  [dir="rtl"] .lab-kicker { letter-spacing: 0; }
+  .lab-hint { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .lab-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+  .lab-btn { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; border: 1px solid var(--ink); background: #fff; color: var(--ink); border-radius: 999px; padding: 8px 15px; transition: background .15s, color .15s, border-color .15s; white-space: nowrap; }
+  .lab-btn:hover { border-color: var(--accent); }
+  .lab-btn.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .lab-btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+  .lab-btn.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .lab-sep { width: 1px; align-self: stretch; background: var(--line); margin: 2px 4px; }
+
+  /* rhyme counter */
+  .beadrow { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 26px 0 6px; min-height: 52px; }
+  .bead { width: 46px; height: 46px; border-radius: 50%; background: #EFE6D2; border: 1px solid #D9CBB0; display: flex; align-items: center; justify-content: center; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; color: #8C8172; transition: background .2s, transform .2s, color .2s; }
+  .bead.lit { background: var(--accent); border-color: var(--accent); color: #fff; transform: translateY(-4px); }
+  .bead.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .wordout { text-align: center; font-family: "Newsreader", "Vazirmatn", serif; font-size: 34px; min-height: 1.25em; color: #43392E; margin-top: 8px; }
+  .wordout .final { color: var(--accent); font-weight: 600; }
+  .lab-note { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13.5px; line-height: 1.6; color: var(--muted); margin-top: 14px; max-width: 34em; }
+  .keygrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 16px; }
+  .keycell { text-align: center; border: 1px solid var(--line); border-radius: 6px; padding: 8px 4px; background: #fff; }
+  .keycell .kn { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; color: #948876; display: block; }
+  .keycell .kw { font-family: "Newsreader", "Vazirmatn", serif; font-size: 15px; color: var(--ink); }
+  @media (max-width: 560px) { .keygrid { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ten-frame */
+  .tenframe { display: grid; grid-template-columns: repeat(5, 54px); grid-auto-rows: 54px; gap: 8px; justify-content: center; margin: 22px auto 6px; padding: 12px; border: 3px solid var(--ink); border-radius: 8px; width: max-content; }
+  .tf-cell { border: 2px solid #D9CBB0; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .tf-bead { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: #fff; font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 14px; transition: background .2s; }
+  .tf-cell.empty-mark { border-style: dashed; border-color: var(--accent); background: #F4ECDC; }
+  .tf-expr { text-align: center; font-family: "Newsreader", serif; font-size: 30px; color: var(--ink); margin-top: 10px; direction: ltr; }
+  @media (max-width: 560px) { .tenframe { grid-template-columns: repeat(5, 44px); grid-auto-rows: 44px; } .tf-bead { width: 28px; height: 28px; } }
+</style>
+
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="WikiLetter" data-fa="ویکی‌نوشت"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#567D46;display:inline-block;flex:0 0 auto;"></span><span data-en="School maths · Originally WikiLetter No. 15, 2022" data-fa="ریاضیِ مدرسه · نخست: ویکی‌نوشتِ ۱۵، ۱۴۰۱"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="kicker">WikiLetter · No. 15</div>
+  <h1 class="title">Counting Like a Beginner</h1>
+  <p class="standfirst">To understand a child still wrestling with "how many?", put yourself back where they stand — count with the words of a rhyme you know by heart, and feel what it is like when counting is all you have.</p>
+  <div class="byline">
+    <span class="name">Zohreh Pandi</span>
+  </div>
+
+  <div class="body">
+    <p>Listening to children is one of the most important things any teacher does. But to hear what a child says, to understand it rightly, and to plan the next step of teaching around it — that is not easy. Sometimes we teachers have drifted so far from the experience of learning, from the struggle of making sense of something new, that we can no longer tell where a child stands on the path, or how to open a better chance to learn.</p>
+
+    <p>The idea of this piece is simple: if we can place ourselves in a situation like the learner's, we understand children better — and we design and run the lesson so that more of them are carried forward.</p>
+
+    <p>Using a <em>similar situation</em> is a general idea; it fits many topics. Here I will explain it through one example — a lesson on <em>counting and quantity</em>. First I describe what happened in the class. Then I show the situation I built for teachers, so they can put themselves in something like the child's place. Read the classroom example first, and try to place each child on the path of learning number.</p>
+
+    <h2 class="subhead">An example from a classroom</h2>
+
+    <p>Picture a first-grade class: one teacher, a handful of children. It is not quite an ordinary class — a few observers are recording the routes the children take to reach each answer.</p>
+
+    <p>To begin, the teacher asks the children to sing the opening rhyme. Together they chant: <span class="sans">1, 2, 3, 4, 5, 6, 7, 8, 9, 10</span>. All sing along — except one child, who says <em>9</em> right after <em>5</em>, then stops, and rejoins the others at <em>10</em>.</p>
+
+    <p>The teacher shows a small handful of beads and asks how many they see. Most children say <em>four</em>; others find it by counting \(1, 2, 3, 4\); a few also open four fingers. Everyone is right, and the teacher goes on.</p>
+
+    <p>She adds one bead — saying nothing about the adding; some children watch it happen, others attend only to the result — and asks how many now. Most say <em>five</em> without counting; the rest count \(1, 2, 3, 4, 5\); again some show five fingers. All correct: now there are five.</p>
+
+    <p>She adds two more beads and asks again. This time only a few say <em>seven</em> at once; more of them count. Some count just the new beads, \(6, 7\); others start over from \(1\). One child says <em>eight</em>, two say <em>six</em>, the rest say <em>seven</em>; the child who had not sung along at the start says nothing. Some show seven as five fingers and two. The teacher counts the beads one by one — seven — and those who had said six or eight, and the silent child, now agree.</p>
+
+    <p>"Some of you said eight," she says. "Is eight more, or seven?" A few by counting and the rest without, they answer <em>eight</em> — only the child who had not sung along stays quiet. She confirms it, and moves on.</p>
+
+    <p>She takes one bead away and asks how many. Now nearly half say <em>six</em> at once; the rest count to six. The silent child is silent still. Again some show six as five and one. She confirms, and the activity ends.</p>
+
+    <p>To close, the children sing the ending rhyme, counting down: <span class="sans">10, 9, 8, 7, 6, 5, 4, 3, 2, 1</span>. Almost half fall out of step somewhere along the way.</p>
+
+    <p>Now the teacher returns to the observers' notes. The child who could not sing the opening count worries her. About the rest she asks herself: <em>Does it matter that some children start from one to find the answer? When they reach the right answer, does the route they took matter?</em> The falling-out on the closing count she reads more easily — "For now we are only practising. They know the first rhyme, so we can begin addition; once more of them can sing the countdown, we will turn to subtraction."</p>
+
+    <p>Now that you have read the example, think about each child's grasp of counting and quantity. You might ask yourself:</p>
+
+    <ul>
+      <li>Does each of these children know the numbers up to ten?</li>
+      <li>How do they find \(4+3\)?</li>
+      <li>How do they find \(9-2\)?</li>
+      <li>Are they ready to begin adding and subtracting one-digit numbers?</li>
+    </ul>
+
+    <p>When you have spent enough time on the notes, try the <em>similar situation</em> below, and put yourself inside it.</p>
+
+    <h2 class="subhead">A similar situation</h2>
+
+    <p>Stand where a beginner stands — someone about to count. To feel what that beginner feels, replace the familiar "one, two, three… ten" with something you know just as well, but not as number: the words of a rhyme. In the original Persian, readers use a line of a classical poem; here we will use a counting-out rhyme almost every English speaker knows —</p>
+
+    <p class="eq artic">eeny · meeny · miny · moe · catch · a · tiger · by · the · toe</p>
+
+    <p>— and let its ten words stand in for the numbers one to ten. Learn it by heart if you must, then cover the words. The little machine below shows the beads — and the rhyme you have to recite to name them. Add a bead, take one away, and each time answer, out loud: <em>how many?</em></p>
+
+    <div class="rhyme-slot" data-lang-slot="en"></div>
+
+    <p>Now go back to the classroom example and, with this fresh in mind, describe where each child stands. To test whether they are ready to add and subtract, ask how <em>you</em> would do it: how do you find "moe" and "catch" — \(4\) and \(5\)? What about "the" take away "meeny" — \(9-2\)? Is there any way to answer other than counting? And which is more — "by" or "tiger" — when you cannot see the words at all?</p>
+
+    <p>The hope is that, having stood in the similar situation, a teacher can better read what children are doing, use that to judge the learning path she designed, and then improve it.</p>
+
+    <p>Keep in mind, though, that an adult in the similar situation is not truly a child. Long before this, an adult has met "how many?" countless times and built many strategies; meeting a fresh difficulty, they can turn it into something familiar and lean on past experience. A child cannot yet do that. Even so, the experience does its work. In ordinary life we answer "how many?" without thinking, and so we cannot see the different routes children take. Inside the similar situation we act like students whose grasp of number is <em>counting-based</em> — and from there we can judge that grasp more honestly, see how far it sits from the number sense real arithmetic needs, and change the path toward a deeper understanding.</p>
+
+    <h2 class="subhead">What counting-based understanding costs</h2>
+
+    <p>In the classroom, some children counted to answer; the same happens to us in the similar situation. When our grasp of number is at that level and we try to find the number before or after, to build combinations, to add or subtract, we are forced back to counting — and there we can understand the children who live at that level. The experience reminds us, in a practical way, of two things.</p>
+
+    <p><strong>First</strong>, when a child's grasp of number is limited to counting, they lean on counting even to recall a number's <em>name</em>, or the name of the one before or after. Show four beads and ask a child to hold up that many fingers, and many will open four fingers without counting — yet some of those same children must count \(1, 2, 3, 4\) to <em>say</em> how many. The child sees how many there are the moment they look — they <em>see the quantity</em> — but does not know its name, and must count to say it.</p>
+
+    <p>We felt this in the similar situation: we saw the beads and knew there were four, but to answer "how many?" we had to count — "eeny, meeny, miny, moe." If we must recite every time to find the count, or even to learn what "moe" means, we cannot work with numbers; nor can children, leaning on counting. The remedy is to design activities that help children at this level recall number names and relationships <em>without</em> counting — activities that let them see numbers in relation to one another, talk about those relations, and, along the way, commit names and a few number facts to memory.</p>
+
+    <p><strong>Second</strong>, when understanding is limited to counting, so are the strategies for adding and subtracting — "count all" and "count on" for addition; "count up to," "count back," and "count the rest" for subtraction. With that limit, addition and subtraction split apart: addition begins after counting on, subtraction waits until a child can count backward. Yet the two are one coin. Once the <em>part–part–whole</em> relation among three numbers is grasped, their addition and subtraction are grasped together, and a child can use the relation they see to find a sum, a difference, or a missing part.</p>
+
+    <p>Counting-based strategies also shut out the use of known facts. As Cheng (2012) puts it, a child's ability to choose efficient strategies for addition and subtraction is tied to their organised knowledge of the part–part–whole relations of the numbers \(1\) to \(10\). A child who has combined numbers before can find \(4+3\) from a fact that has become solid — \(3+3=6\) — and, seeing that \(4\) is one more than \(3\), add one to six to reach \(7\).</p>
+
+    <h2 class="subhead">An alternative activity — a chance not to count</h2>
+
+    <p>Feeling the limit of counting-based understanding, we can then choose or design activities that open room for a child's number sense to grow — activities that give children whose grasp is counting-based a chance <em>not</em> to count. The one below was made with that in mind. It fits the same moment in the lesson as the classroom example, and can replace it.</p>
+
+    <p>Each child has a <em>ten-frame</em> — a two-by-five grid, one bead to a cell, so any number up to ten can be shown — and a handful of beads. The teacher has prepared pictures of numbers on the frame. She shows a picture for three seconds and hides it; the children build the same on their own frames; then each explains how they knew how many, and she writes what they say on the board. Try it below — see a frame, then read it in as many ways as you can, <em>without counting</em>.</p>
+
+    <div class="frame-slot" data-lang-slot="en"></div>
+
+    <p>Here is some of the classroom talk, for a frame of seven:</p>
+
+    <ul class="talk">
+      <li>"One full row, and two more." — she points to the top row and the two below: "Five and two makes seven," and writes \(5+2\).</li>
+      <li>"Three empty." — she points to the gaps: "if those three were full it would be ten; seven is three less than ten," and writes \(10-3\).</li>
+      <li>"Four and three." — she writes \(4+3\).</li>
+      <li>"That's the seven card; I built that." — she writes "card 7."</li>
+      <li>"Seven beads — one, two, three, four, five, six, seven." — she writes the count and circles the seven.</li>
+      <li>"Two and two and three." — she writes \(2+2+3\).</li>
+    </ul>
+
+    <p>This activity differs from the classroom example in several ways.</p>
+
+    <p><strong>First</strong>, its picture lets children show what they understand by building it — even when the <em>names</em> of numbers still escape them. <strong>Second</strong>, by placing beads in a ten-frame rather than a single row, it opens the door to many strategies — counting, yes, but also using the combinations of a number — and lets each child answer at their own level: if they know a number and its parts, they need not count. <strong>Third</strong>, it makes room for talk: children at different levels hear one another and learn. The child who counted seven hears another say "this is five" without counting the top row, then "six, seven," and — comparing it to their own way — may take it up; the child who sees seven as five-and-two but cannot name it hears "seven" again and again, and remembers. Some fix the fact that two-and-five, or three-and-four, make seven; others come to see two-and-five as the same as three-and-four, and wonder at the link. <strong>Fourth</strong>, by writing down in symbols what children say about combining numbers, it lets them meet those symbols before they are ever formally taught.</p>
+
+    <p>Of these, it was the second and third that made this the activity to choose: they are what bring out strategies built on the relations between numbers and the parts that make them, and help children whose grasp is counting-based to hear those strategies, weigh them, and grow.</p>
+
+    <p>What I wanted to show is how standing in a <em>similar situation</em> helps a teacher judge the activities of her class, and choose, design, and run better ones. This was one example, about counting and quantity. But the idea — designing situations that let teachers understand learners better — is general, and reaches across topics. As someone who supports mathematics teachers, I have built such situations on many subjects for teacher workshops; you may have your own, and I would be glad if we could share them. It is neither possible nor necessary to relive a similar learning situation for every topic — but the struggle to learn, in a few of them, may help us feel with the children who are still on the path.</p>
+  </div>
+
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Author</div>
+        <div class="who">Zohreh Pandi</div>
+        <div class="aff">Support for mathematics teachers</div>
+      </div>
+      <div class="role">
+        <div class="lab">English translation</div>
+        <div class="who">People and Mathematics</div>
+      </div>
+      <div class="role">
+        <div class="lab">Interactive</div>
+        <div class="who">The rhyme-counter and the ten-frame</div>
+        <div class="aff">Reimagining the original's classroom films for the reader to try.</div>
+      </div>
+    </div>
+    <div class="origin">Written for WikiLetter, spring 2022 (Ordibehesht 1401) — WikiLetter No. 15. Published here in English for the first time. The English "similar situation" borrows a traditional counting-out rhyme in place of the Persian poem — a line by Hafez — used in the original.</div>
+  </div>
+
+  <div class="refs">
+    <h3>Reference</h3>
+    <ol>
+      <li>Zhen-Jun Cheng (2012). Teaching young children decomposition strategies to solve addition problems: An experimental study. <em>The Journal of Mathematical Behavior</em>, 31(1), 29–47.</li>
+    </ol>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">ویکی‌نوشت · شماره‌ی ۱۵</div>
+  <h1 class="title">موقعیت مشابه؛ برای همدلی با کودکی که می‌شمارد!</h1>
+  <p class="standfirst">فرصتی برای درکِ کودکانی که در مسیرِ یادگیریِ «شمارش و تعداد» دست‌وپا می‌زنند: خودت را جای یک نوآموز بگذار و با کلماتِ یک شعر بشمار، تا ببینی وقتی همه‌ی دارایی‌ات شمردن است، یادگیری چه حالی دارد.</p>
+  <div class="byline">
+    <span class="name">زهره پندی</span>
+  </div>
+
+  <div class="body">
+    <p>شنیدنِ بچه‌ها یکی از مهم‌ترین کارهایی است که هر معلمی به آن نیاز دارد. اما این‌که معلم آنچه را از بچه‌ها می‌شنود به‌درستی درک کند و بر پایه‌ی آن قدم‌های بعدیِ آموزش را طراحی کند، کارِ ساده‌ای نیست؛ گاهی ما به‌عنوان معلم آن‌قدر از تجربه‌های یادگیری و دست‌وپازدنِ بچه‌ها در فهمیدنِ آنچه یاد می‌گیرند فاصله گرفته‌ایم که نمی‌توانیم درک کنیم کودک کجای مسیر است و چگونه می‌توانیم فرصتِ یادگیریِ مؤثرتری برایش فراهم کنیم.</p>
+
+    <p>ایده‌ی این نوشته این است که اگر ما به‌عنوان معلم بتوانیم خودمان را در موقعیتی مشابه با تجربه‌ی دانش‌آموز در مسیر یادگیری قرار دهیم، می‌توانیم بچه‌ها را بهتر درک کنیم و در طراحیِ مسیرِ آموزش و اجرای آن، از یادگیریِ تعداد بیشتری از دانش‌آموزان پشتیبانی کنیم.</p>
+
+    <p>این ایده — یعنی استفاده از «موقعیتِ مشابه» — ایده‌ای کلی است و می‌توان در موضوع‌های مختلف از آن یاد کرد. اما اینجا برای توضیحِ آن، از مثالی از یک کلاسِ درس با موضوعِ «شمارش و تعداد» استفاده می‌کنم و آنچه را در کلاس اتفاق افتاده توصیف می‌کنم. سپس موقعیتی را که برای معلم‌ها طراحی کرده‌ام تا بتوانند خودشان را در شرایطی مشابهِ کودک قرار دهند، شرح می‌دهم. ابتدا «مثالی از کلاسِ درس» را بخوانید و بکوشید موقعیتِ هر یک از دانش‌آموزان را در مسیرِ یادگیریِ اعداد تشخیص دهید.</p>
+
+    <h2 class="subhead">مثالی از کلاسِ درس</h2>
+
+    <p>یک کلاسِ اولِ دبستان با یک معلم و چند کودک را تصور کنید؛ البته این کلاس با کلاسِ معمولی فرق دارد، زیرا چند مشاهده‌گر مسیرهایی را که بچه‌ها برای رسیدن به پاسخ می‌روند ثبت می‌کنند.</p>
+
+    <p>در ابتدا، معلم از بچه‌ها می‌خواهد شعرِ آغازِ فعالیت را بخوانند؛ بچه‌ها با هم می‌خوانند: <span class="sans">۱، ۲، ۳، ۴، ۵، ۶، ۷، ۸، ۹ و ۱۰</span>. همه با هم همخوانی می‌کنند، فقط یکی از بچه‌ها بعد از ۵ می‌گوید ۹ و بعد می‌ایستد و با بقیه می‌گوید ۱۰.</p>
+
+    <p>معلم چند مهره به بچه‌ها نشان می‌دهد و می‌پرسد چند تا مهره می‌بینند. در حالی‌که بیشترِ بچه‌ها می‌گویند <em>۴ تا</em>، بقیه با شمردنِ ۱، ۲، ۳، ۴ عددِ ۴ را پیدا می‌کنند، و بعضی هم ۴ تا از انگشتانشان را باز کرده‌اند. همه پاسخِ درست داده‌اند و معلم با تأییدِ بچه‌ها سؤالِ بعدی را مطرح می‌کند.</p>
+
+    <p>معلم یک مهره اضافه می‌کند (توضیحی درباره‌ی اضافه‌کردن نمی‌دهد؛ به‌نظر می‌رسد بعضی این اضافه‌شدن را دیده‌اند و بعضی فقط به نتیجه توجه دارند) و می‌پرسد حالا چند تا مهره می‌بینند. باز هم بیشترِ بچه‌ها بدونِ شمردن پاسخ می‌دهند، بقیه با شمردنِ ۱، ۲، ۳، ۴، ۵ عددِ ۵ را پیدا می‌کنند، و باز بعضی با انگشتانشان ۵ را نشان می‌دهند. همه درست پاسخ داده‌اند و معلم تأیید می‌کند که حالا ۵ تا مهره داریم.</p>
+
+    <p>معلم دو مهره‌ی دیگر اضافه می‌کند و می‌پرسد حالا چند تا است. این بار فقط چند نفر یک‌باره ۷ را می‌گویند و بیشترِ بچه‌ها می‌شمرند. چند نفر ۶ و ۷ (یعنی مهره‌هایی را که معلم اضافه کرده) را می‌شمرند و بعضی از ۱ تا ۷ را. به‌جز یک نفر که ۸ و دو نفر که ۶ می‌گویند، بقیه ۷ را می‌گویند؛ کودکی که در شمارشِ آغازِ کلاس همراه نبود، پاسخی نمی‌دهد. بعضی ۷ را با انگشتانشان به‌صورتِ ترکیبِ ۵ و ۲ نشان می‌دهند. معلم مهره‌ها را یکی‌یکی می‌شمرد و نشان می‌دهد که ۷ درست است، و آن‌ها که ۶ یا ۸ گفته بودند و آن کودکِ خاموش هم با او موافق می‌شوند.</p>
+
+    <p>معلم می‌گوید بعضی گفته بودند ۸؛ ۸ بیشتر است یا ۷؟ چند نفر با شمارش و بقیه بی‌شمارش می‌گویند ۸ و فقط همان کودکِ خاموش پاسخی نمی‌دهد. معلم ۸ را تأیید می‌کند و به سؤالِ بعدی می‌رود.</p>
+
+    <p>معلم یک مهره برمی‌دارد و می‌پرسد چند تا مهره می‌بینند. این بار تقریباً نیمی از بچه‌ها یک‌باره ۶ را می‌گویند و بقیه از ۱ تا ۶ می‌شمرند. همان کودک باز پاسخی نمی‌دهد. باز هم بعضی ۶ را به‌صورتِ ترکیبِ ۵ و ۱ نشان می‌دهند. معلم پاسخ را تأیید می‌کند و فعالیت به پایان می‌رسد.</p>
+
+    <p>در ادامه، معلم از بچه‌ها می‌خواهد شعرِ پایانِ فعالیت را بخوانند؛ بچه‌ها با هم می‌خوانند: <span class="sans">۱۰، ۹، ۸، ۷، ۶، ۵، ۴، ۳، ۲ و ۱</span>. تقریباً نیمی از بچه‌ها بخش‌هایی از شعر را همراه نیستند.</p>
+
+    <p>حالا معلم به مشاهداتِ ثبت‌شده برمی‌گردد؛ برای کودکی که در شعرِ شمارشِ ابتدای کلاس همراه نبوده نگران می‌شود و درباره‌ی بقیه‌ی یادداشت‌ها از خود می‌پرسد: <em>«آیا مهم است که بعضی برای یافتنِ جواب از یک شروع به شمردن می‌کنند؟ وقتی پاسخِ درست را پیدا می‌کنند، فرقی می‌کند از چه راهی به آن رسیده‌اند؟»</em> درباره‌ی همراه‌نبودن در شعرِ پایانی برایش روشن است: «فعلاً داریم تمرین می‌کنیم؛ بچه‌ها شعرِ اول را بلدند و می‌توانیم جمع را شروع کنیم، و بعد از این‌که بیشترشان در شعرِ پایانی همراه شدند، می‌رویم سراغِ تفریق.»</p>
+
+    <p>حالا که مثال را خوانده‌اید، سعی کنید به درکِ هر یک از بچه‌ها از «شمارش و تعداد» فکر کنید. می‌توانید این سؤال‌ها را از خودتان بپرسید:</p>
+
+    <ul>
+      <li>آیا هر یک از این بچه‌ها اعداد تا ۱۰ را می‌شناسند؟</li>
+      <li>حاصلِ <span dir="ltr" style="unicode-bidi:isolate">۴+۳</span> را چطور به دست می‌آورند؟</li>
+      <li>حاصلِ <span dir="ltr" style="unicode-bidi:isolate">۹−۲</span> را چطور پیدا می‌کنند؟</li>
+      <li>آیا آماده‌اند واردِ جمع و تفریقِ اعدادِ یک‌رقمی شوند؟</li>
+    </ul>
+
+    <p>پس از آن‌که زمانِ کافی صرفِ تحلیلِ مشاهدات کردید، «موقعیتِ مشابه» را ببینید و بکوشید خودتان را در آن قرار دهید.</p>
+
+    <h2 class="subhead">موقعیتِ مشابه</h2>
+
+    <p>خودتان را جای یک نوآموز بگذارید که قرار است بشمارد. برای این‌که حسِ او را بهتر درک کنید، شعرِ آشنای «یک، دو، سه… ده» را با چیزی جایگزین کنید که آن را هم خوب می‌دانید، اما نه به‌عنوانِ عدد: کلماتِ یک شعر. در متنِ اصلی، شعرِ معروفِ حافظ به‌کار رفته است —</p>
+
+    <p class="eq artic">اِلا · ای · آهویِ · وحشی · کجایی · مرا · با · توست · چندین · آشنایی</p>
+
+    <p>— و ده کلمه‌ی آن، جای اعدادِ یک تا ده را می‌گیرد. اگر شعر را از بر نیستید حفظش کنید، بعد روی کلمه‌ها را بپوشانید. ماشینِ کوچکِ زیر مهره‌ها را نشان می‌دهد — و شعری را که باید بخوانید تا نامشان را بیابید. مهره اضافه کنید، یکی بردارید، و هر بار با صدای بلند پاسخ دهید: <em>چند تا؟</em></p>
+
+    <div class="rhyme-slot" data-lang-slot="fa"></div>
+
+    <p>حالا به مثالِ کلاس برگردید و با این تجربه‌ی تازه، موقعیتِ هر دانش‌آموز را توصیف کنید. برای این‌که ببینید آماده‌ی جمع و تفریق هستند یا نه، از خودتان بپرسید چطور آن را انجام می‌دهید: حاصلِ «آهوی» به‌علاوه‌ی «کجایی» — یعنی ۴ و ۵ — را چطور پیدا می‌کنید؟ «چندین» منهای «ای» — یعنی <span dir="ltr" style="unicode-bidi:isolate">۹−۲</span> — چطور؟ آیا راهی جز شمردن دارید؟ و وقتی اصلاً کلمه‌ها را نمی‌بینید، «توست» بیشتر است یا «با»؟</p>
+
+    <p>امیدِ این نوشته این است که معلم پس از قرارگرفتن در «موقعیتِ مشابه» بهتر بتواند ادراکاتِ بچه‌ها را تحلیل کند و از آن در ارزیابیِ مسیری که برای یادگیری طراحی کرده و در بهبودِ آن بهره ببرد.</p>
+
+    <p>البته در نظر بگیرید که تجربه‌ی یک بزرگسال با تجربه‌ی واقعیِ بچه‌ها بسیار متفاوت است. یک بزرگسال پیش از این، بارها با «چند تا؟» روبه‌رو شده و راهبردهای بسیاری ساخته است؛ در برخوردی تازه می‌تواند موقعیت را به موقعیتی آشنا بدل کند و از تجربه‌های پیشین بهره بگیرد — کاری که کودک هنوز نمی‌تواند. با این‌همه، این تجربه کارکردِ خود را دارد. ما در شرایطِ معمول به «این چند تا است؟» ناخودآگاه و بی‌تقلا پاسخ می‌دهیم و نمی‌توانیم ببینیم بچه‌ها در سطوحِ مختلف چه راهی را می‌روند. اما در «موقعیتِ مشابه» مانندِ دانش‌آموزانی عمل می‌کنیم که درکشان از عدد «مبتنی بر شمارش» است، و از آنجا می‌توانیم آن درک را صادقانه‌تر بسنجیم، فاصله‌اش را با درکِ عددیِ لازم برای ریاضی‌ورزی ببینیم، و مسیرِ یادگیری را به‌سوی درکی عمیق‌تر تغییر دهیم.</p>
+
+    <h2 class="subhead">ارزیابیِ «درکِ مبتنی بر شمارش»</h2>
+
+    <p>در مثالِ کلاس، بعضی بچه‌ها برای پاسخ‌دادن می‌شمردند؛ همین در «موقعیتِ مشابه» برای ما هم پیش می‌آید. وقتی درکِ ما در آن سطح است و می‌خواهیم عددِ قبلی یا بعدی را بیابیم، ترکیب بسازیم، یا جمع و تفریق کنیم، ناچار به شمارش برمی‌گردیم — و آنجا می‌توانیم بچه‌هایی را که در این سطح‌اند بهتر درک کنیم. این تجربه به‌شکلی عملی دو چیز را یادآوری می‌کند.</p>
+
+    <p><strong>اول</strong> آن‌که وقتی درکِ کودک از اعداد به شمارش محدود است، برای به‌یادآوردنِ نامِ هر عدد — یا نامِ عددِ قبل و بعدِ آن — به شمارش متکی می‌شود. مثلاً وقتی چهار مهره نشان می‌دهیم و می‌خواهیم با انگشتانشان تعداد را نشان دهند، خیلی‌ها بی‌شمردن ۴ انگشت باز می‌کنند؛ اما بعضی از همان بچه‌ها برای این‌که <em>بگویند</em> چند تا است، باید ۱، ۲، ۳، ۴ را بشمرند. کودک می‌داند چند تا مهره می‌بیند و هم‌زمان تعدادشان را می‌بیند (تعدادبینی می‌کند)، اما نامِ آن تعداد را نمی‌داند و برای گفتنش نیاز به شمردن دارد.</p>
+
+    <p>ما هم در «موقعیتِ مشابه» مهره‌ها را می‌دیدیم و می‌دانستیم ۴ تا است، ولی برای پاسخ به «چند تا؟» ناچار بودیم بشمریم: «الا، ای، آهوی، وحشی». اگر قرار باشد هر بار برای یافتنِ تعداد یا حتی برای فهمیدنِ معنیِ «وحشی» بشماریم، نمی‌توانیم با اعداد کار کنیم؛ بچه‌ها هم با تکیه بر شمارش نمی‌توانند. برای رفعِ این مشکل باید فعالیت‌هایی طراحی کنیم که به بچه‌های این سطح کمک کند نامِ اعداد و رابطه‌هایشان را <em>بی‌شمارش</em> به یاد بیاورند — فعالیت‌هایی که بگذارند اعداد را در رابطه با یکدیگر ببینند، درباره‌ی این رابطه‌ها گفتگو کنند، و در این میان نامِ اعداد و چند حقیقتِ عددی را به خاطر بسپارند.</p>
+
+    <p><strong>دوم</strong> آن‌که وقتی درک به شمارش محدود می‌شود، راهبردهای جمع و تفریق هم به شمارش محدود می‌شوند — «شمارشِ همه» و «شمارش به جلو» در جمع، و «شمارش تا»، «شمارش به عقب» و «شمارشِ باقی‌مانده» در تفریق. با این محدودیت، جمع و تفریق از هم جدا می‌شوند: جمع بعد از شمارش به جلو آغاز می‌شود و تفریق به بعد از توانایی در شمارش به عقب موکول می‌گردد. حال آن‌که این دو، دو رویِ یک سکه‌اند: وقتی رابطه‌ی «جزء–جزء–کل» میانِ سه عدد درک شود، جمع و تفریقشان هم‌زمان درک می‌شود و کودک می‌تواند از رابطه‌ای که می‌بیند برای یافتنِ حاصلِ جمع، حاصلِ تفریق، یا جزءِ مجهول استفاده کند.</p>
+
+    <p>راهبردهای مبتنی بر شمارش، استفاده از حقایقِ عددی را نیز می‌بندند. به گفته‌ی چِنگ (۲۰۱۲)، توانایی کودک در اتخاذِ راهبردهای کارآمدِ جمع و تفریق به دانشِ سازمان‌یافته‌ی او از رابطه‌ی «جزء–جزء–کل»ِ اعدادِ ۱ تا ۱۰ وابسته است. کودکی که تجربه‌ی ترکیبِ اعداد دارد، می‌تواند حاصلِ <span dir="ltr" style="unicode-bidi:isolate">۴+۳</span> را از حقیقتی که برایش جا افتاده — <span dir="ltr" style="unicode-bidi:isolate">۳+۳=۶</span> — بیابد و، با توجه به این‌که ۴ یکی بیشتر از ۳ است، یکی به ۶ بیفزاید و به ۷ برسد.</p>
+
+    <h2 class="subhead">فعالیتِ جایگزین؛ فرصتی برای «نشمردن»</h2>
+
+    <p>با احساسِ محدودیتِ «درکِ مبتنی بر شمارش»، می‌توانیم فعالیت‌هایی برگزینیم یا طراحی کنیم که امکانِ رشدِ درکِ عددیِ بچه‌ها را فراهم کند و به آن‌ها که درکشان «مبتنی بر شمارش» است فرصتِ «نشمردن» بدهد. فعالیتِ زیر با همین نگاه طراحی شده؛ هم‌زمان با فعالیتِ «مثالِ کلاس» قابلِ اجراست و می‌تواند جایگزینِ آن شود.</p>
+
+    <p>هر کودک یک <em>قابِ ده‌تایی</em> دارد — جدولی دو در پنج، که در هر خانه یک مهره می‌نشیند و می‌توان اعداد تا ۱۰ را روی آن نمایش داد — و تعدادی مهره. معلم تصویرهایی از اعداد روی قاب آماده کرده است؛ هر تصویر را سه ثانیه نشان می‌دهد و پنهان می‌کند، بچه‌ها همان را روی قابِ خود می‌سازند، سپس هر یک توضیح می‌دهد چطور فهمید چند تا مهره بگذارد و معلم گفته‌هایشان را روی تخته می‌نویسد. پایین را امتحان کنید — قابی را ببینید و آن را به هر شکل که می‌توانید بخوانید، <em>بی‌آنکه بشمارید</em>.</p>
+
+    <div class="frame-slot" data-lang-slot="fa"></div>
+
+    <p>نمونه‌ای از گفتگوی کلاس، برای قابی با هفت مهره:</p>
+
+    <ul class="talk">
+      <li>«یک ردیفِ کامل و ۲ تای دیگر.» — معلم ردیفِ بالا و دو تای پایین را نشان می‌دهد: «۵ و ۲ می‌شود ۷»، و می‌نویسد <span dir="ltr" style="unicode-bidi:isolate">۵+۲</span>.</li>
+      <li>«۳ تا جای خالی بود.» — جای خالی را نشان می‌دهد: «اگر آن سه پُر بود ۱۰ می‌شد؛ ۷ سه‌تا کمتر از ۱۰ است»، و می‌نویسد <span dir="ltr" style="unicode-bidi:isolate">۱۰−۳</span>.</li>
+      <li>«۴ تا و ۳ تا.» — می‌نویسد <span dir="ltr" style="unicode-bidi:isolate">۴+۳</span>.</li>
+      <li>«این کارتِ عددِ ۷ است، همان را ساختم.» — می‌نویسد «کارتِ ۷».</li>
+      <li>«۷ مهره بود — ۱، ۲، ۳، ۴، ۵، ۶ و ۷.» — شمارش را می‌نویسد و دورِ ۷ خط می‌کشد.</li>
+      <li>«۲ تا و ۲ تا و ۳ تا.» — می‌نویسد <span dir="ltr" style="unicode-bidi:isolate">۲+۲+۳</span>.</li>
+    </ul>
+
+    <p>این فعالیت از چند نظر با مثالِ کلاس فرق دارد. <strong>اول</strong>، بازنماییِ تصویری می‌گذارد بچه‌ها درکشان را با ساختنِ تصویر نشان دهند، حتی اگر در به‌یادآوردنِ نامِ اعداد مشکل دارند. <strong>دوم</strong>، با قراردادنِ مهره‌ها در قابِ ده‌تایی به‌جای یک ردیف، راهبردهای گوناگون (هم شمردن و هم استفاده از ترکیبِ اعداد) را ممکن می‌کند و می‌گذارد هر کودک در سطحِ خودش پاسخ دهد؛ اگر عددی و ترکیب‌هایش را می‌شناسد، لازم نیست بشمرد. <strong>سوم</strong>، فرصتِ گفتگو فراهم می‌کند: بچه‌ها در سطوحِ مختلف پاسخِ یکدیگر را می‌شنوند و از هم یاد می‌گیرند — کودکی که ۷ را شمرده می‌شنود که دیگری ۵ تای بالا را نمی‌شمرد و فقط با «۶ و ۷» تعداد را می‌یابد، و اگر آن را دریافت، در موقعیت‌های دیگر به‌کار می‌برد؛ و کودکی که ۷ را ترکیبِ ۵ و ۲ می‌بیند اما نامش را نمی‌داند، بارها «۷» را می‌شنود و به خاطر می‌سپارد. <strong>چهارم</strong>، با بازنماییِ نمادینِ آنچه بچه‌ها درباره‌ی ترکیبِ اعداد می‌گویند، پیش از آموزشِ رسمیِ علائم، فرصتِ مواجهه با آن‌ها را می‌دهد.</p>
+
+    <p>از میانِ این‌ها، تفاوتِ دوم و سوم بود که این فعالیت را به گزینه‌ی جایگزین بدل کرد: همین‌هاست که راهبردهای مبتنی بر رابطه‌ی میانِ اعداد و ترکیب‌های سازنده‌ی هر عدد را در کلاس آشکار می‌کند و به بچه‌های «مبتنی بر شمارش» کمک می‌کند این راهبردها را بشنوند، بسنجند و رشد کنند.</p>
+
+    <p>می‌خواستم نشان دهم که قرارگرفتن در «موقعیتِ مشابه» چگونه به معلم کمک می‌کند فعالیت‌های کلاسش را ارزیابی کند و فعالیت‌های جایگزین را مؤثرتر برگزیند، طراحی و اجرا کند. این یک مثال بود، درباره‌ی «شمارش و تعداد». اما ایده‌ی طراحیِ موقعیت‌های مشابه برای معلمان، ایده‌ای کلی است که در موضوع‌های گوناگون به‌کار می‌آید. من به‌عنوانِ پشتیبانِ معلم‌های ریاضی، موقعیت‌های مشابهی در موضوع‌های مختلف ساخته‌ام و در کارگاه‌ها به‌کار می‌برم؛ شاید شما هم چنین تجربه‌هایی داشته باشید که خوشحال می‌شوم با هم به اشتراک بگذاریم. نه شدنی است و نه لازم که برای هر موضوع در موقعیتی مشابه قرار بگیریم — اما تقلا برای یادگیری، در چند مورد، شاید به همدلی با کودکانی که هنوز در مسیرند کمک کند.</p>
+  </div>
+
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">نویسنده</div>
+        <div class="who">زهره پندی</div>
+        <div class="aff">پشتیبانِ معلم‌های ریاضی</div>
+      </div>
+      <div class="role">
+        <div class="lab">ترجمه‌ی انگلیسی</div>
+        <div class="who">آدم‌ها و ریاضیات</div>
+      </div>
+      <div class="role">
+        <div class="lab">بخش‌های تعاملی</div>
+        <div class="who">شمارشگرِ شعر و قابِ ده‌تایی</div>
+        <div class="aff">بازآفرینیِ فیلم‌های کلاسیِ متنِ اصلی، برای این‌که خواننده خودش بیازماید.</div>
+      </div>
+    </div>
+    <div class="origin">نخست برای ویکی‌نوشت، اردیبهشتِ ۱۴۰۱، نوشته شد — ویکی‌نوشتِ شماره‌ی ۱۵. اینجا برای نخستین‌بار به انگلیسی هم منتشر می‌شود. «موقعیتِ مشابهِ» انگلیسی، به‌جای شعرِ فارسیِ متنِ اصلی (بیتی از حافظ)، از یک ترانه‌ی شمارشیِ کودکانه بهره می‌برد.</div>
+  </div>
+
+  <div class="refs">
+    <h3>مرجع</h3>
+    <ol>
+      <li>Zhen-Jun Cheng (2012). Teaching young children decomposition strategies to solve addition problems: An experimental study. <em>The Journal of Mathematical Behavior</em>, 31(1), 29–47.</li>
+    </ol>
+  </div>
+</article>
+
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+    if (window.__onLang) window.__onLang(lang);
+  }
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+
+  // Render math once KaTeX is ready
+  function renderMath(){
+    if (!window.renderMathInElement) { setTimeout(renderMath, 60); return; }
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+  renderMath();
+</script>
+<script>
+/* ===== Pandi: interactive "similar situation" (rhyme counter) + ten-frame ===== */
+(function(){
+  var RHYME = {
+    en: ['eeny','meeny','miny','moe','catch','a','tiger','by','the','toe'],
+    fa: ['الا','ای','آهوی','وحشی','کجایی','مرا','با','توست','چندین','آشنایی']
+  };
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function ord(n){ return ({1:'first',2:'second',3:'third',4:'fourth',5:'fifth',6:'sixth',7:'seventh',8:'eighth',9:'ninth',10:'tenth'})[n]||(n+'th'); }
+  function ordFa(n){ return ({1:'اول',2:'دوم',3:'سوم',4:'چهارم',5:'پنجم',6:'ششم',7:'هفتم',8:'هشتم',9:'نهم',10:'دهم'})[n]||n; }
+  function faNum(n){ return String(n).replace(/[0-9]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'[+d];}); }
+
+  var RLAB = {
+    en:{ kicker:'Try it — a similar situation', hint:'Recite the rhyme to name them.',
+         count:'\u25B6 Count them', again:'Count again', add1:'+1 bead', add2:'+2 more', sub1:'\u22121 bead',
+         show:'Show the words', hide:'Hide the words',
+         name:function(w,n){ return 'These are \u201C'+w+'\u201D \u2014 the '+ord(n)+' word.'; },
+         reflect:'You had to recite from the very start to name them. That is what a child feels when their sense of number rests only on counting.' },
+    fa:{ kicker:'\u0627\u0645\u062A\u062D\u0627\u0646 \u06A9\u0646 \u2014 \u06CC\u06A9 \u0645\u0648\u0642\u0639\u06CC\u062A \u0645\u0634\u0627\u0628\u0647', hint:'\u0628\u0631\u0627\u06CC \u0646\u0627\u0645\u06CC\u062F\u0646\u0634\u0627\u0646\u060C \u0634\u0639\u0631 \u0631\u0627 \u0628\u062E\u0648\u0627\u0646.',
+         count:'\u25B6 \u0628\u0634\u0645\u0627\u0631', again:'\u062F\u0648\u0628\u0627\u0631\u0647 \u0628\u0634\u0645\u0627\u0631', add1:'+\u06F1 \u0645\u0647\u0631\u0647', add2:'+\u06F2 \u062A\u0627\u06CC \u062F\u06CC\u06AF\u0631', sub1:'\u2212\u06F1 \u0645\u0647\u0631\u0647',
+         show:'\u0646\u0645\u0627\u06CC\u0634\u0650 \u06A9\u0644\u0645\u0647\u200C\u0647\u0627', hide:'\u067E\u0646\u0647\u0627\u0646\u200C\u06A9\u0631\u062F\u0646\u0650 \u06A9\u0644\u0645\u0647\u200C\u0647\u0627',
+         name:function(w,n){ return '\u0627\u06CC\u0646 \u062A\u0639\u062F\u0627\u062F \u06CC\u0639\u0646\u06CC \u00AB'+w+'\u00BB \u2014 \u06A9\u0644\u0645\u0647\u200C\u06CC '+ordFa(n)+'.'; },
+         reflect:'\u0628\u0631\u0627\u06CC \u0646\u0627\u0645\u06CC\u062F\u0646\u0634\u0627\u0646 \u0645\u062C\u0628\u0648\u0631 \u0634\u062F\u06CC \u0627\u0632 \u0627\u0648\u0651\u0644 \u0628\u062E\u0648\u0627\u0646\u06CC. \u06A9\u0648\u062F\u06A9\u06CC \u06A9\u0647 \u062F\u0631\u06A9\u0634 \u0627\u0632 \u0639\u062F\u062F \u062A\u0646\u0647\u0627 \u0628\u0631 \u0634\u0645\u0627\u0631\u0634 \u0627\u0633\u062A\u0648\u0627\u0631 \u0627\u0633\u062A\u060C \u0647\u0645\u06CC\u0646 \u0631\u0627 \u062D\u0633 \u0645\u06CC\u200C\u06A9\u0646\u062F.' }
+  };
+
+  var GC = ['#C8633E','#B08A2E','#6E7D46'];
+  var FRAMES = {
+    4:[ {t:'groups', g:[[0,1,2,3]], expr:'4', cap:{en:'Four \u2014 seen at a glance.', fa:'\u0686\u0647\u0627\u0631 \u2014 \u0628\u0647 \u06CC\u06A9 \u0646\u06AF\u0627\u0647.'}},
+        {t:'groups', g:[[0,1],[2,3]], expr:'2 + 2', cap:{en:'Two and two.', fa:'\u062F\u0648 \u0648 \u062F\u0648.'}},
+        {t:'complement', empty:[4], expr:'5 \u2212 1', cap:{en:'One short of a full row of five.', fa:'\u06CC\u06A9\u06CC \u06A9\u0645\u062A\u0631 \u0627\u0632 \u06CC\u06A9 \u0631\u062F\u06CC\u0641\u0650 \u067E\u0646\u062C\u200C\u062A\u0627\u06CC\u06CC.'}},
+        {t:'count', expr:'1 \u00B7 2 \u00B7 3 \u00B7 4', cap:{en:'Or simply count: one to four.', fa:'\u06CC\u0627 \u0641\u0642\u0637 \u0628\u0634\u0645\u0627\u0631: \u06CC\u06A9 \u062A\u0627 \u0686\u0647\u0627\u0631.'}} ],
+    7:[ {t:'groups', g:[[0,1,2,3,4],[5,6]], expr:'5 + 2', cap:{en:'A full top row, and two more below.', fa:'\u06CC\u06A9 \u0631\u062F\u06CC\u0641\u0650 \u06A9\u0627\u0645\u0644\u0650 \u0628\u0627\u0644\u0627\u060C \u0648 \u062F\u0648 \u062A\u0627\u06CC \u067E\u0627\u06CC\u06CC\u0646.'}},
+        {t:'complement', empty:[7,8,9], expr:'10 \u2212 3', cap:{en:'Three cells empty \u2014 three short of ten.', fa:'\u0633\u0647 \u062E\u0627\u0646\u0647 \u062E\u0627\u0644\u06CC \u2014 \u0633\u0647\u200C\u062A\u0627 \u06A9\u0645\u062A\u0631 \u0627\u0632 \u062F\u0647.'}},
+        {t:'groups', g:[[0,1,2,3],[4,5,6]], expr:'4 + 3', cap:{en:'Four and three.', fa:'\u0686\u0647\u0627\u0631 \u0648 \u0633\u0647.'}},
+        {t:'groups', g:[[0,1],[2,3],[4,5,6]], expr:'2 + 2 + 3', cap:{en:'Two, two, and three.', fa:'\u062F\u0648\u060C \u062F\u0648\u060C \u0648 \u0633\u0647.'}},
+        {t:'count', expr:'1 \u00B7 2 \u00B7 3 \u00B7 4 \u00B7 5 \u00B7 6 \u00B7 7', cap:{en:'Or count them one by one.', fa:'\u06CC\u0627 \u06CC\u06A9\u06CC\u200C\u06CC\u06A9\u06CC \u0628\u0634\u0645\u0627\u0631.'}} ],
+    9:[ {t:'groups', g:[[0,1,2,3,4],[5,6,7,8]], expr:'5 + 4', cap:{en:'A full top row and four below.', fa:'\u06CC\u06A9 \u0631\u062F\u06CC\u0641\u0650 \u06A9\u0627\u0645\u0644\u0650 \u0628\u0627\u0644\u0627 \u0648 \u0686\u0647\u0627\u0631 \u062A\u0627\u06CC \u067E\u0627\u06CC\u06CC\u0646.'}},
+        {t:'complement', empty:[9], expr:'10 \u2212 1', cap:{en:'One cell empty \u2014 one short of ten.', fa:'\u06CC\u06A9 \u062E\u0627\u0646\u0647 \u062E\u0627\u0644\u06CC \u2014 \u06CC\u06A9\u06CC \u06A9\u0645\u062A\u0631 \u0627\u0632 \u062F\u0647.'}},
+        {t:'groups', g:[[0,1,2,3],[4,5,6,7],[8]], expr:'4 + 4 + 1', cap:{en:'Four, four, and one.', fa:'\u0686\u0647\u0627\u0631\u060C \u0686\u0647\u0627\u0631\u060C \u0648 \u06CC\u06A9.'}},
+        {t:'count', expr:'1 \u00B7 2 \u00B7 3 \u00B7 4 \u00B7 5 \u00B7 6 \u00B7 7 \u00B7 8 \u00B7 9', cap:{en:'Or count them one by one.', fa:'\u06CC\u0627 \u06CC\u06A9\u06CC\u200C\u06CC\u06A9\u06CC \u0628\u0634\u0645\u0627\u0631.'}} ]
+  };
+  var FLAB = {
+    en:{ kicker:'Try it — a chance not to count', hint:'Read the frame in parts.' },
+    fa:{ kicker:'\u0627\u0645\u062A\u062D\u0627\u0646 \u06A9\u0646 \u2014 \u0641\u0631\u0635\u062A\u06CC \u0628\u0631\u0627\u06CC \u0646\u0634\u0645\u0631\u062F\u0646', hint:'' }
+  };
+
+  var curLang = (document.documentElement.lang==='fa') ? 'fa' : 'en';
+  function digits(n){ return curLang==='fa' ? faNum(n) : String(n); }
+
+  /* ---------- rhyme counter ---------- */
+  var rState = { n:4, lit:0, counting:false, showKey:false };
+  var rTimer = null;
+  function rStop(){ if(rTimer){ clearInterval(rTimer); rTimer=null; } rState.counting=false; }
+  function rRender(){
+    document.querySelectorAll('.rhyme-slot').forEach(function(s){ if(s.getAttribute('data-lang-slot')!==curLang) s.innerHTML=''; });
+    var slot = document.querySelector('.rhyme-slot[data-lang-slot="'+curLang+'"]'); if(!slot) return;
+    var T = RLAB[curLang], words = RHYME[curLang];
+    var done = (rState.lit>=rState.n && !rState.counting);
+    var beads='';
+    for(var i=0;i<rState.n;i++){
+      var lit = i<rState.lit;
+      var cls = 'bead' + (lit ? (done?' done':' lit') : '');
+      beads += '<div class="'+cls+'">'+(lit?digits(i+1):'')+'</div>';
+    }
+    var wordout='';
+    if(rState.lit>0){ var w=words[rState.lit-1]; wordout = done ? '<span class="final">'+w+'</span>' : w; }
+    var named = done ? '<div class="lab-note">'+esc(T.name(words[rState.n-1], rState.n))+' '+esc(T.reflect)+'</div>' : '';
+    var key='';
+    if(rState.showKey){
+      key='<div class="keygrid">';
+      for(var k=0;k<10;k++){ key+='<div class="keycell"><span class="kn">'+digits(k+1)+'</span><span class="kw">'+words[k]+'</span></div>'; }
+      key+='</div>';
+    }
+    slot.innerHTML =
+      '<div class="lab">'
+      + '<div class="lab-head"><span class="lab-kicker">'+esc(T.kicker)+'</span><span class="lab-hint">'+esc(T.hint)+'</span></div>'
+      + '<div class="beadrow">'+beads+'</div>'
+      + '<div class="wordout">'+wordout+'</div>'
+      + named
+      + '<div class="lab-controls">'
+      +   '<button class="lab-btn primary" data-act="count">'+esc(done?T.again:T.count)+'</button>'
+      +   '<span class="lab-sep"></span>'
+      +   '<button class="lab-btn" data-act="add1">'+esc(T.add1)+'</button>'
+      +   '<button class="lab-btn" data-act="add2">'+esc(T.add2)+'</button>'
+      +   '<button class="lab-btn" data-act="sub1">'+esc(T.sub1)+'</button>'
+      +   '<span class="lab-sep"></span>'
+      +   '<button class="lab-btn" data-act="key">'+esc(rState.showKey?T.hide:T.show)+'</button>'
+      + '</div>'
+      + key
+      + '</div>';
+    slot.querySelectorAll('.lab-btn').forEach(function(b){ b.addEventListener('click', function(){ rAct(b.getAttribute('data-act')); }); });
+  }
+  function rAct(a){
+    if(a==='count'){ rCount(); return; }
+    rStop();
+    if(a==='add1') rState.n=Math.min(10,rState.n+1);
+    else if(a==='add2') rState.n=Math.min(10,rState.n+2);
+    else if(a==='sub1') rState.n=Math.max(1,rState.n-1);
+    else if(a==='key') rState.showKey=!rState.showKey;
+    if(a!=='key') rState.lit=0;
+    rRender();
+  }
+  function rCount(){
+    rStop(); rState.lit=0; rState.counting=true; rRender();
+    var i=0;
+    rTimer=setInterval(function(){
+      i++; rState.lit=i;
+      if(i>=rState.n){ clearInterval(rTimer); rTimer=null; rState.counting=false; }
+      rRender();
+    }, 480);
+  }
+
+  /* ---------- ten-frame ---------- */
+  var fState = { n:7, way:0 };
+  function fRender(){
+    document.querySelectorAll('.frame-slot').forEach(function(s){ if(s.getAttribute('data-lang-slot')!==curLang) s.innerHTML=''; });
+    var slot = document.querySelector('.frame-slot[data-lang-slot="'+curLang+'"]'); if(!slot) return;
+    var T = FLAB[curLang];
+    var ways = FRAMES[fState.n], way = ways[fState.way];
+    var colorOf={}, numberOf={}, emptyset={};
+    if(way.t==='groups'){ way.g.forEach(function(grp,gi){ grp.forEach(function(idx){ colorOf[idx]=GC[gi%GC.length]; }); }); }
+    if(way.t==='count'){ for(var q=0;q<fState.n;q++) numberOf[q]=q+1; }
+    if(way.t==='complement'){ (way.empty||[]).forEach(function(e){ emptyset[e]=1; }); }
+    var cells='';
+    for(var c=0;c<10;c++){
+      if(c<fState.n){
+        var bg = colorOf[c] || '#C8633E';
+        cells += '<div class="tf-cell"><div class="tf-bead" style="background:'+bg+'">'+(numberOf[c]?digits(numberOf[c]):'')+'</div></div>';
+      } else {
+        cells += '<div class="tf-cell'+(emptyset[c]?' empty-mark':'')+'"></div>';
+      }
+    }
+    var nchips = [4,7,9].map(function(v){ return '<button class="lab-btn'+(v===fState.n?' on':'')+'" data-n="'+v+'">'+digits(v)+'</button>'; }).join('');
+    var wchips = ways.map(function(w,i){ return '<button class="lab-btn'+(i===fState.way?' on':'')+'" data-way="'+i+'"><span style="direction:ltr;unicode-bidi:isolate;display:inline-block;">'+w.expr+'</span></button>'; }).join('');
+    slot.innerHTML =
+      '<div class="lab">'
+      + '<div class="lab-head"><span class="lab-kicker">'+esc(T.kicker)+'</span><span class="lab-hint">'+esc(T.hint)+'</span></div>'
+      + '<div class="lab-controls" style="margin-top:12px;">'+nchips+'</div>'
+      + '<div class="tenframe">'+cells+'</div>'
+      + '<div class="tf-expr">'+way.expr+'</div>'
+      + '<div class="lab-note" style="text-align:center;max-width:30em;margin-inline:auto;">'+esc(way.cap[curLang])+'</div>'
+      + '<div class="lab-controls" style="justify-content:center;margin-top:14px;">'+wchips+'</div>'
+      + '</div>';
+    slot.querySelectorAll('[data-n]').forEach(function(b){ b.addEventListener('click', function(){ fState.n=+b.getAttribute('data-n'); fState.way=0; fRender(); }); });
+    slot.querySelectorAll('[data-way]').forEach(function(b){ b.addEventListener('click', function(){ fState.way=+b.getAttribute('data-way'); fRender(); }); });
+  }
+
+  function renderAll(){ rRender(); fRender(); }
+  window.__onLang = function(lang){ curLang=(lang==='fa')?'fa':'en'; rStop(); renderAll(); };
+  renderAll();
+})();
+</script>
+
+<script src="../counter.js"></script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Long-term sense making in arithmetic and algebra — David Tall · WikiLetter 05</title>
+<meta name="description" content="David Tall on how humans make sense of arithmetic and algebra over the long term. WikiLetter No. 5, a People and Mathematics publication.">
+
+<meta property="og:title" content="Long-term sense making in arithmetic and algebra — David Tall">
+<meta property="og:description" content="WikiLetter No. 5 · People and Mathematics — آدم‌ها و ریاضیات">
+<meta property="og:image" content="../assets/logo.jpg">
+<meta property="og:type" content="article">
+
+<link rel="icon" href="../assets/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX for crisp typeset mathematics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>/* KaTeX inside RTL text — keep formulas LTR & bidi-isolated so exponents/coefficients stay put */
+.katex, .katex-display { direction: ltr; unicode-bidi: isolate; }
+  /* Site rule: body text is justified, in both languages */
+  .standfirst, .body p, .body li, .article p, .intro p, .prose p, .tribute, .dek { text-align: justify; }
+</style>
+
+<style>
+  @font-face {
+    font-family: "B Nazanin";
+    src: url("../fonts/BNazanin.woff2") format("woff2"),
+         url("../fonts/BNazanin.woff")  format("woff"),
+         url("../fonts/BNazanin.ttf")   format("truetype");
+    font-weight: 400 700; font-display: swap;
+  }
+  :root { --accent: #C8633E; --ink: #1C1814; --paper: #FBF7EF; --black: #0D0C0B; --muted: #6B6155; --line: #E4DAC6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: Newsreader, "B Nazanin", "Noto Naskh Arabic", Georgia, serif; }
+  ::selection { background: var(--accent); color: var(--paper); }
+  .sans { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; }
+  a { color: inherit; }
+
+  /* ---------- Masthead ---------- */
+  .topband { background: var(--black); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px; }
+  .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+  .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 6px; }
+  .brand-fa { font-family: "Vazirmatn", "B Nazanin", sans-serif; font-size: 18px; font-weight: 600; line-height: 1.05; }
+  .brand-en { font-size: 12.5px; font-style: italic; color: #B9AE9B; margin-top: 2px; }
+  .langtoggle { display: inline-flex; border: 1px solid #4A443B; border-radius: 999px; overflow: hidden; }
+  .langtoggle button { border: 0; cursor: pointer; padding: 7px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; background: transparent; color: var(--paper); }
+  .langtoggle button.on { background: var(--paper); color: var(--black); }
+
+  /* breadcrumb sub-bar */
+  .subbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 40px; border-bottom: 1px solid var(--ink); }
+  .subbar a { text-decoration: none; }
+  .crumb { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); }
+  .crumb .accent { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Article shell ---------- */
+  .article { max-width: 760px; margin: 0 auto; padding: 54px 28px 40px; }
+  .kicker { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  h1.title { font-size: 46px; line-height: 1.08; font-weight: 500; letter-spacing: -.02em; margin: 16px 0 0; }
+  .standfirst { font-size: 21px; line-height: 1.5; font-style: italic; color: #43392E; margin: 18px 0 0; }
+  .byline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 13px; margin-top: 22px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .byline .name { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; }
+  .byline .meta { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .byline .dot { width: 3px; height: 3px; border-radius: 50%; background: #B7AC99; align-self: center; }
+
+  .dedication { font-style: italic; color: var(--muted); font-size: 16px; margin: 22px 0 0; }
+
+  /* in-memoriam ribbon — REMOVE if not wanted */
+  .memoriam { display: flex; align-items: center; gap: 12px; margin: 26px 0 0; padding: 14px 18px; background: var(--black); color: var(--paper); border-radius: 4px; }
+  .memoriam .mk { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 600; white-space: nowrap; }
+  .memoriam .mt { font-size: 15px; color: #E7DFD2; }
+
+  .body { font-size: 19px; line-height: 1.72; margin-top: 30px; }
+  .body p { margin: 0 0 20px; text-wrap: pretty; }
+  .body p:first-of-type:first-letter { font-size: 58px; float: left; line-height: .78; padding: 7px 9px 0 0; font-weight: 600; color: var(--accent); font-family: Newsreader, serif; }
+  .subhead { font-family: "Newsreader", "Vazirmatn", serif; font-size: 27px; font-weight: 500; letter-spacing: -.01em; margin: 40px 0 14px; padding-top: 8px; }
+
+  /* principle callout */
+  .principle { border-inline-start: 3px solid var(--accent); background: #F4ECDC; padding: 18px 22px; margin: 26px 0; border-radius: 0 4px 4px 0; }
+  .principle .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-bottom: 7px; }
+  .principle .txt { font-size: 18px; line-height: 1.55; }
+
+  .pullquote { font-size: 26px; line-height: 1.32; font-weight: 500; letter-spacing: -.01em; color: var(--ink); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); padding: 20px 0; margin: 30px 0; }
+
+  .eq { text-align: center; margin: 22px 0; font-size: 20px; }
+  /* articulation gap marker */
+  .artic { font-family: "Newsreader", serif; font-size: 1.05em; }
+  .gap { color: var(--accent); font-weight: 700; padding: 0 .15em; }
+
+  /* contributor colophon (Option A) */
+  .colophon { margin-top: 46px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .colophon .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .colophon .role .lab { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; margin-bottom: 7px; }
+  .colophon .role .who { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .colophon .role .aff { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .colophon .who + .who { margin-top: 9px; }
+  .origin { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); line-height: 1.6; }
+  .origin .lab { color: #948876; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; font-weight: 600; }
+
+  .refs { margin-top: 40px; }
+  .refs h3 { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #948876; font-weight: 600; }
+  .refs ol { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; line-height: 1.6; color: #43392E; padding-inline-start: 20px; margin: 10px 0 0; }
+  .refs li { margin-bottom: 10px; }
+  .refs a { color: var(--accent); word-break: break-word; }
+
+  .footer { border-top: 1px solid var(--ink); padding: 30px 40px 56px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
+  .footer .fl { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; color: var(--muted); }
+  .footer a.back { font-family: "Hanken Grotesk", "Vazirmatn", sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; }
+
+  /* ---------- Persian / RTL ---------- */
+  [dir="rtl"] body, [dir="rtl"] { font-family: "B Nazanin", "Noto Naskh Arabic", "Vazirmatn", Georgia, serif; }
+  [dir="rtl"] h1.title, [dir="rtl"] .subhead { font-family: "Vazirmatn", "B Nazanin", serif; }
+  [dir="rtl"] .body { font-size: 18px; line-height: 2.05; }
+  [dir="rtl"] .body p:first-of-type:first-letter { font-size: 1em; float: none; padding: 0; color: inherit; font-weight: inherit; }
+  [dir="rtl"] .standfirst { font-style: normal; }
+
+  /* language visibility */
+  [data-lang-block] { display: none; }
+  [data-lang-block].active { display: block; }
+
+  @media (max-width: 640px) {
+    .topband, .subbar { padding-left: 20px; padding-right: 20px; }
+    .article { padding: 34px 22px 32px; }
+    h1.title { font-size: 33px; }
+    .standfirst { font-size: 18px; }
+    .body { font-size: 17.5px; }
+    .colophon .roles { grid-template-columns: 1fr; gap: 18px; }
+    .pullquote { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Masthead ===== -->
+<div class="topband">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo.jpg" alt="People and Mathematics">
+    <span><span class="brand-fa">آدم‌ها و ریاضیات</span><br><span class="brand-en">People and Mathematics</span></span>
+  </a>
+  <div class="langtoggle">
+    <button data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button data-lang="fa" class="persian" onclick="setLang('fa')">فارسی</button>
+  </div>
+</div>
+<div class="subbar">
+  <div class="crumb sans"><a href="../index.html">People and Mathematics</a> &nbsp;·&nbsp; <span class="accent" data-en="WikiLetter" data-fa="ویکی‌نوشت"></span></div>
+  <div class="crumb sans" style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#567D46;display:inline-block;flex:0 0 auto;"></span><span data-en="School maths · No. 05 · July 2018" data-fa="ریاضیِ مدرسه · شماره‌ی ۵ · تیر ۱۳۹۷"></span></div>
+</div>
+
+<!-- =================== ENGLISH =================== -->
+<article class="article" data-lang-block="en">
+  <div class="kicker">WikiLetter · No. 05</div>
+  <h1 class="title">Long-term sense making in arithmetic and algebra</h1>
+  <p class="standfirst">Challenging a few widely held beliefs about teaching: how humans actually make sense of arithmetic and algebra over the long run — through what we perceive, what we manipulate in the mind, and how we say things to one another.</p>
+  <div class="byline">
+    <span class="name">David Tall</span>
+  </div>
+  <p class="dedication">Dedicated to my grandson, Simon Tall, aged twelve.</p>
+
+  <!-- REMOVE this block if a memorial note is not wanted -->
+  <div class="memoriam">
+    <span class="mk">In memory</span>
+    <span class="mt">David Tall · 1941–2024 — teacher, mathematician, grandfather.</span>
+  </div>
+
+  <div class="body">
+    <p>In this WikiLetter, I challenge widely held beliefs about the teaching and learning of mathematics by focusing on how humans develop mathematical thinking over the long term. My purpose is to present an essentially simple approach — one that relates to how we make sense of mathematics: in terms of what we perceive through our senses, what we manipulate within our minds, and how we communicate with others.</p>
+
+    <p>This requires us to consider how mathematics changes in meaning as it becomes more sophisticated, and to focus on those ideas that are <em>supportive</em> — because they continue to work appropriately in a new situation — in contrast to those that are <em>problematic</em>, because in a new situation they no longer work in the same way. In particular, we need supportive ideas that hold good over a long span of time. These can then act as a firm foundation, while ideas that become problematic can be addressed explicitly, rather than left to harden into subconscious misconceptions.</p>
+
+    <p>In arithmetic, the child learns to count and steadily develops the supportive idea that if a collection of objects is counted, the number of objects stays the same. But what matters in the long term is not only that this works for counting whole numbers — it is that <em>addition</em> keeps the same supportive property in more sophisticated number systems: whole numbers, fractions, signed numbers, real numbers, even complex numbers. This may be put as a principle:</p>
+
+    <div class="principle">
+      <div class="lab">The addition principle</div>
+      <div class="txt">When you add together a collection of numbers, it does not matter in which order you add them — the final result is always the same.</div>
+    </div>
+
+    <p>For example, the sum \( 2 + \tfrac{3}{4} + 1.35 + (-17) \) is independent of the order of the terms.</p>
+
+    <p>Expressions are spoken in time, and so have a unique sequence when heard. Written text, meanwhile, is read in a conventional sequence — left to right, in Western societies. If additions and subtractions are performed in a sequence, the order does not matter; from an expert viewpoint, adding a negative number is the same as subtracting the corresponding positive one. The addition principle, at an advanced level, simply extends the young child's idea that a string of additions and subtractions does not depend on the order of operations.</p>
+
+    <p>A similar principle holds for multiplication:</p>
+
+    <div class="principle">
+      <div class="lab">The multiplication principle</div>
+      <div class="txt">When you multiply together a collection of numbers, it does not matter in which order you multiply them — the final result is always the same.</div>
+    </div>
+
+    <p>Both principles hold throughout school mathematics, although they fail in more sophisticated contexts such as the product of matrices or of quaternions. On the other hand, once several operations are involved — addition and multiplication, powers, square roots, the forming of algebraic expressions — the situation becomes more complicated and asks for more careful analysis. Let us begin with a simple example:</p>
+
+    <div class="eq">What is \( 2 + 2 \times 2 \)?</div>
+
+    <p>If we read this from left to right and perform the operations in sequence, we start with \(2+2\) to get \(4\), then calculate \(4 \times 2\) to get \(8\). But in mathematics we use the convention that <em>multiplication takes precedence over addition</em>, so we first work out \(2 \times 2\), giving \(2 + 2\times 2 = 2 + 4\) — the "correct" answer, \(6\). This rule of precedence is <em>problematic</em>: it violates the natural order of reading and speaking, and can cause serious conceptual difficulty. Later, with more operations, it is extended into mnemonics like <span class="sans">BODMAS</span>, <span class="sans">BIDMAS</span>, or, in the USA, <span class="sans">PEMDAS</span> ("Please Excuse My Dear Aunt Sally"). Learnt by rote and used procedurally, these may work for a few — but they cause real trouble for most learners as the mathematics grows.</p>
+
+    <p>The "New Mathematics" of the 1960s tried to clarify matters by defining laws of arithmetic — the <em>commutative</em>, <em>associative</em> and <em>distributive</em> laws for the binary operations of addition and multiplication — which were then "generalised" to wider expressions as new ideas arrived: place value, fractions, signed numbers, decimals, real numbers as points on a line, complex numbers as points in the plane. Mathematics education grew into an industry of specifying difficulties as "misconceptions" to be corrected. I would like to offer a different way of thinking about the difficulties.</p>
+
+    <h2 class="subhead">Making sense of arithmetic by how we <em>say</em> it</h2>
+
+    <p>It turns out we can make sense of these procedural rules simply by attending to how we speak them, and how others hear what we say. There are (at least) two different ways to speak the expression \(2+2\times 2\), by leaving tiny gaps between the words. To show where the gap falls, I will mark it with a coloured break:</p>
+
+    <div class="eq artic">2 + 2 <span class="gap">‹·›</span> × 2 &nbsp;&nbsp;means&nbsp;&nbsp; ( 2 + 2 ) × 2 = 8</div>
+    <div class="eq artic">2 <span class="gap">‹·›</span> + 2 × 2 &nbsp;&nbsp;means&nbsp;&nbsp; 2 + ( 2 × 2 ) = 6</div>
+
+    <p>Say the two aloud — to yourself, and to someone else — and notice how the placing of the gap gives two clearly different meanings. Do this now, before reading on. This leads to a further principle, which applies not only in arithmetic but also in algebra:</p>
+
+    <div class="principle">
+      <div class="lab">The articulation principle</div>
+      <div class="txt">The meaning of a sequence of operations can be expressed by the manner in which the sequence is articulated.</div>
+    </div>
+
+    <p>I only realised the power of this when my then eleven-year-old grandson, who already knew about powers of negative numbers, teased me: "What is the square root of nine times nine?" — spoken evenly, with no implied gap. Knowing he was familiar with squares of negative numbers, I replied that the answer could be \(+9\) or \(-9\).</p>
+
+    <div class="pullquote">"No," he replied. "It is 27." I was shocked. He had meant: the square root of nine <span class="gap">‹·›</span> times nine — that is, \(\sqrt{9}=3\), times \(9\).</div>
+
+    <p>At a stroke, this young child had opened the door to a whole new way of making sense of operations. Instead of learning arbitrary rules of precedence, he offered a way of making <em>meaningful</em> sense — by focusing on how to speak mathematical expressions, and to communicate ideas in ways other people can hear.</p>
+
+    <p>Problematic aspects of operations other than addition and multiplication occur throughout mathematics. Subtraction, for instance, can be articulated to different meanings. The subtraction \(5-3-1\) has different answers: spoken as "5 minus <span class="gap">‹·›</span> 3 minus 1" it reads as \(5-(3-1)=4\); spoken as "5 minus 3 <span class="gap">‹·›</span> minus 1" it is \((5-3)-1 = 1\).</p>
+
+    <h2 class="subhead">General applications of the articulation principle</h2>
+
+    <p>Over the weeks and months that followed my grandson's insight, I found the principle applies widely, wherever operations combine. In McGowen and Tall (2013), studying students' difficulties with quadratic expressions, we found that evaluating \(x^2\) at \(x=-2\) was read by some as "the square of minus two" and by others as "minus the square of two." More generally, \(-x^2\) might be heard as</p>
+
+    <div class="eq">"minus <span class="gap" style="font-family:serif">‹·›</span> \(x\) squared" \(= -(x^2)\) &nbsp;&nbsp;or&nbsp;&nbsp; "minus \(x\) <span class="gap" style="font-family:serif">‹·›</span> squared" \(= (-x)^2\).</div>
+
+    <p>This offers a completely new way of reading the data. Instead of seeing student difficulties as "misconceptions" about the conventional use of brackets, we can see them as different ways of speaking — and hearing — the symbols. Of course, conventions are still needed to keep expressions short: we write the product of \(2\) and \(x\) as \(2x\), dropping the multiplication sign where it causes no confusion. There are subtler uses too, where \(2x\) means \(2\) times \(x\), \(2\tfrac12\) means \(2 + \tfrac12\), and \(21\) means \(2\times 10 + 1\). Even so, the addition and multiplication principles let us simplify how we read expressions.</p>
+
+    <h2 class="subhead">Binding</h2>
+
+    <p>Reading a more complicated expression, such as \(2x^2 + 7x + 5 + 3x^2 - 3x\), brings a new level of sophistication. By the addition principle, the order of terms does not matter, so it can be rewritten \(2x^2 + 3x^2 + 7x - 3x + 5\). Imagining \(x^2\) as a single entity, we add two of them to three of them to get \(5x^2\); likewise \(7x - 3x\) gives \(4x\). Notice that a term like \(3x^2\) is not written purely linearly — the power \(2\) is raised as a superscript.</p>
+
+    <p>In more sophisticated examples, the symbols sit in a spatial array rather than a linear sequence:</p>
+
+    <div class="eq">\[ \sqrt[3]{\dfrac{4x^3 - 2}{x^2 + 1}} \tag{1} \]</div>
+
+    <p>This may be written linearly and spoken as "the cube root of (four \(x\) cubed minus two) over (\(x\) squared plus one)," the brackets showing how symbols group. Here it is easier to write and read than to say and hear: the visual, embodied sense — essential to human conceptualisation — blends with the symbolic sense. To read such a symbol, it must be scanned and interpreted. In expression (1), the powers \(x^3\) and \(x^2\) are each strongly <em>bound</em> as single entities; the numerator \(4x^3 - 2\) is a difference of two terms, while the denominator \(x^2+1\) is a sum.</p>
+
+    <p>Some conventions are less obvious. The expression \(e^{x^2}\) is usually read "\(e\) to the power \(x^2\)," not "\(e^x\) squared." (To convince yourself, consider what \(e^{x^2+x}\) means to you.) If we write a power as <span class="sans">x^n</span>, then \(e^{x^2}\) becomes <span class="sans">e^x^2</span> — and brackets show that \(e^{(x^2)}\) differs from \((e^x)^2\). The first is "right binding," the second "left binding." Likewise the usual reading of \(2^{3^4}\) is \(2^{(3^4)} = 2^{81}\) — right binding — which differs from a left-to-right reading \((2^3)^4 = 2^{12}\). This is quite unlike addition and multiplication, where left and right binding agree: \((2+3)+4 = 2+(3+4)\) and \((2\times 3)\times 4 = 2\times(3\times 4)\).</p>
+
+    <h2 class="subhead">Summary</h2>
+
+    <p>What does this tell us about sense making over the long term? That it may first be clarified by attending to the verbal articulation of expressions involving addition and multiplication. Over time, the addition and multiplication principles show that the final sum or product of a collection of numbers stays the same whatever the order — stable and supportive throughout school mathematics, whatever kinds of number are involved. When other operations enter, different articulations correspond to different meanings, and hence to different groupings in brackets, which give different results. Those meanings can be written with brackets, so that the problematic aspects of operations are made explicit. Instead of rote conventions that violate the natural sequence of spoken language, we can build on meaningful human experience, and prepare a longer-term path for meaningful learning for a far wider proportion of people.</p>
+
+    <p>This approach has not, to my knowledge, been the focus of any clearly defined research project. You, dear reader, will interpret what I have suggested through your own experience — as I am biased by mine: a pure mathematician, a participant in teacher training, a parent and grandparent watching the long-term growth of his own children and grandchildren. It is time for all of us to rise above our own familiar surroundings and seek a broader vision of what it means to learn to think mathematically in an ever-changing world.</p>
+
+    <p>In this short writing, I have focused on the essential blending of linear symbolism and visual embodiment in long-term sense making. For further reading, the full framework as I understood it in 2013 is in <em>How Humans Learn to Think Mathematically</em> (Tall, 2013); the origin of my interest in articulation is told in Tall, Tall &amp; Tall (2017); and a more recent exposition, written for Japanese elementary school teachers, is Tall (2018).</p>
+  </div>
+
+  <!-- ===== Contributor colophon — Option A ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">Author</div>
+        <div class="who">David Tall</div>
+        <div class="aff">University of Warwick</div>
+      </div>
+      <div class="role">
+        <div class="lab">Translation</div>
+        <div class="who">Yasaman Baghaei</div>
+        <div class="aff">Salam School, Tehran</div>
+        <div class="who">Amir Asghari</div>
+      </div>
+      <div class="role">
+        <div class="lab">Editing &amp; layout</div>
+        <div class="who">Sharareh Taghi Dastjerdi</div>
+        <div class="aff">Isfahan House of Mathematics</div>
+      </div>
+    </div>
+    <div class="origin">Published as WikiLetter No. 5, July 2018. Republished in <em>People and Mathematics</em> with thanks.</div>
+  </div>
+
+  <div class="refs">
+    <h3>References</h3>
+    <ol>
+      <li>Mercedes McGowen &amp; David Tall (2013). Flexible Thinking and Met-befores: Impact on learning mathematics, with particular reference to the minus sign. <em>Journal of Mathematical Behavior</em>, 32, 527–537. <a href="http://homepages.warwick.ac.uk/staff/David.Tall/pdfs/dot2013b-mcgowen&tall-minus-sign.pdf">link</a></li>
+      <li>David Tall (2013). <em>How Humans Learn to Think Mathematically.</em> New York: Cambridge University Press.</li>
+      <li>David Tall (2018). Making sense of elementary arithmetic and algebra for long-term success. Draft chapter for Japanese Elementary School Teachers. <a href="http://homepages.warwick.ac.uk/staff/David.Tall/pdfs/dot2018a%20long-term-sense-making.pdf">link</a></li>
+      <li>David Tall, Nic Tall, Simon Tall (2017). Problem posing in the long-term conceptual development of a gifted child. <em>Festschrift for the 75th birthday of András Ambrus.</em> WTM-Verlag. <a href="http://homepages.warwick.ac.uk/staff/David.Tall/pdfs/dot2017a-long-term-problem-posing.pdf">link</a></li>
+    </ol>
+  </div>
+</article>
+
+<!-- =================== فارسی =================== -->
+<article class="article" data-lang-block="fa" dir="rtl" lang="fa">
+  <div class="kicker">ویکی‌نوشت · شماره‌ی ۵</div>
+  <h1 class="title">مسیر طولانی ملموس‌شدن حساب و جبر</h1>
+  <p class="standfirst">به‌چالش‌کشیدن چند باور رایج درباره‌ی آموزش: اینکه انسان‌ها در بلندمدت چگونه حساب و جبر را ملموس می‌کنند — از راهِ آنچه حس می‌کنیم، آنچه در ذهن دست‌کاری می‌کنیم، و شیوه‌ای که با دیگران سخن می‌گوییم.</p>
+  <div class="byline">
+    <span class="name">دیوید تال</span>
+  </div>
+  <p class="dedication">تقدیم به نوه‌ی دوازده‌ساله‌ام، سایمون تال.</p>
+
+  <!-- REMOVE this block if a memorial note is not wanted -->
+  <div class="memoriam">
+    <span class="mk">به یاد</span>
+    <span class="mt">دیوید تال · ۱۹۴۱–۲۰۲۴ — معلم، ریاضی‌دان، پدربزرگ.</span>
+  </div>
+
+  <div class="body">
+    <p>در این مقاله کوشیده‌ام با تمرکز بر نحوه‌ی توسعه‌ی تفکر ریاضی در بلندمدت، باورهای رایج در مورد یاددهی و یادگیری ریاضی را به چالش بکشم. هدف من این است که با توجه به نحوه‌ی درک ما از ریاضیات، رویکردی ساده برای یاددهی و یادگیری آن ارائه دهم. به‌طور خاص توجه من بر دریافت‌های حسی، دست‌کاری‌های ذهنی و تلاش برای ارتباط با دیگران است.</p>
+
+    <p>به دلیل تغییر معناییِ ریاضیات و پیچیده‌شدن آن در طول مسیر، ناچاریم بر ایده‌های «حمایتی» تمرکز کنیم — ایده‌هایی که در شرایط جدید هم به‌درستی کار می‌کنند. در نقطه‌ی مقابل، ایده‌های «مشکل‌ساز» قرار دارند که در شرایط جدید کارکرد قبلی خود را ندارند. بهتر است به ایده‌های حمایتی‌ای توجه کنیم که کارایی خود را در گستره‌ی زمانی طولانی‌تری حفظ می‌کنند؛ چنین ایده‌هایی می‌توانند مبنای تفکر ما شوند، و ایده‌هایی که مشکل‌ساز می‌شوند، به‌جای آنکه جایی در ذهن پنهان بمانند، می‌توانند به‌صراحت بررسی شوند.</p>
+
+    <p>کودک در حساب یاد می‌گیرد که بشمارد و به‌تدریج این ایده‌ی حمایتی را توسعه می‌دهد که در شمارشِ مجموعه‌ای از اشیاء، تعداد اشیاء ثابت می‌ماند. آنچه در بلندمدت اهمیت دارد محدود به کاراییِ این ایده در شمارش نیست، بلکه در وجودِ همین خاصیتِ حمایتی در عملِ جمعِ ساختارهای عددیِ پیچیده‌تر است — در کسرها، در اعداد علامت‌دار، در اعداد حقیقی و حتی در اعداد مختلط. این خاصیت را می‌توان چنین بیان کرد:</p>
+
+    <div class="principle">
+      <div class="lab">اصل جمع</div>
+      <div class="txt">در جمعِ مجموعه‌ای از اعداد، ترتیبِ اعداد در جمع‌کردن اهمیتی ندارد؛ نتیجه‌ی نهایی همواره یکسان است.</div>
+    </div>
+
+    <p>به‌طور مثال، حاصلِ جمعِ \( 2 + \tfrac{3}{4} + 1.35 + (-17) \) مستقل از ترتیبِ عواملِ جمع است.</p>
+
+    <p>در گفتار، عبارات در زمان جاری می‌شوند و در نتیجه وقتی شنیده می‌شوند توالیِ منحصربه‌فردی دارند. در همین حال، متنِ نوشته‌شده در یک توالیِ قاعده‌مند خوانده می‌شود که در جوامعِ غربی از چپ به راست است. اگر جمع و تفریق در یک توالی انجام شوند، ترتیب اهمیتی نخواهد داشت؛ از نگاهِ یک متخصص، تفریق همان جمع با قرینه‌ی عدد است. اصل جمع در سطحی پیشرفته‌تر، این ایده‌ی ساده را برای یک کودک توسعه می‌دهد که حاصلِ یک دنباله از جمع‌ها و تفریق‌ها مستقل از ترتیبِ اعمال است.</p>
+
+    <p>قانونِ مشابهی را در ضرب نیز داریم:</p>
+
+    <div class="principle">
+      <div class="lab">اصل ضرب</div>
+      <div class="txt">در ضربِ مجموعه‌ای از اعداد، ترتیبِ اعداد در ضرب‌کردن اهمیتی ندارد؛ نتیجه‌ی نهایی همواره یکسان است.</div>
+    </div>
+
+    <p>هر دو اصلِ جمع و ضرب در طولِ دورانِ مدرسه به‌درستی کار می‌کنند، اما در ساختارهای پیچیده‌تر مثلِ ضربِ ماتریس‌ها یا چهارگان‌ها درست نیستند. از طرف دیگر، وقتی عملگرهای مختلف — جمع یا ضرب، به‌توان‌رساندن، ریشه‌گیری، تشکیلِ عبارت جبری و چیزهای دیگر — وجود داشته باشند، شرایط پیچیده‌تر است و تحلیلِ دقیق‌تری می‌طلبد. با یک مثالِ ساده آغاز می‌کنیم:</p>
+
+    <div class="eq">حاصلِ \( 2 + 2 \times 2 \) چیست؟</div>
+
+    <p>اگر این عبارت را از چپ به راست بخوانیم و توالیِ اعمال را به همان ترتیبی که آمده در نظر بگیریم، از \(2+2\) شروع می‌کنیم؛ حاصل \(4\) می‌شود و سپس \(4\times 2\) را حساب می‌کنیم و \(8\) به دست می‌آید. اما با در نظر گرفتنِ این قرارداد که ضرب نسبت به جمع تقدم دارد، ابتدا \(2\times 2\) را حساب می‌کنیم و سپس \(2 + 2\times 2 = 2 + 4\) که جوابِ «درستِ» \(6\) را می‌دهد. قانونِ تقدم مشکل‌ساز است؛ چرا که از ترتیبِ طبیعیِ خواندن و حرف‌زدن پیروی نمی‌کند. در ادامه، با وجودِ عملگرهای دیگر، این قانون پیچیده‌تر می‌شود: تقدم به‌ترتیب با پرانتز، توان و ریشه، ضرب و تقسیم، و جمع و تفریق است. بعضی این قوانین را با تکرار یاد می‌گیرند و بدونِ تفکر درست به‌کار می‌برند؛ اما اکثرِ افراد هنگامِ مواجهه با ریاضیاتِ پیچیده‌تر در استفاده از آن‌ها دچار مشکل می‌شوند.</p>
+
+    <p>«ریاضیاتِ جدید» در دهه‌ی ۱۹۶۰ تلاش کرد تا با تبیینِ قوانینِ حساب — مانندِ «جابه‌جایی»، «شرکت‌پذیری» و «توزیع‌پذیری» — درستیِ این قواعد را توجیه کند. بعدها، با معرفیِ مفاهیمِ جدید مثلِ ارزشِ مکانی، کسرها، اعدادِ علامت‌دار، اعشاری‌ها، اعدادِ حقیقی و اعدادِ مختلط، این قواعد به عبارت‌های کلی‌تری «تعمیم» داده شدند. هم‌زمان، آموزشِ ریاضی مشکلِ دانش‌آموزان را «بدفهمی» تعبیر کرد و به صنعتی برای اصلاحِ آن‌ها تبدیل شد. من راهِ دیگری برای نگاه به این مشکلات پیشنهاد می‌کنم.</p>
+
+    <h2 class="subhead">ملموس‌شدنِ حساب از راهِ نحوه‌ی <em>بیانِ</em> آن</h2>
+
+    <p>می‌توان رویه‌ها را با توجه به نحوه‌ی بیانِ آن‌ها توسطِ ما و نحوه‌ی شنیدنشان توسطِ دیگران درک کرد. دستِ‌کم دو روش برای خواندنِ عبارتِ \(2+2\times 2\) وجود دارد، با مکث‌های کوتاهِ متفاوت میانِ کلمات. برای نشان‌دادنِ جای مکث، آن را با یک شکافِ رنگی علامت می‌زنم:</p>
+
+    <div class="eq artic">۲ + ۲ <span class="gap">‹·›</span> × ۲ &nbsp;&nbsp;یعنی&nbsp;&nbsp; (۲ + ۲) × ۲ = ۸</div>
+    <div class="eq artic">۲ <span class="gap">‹·›</span> + ۲ × ۲ &nbsp;&nbsp;یعنی&nbsp;&nbsp; ۲ + (۲ × ۲) = ۶</div>
+
+    <p>این دو را با صدای بلند بخوان — برای خودت و برای کسی دیگر — تا ببینی جای مکث چگونه دو معنیِ کاملاً متفاوت را منتقل می‌کند. این کار را پیش از ادامه‌ی مقاله انجام بده. این تفاوت، اصلِ کلی‌تری را نشان می‌دهد که نه‌تنها در حساب که در جبر هم به‌کار می‌رود:</p>
+
+    <div class="principle">
+      <div class="lab">اصلِ بخش‌بندیِ کلامی</div>
+      <div class="txt">می‌توان به یک دنباله از عملگرها با شیوه‌ی بخش‌بندیِ کلامیِ آن‌ها معنی بخشید.</div>
+    </div>
+
+    <p>من زمانی به قدرتِ این اصل پی بردم که نوه‌ام — که آن زمان ۱۱ ساله بود و با توان‌های اعدادِ منفی آشنا بود — با زیرکی از من پرسید: «ریشه‌ی دومِ ۹ ضربدر ۹ چی می‌شه؟»؛ این را خیلی هموار و بدونِ هیچ تأکیدی پرسید. چون می‌دانستم با مربعِ اعدادِ منفی آشناست، پاسخ دادم جوابش می‌تواند \(+9\) یا \(-9\) باشد.</p>
+
+    <div class="pullquote">گفت: «نه! جوابش ۲۷ است!» جا خوردم. منظورش این بود: ریشه‌ی دومِ ۹ <span class="gap">‹·›</span> ضربدرِ ۹ — یعنی \(\sqrt{9}=3\)، ضربدرِ ۹.</div>
+
+    <p>خیلی غافل‌گیرانه، نوه‌ام دریچه‌ی جدیدی برای درکِ عملگرها در حساب و جبر گشود. او راهِ تازه‌ای برای درکِ معنی‌دار به من آموخت: اینکه به‌جای یادگرفتنِ قواعدِ تقدمِ دل‌بخواهی، می‌توان روی نحوه‌ی صحبت‌کردن درباره‌ی عبارت‌های ریاضی — و بیانِ ایده‌ها به‌گونه‌ای که دیگران بتوانند بشنوند — تمرکز کرد.</p>
+
+    <p>آنچه در موردِ جمع و ضرب برقرار است، در موردِ عملگرهای دیگر مشکل‌ساز می‌شود. مثلاً تفریق می‌تواند با بخش‌بندی‌های متفاوت معانیِ متفاوت بدهد. اگر \(5-3-1\) را «۵ منهای <span class="gap">‹·›</span> ۳ منهای ۱» بخوانیم، یعنی \(5-(3-1)=4\)؛ و اگر «۵ منهای ۳ <span class="gap">‹·›</span> منهای ۱» بگوییم، یعنی \((5-3)-1 = 1\).</p>
+
+    <h2 class="subhead">کاربردهای عمومیِ اصلِ بخش‌بندیِ کلامی</h2>
+
+    <p>هفته‌ها و ماه‌ها بعد از بینشی که نوه‌ام به من داد، فهمیدم این اصل به‌صورتِ گسترده‌ای در ترکیبِ عملگرهای مختلف ظاهر می‌شود. مثلاً وقتی با مک‌گاون (تال و مک‌گاون، ۲۰۱۳) مشکلاتِ دانش‌آموزان را در کار با عبارت‌های درجه‌ی دوم مطالعه می‌کردیم، دیدیم محاسبه‌ی \(x^2\) به‌ازای \(x=-2\) می‌تواند دو تعبیرِ مختلف داشته باشد: بعضی آن را «مربعِ منهای ۲» می‌خواندند و بعضی «منهای مربعِ ۲». به‌طور کلی \(-x^2\) را می‌توان چنین تعبیر کرد:</p>
+
+    <div class="eq">«منهای <span class="gap" style="font-family:serif">‹·›</span> \(x\) به‌توانِ ۲» \(= -(x^2)\) &nbsp;&nbsp;یا&nbsp;&nbsp; «منهای \(x\) <span class="gap" style="font-family:serif">‹·›</span> به‌توانِ ۲» \(= (-x)^2\).</div>
+
+    <p>این، راهِ تازه‌ای برای تفسیرِ داده‌ها به ما می‌دهد: به‌جای تعبیرِ مشکلِ دانش‌آموزان به‌عنوانِ بدفهمی در استفاده از پرانتز، می‌توان آن‌ها را روش‌های متفاوتِ بیان و شنیدنِ نمادها دانست. البته قراردادهایی هم برای کوتاه‌کردنِ عبارت‌ها لازم‌اند: دو برابرِ \(x\) را \(2x\) می‌نویسیم (و علامتِ ضرب را، جایی که اشتباهی پیش نمی‌آید، حذف می‌کنیم). کاربردهای ظریف‌تری هم هست، جایی که \(2x\) یعنی \(2\) ضربدرِ \(x\)، \(2\tfrac12\) یعنی \(2 + \tfrac12\)، و \(21\) یعنی \(2\times 10 + 1\). با این‌همه، اصل‌های جمع و ضرب خواندنِ عبارت‌ها را ساده‌تر می‌کنند.</p>
+
+    <h2 class="subhead">اتصال</h2>
+
+    <p>خواندنِ عبارتِ پیچیده‌تری مثلِ \(2x^2 + 7x + 5 + 3x^2 - 3x\) سطحِ دشوارتری دارد. بنا بر اصلِ جمع، ترتیبِ جمله‌ها مهم نیست، پس می‌توان آن را \(2x^2 + 3x^2 + 7x - 3x + 5\) بازنویسی کرد. اگر \(x^2\) را یک شیءِ مجزا در نظر بگیریم، دو تا از آن را با سه تا جمع می‌کنیم و \(5x^2\) به دست می‌آید؛ به‌همین‌ترتیب \(7x-3x\) می‌شود \(4x\). توجه کن که جمله‌ای مثلِ \(3x^2\) صرفاً خطی نوشته نشده — توانِ \(2\) بالا نوشته شده است.</p>
+
+    <p>در مثال‌های پیچیده‌تر، علائم نه در دنباله‌ای خطی بلکه در موقعیتی مکانی قرار می‌گیرند:</p>
+
+    <div class="eq">\[ \sqrt[3]{\dfrac{4x^3 - 2}{x^2 + 1}} \tag{1} \]</div>
+
+    <p>این را می‌توان خطی نوشت و دنباله‌ای گفت: «ریشه‌ی سومِ ((چهار برابرِ مکعبِ \(x\)) منهای دو) بر (مربعِ \(x\) به‌علاوه‌ی یک)»، که پرانتزها نشان می‌دهند نمادها چگونه دسته‌بندی شده‌اند. اینجا نوشتن و خواندن از گفتن و شنیدن آسان‌تر است؛ حسِ بصریِ این نمادها با حسِ نمادینشان تلفیق می‌شود. برای خواندنِ چنین نمادی باید آن را اسکن و تعبیر کرد: در عبارتِ (۱)، توان‌های \(x^3\) و \(x^2\) هرکدام به‌عنوانِ یک کلِ یکپارچه به هم «متصل»اند؛ صورتِ کسر \(4x^3-2\) اختلافِ دو جمله است و مخرجِ \(x^2+1\) حاصلِ جمعِ دو جمله.</p>
+
+    <p>بعضی قراردادها وضوحِ کمتری دارند. عبارتِ \(e^{x^2}\) معمولاً «\(e\) به‌توانِ \(x^2\)» خوانده می‌شود، نه «مربعِ \(e^x\)». (برای متقاعدشدن، در نظر بگیر که \(e^{x^2+x}\) برایت چه معنایی دارد.) اگر توان را به‌شکلِ <span class="sans">x^n</span> بنویسیم، \(e^{x^2}\) می‌شود <span class="sans">e^x^2</span>، و با پرانتز تفاوتِ \(e^{(x^2)}\) و \((e^x)^2\) دیده می‌شود: اولی «اتصال از راست» و دومی «اتصال از چپ» است. همین‌طور تعبیرِ معمولِ \(2^{3^4}\) برابرِ \(2^{(3^4)} = 2^{81}\) است — اتصال از راست — که با خواندنِ چپ‌به‌راستِ \((2^3)^4 = 2^{12}\) فرق دارد. این با جمع و ضرب کاملاً متفاوت است، که در آن‌ها اتصال از چپ و راست یکسان است: \((2+3)+4 = 2+(3+4)\) و \((2\times 3)\times 4 = 2\times(3\times 4)\).</p>
+
+    <h2 class="subhead">جمع‌بندی</h2>
+
+    <p>این بحث‌ها درباره‌ی مسیرِ طولانیِ ملموس‌شدنِ حساب و جبر چه می‌گویند؟ اینکه ملموس‌شدن، در ابتدا می‌تواند با توجه به بخش‌بندیِ کلامیِ عبارت‌های جمعی و ضربی روشن شود. به‌تدریج، اصل‌های جمع و ضرب به ما می‌آموزند که با هر ترتیبی که جمع یا ضرب انجام شود، نتیجه‌ی نهایی یکسان است — اصولی که در طولِ ریاضیِ مدرسه پایدار و حمایتی می‌مانند، فارغ از نوعِ اعداد. از طرفِ دیگر، در عملگرهای دیگر، بخش‌بندی‌های کلامیِ متفاوت نیازمندِ استفاده از پرانتز در نوشتن‌اند؛ چرا که بیان‌های متفاوت، معانی و نتایجِ متفاوت دارند. به این ترتیب، به‌جای اصرار بر یاددادنِ طوطی‌وارِ قراردادهایی که با توالیِ طبیعیِ گفتار همخوانی ندارند، می‌توان به‌صراحت بر جنبه‌های مسئله‌دارِ عمل‌ها تمرکز کرد و نشان داد که چگونه تفاوتِ مفهومیِ بیان‌های متفاوت را می‌توان با استفاده‌ی درست از پرانتز نوشت. با چنین تجربه‌ی انسانی‌ای شاید بتوان در درازمدت مسیرِ معنادارتری برای یادگیریِ گروهِ بیشتری از افراد فراهم کرد.</p>
+
+    <p>تا جایی که می‌دانم، این رویکرد تاکنون در کانونِ توجهِ یک پروژه‌ی تحقیقی نبوده است. تو، خواننده‌ی عزیز، آنچه را پیشنهاد کرده‌ام در سایه‌ی تجربیاتِ خودت تفسیر خواهی کرد — همچنان که من هم آن‌ها را با توجه به تجربیاتم می‌فهمم: تجربه‌ی یک ریاضی‌دانِ محض، یک شرکت‌کننده در دوره‌های تربیتِ معلم، و یک پدر و پدربزرگ که شاهدِ رشدِ درازمدتِ کودکان و نوه‌هایش بوده است. اکنون فرصتی هست تا هر یک از ما پا را از تجربه‌ی شخصیِ خود فراتر بگذاریم و در دنیایی که مدام در حالِ تغییر است، در جست‌وجوی تصویرِ بزرگ‌تری از معنای یادگیریِ تفکرِ ریاضی باشیم.</p>
+
+    <p>در این نوشته‌ی کوتاه، تمرکزِ من بر تلفیقِ ضروریِ نمادگذاریِ خطی و مجسم‌سازیِ تصویری برای ملموس‌شدنِ حساب و جبر در درازمدت بود. برای مطالعه‌ی بیشتر می‌توانی به کتابِ <em>چگونه انسان‌ها یاد می‌گیرند ریاضی‌وار فکر کنند</em> (تال، ۲۰۱۳) رجوع کنی؛ داستانِ آغازِ علاقه‌ام به بخش‌بندیِ کلامی در تال، تال و تال (۲۰۱۷) آمده، و تازه‌ترین تفسیرم — نوشته‌شده برای معلمانِ دبستانِ ژاپن — تال (۲۰۱۸) است.</p>
+  </div>
+
+  <!-- ===== کارنامه‌ی دست‌اندرکاران — گزینه‌ی الف ===== -->
+  <div class="colophon">
+    <div class="roles">
+      <div class="role">
+        <div class="lab">نویسنده</div>
+        <div class="who">دیوید تال</div>
+        <div class="aff">دانشگاه واریک</div>
+      </div>
+      <div class="role">
+        <div class="lab">ترجمه</div>
+        <div class="who">یاسمن بقایی</div>
+        <div class="aff">مجموعه‌ی سلام، تهران</div>
+        <div class="who">امیر اصغری</div>
+      </div>
+      <div class="role">
+        <div class="lab">ویرایش و صفحه‌آرایی</div>
+        <div class="who">شراره تقی دستجردی</div>
+        <div class="aff">خانه‌ی ریاضیات اصفهان</div>
+      </div>
+    </div>
+    <div class="origin">نخست به‌صورتِ ویکی‌نوشتِ شماره‌ی ۵، تیر ۱۳۹۷ منتشر شد. با سپاس، در «آدم‌ها و ریاضیات» بازنشر شده است.</div>
+  </div>
+
+  <div class="refs">
+    <h3>مراجع</h3>
+    <ol>
+      <li>Mercedes McGowen &amp; David Tall (2013). Flexible Thinking and Met-befores: Impact on learning mathematics, with particular reference to the minus sign. <em>Journal of Mathematical Behavior</em>, 32, 527–537. <a href="http://homepages.warwick.ac.uk/staff/David.Tall/pdfs/dot2013b-mcgowen&tall-minus-sign.pdf">link</a></li>
+      <li>David Tall (2013). <em>How Humans Learn to Think Mathematically.</em> New York: Cambridge University Press.</li>
+      <li>David Tall (2018). Making sense of elementary arithmetic and algebra for long-term success. Draft chapter for Japanese Elementary School Teachers. <a href="http://homepages.warwick.ac.uk/staff/David.Tall/pdfs/dot2018a%20long-term-sense-making.pdf">link</a></li>
+      <li>David Tall, Nic Tall, Simon Tall (2017). Problem posing in the long-term conceptual development of a gifted child. <em>Festschrift for the 75th birthday of András Ambrus.</em> WTM-Verlag. <a href="http://homepages.warwick.ac.uk/staff/David.Tall/pdfs/dot2017a-long-term-problem-posing.pdf">link</a></li>
+    </ol>
+  </div>
+</article>
+
+<footer class="footer">
+  <span class="fl">A Mathswell publication · <a href="../index.html">mathswell.com</a></span>
+  <span style="display:flex;gap:14px;align-items:center;"><a class="back" href="javascript:window.print()" data-en="↓ Download PDF" data-fa="↓ دریافت پی‌دی‌اف"></a><a class="back" href="../index.html" data-en="← Back to the journal" data-fa="بازگشت به مجله →"></a></span>
+</footer>
+
+<script>
+  function applyLabels(lang){
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if (v !== null) el.textContent = v;
+    });
+  }
+  function setLang(lang){
+    var isFa = lang === 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isFa ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang-block]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang-block') === lang);
+    });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-lang') === lang);
+    });
+    applyLabels(lang);
+    try { localStorage.setItem('pm-lang', lang); } catch(e){}
+  }
+  var start = 'en';
+  try { var s = localStorage.getItem('pm-lang'); if (s === 'en' || s === 'fa') start = s; } catch(e){}
+  setLang(start);
+
+  // Render math once KaTeX is ready
+  function renderMath(){
+    if (!window.renderMathInElement) { setTimeout(renderMath, 60); return; }
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+  renderMath();
+</script>
+<script src="../counter.js"></script>
+</body>
+</html>
