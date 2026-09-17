@@ -270,59 +270,84 @@
         .quiz-question {
             font-size: 1rem;
             font-weight: 500;
+            margin-bottom: 0.35rem;
+        }
+        .quiz-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
             margin-bottom: 1rem;
         }
-        .quiz-options { display: flex; flex-direction: column; gap: 0.6rem; }
-        .quiz-option {
+        /* Drag-to-order list */
+        .order-list { display: flex; flex-direction: column; gap: 0.6rem; }
+        .order-card {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.75rem;
             padding: 0.85rem 1rem;
             border: 2px solid #e5e7eb;
             border-radius: 10px;
             background: white;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-            text-align: left;
+            cursor: grab;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.05s;
             min-height: 44px;
         }
-        .quiz-option:hover:not(.locked) {
+        .order-card:active { cursor: grabbing; }
+        .order-card.dragging {
+            opacity: 0.9;
+            box-shadow: 0 8px 20px rgba(15,118,110,0.18);
             border-color: var(--primary-light);
-            background: var(--interactive);
         }
-        .quiz-option .option-marker {
+        .order-card.drop-above { border-top: 3px solid var(--primary); }
+        .order-card.drop-below { border-bottom: 3px solid var(--primary); }
+        .drag-handle {
             flex-shrink: 0;
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            border: 2px solid #d1d5db;
+            width: 24px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-muted);
+            gap: 3px;
+            padding-top: 4px;
+            color: #cbd5e1;
+            cursor: grab;
         }
-        .quiz-option.correct {
+        .drag-handle span { width: 16px; height: 2px; background: currentColor; border-radius: 2px; }
+        .order-card-body { flex: 1; }
+        .order-step {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+        .order-reason {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+        /* Locked-correct state */
+        .order-card.locked { cursor: default; }
+        .order-card.locked .drag-handle { visibility: hidden; }
+        .order-list.solved .order-card {
             border-color: var(--success);
             background: #ecfdf5;
         }
-        .quiz-option.correct .option-marker {
-            border-color: var(--success);
+        .order-position {
+            flex-shrink: 0;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: var(--interactive);
+            color: var(--primary);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .order-list.solved .order-position {
+            display: flex;
             background: var(--success);
             color: white;
         }
-        .quiz-option.incorrect {
-            border-color: var(--accent-red);
-            background: #fef2f2;
-        }
-        .quiz-option.incorrect .option-marker {
-            border-color: var(--accent-red);
-            background: var(--accent-red);
-            color: white;
-        }
-        .quiz-option.locked { cursor: default; }
-        .quiz-option.dimmed { opacity: 0.55; }
 
         .quiz-feedback {
             margin-top: 1rem;
@@ -541,20 +566,11 @@ const package = {
             `,
             file: "vectors-planes/vector-given-length.mp4",
             cover: "https://videos.mathswell.com/vectors-planes/vector-given-length.png",
-            quiz: {
-                question: "To get a vector of length 5 pointing the same way as $\\vec{v}$, what do you do first?",
-                options: [
-                    "Multiply $\\vec{v}$ by 5 directly",
-                    "Divide $\\vec{v}$ by its own length to get a unit vector",
-                    "Add 5 to each component of $\\vec{v}$",
-                    "Square each component of $\\vec{v}$"
-                ],
-                correct: 1,
-                feedback: {
-                    correct: "Exactly — normalise first (divide by $|\\vec{v}|$), then scale by 5. The unit vector keeps the direction; the 5 sets the length.",
-                    incorrect: "Not quite. The direction must be preserved first by making a unit vector (divide by $|\\vec{v}|$), and only then do we scale to the length we want."
-                }
-            },
+            order: [
+                { step: "Find the magnitude $|\\vec{v}|$", reason: "We need the vector's current length before we can rescale it." },
+                { step: "Divide $\\vec{v}$ by $|\\vec{v}|$", reason: "This gives a unit vector — same direction, length exactly 1." },
+                { step: "Multiply the unit vector by the target length", reason: "Scaling a length-1 vector by $L$ gives length $L$, keeping the direction." }
+            ],
             appLink: { url: APP_URL, label: "Lines and Planes in 3D", desc: "Try it interactively" }
         },
         {
@@ -567,20 +583,11 @@ const package = {
             `,
             file: "vectors-planes/line-in-3d.mp4",
             cover: "https://videos.mathswell.com/vectors-planes/line-in-3d.png",
-            quiz: {
-                question: "The parametric equation of a line $\\vec{r} = \\vec{a} + t\\vec{d}$ uses $\\vec{a}$ and $\\vec{d}$. What are they?",
-                options: [
-                    "$\\vec{a}$ is the direction, $\\vec{d}$ is a point on the line",
-                    "$\\vec{a}$ is a point on the line, $\\vec{d}$ is the direction",
-                    "Both are points on the line",
-                    "Both are directions the line travels in"
-                ],
-                correct: 1,
-                feedback: {
-                    correct: "Right. $\\vec{a}$ anchors the line at a known point, and $\\vec{d}$ is the direction; the parameter $t$ slides you along it.",
-                    incorrect: "Look again: $\\vec{a}$ is the position vector of a point on the line (where you start), and $\\vec{d}$ is the direction you travel as $t$ changes."
-                }
-            },
+            order: [
+                { step: "Pick a known point on the line", reason: "A line needs an anchor to fix it in space." },
+                { step: "Pick a direction vector", reason: "A point alone isn't enough — the line also needs a way to travel." },
+                { step: "Write $\\vec{r} = \\vec{a} + t\\vec{d}$", reason: "Adding every multiple of the direction to the point traces the whole line." }
+            ],
             appLink: { url: APP_URL, label: "Lines and Planes in 3D", desc: "Visualise lines in space" }
         },
         {
@@ -594,20 +601,11 @@ const package = {
             `,
             file: "vectors-planes/equation-of-plane.mp4",
             cover: "https://videos.mathswell.com/vectors-planes/equation-of-plane.png",
-            quiz: {
-                question: "The equation of a plane is built around its normal vector $\\vec{n}$. What is special about $\\vec{n}$?",
-                options: [
-                    "It lies flat inside the plane",
-                    "It is perpendicular to the plane",
-                    "It is parallel to the x-axis",
-                    "It has length 1 always"
-                ],
-                correct: 1,
-                feedback: {
-                    correct: "Yes — $\\vec{n}$ sticks straight out of the plane. Any vector lying in the plane is perpendicular to it, which is exactly what gives the plane equation.",
-                    incorrect: "Not quite. The normal vector $\\vec{n}$ points perpendicular to the plane (straight out of it), not within it. That perpendicularity is the whole key."
-                }
-            },
+            order: [
+                { step: "Take the normal vector $\\vec{n}$", reason: "The direction perpendicular to the plane is what defines its tilt." },
+                { step: "Take a known point on the plane", reason: "Infinitely many parallel planes share a normal; the point picks out ours." },
+                { step: "Set $(\\vec{r} - \\vec{r_0}) \\cdot \\vec{n} = 0$", reason: "Every vector lying in the plane is perpendicular to $\\vec{n}$, so their dot product is zero." }
+            ],
             appLink: { url: APP_URL, label: "Lines and Planes in 3D", desc: "Build a plane from a normal" }
         },
         {
@@ -620,20 +618,11 @@ const package = {
             `,
             file: "vectors-planes/vector-projection.mp4",
             cover: "https://videos.mathswell.com/vectors-planes/vector-projection.png",
-            quiz: {
-                question: "The projection of $\\vec{a}$ onto $\\vec{b}$ tells you...",
-                options: [
-                    "The total length of $\\vec{a}$ plus $\\vec{b}$",
-                    "How much of $\\vec{a}$ points in the direction of $\\vec{b}$",
-                    "The angle between $\\vec{a}$ and $\\vec{b}$ in degrees",
-                    "Whether $\\vec{a}$ and $\\vec{b}$ are equal"
-                ],
-                correct: 1,
-                feedback: {
-                    correct: "Exactly — it's the component of $\\vec{a}$ along $\\vec{b}$'s direction, the shadow $\\vec{a}$ casts onto $\\vec{b}$.",
-                    incorrect: "Think of a shadow: the projection measures how much of $\\vec{a}$ lies along the direction of $\\vec{b}$ — its component in that direction."
-                }
-            },
+            order: [
+                { step: "Compute the dot product $\\vec{a} \\cdot \\vec{b}$", reason: "The dot product measures how much $\\vec{a}$ and $\\vec{b}$ align." },
+                { step: "Divide by $|\\vec{b}|$", reason: "We want the length of $\\vec{a}$ along $\\vec{b}$, independent of $\\vec{b}$'s own length." },
+                { step: "Multiply by $\\vec{b}$'s unit direction", reason: "The projection is a vector, so it needs $\\vec{b}$'s direction restored." }
+            ],
             appLink: { url: APP_URL, label: "Lines and Planes in 3D", desc: "See projections in action" }
         }
     ]
@@ -689,32 +678,25 @@ package.steps.forEach((step, i) => {
         <div class="quiz">
             <div class="quiz-header">
                 <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
-                <h3>Quick Check</h3>
+                <h3>Quick Check — Put the steps in order</h3>
             </div>
-            <div class="quiz-question" id="question-${i}">${step.quiz.question}</div>
-            <div class="quiz-options" id="options-${i}"></div>
+            <div class="quiz-question">Drag the cards into the correct sequence for this method.</div>
+            <div class="quiz-hint" id="hint-${i}">Each card names a step and the reason behind it.</div>
+            <div class="order-list" id="order-${i}"></div>
             <div class="quiz-feedback" id="feedback-${i}"></div>
-            <button class="quiz-retry" id="retry-${i}">Try again</button>
+            <button class="quiz-retry" id="retry-${i}">Shuffle &amp; try again</button>
         </div>
     `;
     content.appendChild(stepEl);
 
-    // Build options
-    const optionsEl = stepEl.querySelector(`#options-${i}`);
-    const letters = ['A', 'B', 'C', 'D', 'E'];
-    step.quiz.options.forEach((opt, j) => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-option';
-        btn.innerHTML = `<span class="option-marker">${letters[j]}</span><span class="option-text">${opt}</span>`;
-        btn.addEventListener('click', () => handleAnswer(i, j));
-        optionsEl.appendChild(btn);
-    });
+    // Build the drag-to-order list (shuffled)
+    buildOrderList(i, step.order);
 
     // Video cover click
     stepEl.querySelector('.video-cover').addEventListener('click', () => loadVideo(i));
 
-    // Retry
-    stepEl.querySelector(`#retry-${i}`).addEventListener('click', () => resetQuiz(i));
+    // Retry → reshuffle
+    stepEl.querySelector(`#retry-${i}`).addEventListener('click', () => resetOrder(i));
 });
 
 // Completion block
@@ -798,51 +780,144 @@ function loadVideo(i) {
 // ═══════════════════════════════════════════════════════════════
 // Quiz logic
 // ═══════════════════════════════════════════════════════════════
-function handleAnswer(stepIndex, optionIndex) {
-    const step = package.steps[stepIndex];
-    if (answered[stepIndex] === true) return; // already correct, locked
+// ═══════════════════════════════════════════════════════════════
+// Drag-to-order engine
+// ═══════════════════════════════════════════════════════════════
+// Fisher–Yates shuffle that guarantees a non-identity order (so it's never pre-solved)
+function shuffledIndices(n) {
+    if (n <= 1) return [...Array(n).keys()];
+    let idx;
+    do {
+        idx = [...Array(n).keys()];
+        for (let i = n - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [idx[i], idx[j]] = [idx[j], idx[i]];
+        }
+    } while (idx.every((v, i) => v === i)); // reshuffle if it landed already-sorted
+    return idx;
+}
 
-    const options = document.querySelectorAll(`#options-${stepIndex} .quiz-option`);
+function buildOrderList(stepIndex, orderData) {
+    const listEl = document.getElementById(`order-${stepIndex}`);
+    listEl.classList.remove('solved');
+    listEl.innerHTML = '';
+
+    const order = shuffledIndices(orderData.length);
+    order.forEach(correctIdx => {
+        const item = orderData[correctIdx];
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.draggable = true;
+        card.dataset.correct = correctIdx;   // its correct position (0-based)
+        card.innerHTML = `
+            <div class="order-position"></div>
+            <div class="drag-handle"><span></span><span></span><span></span></div>
+            <div class="order-card-body">
+                <div class="order-step">${item.step}</div>
+                <div class="order-reason">${item.reason}</div>
+            </div>
+        `;
+        attachDrag(card, stepIndex);
+        listEl.appendChild(card);
+    });
+
+    renderMath(listEl);
+    checkOrder(stepIndex, false); // initial state — do not flag as incorrect yet
+}
+
+function attachDrag(card, stepIndex) {
+    card.addEventListener('dragstart', e => {
+        if (card.classList.contains('locked')) { e.preventDefault(); return; }
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        document.querySelectorAll(`#order-${stepIndex} .order-card`)
+            .forEach(c => c.classList.remove('drop-above','drop-below'));
+        checkOrder(stepIndex);
+    });
+    card.addEventListener('dragover', e => {
+        e.preventDefault();
+        const list = document.getElementById(`order-${stepIndex}`);
+        const dragging = list.querySelector('.dragging');
+        if (!dragging || dragging === card) return;
+        const rect = card.getBoundingClientRect();
+        const after = (e.clientY - rect.top) > rect.height / 2;
+        if (after) list.insertBefore(dragging, card.nextSibling);
+        else list.insertBefore(dragging, card);
+    });
+
+    // ── Touch support (drag events don't fire on most touchscreens) ──
+    let touchClone = null, startY = 0;
+    card.addEventListener('touchstart', e => {
+        if (card.classList.contains('locked')) return;
+        card.classList.add('dragging');
+        startY = e.touches[0].clientY;
+    }, {passive:true});
+    card.addEventListener('touchmove', e => {
+        if (!card.classList.contains('dragging')) return;
+        e.preventDefault();
+        const y = e.touches[0].clientY;
+        const list = document.getElementById(`order-${stepIndex}`);
+        const siblings = [...list.querySelectorAll('.order-card:not(.dragging)')];
+        const below = siblings.find(s => {
+            const r = s.getBoundingClientRect();
+            return y < r.top + r.height / 2;
+        });
+        if (below) list.insertBefore(card, below);
+        else list.appendChild(card);
+    }, {passive:false});
+    card.addEventListener('touchend', () => {
+        if (!card.classList.contains('dragging')) return;
+        card.classList.remove('dragging');
+        checkOrder(stepIndex);
+    });
+}
+
+function checkOrder(stepIndex, announce = true) {
+    const list = document.getElementById(`order-${stepIndex}`);
+    const cards = [...list.querySelectorAll('.order-card')];
     const feedback = document.getElementById(`feedback-${stepIndex}`);
     const retry = document.getElementById(`retry-${stepIndex}`);
-    const isCorrect = optionIndex === step.quiz.correct;
 
-    if (isCorrect) {
+    const correct = cards.every((card, pos) => parseInt(card.dataset.correct) === pos);
+
+    if (correct) {
         answered[stepIndex] = true;
-        options.forEach((o, j) => {
-            o.classList.add('locked');
-            if (j === optionIndex) o.classList.add('correct');
-            else o.classList.add('dimmed');
+        list.classList.add('solved');
+        cards.forEach((card, pos) => {
+            card.classList.add('locked');
+            card.draggable = false;
+            card.querySelector('.order-position').textContent = pos + 1;
         });
         feedback.className = 'quiz-feedback correct show';
-        feedback.innerHTML = step.quiz.feedback.correct;
+        feedback.innerHTML = 'Correct — that\'s the right sequence, and each step follows from the one before.';
         retry.classList.remove('show');
     } else {
-        answered[stepIndex] = false;
-        options[optionIndex].classList.add('incorrect');
-        feedback.className = 'quiz-feedback incorrect show';
-        feedback.innerHTML = step.quiz.feedback.incorrect;
-        retry.classList.add('show');
+        // announce=false is the silent initial build: leave state untouched, no message.
+        if (announce) {
+            answered[stepIndex] = false;   // user has interacted; count as attempted-not-yet-correct
+            feedback.className = 'quiz-feedback incorrect show';
+            feedback.innerHTML = 'Not in order yet — think about which step has to happen before the others can.';
+            retry.classList.add('show');
+        }
     }
-
-    renderMath(document.getElementById(`feedback-${stepIndex}`));
     updateProgress();
 }
 
-function resetQuiz(stepIndex) {
-    const options = document.querySelectorAll(`#options-${stepIndex} .quiz-option`);
-    options.forEach(o => o.classList.remove('incorrect', 'dimmed', 'correct', 'locked'));
+function resetOrder(stepIndex) {
+    answered[stepIndex] = null;
     document.getElementById(`feedback-${stepIndex}`).className = 'quiz-feedback';
     document.getElementById(`retry-${stepIndex}`).classList.remove('show');
-    answered[stepIndex] = null;
-    updateProgress();
+    buildOrderList(stepIndex, package.steps[stepIndex].order);
 }
 
 function showCompletion() {
     const el = document.getElementById('completion');
     el.style.display = 'block';
     document.getElementById('completionScore').textContent =
-        `All ${totalSteps} checks passed on first or later try`;
+        `All ${totalSteps} step-sequences solved`;
 }
 
 // ═══════════════════════════════════════════════════════════════
