@@ -482,6 +482,23 @@
         @media (max-width: 400px) {
             .video-grid { grid-template-columns: 1fr; }
         }
+
+        /* ── Disclaimer footer ── */
+        .site-footer {
+            max-width: 720px;
+            margin: 1rem auto 0;
+            padding: 1.5rem 1rem 2.5rem;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        .site-footer p {
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+        }
+        .site-footer p:last-child { margin-bottom: 0; }
+        .site-footer strong { color: var(--text-primary); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -528,6 +545,12 @@
     </div>
 </div>
 
+
+<footer class="site-footer">
+    <p><strong>M.Reachable</strong> exists to make mathematics reachable for every learner. Originally funded by Liverpool John Moores University, it is supervised by Dr. Amir Asghari of the Department of Mathematics in the School of Computer Science and Mathematics, and created with undergraduate students from the department.</p>
+    <p>M.Reachable is an independent project by staff and students in the department, not an official university project. These videos are shared here on mathswell.com, a personal project of Dr. Amir Asghari.</p>
+</footer>
+
 <!-- Modal -->
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
@@ -573,7 +596,7 @@ const series = {
         name: "Vectors & Planes in 3D",
         description: "A four-part journey from vector basics to the equation of a plane, with a quick check after each video.",
         packageUrl: "/maths-shorts/vectors-planes-3d/",
-        cover: "https://videos.mathswell.com/vectors-planes/vector-given-length.jpg",
+        cover: "https://videos.mathswell.com/vectors-planes/vectors-series-cover.jpg",
         emoji: "📐",
         topics: ["Vectors & Planes"]
     },
