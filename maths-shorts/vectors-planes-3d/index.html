@@ -634,6 +634,7 @@ const package = {
 const content = document.getElementById('packageContent');
 const totalSteps = package.steps.length;
 let answered = new Array(totalSteps).fill(null); // null | true | false
+let progressReady = false; // becomes true once the sticky progress bar is built
 
 // Intro story
 const introEl = document.createElement('div');
@@ -726,6 +727,7 @@ content.appendChild(creditEl);
 // Progress bar
 // ═══════════════════════════════════════════════════════════════
 const progressStepsEl = document.getElementById('progressSteps');
+progressReady = true;
 for (let i = 0; i < totalSteps; i++) {
     const s = document.createElement('div');
     s.className = 'progress-step';
@@ -903,7 +905,11 @@ function checkOrder(stepIndex, announce = true) {
             retry.classList.add('show');
         }
     }
-    updateProgress();
+    // Only touch the progress bar once it exists (it's built after the render loop),
+    // and never during the silent initial build.
+    if (announce && progressReady) {
+        updateProgress();
+    }
 }
 
 function resetOrder(stepIndex) {
