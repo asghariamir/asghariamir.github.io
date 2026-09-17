@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vectors & Planes in 3D | Maths Shorts | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #115e59;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+            --card-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding-top: 60px;
+            line-height: 1.6;
+        }
+
+        /* Nav */
+        .mathswell-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .mw-link {
+            display: flex; align-items: center; gap: 0.5rem;
+            text-decoration: none; color: var(--primary);
+            font-weight: 600; letter-spacing: 1px;
+        }
+
+        .container { max-width: 720px; margin: 0 auto; padding: 0 1rem; }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 1.5rem 0 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .breadcrumb a { color: var(--primary); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* Package header */
+        .package-header {
+            text-align: center;
+            padding: 2rem 0 1.5rem;
+        }
+        .package-kicker {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.3rem 0.85rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+        }
+        .package-header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        .package-intro {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .package-meta {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .package-meta span { display: flex; align-items: center; gap: 0.35rem; }
+        .package-meta svg { width: 15px; height: 15px; fill: var(--primary); }
+
+        /* Progress bar (sticky) */
+        .progress-wrap {
+            position: sticky;
+            top: 60px;
+            z-index: 90;
+            background: rgba(247,250,249,0.95);
+            backdrop-filter: blur(8px);
+            padding: 0.75rem 0;
+            margin-bottom: 1rem;
+        }
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .progress-step {
+            flex: 1;
+            max-width: 80px;
+            height: 5px;
+            border-radius: 999px;
+            background: #d1d5db;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+        .progress-step.done { background: var(--primary-light); }
+        .progress-step.current { background: var(--primary); }
+        .progress-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Story block */
+        .story {
+            background: white;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: var(--card-shadow);
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        .story.intro-story {
+            border-left-color: var(--accent-amber);
+            background: linear-gradient(135deg, #fffbf0, white);
+        }
+        .story p { margin-bottom: 0.75rem; }
+        .story p:last-child { margin-bottom: 0; }
+
+        /* Video step */
+        .step {
+            margin: 2rem 0;
+            scroll-margin-top: 130px;
+        }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+        .step-title {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Video player area */
+        .video-frame {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1rem;
+        }
+        .video-cover {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            cursor: pointer;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        }
+        .video-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .video-cover .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.15);
+            transition: background 0.25s;
+        }
+        .video-cover:hover .play-overlay { background: rgba(0,0,0,0.05); }
+        .play-circle {
+            width: 72px; height: 72px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            transition: transform 0.25s;
+        }
+        .video-cover:hover .play-circle { transform: scale(1.08); }
+        .play-circle svg { width: 30px; height: 30px; fill: var(--primary); margin-left: 4px; }
+        .ig-badge {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: rgba(225,48,108,0.9);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+        }
+        .video-embed-container { display: none; }
+        .video-embed-container.active {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: #000;
+        }
+        /* Vertical 9:16 player */
+        .video-embed-container video {
+            width: 100%;
+            max-width: 360px;      /* keeps the 9:16 reel a sensible size on desktop */
+            aspect-ratio: 9 / 16;
+            border-radius: 10px;
+            background: #000;
+            display: block;
+        }
+
+        /* Quiz */
+        .quiz {
+            background: white;
+            border: 2px solid var(--interactive);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+        .quiz-header svg { width: 22px; height: 22px; fill: var(--primary); }
+        .quiz-header h3 { font-size: 1.1rem; color: var(--primary); }
+        .quiz-question {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        .quiz-options { display: flex; flex-direction: column; gap: 0.6rem; }
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            text-align: left;
+            min-height: 44px;
+        }
+        .quiz-option:hover:not(.locked) {
+            border-color: var(--primary-light);
+            background: var(--interactive);
+        }
+        .quiz-option .option-marker {
+            flex-shrink: 0;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+        .quiz-option.correct .option-marker {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+        .quiz-option.incorrect {
+            border-color: var(--accent-red);
+            background: #fef2f2;
+        }
+        .quiz-option.incorrect .option-marker {
+            border-color: var(--accent-red);
+            background: var(--accent-red);
+            color: white;
+        }
+        .quiz-option.locked { cursor: default; }
+        .quiz-option.dimmed { opacity: 0.55; }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            display: none;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct {
+            background: #ecfdf5;
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+        .quiz-feedback.incorrect {
+            background: #fef2f2;
+            border: 1px solid var(--accent-red);
+            color: #991b1b;
+        }
+        .quiz-retry {
+            margin-top: 0.75rem;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            display: none;
+        }
+        .quiz-retry.show { display: inline; }
+
+        /* App link card */
+        .app-link-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, var(--interactive), white);
+            border: 2px solid var(--card-border, #d1fae5);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s;
+        }
+        .app-link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--primary-light);
+        }
+        .app-link-icon {
+            flex-shrink: 0;
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .app-link-icon svg { width: 22px; height: 22px; fill: white; }
+        .app-link-text { flex: 1; }
+        .app-link-text strong { color: var(--primary); display: block; font-size: 0.95rem; }
+        .app-link-text span { font-size: 0.82rem; color: var(--text-muted); }
+
+        /* Completion */
+        .completion {
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem 1.5rem;
+            margin: 2.5rem 0;
+            box-shadow: var(--card-shadow);
+            border: 2px solid var(--interactive);
+        }
+        .completion-emoji { font-size: 3rem; margin-bottom: 1rem; }
+        .completion h2 { color: var(--primary); margin-bottom: 0.5rem; }
+        .completion p { color: var(--text-muted); max-width: 440px; margin: 0 auto 1.5rem; }
+        .completion-score {
+            display: inline-block;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.5rem 1.25rem;
+            border-radius: 999px;
+            margin-bottom: 1.5rem;
+        }
+        .completion-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.7rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.92rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-secondary:hover { background: var(--interactive); }
+
+        /* M.Reachable footer credit */
+        .package-credit {
+            text-align: center;
+            padding: 2rem 0 3rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .package-credit a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .package-credit a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .package-header h1 { font-size: 1.6rem; }
+            .step-title { font-size: 1.2rem; }
+            .progress-step { max-width: 60px; }
+            input, button, select { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mathswell-nav">
+    <a href="/" class="mw-link">
+        <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+        <span>MATHSWELL</span>
+    </a>
+</div>
+
+<div class="container">
+    <div class="breadcrumb">
+        <a href="/">Home</a> › <a href="/maths-shorts/">Maths Shorts</a> › Vectors &amp; Planes in 3D
+    </div>
+
+    <div class="package-header">
+        <span class="package-kicker">Learning Package</span>
+        <h1>Vectors &amp; Planes in 3D</h1>
+        <p class="package-intro">
+            Four short videos that build, step by step, from a single vector to the equation of a plane in space.
+            Watch each one, then check your understanding before moving on.
+        </p>
+        <div class="package-meta">
+            <span>
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                4 videos
+            </span>
+            <span>
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                4 quick checks
+            </span>
+            <span>
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                ~15 min
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Sticky progress -->
+<div class="progress-wrap">
+    <div class="progress-steps" id="progressSteps"></div>
+    <div class="progress-label" id="progressLabel">Start the journey below</div>
+</div>
+
+<div class="container" id="packageContent">
+    <!-- Generated -->
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PACKAGE DATA
+// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// R2 CONFIG — set your custom-domain base URL once.
+// Each step's `file` is appended to this. e.g.
+//   R2_BASE + "vectors-planes/vector-given-length.mp4"
+// ═══════════════════════════════════════════════════════════════
+const R2_BASE = "https://videos.mathswell.com/";
+
+// APP LINK — set to your Lines & Planes / 3D app folder. Confirm it matches your repo.
+const APP_URL = "/3d/";   // ← confirm this matches your 3D app folder
+
+const package = {
+    introStory: `
+        <p>Vectors are the language of direction and space. Before we can describe lines and planes
+        floating in three dimensions, we need a few essential moves — and they build on each other.</p>
+        <p>We'll start with the most basic skill: making a vector point the way we want, with the
+        length we want. From there, a line in 3D is just a starting point plus a direction. A plane
+        is one more idea on top. By the end, the equation of a plane won't feel like a formula to
+        memorise — it'll feel inevitable.</p>
+    `,
+    steps: [
+        {
+            title: "Finding a Vector with a Given Length",
+            // Story BEFORE this video — sets it up
+            story: `
+                <p>Every vector carries two pieces of information: a <strong>direction</strong> and a
+                <strong>length</strong> (its magnitude). What if we like the direction a vector points,
+                but want it to be a specific length instead?</p>
+                <p>The trick is to first shrink the vector down to length 1 — the <em>unit vector</em> —
+                and then scale it up to whatever length we need. This single idea comes back again and
+                again in everything that follows.</p>
+            `,
+            file: "vectors-planes/vector-given-length.mp4",
+            cover: "https://videos.mathswell.com/vectors-planes/vector-given-length.jpg",
+            quiz: {
+                question: "To get a vector of length 5 pointing the same way as $\\vec{v}$, what do you do first?",
+                options: [
+                    "Multiply $\\vec{v}$ by 5 directly",
+                    "Divide $\\vec{v}$ by its own length to get a unit vector",
+                    "Add 5 to each component of $\\vec{v}$",
+                    "Square each component of $\\vec{v}$"
+                ],
+                correct: 1,
+                feedback: {
+                    correct: "Exactly — normalise first (divide by $|\\vec{v}|$), then scale by 5. The unit vector keeps the direction; the 5 sets the length.",
+                    incorrect: "Not quite. The direction must be preserved first by making a unit vector (divide by $|\\vec{v}|$), and only then do we scale to the length we want."
+                }
+            },
+            appLink: { url: APP_URL, label: "Lines and Planes in 3D", desc: "Try it interactively" }
+        },
+        {
+            title: "Equation of a Line in 3D",
+            story: `
+                <p>A line in 3D needs two things: a point it passes through, and a direction to travel in.
+                Sound familiar? That direction is a vector — and now we know how to control it.</p>
+                <p>Starting at a known point and stepping along a direction vector traces out every point
+                on the line. That's the <em>parametric equation</em> of a line.</p>
+            `,
+            file: "vectors-planes/line-in-3d.mp4",
+            cover: "https://videos.mathswell.com/vectors-planes/line-in-3d.jpg",
+            quiz: {
+                question: "The parametric equation of a line $\\vec{r} = \\vec{a} + t\\vec{d}$ uses $\\vec{a}$ and $\\vec{d}$. What are they?",
+                options: [
+                    "$\\vec{a}$ is the direction, $\\vec{d}$ is a point on the line",
+                    "$\\vec{a}$ is a point on the line, $\\vec{d}$ is the direction",
+                    "Both are points on the line",
+                    "Both are directions the line travels in"
+                ],
+                correct: 1,
+                feedback: {
+                    correct: "Right. $\\vec{a}$ anchors the line at a known point, and $\\vec{d}$ is the direction; the parameter $t$ slides you along it.",
+                    incorrect: "Look again: $\\vec{a}$ is the position vector of a point on the line (where you start), and $\\vec{d}$ is the direction you travel as $t$ changes."
+                }
+            },
+            appLink: { url: APP_URL, label: "Lines and Planes in 3D", desc: "Visualise lines in space" }
+        },
+        {
+            title: "Finding the Equation of a Plane",
+            story: `
+                <p>A plane is harder to pin down than a line — it spreads out in two directions. The clever
+                move is to describe it not by what lies <em>in</em> it, but by the direction that points
+                straight <em>out</em> of it: the <strong>normal vector</strong>.</p>
+                <p>Once you have a normal vector and one point on the plane, the equation falls out almost
+                for free — because every vector lying in the plane must be perpendicular to the normal.</p>
+            `,
+            file: "vectors-planes/equation-of-plane.mp4",
+            cover: "https://videos.mathswell.com/vectors-planes/equation-of-plane.jpg",
+            quiz: {
+                question: "The equation of a plane is built around its normal vector $\\vec{n}$. What is special about $\\vec{n}$?",
+                options: [
+                    "It lies flat inside the plane",
+                    "It is perpendicular to the plane",
+                    "It is parallel to the x-axis",
+                    "It has length 1 always"
+                ],
+                correct: 1,
+                feedback: {
+                    correct: "Yes — $\\vec{n}$ sticks straight out of the plane. Any vector lying in the plane is perpendicular to it, which is exactly what gives the plane equation.",
+                    incorrect: "Not quite. The normal vector $\\vec{n}$ points perpendicular to the plane (straight out of it), not within it. That perpendicularity is the whole key."
+                }
+            },
+            appLink: { url: APP_URL, label: "Lines and Planes in 3D", desc: "Build a plane from a normal" }
+        },
+        {
+            title: "Projection of a Vector",
+            story: `
+                <p>One last essential: how much of one vector points along another? That's the
+                <strong>projection</strong> — the "shadow" one vector casts onto another's direction.</p>
+                <p>This ties everything together. Projections let us measure distances to lines and planes,
+                decompose forces, and much more. It's the natural close to our journey through 3D vectors.</p>
+            `,
+            file: "vectors-planes/vector-projection.mp4",
+            cover: "https://videos.mathswell.com/vectors-planes/vector-projection.jpg",
+            quiz: {
+                question: "The projection of $\\vec{a}$ onto $\\vec{b}$ tells you...",
+                options: [
+                    "The total length of $\\vec{a}$ plus $\\vec{b}$",
+                    "How much of $\\vec{a}$ points in the direction of $\\vec{b}$",
+                    "The angle between $\\vec{a}$ and $\\vec{b}$ in degrees",
+                    "Whether $\\vec{a}$ and $\\vec{b}$ are equal"
+                ],
+                correct: 1,
+                feedback: {
+                    correct: "Exactly — it's the component of $\\vec{a}$ along $\\vec{b}$'s direction, the shadow $\\vec{a}$ casts onto $\\vec{b}$.",
+                    incorrect: "Think of a shadow: the projection measures how much of $\\vec{a}$ lies along the direction of $\\vec{b}$ — its component in that direction."
+                }
+            },
+            appLink: { url: APP_URL, label: "Lines and Planes in 3D", desc: "See projections in action" }
+        }
+    ]
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Render
+// ═══════════════════════════════════════════════════════════════
+const content = document.getElementById('packageContent');
+const totalSteps = package.steps.length;
+let answered = new Array(totalSteps).fill(null); // null | true | false
+
+// Intro story
+const introEl = document.createElement('div');
+introEl.className = 'story intro-story';
+introEl.innerHTML = package.introStory;
+content.appendChild(introEl);
+
+// Steps
+package.steps.forEach((step, i) => {
+    const stepEl = document.createElement('div');
+    stepEl.className = 'step';
+    stepEl.id = `step-${i}`;
+
+    stepEl.innerHTML = `
+        <div class="step-number">${i + 1}</div>
+        <div class="story">${step.story}</div>
+        <h2 class="step-title">${step.title}</h2>
+        <div class="video-frame">
+            <div class="video-cover" data-step="${i}">
+                <img src="${step.cover}" alt="${step.title}"
+                     onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,var(--primary),var(--primary-light))'">
+                <span class="ig-badge" style="background:rgba(15,118,110,0.9)">Video</span>
+                <div class="play-overlay">
+                    <div class="play-circle">
+                        <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="video-embed-container" id="embed-${i}"></div>
+        </div>
+        ${step.appLink ? `
+            <a class="app-link-card" href="${step.appLink.url}" target="_blank">
+                <div class="app-link-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="app-link-text">
+                    <strong>${step.appLink.label}</strong>
+                    <span>${step.appLink.desc}</span>
+                </div>
+            </a>
+        ` : ''}
+        <div class="quiz">
+            <div class="quiz-header">
+                <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+                <h3>Quick Check</h3>
+            </div>
+            <div class="quiz-question" id="question-${i}">${step.quiz.question}</div>
+            <div class="quiz-options" id="options-${i}"></div>
+            <div class="quiz-feedback" id="feedback-${i}"></div>
+            <button class="quiz-retry" id="retry-${i}">Try again</button>
+        </div>
+    `;
+    content.appendChild(stepEl);
+
+    // Build options
+    const optionsEl = stepEl.querySelector(`#options-${i}`);
+    const letters = ['A', 'B', 'C', 'D', 'E'];
+    step.quiz.options.forEach((opt, j) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.innerHTML = `<span class="option-marker">${letters[j]}</span><span class="option-text">${opt}</span>`;
+        btn.addEventListener('click', () => handleAnswer(i, j));
+        optionsEl.appendChild(btn);
+    });
+
+    // Video cover click
+    stepEl.querySelector('.video-cover').addEventListener('click', () => loadVideo(i));
+
+    // Retry
+    stepEl.querySelector(`#retry-${i}`).addEventListener('click', () => resetQuiz(i));
+});
+
+// Completion block
+const completionEl = document.createElement('div');
+completionEl.className = 'completion';
+completionEl.id = 'completion';
+completionEl.style.display = 'none';
+completionEl.innerHTML = `
+    <div class="completion-emoji">🎉</div>
+    <h2>Package Complete!</h2>
+    <p>You've worked through all four videos and checks. The equation of a plane should feel a lot less mysterious now.</p>
+    <div class="completion-score" id="completionScore"></div>
+    <div class="completion-actions">
+        <a class="btn btn-primary" href="/3d/" target="_blank">Explore the 3D App</a>
+        <a class="btn btn-secondary" href="/maths-shorts/">More Maths Shorts</a>
+    </div>
+`;
+content.appendChild(completionEl);
+
+// Credit
+const creditEl = document.createElement('div');
+creditEl.className = 'package-credit';
+creditEl.innerHTML = `Videos by <a href="https://www.instagram.com/mreachable?igsh=MWMzb2wzbzZqb3g1MA==" target="_blank">M.Reachable</a> · Maths is Reachable`;
+content.appendChild(creditEl);
+
+// ═══════════════════════════════════════════════════════════════
+// Progress bar
+// ═══════════════════════════════════════════════════════════════
+const progressStepsEl = document.getElementById('progressSteps');
+for (let i = 0; i < totalSteps; i++) {
+    const s = document.createElement('div');
+    s.className = 'progress-step';
+    s.addEventListener('click', () => {
+        document.getElementById(`step-${i}`).scrollIntoView({ behavior: 'smooth' });
+    });
+    progressStepsEl.appendChild(s);
+}
+updateProgress();
+
+function updateProgress() {
+    const steps = progressStepsEl.querySelectorAll('.progress-step');
+    const done = answered.filter(a => a === true).length;
+    steps.forEach((s, i) => {
+        s.classList.toggle('done', answered[i] === true);
+    });
+    const label = document.getElementById('progressLabel');
+    if (done === 0) label.textContent = 'Start the journey below';
+    else if (done < totalSteps) label.textContent = `${done} of ${totalSteps} checks passed`;
+    else label.textContent = 'All checks passed — well done!';
+
+    if (done === totalSteps) showCompletion();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Video loading
+// ═══════════════════════════════════════════════════════════════
+function loadVideo(i) {
+    const step = package.steps[i];
+    const cover = document.querySelector(`#step-${i} .video-cover`);
+    const embedContainer = document.getElementById(`embed-${i}`);
+
+    // Pause any other playing video (one at a time)
+    document.querySelectorAll('.video-embed-container video').forEach(v => v.pause());
+
+    cover.style.display = 'none';
+    embedContainer.classList.add('active');
+    embedContainer.innerHTML = `
+        <video
+            controls
+            playsinline
+            preload="metadata"
+            poster="${step.cover}"
+            src="${R2_BASE}${step.file}">
+            Your browser can't play this video.
+        </video>
+    `;
+    const v = embedContainer.querySelector('video');
+    v.play().catch(() => { /* autoplay may be blocked; controls are there */ });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Quiz logic
+// ═══════════════════════════════════════════════════════════════
+function handleAnswer(stepIndex, optionIndex) {
+    const step = package.steps[stepIndex];
+    if (answered[stepIndex] === true) return; // already correct, locked
+
+    const options = document.querySelectorAll(`#options-${stepIndex} .quiz-option`);
+    const feedback = document.getElementById(`feedback-${stepIndex}`);
+    const retry = document.getElementById(`retry-${stepIndex}`);
+    const isCorrect = optionIndex === step.quiz.correct;
+
+    if (isCorrect) {
+        answered[stepIndex] = true;
+        options.forEach((o, j) => {
+            o.classList.add('locked');
+            if (j === optionIndex) o.classList.add('correct');
+            else o.classList.add('dimmed');
+        });
+        feedback.className = 'quiz-feedback correct show';
+        feedback.innerHTML = step.quiz.feedback.correct;
+        retry.classList.remove('show');
+    } else {
+        answered[stepIndex] = false;
+        options[optionIndex].classList.add('incorrect');
+        feedback.className = 'quiz-feedback incorrect show';
+        feedback.innerHTML = step.quiz.feedback.incorrect;
+        retry.classList.add('show');
+    }
+
+    renderMath(document.getElementById(`feedback-${stepIndex}`));
+    updateProgress();
+}
+
+function resetQuiz(stepIndex) {
+    const options = document.querySelectorAll(`#options-${stepIndex} .quiz-option`);
+    options.forEach(o => o.classList.remove('incorrect', 'dimmed', 'correct', 'locked'));
+    document.getElementById(`feedback-${stepIndex}`).className = 'quiz-feedback';
+    document.getElementById(`retry-${stepIndex}`).classList.remove('show');
+    answered[stepIndex] = null;
+    updateProgress();
+}
+
+function showCompletion() {
+    const el = document.getElementById('completion');
+    el.style.display = 'block';
+    document.getElementById('completionScore').textContent =
+        `All ${totalSteps} checks passed on first or later try`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KaTeX rendering
+// ═══════════════════════════════════════════════════════════════
+function renderMath(el) {
+    if (window.renderMathInElement) {
+        renderMathInElement(el, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false
+        });
+    }
+}
+
+window.addEventListener('load', () => {
+    setTimeout(() => renderMath(document.body), 100);
+});
+</script>
+
+
+</body>
+</html>
