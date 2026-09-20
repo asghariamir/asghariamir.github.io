@@ -521,8 +521,9 @@
         <span class="package-kicker">Learning Package</span>
         <h1>Equations as Functions</h1>
         <p class="package-intro">
-            When is an equation actually a function in disguise? This short video reveals the idea
-            that connects solving equations to the graphs you already know.
+            Meet one of the most fundamental ideas in all of mathematics — the function. This package
+            builds it up piece by piece, starting from equations you already know and opening into a
+            whole new way of seeing them.
         </p>
         <div class="package-meta">
             <span>
@@ -564,12 +565,11 @@ const R2_BASE = "https://videos.mathswell.com/";
 
 const package = {
     introStory: `
-        <p>We spend years learning to <em>solve</em> equations. But what are we really doing when we
-        solve one — and what happens to all the numbers that <em>aren't</em> the answer?</p>
-        <p>This short video takes two equations you already know how to handle and, by asking one
-        innocent question, uncovers the idea hiding underneath: an equation's left-hand side is a
-        <strong>function</strong>, and solving it is really about where that function's graph meets
-        the x-axis.</p>
+        <p>The <strong>function</strong> is one of the most fundamental concepts in all of mathematics —
+        the idea that one quantity depends on another. Once you see it, equations, graphs, and motion
+        all start to look like the same thing viewed from different angles.</p>
+        <p>This package builds that idea up gradually. We begin somewhere surprising: with equations you
+        already know how to solve, and one innocent question that turns them inside out.</p>
     `,
     steps: [
         {
@@ -581,7 +581,7 @@ const package = {
                 question: what does "solving" actually mean?</p>
                 <p>A solution is a number that makes the left-hand side equal zero. So what about the
                 numbers that <em>don't</em>? Watch what happens when we stop throwing them away and
-                start collecting them instead.</p>
+                start recording them instead.</p>
             `,
             file: "functions/equations-as-functions.mp4",
             cover: "https://videos.mathswell.com/functions/equations-as-functions-cover.png",
@@ -815,43 +815,61 @@ function checkMulti(stepIndex) {
     const feedback = document.getElementById(`feedback-${stepIndex}`);
     const retry = document.getElementById(`retry-${stepIndex}`);
 
-    let allRight = true;
-    cards.forEach((card, j) => {
-        const isCorrect = opts[j].correct;
-        const picked = chosen.has(j);
-        card.classList.remove('selected');
-        const whyEl = card.querySelector('.option-why');
-        whyEl.innerHTML = opts[j].why || '';
-
-        // A card is "handled right" if: correct&picked, or incorrect&not-picked
-        if (isCorrect && picked) {
-            card.classList.add('correct', 'locked');
-        } else if (!isCorrect && !picked) {
-            card.classList.add('faded', 'locked');           // correctly left unticked
-        } else if (isCorrect && !picked) {
-            card.classList.add('missed', 'locked');          // should have ticked
-            allRight = false;
-        } else { // incorrect && picked
-            card.classList.add('wrong', 'locked');           // wrongly ticked
-            allRight = false;
-        }
-        whyEl.classList.add('show');
-    });
-
-    if (allRight) {
-        answered[stepIndex] = true;
-        feedback.className = 'quiz-feedback correct show';
-        feedback.innerHTML = "Exactly right — you kept the readable facts and rejected the exact values a graph can't give.";
-        retry.classList.remove('show');
-        document.getElementById(`check-${stepIndex}`).style.display = 'none';
-    } else {
-        answered[stepIndex] = false;
+    // Require at least one selection before checking
+    if (chosen.size === 0) {
         feedback.className = 'quiz-feedback incorrect show';
-        feedback.innerHTML = "Not quite — check the notes under each option, then try again. Remember: a graph shows <em>where</em> a root is, not its exact value.";
-        retry.classList.add('show');
-        document.getElementById(`check-${stepIndex}`).style.display = 'none';
+        feedback.innerHTML = "Pick at least one option first, then check.";
+        return;
     }
 
+    // Judge ONLY the options the learner actually selected.
+    // Each selected option is right if it is a correct statement; wrong if it isn't.
+    let allSelectedCorrect = true;
+    cards.forEach((card, j) => {
+        card.classList.remove('selected');
+        const whyEl = card.querySelector('.option-why');
+
+        if (!chosen.has(j)) {
+            // untouched option — leave it neutral, no reveal
+            card.classList.add('locked');   // freeze interaction until retry
+            return;
+        }
+        // this option was chosen → show its verdict + reason
+        whyEl.innerHTML = opts[j].why || '';
+        whyEl.classList.add('show');
+        card.classList.add('locked');
+        if (opts[j].correct) {
+            card.classList.add('correct');
+        } else {
+            card.classList.add('wrong');
+            allSelectedCorrect = false;
+        }
+    });
+
+    // "Fully solved" = every selected option is correct AND all correct options were selected.
+    const allCorrectPicked = opts.every((o, j) => !o.correct || chosen.has(j));
+    const solved = allSelectedCorrect && allCorrectPicked;
+
+    if (solved) {
+        answered[stepIndex] = true;
+        feedback.className = 'quiz-feedback correct show';
+        feedback.innerHTML = "Exactly right — everything you picked can be read from the graph.";
+        retry.classList.remove('show');
+    } else if (allSelectedCorrect && !allCorrectPicked) {
+        // everything they picked is correct, but they missed some correct ones
+        answered[stepIndex] = false;
+        feedback.className = 'quiz-feedback correct show';
+        feedback.innerHTML = "Everything you picked is right — but there's more the graph can tell you. Try again to find the rest.";
+        retry.classList.add('show');
+    } else {
+        // at least one wrong pick
+        answered[stepIndex] = false;
+        feedback.className = 'quiz-feedback incorrect show';
+        feedback.innerHTML = "One or more of your picks can't be read from the graph — see the notes on them, then try again.";
+        retry.classList.add('show');
+    }
+
+    document.getElementById(`check-${stepIndex}`).style.display = 'none';
     renderMath(document.getElementById(`step-${stepIndex}`));
     updateProgress();
 }
