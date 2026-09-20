@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equations as Functions | Maths Shorts | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #115e59;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+            --card-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding-top: 60px;
+            line-height: 1.6;
+        }
+
+        /* Nav */
+        .mathswell-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .mw-link {
+            display: flex; align-items: center; gap: 0.5rem;
+            text-decoration: none; color: var(--primary);
+            font-weight: 600; letter-spacing: 1px;
+        }
+
+        .container { max-width: 720px; margin: 0 auto; padding: 0 1rem; }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 1.5rem 0 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .breadcrumb a { color: var(--primary); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* Package header */
+        .package-header {
+            text-align: center;
+            padding: 2rem 0 1.5rem;
+        }
+        .package-kicker {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.3rem 0.85rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+        }
+        .package-header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        .package-intro {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .package-meta {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .package-meta span { display: flex; align-items: center; gap: 0.35rem; }
+        .package-meta svg { width: 15px; height: 15px; fill: var(--primary); }
+
+        /* Progress bar (sticky) */
+        .progress-wrap {
+            position: sticky;
+            top: 60px;
+            z-index: 90;
+            background: rgba(247,250,249,0.95);
+            backdrop-filter: blur(8px);
+            padding: 0.75rem 0;
+            margin-bottom: 1rem;
+        }
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .progress-step {
+            flex: 1;
+            max-width: 80px;
+            height: 5px;
+            border-radius: 999px;
+            background: #d1d5db;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+        .progress-step.done { background: var(--primary-light); }
+        .progress-step.current { background: var(--primary); }
+        .progress-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Story block */
+        .story {
+            background: white;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: var(--card-shadow);
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        .story.intro-story {
+            border-left-color: var(--accent-amber);
+            background: linear-gradient(135deg, #fffbf0, white);
+        }
+        .story p { margin-bottom: 0.75rem; }
+        .story p:last-child { margin-bottom: 0; }
+
+        /* Video step */
+        .step {
+            margin: 2rem 0;
+            scroll-margin-top: 130px;
+        }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+        .step-title {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Video player area */
+        .video-frame {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1rem;
+        }
+        .video-cover {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            cursor: pointer;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        }
+        .video-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .video-cover .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.15);
+            transition: background 0.25s;
+        }
+        .video-cover:hover .play-overlay { background: rgba(0,0,0,0.05); }
+        .play-circle {
+            width: 72px; height: 72px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            transition: transform 0.25s;
+        }
+        .video-cover:hover .play-circle { transform: scale(1.08); }
+        .play-circle svg { width: 30px; height: 30px; fill: var(--primary); margin-left: 4px; }
+        .ig-badge {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: rgba(225,48,108,0.9);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+        }
+        .video-embed-container { display: none; }
+        .video-embed-container.active {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: #000;
+        }
+        /* Vertical 9:16 player */
+        .video-embed-container video {
+            width: 100%;
+            max-width: 360px;      /* keeps the 9:16 reel a sensible size on desktop */
+            aspect-ratio: 9 / 16;
+            border-radius: 10px;
+            background: #000;
+            display: block;
+        }
+
+        /* Quiz */
+        .quiz {
+            background: white;
+            border: 2px solid var(--interactive);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+        .quiz-header svg { width: 22px; height: 22px; fill: var(--primary); }
+        .quiz-header h3 { font-size: 1.1rem; color: var(--primary); }
+        .quiz-question {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        .quiz-options { display: flex; flex-direction: column; gap: 0.6rem; }
+        .quiz-option {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            text-align: left;
+            min-height: 44px;
+        }
+        .quiz-option:hover:not(.locked) {
+            border-color: var(--primary-light);
+            background: var(--interactive);
+        }
+        .quiz-option .option-check {
+            flex-shrink: 0;
+            width: 24px; height: 24px;
+            border-radius: 6px;
+            border: 2px solid #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .quiz-option .option-text { flex: 1; }
+        .quiz-option.selected {
+            border-color: var(--primary);
+            background: var(--interactive);
+        }
+        .quiz-option.selected .option-check {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .quiz-option.selected .option-check::after {
+            content: "✓";
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        /* Post-check states */
+        .quiz-option.locked { cursor: default; }
+        .quiz-option.correct {                       /* correct & ticked */
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+        .quiz-option.correct .option-check {
+            background: var(--success); border-color: var(--success);
+        }
+        .quiz-option.correct .option-check::after { content: "✓"; color:white; font-size:0.85rem; font-weight:700; }
+        .quiz-option.missed {                         /* correct but NOT ticked */
+            border-color: var(--success);
+            background: #f0fdf4;
+        }
+        .quiz-option.missed .option-check::after { content: "+"; color: var(--success); font-size:1rem; font-weight:700; }
+        .quiz-option.wrong {                          /* incorrect & ticked */
+            border-color: var(--accent-red);
+            background: #fef2f2;
+        }
+        .quiz-option.wrong .option-check {
+            background: var(--accent-red); border-color: var(--accent-red);
+        }
+        .quiz-option.wrong .option-check::after { content: "✕"; color:white; font-size:0.8rem; font-weight:700; }
+        .quiz-option.faded { opacity: 0.65; }         /* incorrect & correctly left unticked */
+
+        /* Per-option explanation */
+        .option-why {
+            flex-basis: 100%;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-top: 0.4rem;
+            padding-top: 0.4rem;
+            border-top: 1px dashed #e5e7eb;
+            display: none;
+        }
+        .option-why.show { display: block; }
+
+        /* Check button + actions bar */
+        .quiz-graph { margin-bottom: 1rem; }
+        .quiz-actions { margin-top: 1rem; }
+        .btn-check {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.3rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-check:hover { background: var(--primary-dark); }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            display: none;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct {
+            background: #ecfdf5;
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+        .quiz-feedback.incorrect {
+            background: #fef2f2;
+            border: 1px solid var(--accent-red);
+            color: #991b1b;
+        }
+        .quiz-retry {
+            margin-top: 0.75rem;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            display: none;
+        }
+        .quiz-retry.show { display: inline; }
+
+        /* App link card */
+        .app-link-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, var(--interactive), white);
+            border: 2px solid var(--card-border, #d1fae5);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s;
+        }
+        .app-link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--primary-light);
+        }
+        .app-link-icon {
+            flex-shrink: 0;
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .app-link-icon svg { width: 22px; height: 22px; fill: white; }
+        .app-link-text { flex: 1; }
+        .app-link-text strong { color: var(--primary); display: block; font-size: 0.95rem; }
+        .app-link-text span { font-size: 0.82rem; color: var(--text-muted); }
+
+        /* Completion */
+        .completion {
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem 1.5rem;
+            margin: 2.5rem 0;
+            box-shadow: var(--card-shadow);
+            border: 2px solid var(--interactive);
+        }
+        .completion-emoji { font-size: 3rem; margin-bottom: 1rem; }
+        .completion h2 { color: var(--primary); margin-bottom: 0.5rem; }
+        .completion p { color: var(--text-muted); max-width: 440px; margin: 0 auto 1.5rem; }
+        .completion-score {
+            display: inline-block;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.5rem 1.25rem;
+            border-radius: 999px;
+            margin-bottom: 1.5rem;
+        }
+        .completion-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.7rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.92rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-secondary:hover { background: var(--interactive); }
+
+        /* M.Reachable footer credit */
+        .package-credit {
+            text-align: center;
+            padding: 2rem 0 3rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .package-credit a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .package-credit a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .package-header h1 { font-size: 1.6rem; }
+            .step-title { font-size: 1.2rem; }
+            .progress-step { max-width: 60px; }
+            input, button, select { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mathswell-nav">
+    <a href="/" class="mw-link">
+        <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+        <span>MATHSWELL</span>
+    </a>
+</div>
+
+<div class="container">
+    <div class="breadcrumb">
+        <a href="/">Home</a> › <a href="/maths-shorts/">Maths Shorts</a> › Functions
+    </div>
+
+    <div class="package-header">
+        <span class="package-kicker">Learning Package</span>
+        <h1>Equations as Functions</h1>
+        <p class="package-intro">
+            When is an equation actually a function in disguise? This short video reveals the idea
+            that connects solving equations to the graphs you already know.
+        </p>
+        <div class="package-meta">
+            <span>
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                1 video
+            </span>
+            <span>
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                1 quick check
+            </span>
+            <span>
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                ~3 min
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Sticky progress -->
+<div class="progress-wrap">
+    <div class="progress-steps" id="progressSteps"></div>
+    <div class="progress-label" id="progressLabel">Start the journey below</div>
+</div>
+
+<div class="container" id="packageContent">
+    <!-- Generated -->
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PACKAGE DATA
+// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// R2 CONFIG — set your custom-domain base URL once.
+// Each step's `file` is appended to this. e.g.
+//   R2_BASE + "vectors-planes/vector-given-length.mp4"
+// ═══════════════════════════════════════════════════════════════
+const R2_BASE = "https://videos.mathswell.com/";
+
+const package = {
+    introStory: `
+        <p>We spend years learning to <em>solve</em> equations. But what are we really doing when we
+        solve one — and what happens to all the numbers that <em>aren't</em> the answer?</p>
+        <p>This short video takes two equations you already know how to handle and, by asking one
+        innocent question, uncovers the idea hiding underneath: an equation's left-hand side is a
+        <strong>function</strong>, and solving it is really about where that function's graph meets
+        the x-axis.</p>
+    `,
+    steps: [
+        {
+            title: "When an Equation Becomes a Function",
+            // Story BEFORE the video — sets it up without giving away the punchline
+            story: `
+                <p>Start with two familiar equations: a linear one, $3x - 7 = 0$, and a quadratic,
+                $x^2 - 5x + 6 = 0$. Solving them is routine — but pause on a deceptively simple
+                question: what does "solving" actually mean?</p>
+                <p>A solution is a number that makes the left-hand side equal zero. So what about the
+                numbers that <em>don't</em>? Watch what happens when we stop throwing them away and
+                start collecting them instead.</p>
+            `,
+            file: "functions/equations-as-functions.mp4",
+            cover: "https://videos.mathswell.com/functions/equations-as-functions-cover.png",
+
+            // ─────────────────────────────────────────────────────────────
+            // QUICK CHECK — Amir to write. Replace the placeholder below.
+            // Format:
+            //   question: "text (use $...$ for math)",
+            //   options: ["A", "B", "C", "D"],
+            //   correct: <0-based index of the right option>,
+            //   feedback: { correct: "...", incorrect: "..." }
+            // ─────────────────────────────────────────────────────────────
+            // ─────────────────────────────────────────────────────────────
+            // QUICK CHECK — select-all-that-apply, per-option feedback.
+            // Amir: refine wording. Each option has:
+            //   text, correct (true/false), why (shown after checking)
+            // ─────────────────────────────────────────────────────────────
+            quiz: {
+                type: "multi",
+                graphSVG: `<svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto;display:block;margin:0 auto 0.5rem;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;"> <!-- axes --> <line x1="8" y1="158.2" x2="312" y2="158.2" stroke="#94a3b8" stroke-width="1.5"/> <line x1="129.6" y1="8" x2="129.6" y2="252" stroke="#94a3b8" stroke-width="1.5"/> <line x1="8.0" y1="155.15384615384613" x2="8.0" y2="161.15384615384613" stroke="#94a3b8" stroke-width="1"/><text x="8.0" y="173.15384615384613" font-size="9" fill="#64748b" text-anchor="middle">-2</text><line x1="68.8" y1="155.15384615384613" x2="68.8" y2="161.15384615384613" stroke="#94a3b8" stroke-width="1"/><text x="68.8" y="173.15384615384613" font-size="9" fill="#64748b" text-anchor="middle">-1</text><line x1="129.6" y1="155.15384615384613" x2="129.6" y2="161.15384615384613" stroke="#94a3b8" stroke-width="1"/><line x1="190.4" y1="155.15384615384613" x2="190.4" y2="161.15384615384613" stroke="#94a3b8" stroke-width="1"/><text x="190.4" y="173.15384615384613" font-size="9" fill="#64748b" text-anchor="middle">1</text><line x1="251.2" y1="155.15384615384613" x2="251.2" y2="161.15384615384613" stroke="#94a3b8" stroke-width="1"/><text x="251.2" y="173.15384615384613" font-size="9" fill="#64748b" text-anchor="middle">2</text><line x1="312.0" y1="155.15384615384613" x2="312.0" y2="161.15384615384613" stroke="#94a3b8" stroke-width="1"/><text x="312.0" y="173.15384615384613" font-size="9" fill="#64748b" text-anchor="middle">3</text><line x1="126.60000000000002" y1="233.2" x2="132.60000000000002" y2="233.2" stroke="#94a3b8" stroke-width="1"/><line x1="126.60000000000002" y1="195.7" x2="132.60000000000002" y2="195.7" stroke="#94a3b8" stroke-width="1"/><line x1="126.60000000000002" y1="120.6" x2="132.60000000000002" y2="120.6" stroke="#94a3b8" stroke-width="1"/><line x1="126.60000000000002" y1="83.1" x2="132.60000000000002" y2="83.1" stroke="#94a3b8" stroke-width="1"/><line x1="126.60000000000002" y1="45.5" x2="132.60000000000002" y2="45.5" stroke="#94a3b8" stroke-width="1"/><line x1="126.60000000000002" y1="8.0" x2="132.60000000000002" y2="8.0" stroke="#94a3b8" stroke-width="1"/> <!-- parabola --> <polyline points="23.4,15.6 27.2,26.1 31.1,36.3 34.9,46.2 38.8,55.9 42.6,65.2 46.5,74.2 50.3,82.9 54.2,91.4 58.0,99.5 61.9,107.3 65.7,114.8 69.6,122.0 73.4,129.0 77.3,135.6 81.1,141.9 85.0,147.9 88.8,153.6 92.7,159.0 96.5,164.1 100.4,169.0 104.2,173.5 108.1,177.7 111.9,181.6 115.7,185.2 119.6,188.5 123.4,191.5 127.3,194.2 131.1,196.6 135.0,198.7 138.8,200.5 142.7,202.0 146.5,203.2 150.4,204.1 154.2,204.7 158.1,205.0 161.9,205.0 165.8,204.7 169.6,204.1 173.5,203.2 177.3,202.0 181.2,200.5 185.0,198.7 188.9,196.6 192.7,194.2 196.6,191.5 200.4,188.5 204.3,185.2 208.1,181.6 211.9,177.7 215.8,173.5 219.6,169.0 223.5,164.1 227.3,159.0 231.2,153.6 235.0,147.9 238.9,141.9 242.7,135.6 246.6,129.0 250.4,122.0 254.3,114.8 258.1,107.3 262.0,99.5 265.8,91.4 269.7,82.9 273.5,74.2 277.4,65.2 281.2,55.9 285.1,46.2 288.9,36.3 292.8,26.1 296.6,15.6" fill="none" stroke="#0f766e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/> <!-- roots --> <circle cx="92.0" cy="158.2" r="4.5" fill="#f59e0b"/> <circle cx="228.0" cy="158.2" r="4.5" fill="#f59e0b"/> <text x="312.0" y="152.2" font-size="10" fill="#0f766e" text-anchor="end" font-style="italic">f(x)=x²−x−1</text> </svg>`,
+                question: "The graph of $f(x) = x^2 - x - 1$ is shown above. Which of these can be <strong>inferred from the graph</strong> about the solutions of $x^2 - x - 1 = 0$? Select all that apply.",
+                options: [
+                    { text: "There are exactly two solutions", correct: true,
+                      why: "The curve crosses the x-axis twice — you can see both crossings." },
+                    { text: "One solution lies between $-1$ and $0$", correct: true,
+                      why: "The left crossing sits between these two values — readable straight from the graph." },
+                    { text: "One solution lies between $1$ and $2$", correct: true,
+                      why: "The right crossing falls in this interval — again, just by looking." },
+                    { text: "The solutions are exactly $x = \\frac{1 \\pm \\sqrt{5}}{2}$", correct: false,
+                      why: "These are the true roots — but an <em>exact</em> surd can never be read off a graph, however fine. Exact values come from algebra; a graph only ever locates a root approximately." },
+                    { text: "One solution is exactly $x = 1.62$", correct: false,
+                      why: "$1.62$ is a fine approximation of the exact root $\\frac{1+\\sqrt{5}}{2} \\approx 1.618$ — but <em>this</em> graph is far too rough to read a value to two decimals. A finer graph (say, on Desmos) could get you that close; ours can only place the root somewhere between $1$ and $2$." }
+                ]
+            }
+            // No appLink for now — set one here if a Functions app exists later:
+            // , appLink: { url: "/functions-app/", label: "Explore Functions", desc: "Try it interactively" }
+        }
+    ]
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Render
+// ═══════════════════════════════════════════════════════════════
+const content = document.getElementById('packageContent');
+const totalSteps = package.steps.length;
+let answered = new Array(totalSteps).fill(null); // null | true | false
+
+// Intro story
+const introEl = document.createElement('div');
+introEl.className = 'story intro-story';
+introEl.innerHTML = package.introStory;
+content.appendChild(introEl);
+
+// Steps
+package.steps.forEach((step, i) => {
+    const stepEl = document.createElement('div');
+    stepEl.className = 'step';
+    stepEl.id = `step-${i}`;
+
+    stepEl.innerHTML = `
+        <div class="step-number">${i + 1}</div>
+        <div class="story">${step.story}</div>
+        <h2 class="step-title">${step.title}</h2>
+        <div class="video-frame">
+            <div class="video-cover" data-step="${i}">
+                <img src="${step.cover}" alt="${step.title}"
+                     onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,var(--primary),var(--primary-light))'">
+                <span class="ig-badge" style="background:rgba(15,118,110,0.9)">Video</span>
+                <div class="play-overlay">
+                    <div class="play-circle">
+                        <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="video-embed-container" id="embed-${i}"></div>
+        </div>
+        ${step.appLink ? `
+            <a class="app-link-card" href="${step.appLink.url}" target="_blank">
+                <div class="app-link-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="app-link-text">
+                    <strong>${step.appLink.label}</strong>
+                    <span>${step.appLink.desc}</span>
+                </div>
+            </a>
+        ` : ''}
+        <div class="quiz">
+            <div class="quiz-header">
+                <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+                <h3>Quick Check</h3>
+            </div>
+            ${step.quiz.graphSVG ? `<div class="quiz-graph">${step.quiz.graphSVG}</div>` : ''}
+            <div class="quiz-question" id="question-${i}">${step.quiz.question}</div>
+            <div class="quiz-options" id="options-${i}"></div>
+            <div class="quiz-actions">
+                <button class="btn-check" id="check-${i}">Check my answers</button>
+            </div>
+            <div class="quiz-feedback" id="feedback-${i}"></div>
+            <button class="quiz-retry" id="retry-${i}">Try again</button>
+        </div>
+    `;
+    content.appendChild(stepEl);
+
+    // Build options (multi-select checkboxes)
+    const optionsEl = stepEl.querySelector(`#options-${i}`);
+    step.quiz.options.forEach((opt, j) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.dataset.j = j;
+        btn.innerHTML = `
+            <span class="option-check"></span>
+            <span class="option-text">${opt.text}</span>
+            <span class="option-why"></span>
+        `;
+        btn.addEventListener('click', () => toggleOption(i, j));
+        optionsEl.appendChild(btn);
+    });
+
+    // Video cover click
+    stepEl.querySelector('.video-cover').addEventListener('click', () => loadVideo(i));
+
+    // Check + retry
+    stepEl.querySelector(`#check-${i}`).addEventListener('click', () => checkMulti(i));
+    stepEl.querySelector(`#retry-${i}`).addEventListener('click', () => resetQuiz(i));
+});
+
+// Completion block
+const completionEl = document.createElement('div');
+completionEl.className = 'completion';
+completionEl.id = 'completion';
+completionEl.style.display = 'none';
+completionEl.innerHTML = `
+    <div class="completion-emoji">🎉</div>
+    <h2>Package Complete!</h2>
+    <p>That's the first idea in the Functions series — solving an equation is really about the roots of a function.</p>
+    <div class="completion-score" id="completionScore"></div>
+    <div class="completion-actions">
+        <a class="btn btn-primary" href="/maths-shorts/">More Maths Shorts</a>
+    </div>
+`;
+content.appendChild(completionEl);
+
+// Credit
+const creditEl = document.createElement('div');
+creditEl.className = 'package-credit';
+creditEl.innerHTML = `Videos by <a href="https://www.instagram.com/mreachable?igsh=MWMzb2wzbzZqb3g1MA==" target="_blank">M.Reachable</a> · Maths is Reachable`;
+content.appendChild(creditEl);
+
+// ═══════════════════════════════════════════════════════════════
+// Progress bar
+// ═══════════════════════════════════════════════════════════════
+const progressStepsEl = document.getElementById('progressSteps');
+for (let i = 0; i < totalSteps; i++) {
+    const s = document.createElement('div');
+    s.className = 'progress-step';
+    s.addEventListener('click', () => {
+        document.getElementById(`step-${i}`).scrollIntoView({ behavior: 'smooth' });
+    });
+    progressStepsEl.appendChild(s);
+}
+updateProgress();
+
+function updateProgress() {
+    const steps = progressStepsEl.querySelectorAll('.progress-step');
+    const done = answered.filter(a => a === true).length;
+    steps.forEach((s, i) => {
+        s.classList.toggle('done', answered[i] === true);
+    });
+    const label = document.getElementById('progressLabel');
+    if (done === 0) label.textContent = 'Start the journey below';
+    else if (done < totalSteps) label.textContent = `${done} of ${totalSteps} checks passed`;
+    else label.textContent = 'All checks passed — well done!';
+
+    if (done === totalSteps) showCompletion();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Video loading
+// ═══════════════════════════════════════════════════════════════
+function loadVideo(i) {
+    const step = package.steps[i];
+    const cover = document.querySelector(`#step-${i} .video-cover`);
+    const embedContainer = document.getElementById(`embed-${i}`);
+
+    // Pause any other playing video (one at a time)
+    document.querySelectorAll('.video-embed-container video').forEach(v => v.pause());
+
+    cover.style.display = 'none';
+    embedContainer.classList.add('active');
+    embedContainer.innerHTML = `
+        <video
+            controls
+            playsinline
+            preload="metadata"
+            poster="${step.cover}"
+            src="${R2_BASE}${step.file}">
+            Your browser can't play this video.
+        </video>
+    `;
+    const v = embedContainer.querySelector('video');
+    v.play().catch(() => { /* autoplay may be blocked; controls are there */ });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Quiz logic
+// ═══════════════════════════════════════════════════════════════
+// Track the learner's current selections per step
+const selections = {};
+
+function toggleOption(stepIndex, optionIndex) {
+    // don't allow changes once checked & locked correct
+    if (answered[stepIndex] === true) return;
+    const card = document.querySelector(`#options-${stepIndex} .quiz-option[data-j="${optionIndex}"]`);
+    if (card.classList.contains('locked')) return;
+    if (!selections[stepIndex]) selections[stepIndex] = new Set();
+    if (selections[stepIndex].has(optionIndex)) {
+        selections[stepIndex].delete(optionIndex);
+        card.classList.remove('selected');
+    } else {
+        selections[stepIndex].add(optionIndex);
+        card.classList.add('selected');
+    }
+}
+
+function checkMulti(stepIndex) {
+    const step = package.steps[stepIndex];
+    const opts = step.quiz.options;
+    const chosen = selections[stepIndex] || new Set();
+    const cards = document.querySelectorAll(`#options-${stepIndex} .quiz-option`);
+    const feedback = document.getElementById(`feedback-${stepIndex}`);
+    const retry = document.getElementById(`retry-${stepIndex}`);
+
+    let allRight = true;
+    cards.forEach((card, j) => {
+        const isCorrect = opts[j].correct;
+        const picked = chosen.has(j);
+        card.classList.remove('selected');
+        const whyEl = card.querySelector('.option-why');
+        whyEl.innerHTML = opts[j].why || '';
+
+        // A card is "handled right" if: correct&picked, or incorrect&not-picked
+        if (isCorrect && picked) {
+            card.classList.add('correct', 'locked');
+        } else if (!isCorrect && !picked) {
+            card.classList.add('faded', 'locked');           // correctly left unticked
+        } else if (isCorrect && !picked) {
+            card.classList.add('missed', 'locked');          // should have ticked
+            allRight = false;
+        } else { // incorrect && picked
+            card.classList.add('wrong', 'locked');           // wrongly ticked
+            allRight = false;
+        }
+        whyEl.classList.add('show');
+    });
+
+    if (allRight) {
+        answered[stepIndex] = true;
+        feedback.className = 'quiz-feedback correct show';
+        feedback.innerHTML = "Exactly right — you kept the readable facts and rejected the exact values a graph can't give.";
+        retry.classList.remove('show');
+        document.getElementById(`check-${stepIndex}`).style.display = 'none';
+    } else {
+        answered[stepIndex] = false;
+        feedback.className = 'quiz-feedback incorrect show';
+        feedback.innerHTML = "Not quite — check the notes under each option, then try again. Remember: a graph shows <em>where</em> a root is, not its exact value.";
+        retry.classList.add('show');
+        document.getElementById(`check-${stepIndex}`).style.display = 'none';
+    }
+
+    renderMath(document.getElementById(`step-${stepIndex}`));
+    updateProgress();
+}
+
+function resetQuiz(stepIndex) {
+    const cards = document.querySelectorAll(`#options-${stepIndex} .quiz-option`);
+    cards.forEach(card => {
+        card.classList.remove('selected','correct','faded','missed','wrong','locked');
+        const whyEl = card.querySelector('.option-why');
+        whyEl.classList.remove('show');
+        whyEl.innerHTML = '';
+    });
+    selections[stepIndex] = new Set();
+    document.getElementById(`feedback-${stepIndex}`).className = 'quiz-feedback';
+    document.getElementById(`retry-${stepIndex}`).classList.remove('show');
+    const checkBtn = document.getElementById(`check-${stepIndex}`);
+    if (checkBtn) checkBtn.style.display = '';
+    answered[stepIndex] = null;
+    updateProgress();
+}
+
+function showCompletion() {
+    const el = document.getElementById('completion');
+    el.style.display = 'block';
+    document.getElementById('completionScore').textContent =
+        `Quick check complete`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KaTeX rendering
+// ═══════════════════════════════════════════════════════════════
+function renderMath(el) {
+    if (window.renderMathInElement) {
+        renderMathInElement(el, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false
+        });
+    }
+}
+
+window.addEventListener('load', () => {
+    setTimeout(() => renderMath(document.body), 100);
+});
+</script>
+
+
+</body>
+</html>
