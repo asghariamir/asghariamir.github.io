@@ -1,1 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Moving Paper: Speed is Slope | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
 
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+            --border: #d9e5e2;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+
+        button, input { font-family: inherit; }
+        :focus-visible { outline: 3px solid var(--accent-amber); outline-offset: 2px; }
+
+        /* Centered Mathswell navigation */
+        .mathswell-nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .mw-link {
+            display: flex; align-items: center; gap: 0.5rem;
+            text-decoration: none; color: var(--primary);
+            font-weight: 600; letter-spacing: 1px;
+        }
+
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+
+        /* Hero */
+        .hero { text-align: center; margin-bottom: 2rem; }
+        .hero h1 { color: var(--primary); font-size: clamp(1.7rem, 4vw, 2.3rem); line-height: 1.2; margin-bottom: 0.75rem; }
+        .hero p { color: var(--text-muted); max-width: 700px; margin: 0 auto; font-size: 1.05rem; }
+        .hero .credit { margin-top: 0.75rem; font-size: 0.9rem; font-style: italic; }
+        .hero .credit a { color: var(--primary); }
+
+        /* Centered tabs */
+        .tabs {
+            display: flex; gap: 0.5rem; justify-content: center;
+            background: white; padding: 0.5rem; border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin: 2rem auto;
+        }
+        .tab-btn {
+            padding: 0.75rem 1.5rem; border: none; background: transparent;
+            color: var(--text-muted); cursor: pointer; border-radius: 8px;
+            font-weight: 600; font-size: 1rem; transition: all 0.2s ease;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-btn:hover:not(.active) { background: var(--interactive); color: var(--primary); }
+
+        /* Main card */
+        .card {
+            background: white; border-radius: 12px; padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .card h2 { color: var(--primary); font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .card .lead { color: var(--text-muted); max-width: 75ch; }
+        .card .quote { color: var(--text-muted); font-style: italic; font-size: 0.95rem; margin-top: 0.5rem; }
+
+        /* Function chooser */
+        .chooser { margin-top: 1.5rem; }
+        .pill-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .group-label { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); min-width: 7.5rem; }
+        .preset-pill {
+            padding: 0.4rem 1rem; min-height: 38px; border-radius: 999px;
+            background: white; border: 2px solid var(--primary); color: var(--primary);
+            font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+        }
+        .preset-pill:hover { background: var(--interactive); transform: translateY(-2px); }
+        .preset-pill.active { background: var(--primary); color: white; }
+        
+
+        .control-row {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem;
+            padding: 0.75rem 1rem; margin-bottom: 0.75rem;
+            background: var(--interactive); border: 1px solid var(--primary); border-radius: 8px;
+        }
+        .control-row label { font-weight: 600; color: var(--primary); }
+        .control-row input[type=range] { flex: 1; min-width: 160px; accent-color: var(--primary); height: 28px; }
+        .control-row output { font-family: 'Monaco', 'Consolas', monospace; font-weight: 700; color: var(--primary); min-width: 3.5rem; text-align: right; }
+
+        .formula-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+        .formula-row input[type=text] {
+            flex: 1; min-width: 180px; font-size: 16px; padding: 0.5rem 0.75rem; min-height: 42px;
+            border: 2px solid var(--primary); border-radius: 6px; background: white;
+            font-family: 'Monaco', 'Consolas', monospace; color: var(--text-primary);
+        }
+        .formula-help { flex-basis: 100%; font-size: 0.88rem; color: var(--text-muted); }
+        .formula-help button {
+            font-family: 'Monaco', 'Consolas', monospace; font-size: 0.85rem; padding: 0.15rem 0.5rem; margin: 0.15rem 0.1rem;
+            background: white; color: var(--primary); border: 1px solid var(--primary); border-radius: 6px; cursor: pointer;
+        }
+        .formula-help button:hover { background: var(--interactive); }
+        .formula-msg { flex-basis: 100%; font-size: 0.92rem; font-weight: 600; }
+        .formula-msg.error { color: var(--accent-red); }
+        .formula-msg.ok { color: var(--primary); }
+
+        .fn-display {
+            display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+            margin: 1rem 0; padding: 0.75rem 1rem; min-height: 3.2rem;
+            background: var(--interactive); border: 1px solid var(--primary); border-radius: 8px;
+            overflow-x: auto;
+        }
+        .fn-display .fn-label { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
+
+        /* Buttons */
+        .nav-btn {
+            background: var(--primary); color: white; padding: 0.6rem 1.25rem; border-radius: 6px;
+            border: 2px solid var(--primary); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease;
+        }
+        .nav-btn:hover { transform: translateY(-2px); }
+        .nav-btn.ghost { background: white; color: var(--primary); }
+        .nav-btn.ghost:hover { background: var(--interactive); }
+        .nav-btn.ghost[aria-pressed="true"] { background: var(--primary); color: white; }
+        .button-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 1.25rem 0 1rem; }
+        .button-bar .spacer { flex: 1; }
+
+        /* Canvas */
+        .canvas-wrap {
+            position: relative; height: 440px; border-radius: 12px; overflow: hidden;
+            border: 2px solid var(--border);
+        }
+        #paper-canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: pan-y; }
+        #paper-canvas.dragging { cursor: grabbing; }
+        
+        .canvas-tag {
+            position: absolute; top: 10px; left: 10px; pointer-events: none;
+            background: rgba(255,255,255,0.95); color: var(--primary);
+            padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        .legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; font-size: 0.88rem; color: var(--text-muted); margin: 0.75rem 0 1.5rem; }
+        .legend i { display: inline-block; vertical-align: middle; margin-right: 0.4rem; }
+
+        /* Time slider */
+        .time-control { margin-bottom: 1.5rem; }
+        .time-control label { display: block; font-weight: 600; color: var(--primary); margin-bottom: 0.25rem; }
+        .time-control input[type=range] { width: 100%; accent-color: var(--primary); height: 36px; }
+        .time-scale { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted); }
+
+        /* Info boxes */
+        .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+        .info-display {
+            background: var(--interactive); border: 1px solid var(--primary); border-radius: 8px;
+            padding: 0.75rem; text-align: center;
+        }
+        .info-display .label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+        .info-display .value { font-family: 'Monaco', 'Consolas', monospace; font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .info-display .value.velocity { color: #b45309; }
+        .info-display .value.words { font-family: inherit; font-size: 1.1rem; line-height: 2.4rem; }
+
+        .insight {
+            margin-top: 1rem; padding: 1rem 1.25rem; background: white;
+            border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 8px; font-size: 1.02rem;
+        }
+        .cta { text-align: center; margin-top: 2rem; }
+
+        @media (max-width: 768px) {
+            .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .tab-btn { flex: 1; padding: 0.6rem 0.5rem; font-size: 0.95rem; line-height: 1.25; }
+            .canvas-wrap { height: 360px; }
+            .group-label { min-width: 100%; }
+            .info-grid { grid-template-columns: 1fr 1fr; }
+            .button-bar .spacer { flex-basis: 100%; height: 0; }
+            input, button, select { font-size: 16px; min-height: 44px; }
+            .formula-help button { min-height: 36px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
+        }
+
+        /* Views */
+        #card[data-mode="trace"] .read-only, #card[data-mode="read"] .trace-only { display: none !important; }
+        .views { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+        #card[data-mode="trace"] .views { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+        #card[data-mode="read"] .views { grid-template-columns: 280px minmax(0, 1fr); align-items: start; }
+        #card[data-mode="read"] .static-view .canvas-wrap { height: 210px; }
+        #card[data-mode="read"] .static-view figcaption { display: none; }
+        .view { display: flex; flex-direction: column; }
+        .view figcaption { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.4rem; flex: 1; }
+        .view figcaption strong { color: var(--primary); }
+        .canvas-wrap.short { height: 130px; }
+        .canvas-wrap canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; }
+        .canvas-wrap.road { height: 120px; }
+        .road-view { margin-bottom: 1rem; }
+        .control-row label { min-width: 9.5rem; }
+        @media (max-width: 768px) {
+            #card[data-mode="trace"] .views, #card[data-mode="read"] .views { grid-template-columns: minmax(0, 1fr); }
+            #card[data-mode="trace"] .static-view .canvas-wrap { height: 260px; }
+            #card[data-mode="read"] .static-view .canvas-wrap { height: 170px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>The Moving Paper: Speed is Slope</h1>
+            <p>A dot moves up and down in a fixed window while a sheet of paper slides steadily past. The dot's motion and the graph on the paper are the same story told two ways, and the speed of the dot is the steepness of the graph.</p>
+            <p class="credit">
+                Inspired by W.W. Sawyer's
+                <a href="https://archive.org/details/W.W.SawyerWhatIsCalculusAbout" target="_blank" rel="noopener">"What Is Calculus About?"</a>
+                and his moving paper visualization
+            </p>
+        </div>
+
+        <div class="tabs" role="tablist">
+            <button class="tab-btn active" role="tab" aria-selected="true" data-mode="trace">The Moving Paper Idea</button>
+            <button class="tab-btn" role="tab" aria-selected="false" data-mode="read">Graph Explorer</button>
+        </div>
+
+        <div class="card" id="card" data-mode="trace">
+            <h2 id="mode-title"></h2>
+            <p class="lead" id="mode-lead"></p>
+            <p class="quote" id="mode-quote"></p>
+
+            <div class="chooser read-only">
+                <div class="pill-group" role="group" aria-label="Straight lines">
+                    <span class="group-label">Steady motion</span>
+                    <button class="preset-pill" data-fn="line" data-m="0.25">Gentle rise</button>
+                    <button class="preset-pill" data-fn="line" data-m="1">Steep rise</button>
+                    <button class="preset-pill" data-fn="line" data-m="0">Flat</button>
+                    <button class="preset-pill" data-fn="line" data-m="-0.25">Gentle fall</button>
+                    <button class="preset-pill" data-fn="line" data-m="-1">Steep fall</button>
+                </div>
+                <div class="pill-group" role="group" aria-label="Curves">
+                    <span class="group-label">Changing motion</span>
+                    <button class="preset-pill" data-fn="speedup">Speeding up</button>
+                    <button class="preset-pill" data-fn="slowdown">Slowing down</button>
+                    <button class="preset-pill" data-fn="hill">Hill</button>
+                    <button class="preset-pill" data-fn="scurve">S-curve</button>
+                    <button class="preset-pill" data-fn="stopgo">Stop &amp; go</button>
+                    <button class="preset-pill" data-fn="wave">Wave</button>
+                    <button class="preset-pill" data-fn="fastwave">Fast wave</button>
+                    <button class="preset-pill" data-fn="fading">Fading wave</button>
+                </div>
+
+                <div class="control-row" id="slope-row">
+                    <label for="slope">Slope of the line</label>
+                    <input type="range" id="slope" min="-1" max="1" step="0.05" value="0.25">
+                    <output id="slope-out" for="slope">0.25</output>
+                </div>
+
+                <div class="control-row formula-row">
+                    <label for="formula">Your own function: s(t) =</label>
+                    <input type="text" id="formula" placeholder="e.g. 3sin(t) or t^2/8 - 3" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <button class="nav-btn" id="formula-btn">Plot it</button>
+                    <div class="formula-help">
+                        Uses t from 0 to 8. You can type + − * / ^, brackets, pi, e, and sin, cos, tan, sqrt, exp, ln, abs. Try
+                        <button data-ex="t^2/8 - 3">t^2/8 - 3</button>
+                        <button data-ex="3sin(t)">3sin(t)</button>
+                        <button data-ex="4 - sqrt(8t)">4 - sqrt(8t)</button>
+                        <button data-ex="3exp(-t/3)cos(2t)">3exp(-t/3)cos(2t)</button>
+                    </div>
+                    <div class="formula-msg" id="formula-msg" aria-live="polite"></div>
+                </div>
+
+                <div class="fn-display"><span id="fn-tex"></span></div>
+            </div>
+
+            <div class="button-bar">
+                <button class="nav-btn" id="play-btn"></button>
+                <button class="nav-btn ghost" id="pause-btn">Pause</button>
+                <button class="nav-btn ghost" id="reset-btn">Reset</button>
+                <span class="spacer"></span>
+                <button class="nav-btn ghost read-only" id="cover-btn" aria-pressed="false">Cover the graph</button>
+            </div>
+
+            <figure class="view trace-only road-view">
+                <figcaption><strong>The motion.</strong> The car drives along a straight road beside a ruler.</figcaption>
+                <div class="canvas-wrap road"><canvas id="road-canvas" aria-label="A car driving along a straight road with a distance ruler"></canvas></div>
+            </figure>
+
+            <div class="views">
+                <figure class="view static-view">
+                    <figcaption id="static-caption"></figcaption>
+                    <div class="canvas-wrap"><canvas id="static-canvas" aria-label="The time and distance graph on still paper"></canvas></div>
+                </figure>
+                <figure class="view">
+                    <figcaption id="paper-caption"></figcaption>
+                    <div class="canvas-wrap"><canvas id="paper-canvas" tabindex="0" aria-label="Graph paper sliding left under a fixed upright ruler window with a moving dot"></canvas></div>
+                </figure>
+            </div>
+            <div class="legend">
+                <span><i style="width:12px;height:12px;border-radius:50%;background:#dc2626;"></i>The object</span>
+                <span><i style="width:4px;height:16px;background:#f59e0b;border-radius:2px;"></i>Velocity arrow: longer means faster</span>
+                <span><i style="width:16px;height:0;border-top:3px dashed #f59e0b;"></i>Tangent: the slope of the graph</span>
+            </div>
+
+            <div class="time-control">
+                <label for="time-slider" id="time-label"></label>
+                <input type="range" id="time-slider" min="0" max="8" step="0.01" value="0">
+                <div class="time-scale"><span>t = 0</span><strong>t = <span id="slider-time">0.00</span> s</strong><span>t = 8</span></div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-display"><div class="label">Position s(t)</div><div class="value" id="out-pos">0.00</div></div>
+                <div class="info-display"><div class="label">Velocity = slope</div><div class="value velocity" id="out-vel">0.00</div></div>
+                <div class="info-display"><div class="label" id="who-label">The object is</div><div class="value words" id="out-words">---</div></div>
+                <div class="info-display"><div class="label">Time t</div><div class="value" id="out-time">0.00</div></div>
+            </div>
+
+            <div class="insight" id="insight" aria-live="polite"></div>
+
+            <div class="cta">
+                <button class="nav-btn" id="cta-btn"></button>
+            </div>
+        </div>
+    </div>
+
+<script>
+(function () {
+    'use strict';
+    const T = 8;                       // seconds of paper
+    const BASE_YR = 4.8;               // default visible height range is -4.8..4.8
+    const COL = { brand: '#0f766e', dot: '#dc2626', amber: '#f59e0b' };
+    const $ = id => document.getElementById(id);
+    const fmt = n => String(+(+n).toPrecision(6));
+
+    /* ---------- Formula parser (no eval) ---------- */
+    const FUNCS = { sqrt: Math.sqrt, sin: Math.sin, cos: Math.cos, tan: Math.tan, tanh: Math.tanh, exp: Math.exp, ln: Math.log, log: Math.log10, abs: Math.abs };
+    const NAMES = ['sqrt', 'tanh', 'sin', 'cos', 'tan', 'exp', 'abs', 'log', 'ln', 'pi', 'e', 't', 'x'];
+
+    function tokenize(src) {
+        const s = src.replace(/[−–]/g, '-').replace(/[×·]/g, '*').replace(/÷/g, '/').replace(/π/g, 'pi').replace(/²/g, '^2').replace(/³/g, '^3').toLowerCase();
+        const out = [];
+        let i = 0;
+        while (i < s.length) {
+            const c = s[i];
+            if (/\s/.test(c)) { i++; continue; }
+            if (/[0-9.]/.test(c)) {
+                const m = /^(\d+\.?\d*|\.\d+)/.exec(s.slice(i));
+                if (!m) throw new Error('I could not read the number near "' + s.slice(i, i + 4) + '".');
+                out.push({ k: 'num', v: parseFloat(m[1]) }); i += m[1].length; continue;
+            }
+            if (/[a-z]/.test(c)) {
+                const name = NAMES.find(n => s.startsWith(n, i));
+                if (!name) throw new Error('I don\'t know what "' + /^[a-z]+/.exec(s.slice(i))[0] + '" means. The variable is t.');
+                out.push({ k: 'id', v: name }); i += name.length; continue;
+            }
+            if ('+-*/^()'.includes(c)) { out.push({ k: c }); i++; continue; }
+            throw new Error('I don\'t understand the symbol "' + c + '".');
+        }
+        return out;
+    }
+
+    function parse(src) {
+        const tk = tokenize(src.replace(/^\s*[a-z]\s*(\(\s*[tx]\s*\))?\s*=/i, ''));
+        if (!tk.length) throw new Error('Type a formula first, like 3sin(t).');
+        let p = 0;
+        const peek = () => tk[p], eat = k => { if (tk[p] && tk[p].k === k) { p++; return true; } return false; };
+        function expr() {
+            let a = term();
+            while (peek() && (peek().k === '+' || peek().k === '-')) { const op = tk[p++].k; a = { k: op, a, b: term() }; }
+            return a;
+        }
+        function term() {
+            let a = unary();
+            for (;;) {
+                const n = peek();
+                if (!n) break;
+                if (n.k === '*' || n.k === '/') { p++; a = { k: n.k, a, b: unary() }; }
+                else if (n.k === 'num' || n.k === 'id' || n.k === '(') a = { k: '*', a, b: power() };   // implicit multiplication
+                else break;
+            }
+            return a;
+        }
+        function unary() {
+            if (eat('-')) return { k: 'neg', a: unary() };
+            if (eat('+')) return unary();
+            return power();
+        }
+        function power() {
+            const base = primary();
+            return eat('^') ? { k: '^', a: base, b: unary() } : base;
+        }
+        function primary() {
+            const n = tk[p++];
+            if (!n) throw new Error('The formula seems to stop too early.');
+            if (n.k === 'num') return n;
+            if (n.k === '(') { const e = expr(); if (!eat(')')) throw new Error('A bracket is not closed.'); return e; }
+            if (n.k === 'id') {
+                if (FUNCS[n.v]) {
+                    if (!eat('(')) throw new Error('Put brackets after ' + n.v + ', like ' + n.v + '(t).');
+                    const e = expr(); if (!eat(')')) throw new Error('A bracket is not closed.');
+                    return { k: 'fn', v: n.v, a: e };
+                }
+                return n.v === 'pi' || n.v === 'e' ? { k: 'const', v: n.v } : { k: 'var' };
+            }
+            throw new Error('Something is out of place near "' + n.k + '".');
+        }
+        const tree = expr();
+        if (p < tk.length) throw new Error('Something is out of place near "' + (tk[p].v !== undefined ? tk[p].v : tk[p].k) + '".');
+        return tree;
+    }
+
+    function ev(n, t) {
+        switch (n.k) {
+            case 'num': return n.v;
+            case 'var': return t;
+            case 'const': return n.v === 'pi' ? Math.PI : Math.E;
+            case 'neg': return -ev(n.a, t);
+            case '+': return ev(n.a, t) + ev(n.b, t);
+            case '-': return ev(n.a, t) - ev(n.b, t);
+            case '*': return ev(n.a, t) * ev(n.b, t);
+            case '/': return ev(n.a, t) / ev(n.b, t);
+            case '^': return Math.pow(ev(n.a, t), ev(n.b, t));
+            case 'fn': return FUNCS[n.v](ev(n.a, t));
+        }
+    }
+
+    function tex(n) {
+        const sum = m => m.k === '+' || m.k === '-';
+        const wrap = (m, cond) => cond ? '\\left(' + tex(m) + '\\right)' : tex(m);
+        switch (n.k) {
+            case 'num': return fmt(n.v);
+            case 'var': return 't';
+            case 'const': return n.v === 'pi' ? '\\pi' : 'e';
+            case 'neg': return '-' + wrap(n.a, sum(n.a));
+            case '+': return tex(n.a) + '+' + tex(n.b);
+            case '-': return tex(n.a) + '-' + wrap(n.b, sum(n.b));
+            case '*': {
+                const r = wrap(n.b, sum(n.b) || n.b.k === 'neg');
+                const dot = n.b.k === 'num' || (n.b.k === '*' && /^\d/.test(r)) || (n.b.k === '^' && n.b.a.k === 'num');
+                return wrap(n.a, sum(n.a)) + (dot ? '\\cdot ' : '\\,') + r;
+            }
+            case '/': return '\\frac{' + tex(n.a) + '}{' + tex(n.b) + '}';
+            case '^': return '{' + wrap(n.a, !['num', 'var', 'const'].includes(n.a.k) || (n.a.k === 'num' && n.a.v < 0)) + '}^{' + tex(n.b) + '}';
+            case 'fn':
+                if (n.v === 'sqrt') return '\\sqrt{' + tex(n.a) + '}';
+                if (n.v === 'abs') return '\\left|' + tex(n.a) + '\\right|';
+                if (n.v === 'exp') return 'e^{' + tex(n.a) + '}';
+                return '\\' + n.v + '\\left(' + tex(n.a) + '\\right)';
+        }
+    }
+
+    /* ---------- Functions on the paper ---------- */
+    const line = m => ({
+        f: t => 0.5 + m * (t - 4), df: () => m, isLine: true,
+        tex: m === 0 ? '0.5' : (m === 1 ? '' : m === -1 ? '-' : fmt(m)) + '(t-4)+0.5'
+    });
+    const pw = pts => {
+        const seg = t => { let i = 0; while (i < pts.length - 2 && t > pts[i + 1][0]) i++; return i; };
+        return {
+            f: t => { const i = seg(t), [a, y0] = pts[i], [b, y1] = pts[i + 1]; return y0 + (y1 - y0) * (t - a) / (b - a); },
+            df: t => { const i = seg(t), [a, y0] = pts[i], [b, y1] = pts[i + 1]; return (y1 - y0) / (b - a); }
+        };
+    };
+    const CURVES = {
+        speedup:  { f: t => -3.5 + 0.11 * t * t,            df: t => 0.22 * t,       tex: '0.11\\,t^{2}-3.5', src: '0.11t^2 - 3.5' },
+        slowdown: { f: t => 3.5 - 0.11 * (T - t) * (T - t), df: t => 0.22 * (T - t), tex: '3.5-0.11\\,(8-t)^{2}', src: '3.5 - 0.11(8-t)^2' },
+        hill:     { f: t => -2 + 5 * Math.exp(-(t - 4) * (t - 4) / 2), df: t => -5 * (t - 4) * Math.exp(-(t - 4) * (t - 4) / 2), tex: '5\\,e^{-(t-4)^{2}/2}-2', src: '5exp(-(t-4)^2/2) - 2' },
+        scurve:   { f: t => 3 * Math.tanh(1.1 * (t - 4)),   df: t => 3.3 / Math.pow(Math.cosh(1.1 * (t - 4)), 2), tex: '3\\tanh\\left(1.1\\,(t-4)\\right)', src: '3tanh(1.1(t-4))' },
+        stopgo:   Object.assign(pw([[0, -3], [2, 1], [4.5, 1], [8, -2.5]]), { text: 'up quickly, wait, then down slowly (three straight pieces)' }),
+        wave:     { f: t => 2.5 * Math.sin(Math.PI * t / 2), df: t => 1.25 * Math.PI * Math.cos(Math.PI * t / 2), tex: '2.5\\sin\\left(\\frac{\\pi t}{2}\\right)', src: '2.5sin(pi t/2)' },
+        fastwave: { f: t => 2.5 * Math.sin(Math.PI * t),     df: t => 2.5 * Math.PI * Math.cos(Math.PI * t),      tex: '2.5\\sin\\left(\\pi t\\right)', src: '2.5sin(pi t)' },
+        fading:   { f: t => 3.5 * Math.exp(-0.3 * t) * Math.cos(Math.PI * t),
+                    df: t => 3.5 * Math.exp(-0.3 * t) * (-0.3 * Math.cos(Math.PI * t) - Math.PI * Math.sin(Math.PI * t)), tex: '3.5\\,e^{-0.3t}\\cos\\left(\\pi t\\right)', src: '3.5exp(-0.3t)cos(pi t)' }
+    };
+
+    /* ---------- The car of the introduction: one demonstration drive ---------- */
+    const DRIVE = (() => {
+        // velocity at each knot: speed up, cruise, brake, wait, then reverse
+        const K = [[0, 0], [2, 3], [4, 3], [5.5, 0], [6.25, 0], [7.25, -2], [8, -2]];
+        const S0 = [0];
+        for (let i = 1; i < K.length; i++) S0.push(S0[i - 1] + (K[i][1] + K[i - 1][1]) / 2 * (K[i][0] - K[i - 1][0]));
+        const seg = t => { let i = 0; while (i < K.length - 2 && t > K[i + 1][0]) i++; return i; };
+        const acc = i => (K[i + 1][1] - K[i][1]) / (K[i + 1][0] - K[i][0]);
+        const df = t => { const i = seg(t); return K[i][1] + acc(i) * (t - K[i][0]); };
+        return {
+            isCar: true, range: [-0.9, 12.2], df,
+            f: t => { const i = seg(t), d = t - K[i][0]; return S0[i] + K[i][1] * d + acc(i) * d * d / 2; },
+            phase: t => {
+                const i = seg(t), a = acc(i), v = df(t);
+                return a === 0 ? (v === 0 ? 'still' : v > 0 ? 'steady' : 'reversing') : a > 0 ? 'speeding' : (K[i][1] > 0 ? 'braking' : 'reversing');
+            }
+        };
+    })();
+
+    /* ---------- State ---------- */
+    const card = $('card');
+    const cvPaper = $('paper-canvas'), cvStatic = $('static-canvas'), cvRoad = $('road-canvas');
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const S = {
+        mode: 'trace', t: 0, playing: false, cover: false, last: 0, raf: 0,
+        fn: null, key: '', lo: -BASE_YR, hi: BASE_YR,
+        sel: { trace: { fn: DRIVE, key: 'car' }, read: { fn: CURVES.hill, key: 'hill' } }
+    };
+
+    const MODES = {
+        trace: {
+            title: 'One Motion, Two Views',
+            lead: 'A car drives along a straight road: it speeds up, cruises, brakes, waits, and then reverses. Here are two ways of turning that motion into a graph. View 1 is the way we plot by hand: the paper stays still and we mark the distance of the car against the time. View 2 is the way a recording instrument works: a pen moves up and down with the distance of the car while the paper is pulled steadily underneath it, so the motion draws its own graph. Both views end up with exactly the same graph.',
+            quote: '"If the object has a steady speed, its trail will be a straight line." W.W. Sawyer',
+            staticCaption: '<strong>View 1, plotting by hand.</strong> The paper stays still. Time is marked across and the distance of the car is marked upward.',
+            caption: '<strong>View 2, a recorder.</strong> The pen only moves up and down with the distance of the car, while the paper is pulled steadily to the left, as in a seismograph.',
+            play: 'Start the car', cta: 'Explore more graphs', time: 'Wind time back and forth', who: 'The car is'
+        },
+        read: {
+            title: 'Graph Explorer',
+            lead: 'Choose a graph, or type your own. The small picture keeps the whole graph in view. On the moving paper the same graph slides under the fixed window, and the dot shows how the object moves: where the graph is steep the object races, and where it is flat the object stands still.',
+            quote: '', staticCaption: '', caption: '',
+            play: 'Slide paper', cta: 'Back to the idea', time: 'Move through time (or drag the paper)', who: 'The object is'
+        }
+    };
+
+    /* ---------- Drawing helpers ---------- */
+    function fit(cv) {
+        const r = cv.parentElement.getBoundingClientRect();
+        if (!r.width) return null;
+        const dpr = window.devicePixelRatio || 1, ctx = cv.getContext('2d');
+        if (Math.round(r.width * dpr) !== cv.width || Math.round(r.height * dpr) !== cv.height) {
+            cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+        }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return { ctx, w: r.width, h: r.height };
+    }
+    const span = () => S.hi - S.lo;
+    const paperGeom = () => {
+        const r = cvPaper.parentElement.getBoundingClientRect(), sy = r.height / span();
+        return { sx: Math.max(34, Math.min(68, r.width / 12)), sy, slitX: Math.round(r.width / 2), Y: y => r.height - (y - S.lo) * sy };
+    };
+    const staticGeom = () => {
+        const r = cvStatic.parentElement.getBoundingClientRect(), ml = 34, mr = 12, sy = (r.height - 44) / span();
+        return { ml, pw: r.width - ml - mr, sy, Y: y => r.height - 29 - (y - S.lo) * sy };
+    };
+    function niceStep(raw) {
+        const p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+        return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
+    }
+    function ticks(sub) {                               // tick values inside the visible range
+        const step = niceStep(span() / 9.6) / (sub || 1), m = span() * 0.03, out = [];
+        for (let i = Math.ceil((S.lo + m) / step); i <= Math.floor((S.hi - m) / step); i++) out.push({ y: i * step, major: i % (sub || 1) === 0 });
+        return out;
+    }
+
+    const numbered = (v) => S.mode !== 'trace' || Math.abs(v) < 1e-9;   // the introduction marks only 0 on its axes
+
+    function describe(v, sy, isCar) {
+        const px = Math.abs(v) * sy;                 // judged by how fast it looks on screen
+        if (px < 2.5) return 'At rest';
+        const dir = isCar ? (v > 0 ? 'Going forward' : 'Going backward') : (v > 0 ? 'Rising' : 'Falling');
+        return px < 18 ? dir + ' slowly' : px < 70 ? dir : dir + ' fast';
+    }
+    function arrow(ctx, x, y, dx, dy) {              // (dx, dy) in screen pixels
+        const len = Math.hypot(dx, dy);
+        if (len < 4) return;
+        const ux = dx / len, uy = dy / len, tx = x + dx, ty = y + dy;
+        ctx.save();
+        ctx.strokeStyle = COL.amber; ctx.fillStyle = COL.amber; ctx.lineWidth = 4; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(tx - ux * 8, ty - uy * 8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(tx, ty);
+        ctx.lineTo(tx - ux * 11 - uy * 7, ty - uy * 11 + ux * 7); ctx.lineTo(tx - ux * 11 + uy * 7, ty - uy * 11 - ux * 7);
+        ctx.closePath(); ctx.fill();
+        ctx.restore();
+    }
+    function dot(ctx, x, y, r) {
+        ctx.save();
+        ctx.shadowColor = COL.dot; ctx.shadowBlur = 12;
+        ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fillStyle = COL.dot; ctx.fill();
+        ctx.shadowBlur = 0; ctx.strokeStyle = 'white'; ctx.lineWidth = 3; ctx.stroke();
+        ctx.restore();
+    }
+    function sheet(ctx, x0, y0, x1, y1) {
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 2;
+        ctx.fillStyle = '#fff'; ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+        ctx.restore();
+    }
+    const arrowLen = (v, scale) => Math.sign(v) * Math.min(120, Math.abs(v) * scale * 0.75);
+
+    /* ---------- The moving paper with its fixed upright window ---------- */
+    function drawPaper() {
+        const c = fit(cvPaper); if (!c) return;
+        const { ctx, w, h } = c, g = paperGeom(), t = S.t, fn = S.fn, Y = g.Y;
+        const X = u => g.slitX + (u - t) * g.sx;
+        const half = 13, covered = S.cover && S.mode === 'read';
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#e8f0ee'; ctx.fillRect(0, 0, w, h);
+        const v = fn.df(t), yNow = Y(fn.f(t));
+
+        if (covered) {                                // nothing of the paper shows: only the object in its window
+            ctx.fillStyle = '#d5e3df'; ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#fff'; ctx.fillRect(g.slitX - half, 0, 2 * half, h);
+        } else {
+            const px0 = X(-0.7), px1 = X(T + 0.7), py0 = 10, py1 = h - 10;
+            sheet(ctx, px0, py0, px1, py1);
+            ctx.save();
+            ctx.beginPath(); ctx.rect(px0, py0, px1 - px0, py1 - py0); ctx.clip();
+            ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1; ctx.beginPath();
+            for (let u = 0; u <= T; u++) { ctx.moveTo(X(u), py0); ctx.lineTo(X(u), py1); }
+            ticks().forEach(k => { ctx.moveTo(px0, Y(k.y)); ctx.lineTo(px1, Y(k.y)); });
+            ctx.stroke();
+            ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(px0, Y(0)); ctx.lineTo(px1, Y(0)); ctx.stroke();
+            ctx.fillStyle = '#6b7280'; ctx.font = '12px -apple-system, "Segoe UI", sans-serif'; ctx.textAlign = 'center';
+            for (let u = 0; u <= T; u++) if (numbered(u)) ctx.fillText(u + (u === T ? ' s' : ''), X(u), py1 - 6);
+
+            const uEnd = S.mode === 'trace' ? t : T;  // in the introduction only what the pen has drawn so far
+            if (uEnd > 0) {
+                ctx.beginPath(); ctx.strokeStyle = COL.brand; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                const n = Math.max(2, Math.ceil(uEnd * 60));
+                for (let i = 0; i <= n; i++) { const u = uEnd * i / n; i ? ctx.lineTo(X(u), Y(fn.f(u))) : ctx.moveTo(X(u), Y(fn.f(u))); }
+                ctx.stroke();
+            }
+            const k = v * g.sy / g.sx, L = 90 / Math.sqrt(1 + k * k);
+            ctx.strokeStyle = COL.amber; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.setLineDash([6, 6]);
+            ctx.beginPath(); ctx.moveTo(g.slitX - L, yNow + k * L); ctx.lineTo(g.slitX + L, yNow - k * L); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+        }
+
+        // upright ruler and window
+        ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fillRect(g.slitX - half - 36, 0, 36, h);
+        ctx.strokeStyle = COL.brand; ctx.fillStyle = COL.brand; ctx.lineWidth = 1.5;
+        ctx.font = '600 12px Monaco, Consolas, monospace'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        ctx.beginPath();
+        ticks(2).forEach(k => {
+            ctx.moveTo(g.slitX - half, Y(k.y)); ctx.lineTo(g.slitX - half - (k.major ? 8 : 4), Y(k.y));
+            if (k.major && numbered(k.y)) ctx.fillText(fmt(k.y), g.slitX - half - 11, Y(k.y));
+        });
+        ctx.stroke(); ctx.textBaseline = 'alphabetic';
+        ctx.fillStyle = 'rgba(15,118,110,.07)'; ctx.fillRect(g.slitX - half, 0, 2 * half, h);
+        ctx.strokeStyle = COL.brand; ctx.lineWidth = 2.5; ctx.strokeRect(g.slitX - half, 1.5, 2 * half, h - 3);
+
+        if (!covered) arrow(ctx, g.slitX, yNow, 0, -arrowLen(v, g.sy));
+        dot(ctx, g.slitX, yNow, 9);
+
+        ctx.font = '700 11px -apple-system, "Segoe UI", sans-serif'; ctx.textAlign = 'center';
+        ctx.fillStyle = COL.brand; ctx.fillRect(g.slitX - 31, h - 22, 62, 18);
+        ctx.fillStyle = '#fff'; ctx.fillText(S.mode === 'trace' ? 'PEN' : 'WINDOW', g.slitX, h - 9);
+        if (S.mode === 'trace') {
+            ctx.font = '600 12px -apple-system, "Segoe UI", sans-serif'; ctx.textAlign = 'left';
+            const label = '\u2190 paper is pulled this way', lw = ctx.measureText(label).width + 16;
+            ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fillRect(10, 10, lw, 24);
+            ctx.fillStyle = COL.brand; ctx.fillText(label, 18, 26);
+        }
+    }
+
+    /* ---------- The car on its road ---------- */
+    function drawRoad() {
+        const c = fit(cvRoad); if (!c) return;
+        const { ctx, w, h } = c, t = S.t, fn = S.fn, ml = 34, mr = 34, y0 = h - 40;
+        const Xs = s => ml + (s - S.lo) / span() * (w - ml - mr);
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = '#eef2f1'; ctx.fillRect(0, y0 - 2, w, 6);                 // road surface
+        ctx.strokeStyle = COL.brand; ctx.fillStyle = COL.brand; ctx.lineWidth = 1.5;
+        ctx.font = '600 12px Monaco, Consolas, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        ctx.beginPath(); ctx.moveTo(8, y0 + 4); ctx.lineTo(w - 8, y0 + 4);
+        ticks(2).forEach(k => {
+            ctx.moveTo(Xs(k.y), y0 + 4); ctx.lineTo(Xs(k.y), y0 + 4 + (k.major ? 8 : 4));
+            if (k.major && numbered(k.y)) ctx.fillText(fmt(k.y), Xs(k.y), y0 + 15);
+        });
+        ctx.stroke(); ctx.textBaseline = 'alphabetic';
+        ctx.fillStyle = '#6b7280'; ctx.font = '12px -apple-system, "Segoe UI", sans-serif'; ctx.textAlign = 'right';
+        ctx.fillText('distance along the road', w - 10, 16);
+
+        const x = Xs(fn.f(t)), by = y0 - 7;                                        // car: wheels sit on the road
+        ctx.save();
+        ctx.fillStyle = COL.brand;
+        ctx.beginPath();                                                           // cabin
+        ctx.moveTo(x - 16, by - 12); ctx.lineTo(x - 9, by - 23); ctx.lineTo(x + 8, by - 23); ctx.lineTo(x + 17, by - 12); ctx.closePath(); ctx.fill();
+        ctx.beginPath();                                                           // body
+        if (ctx.roundRect) ctx.roundRect(x - 28, by - 13, 56, 13, 5); else ctx.rect(x - 28, by - 13, 56, 13);
+        ctx.fill();
+        ctx.fillStyle = '#e6fffb';                                                 // windows
+        ctx.beginPath(); ctx.moveTo(x - 11, by - 13); ctx.lineTo(x - 6.5, by - 20); ctx.lineTo(x - 1, by - 20); ctx.lineTo(x - 1, by - 13); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x + 2, by - 13); ctx.lineTo(x + 2, by - 20); ctx.lineTo(x + 6.5, by - 20); ctx.lineTo(x + 12, by - 13); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = COL.amber; ctx.fillRect(x + 25, by - 10, 3, 4);            // headlight shows which way is forward
+        ctx.fillStyle = '#1f2937';
+        [-16, 16].forEach(d => { ctx.beginPath(); ctx.arc(x + d, by, 6.5, 0, 2 * Math.PI); ctx.fill(); });
+        ctx.fillStyle = '#d1d5db';
+        [-16, 16].forEach(d => { ctx.beginPath(); ctx.arc(x + d, by, 2.5, 0, 2 * Math.PI); ctx.fill(); });
+        ctx.restore();
+
+        const sv = (w - ml - mr) / span();
+        arrow(ctx, x, y0 + 4, arrowLen(fn.df(t), sv * 3), 0);
+        dot(ctx, x, y0 + 4, 6);                                                    // the point we track on the ruler
+    }
+
+    /* ---------- The graph on still paper, the way a textbook plots it ---------- */
+    function drawStatic() {
+        const c = fit(cvStatic); if (!c) return;
+        const { ctx, w, h } = c, g = staticGeom(), t = S.t, fn = S.fn, tracing = S.mode === 'trace', Y = g.Y;
+        const X = u => g.ml + u / T * g.pw, tk = ticks();
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1; ctx.beginPath();
+        for (let u = 0; u <= T; u++) { ctx.moveTo(X(u), 8); ctx.lineTo(X(u), h - 22); }
+        tk.forEach(k => { ctx.moveTo(X(0), Y(k.y)); ctx.lineTo(X(T), Y(k.y)); });
+        ctx.stroke();
+        ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 1.5; ctx.beginPath();
+        ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(T), Y(0)); ctx.moveTo(X(0), 8); ctx.lineTo(X(0), h - 22); ctx.stroke();
+        ctx.fillStyle = '#6b7280'; ctx.font = '12px -apple-system, "Segoe UI", sans-serif'; ctx.textAlign = 'center';
+        for (let u = 0; u <= T; u++) if (numbered(u)) ctx.fillText(u + (u === T ? ' s' : ''), X(u), h - 6);
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        const skip = tk.length > 1 && Math.abs(Y(tk[0].y) - Y(tk[1].y)) < 15 ? 2 : 1, step = niceStep(span() / 9.6);
+        tk.forEach(k => { if (Math.round(k.y / step) % skip === 0 && numbered(k.y)) ctx.fillText(fmt(k.y), X(0) - 6, Y(k.y)); });
+        ctx.textBaseline = 'alphabetic';
+        if (tracing) { ctx.textAlign = 'left'; ctx.fillText('distance', X(0) + 6, 18); ctx.textAlign = 'right'; ctx.fillText('time', X(T), Y(0) - 6); }
+
+        if (S.cover && !tracing) {
+            ctx.fillStyle = '#d5e3df'; ctx.fillRect(X(0) + 1, 8, g.pw, h - 30);
+            ctx.fillStyle = '#4b6f68'; ctx.font = '600 13px -apple-system, "Segoe UI", sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('Covered', X(T / 2), h / 2 - 6);
+            return;
+        }
+        const uEnd = tracing ? t : T;                 // in the introduction the graph is plotted as time goes on
+        if (uEnd > 0) {
+            ctx.beginPath(); ctx.strokeStyle = COL.brand; ctx.lineWidth = tracing ? 3 : 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            const n = Math.max(2, Math.ceil(uEnd * 60));
+            for (let i = 0; i <= n; i++) { const u = uEnd * i / n; i ? ctx.lineTo(X(u), Y(fn.f(u))) : ctx.moveTo(X(u), Y(fn.f(u))); }
+            ctx.stroke();
+        }
+        if (tracing) {
+            const xNow = X(t), yNow = Y(fn.f(t)), k = fn.df(t) * g.sy / (g.pw / T), L = 70 / Math.sqrt(1 + k * k);
+            ctx.strokeStyle = COL.amber; ctx.lineWidth = 4; ctx.setLineDash([6, 6]);
+            ctx.beginPath(); ctx.moveTo(xNow - L, yNow + k * L); ctx.lineTo(xNow + L, yNow - k * L); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#fff'; ctx.strokeStyle = COL.brand; ctx.lineWidth = 2;
+            for (let u = 0; u <= Math.floor(t + 1e-9); u++) { ctx.beginPath(); ctx.arc(X(u), Y(fn.f(u)), 4, 0, 2 * Math.PI); ctx.fill(); ctx.stroke(); }
+            dot(ctx, xNow, yNow, 9);
+        }
+    }
+
+    function draw() {
+        drawPaper(); drawStatic();
+        if (S.mode === 'trace') drawRoad();
+        readouts();
+    }
+
+    function readouts() {
+        const t = S.t, fn = S.fn, v = fn.df(t), y = fn.f(t), words = describe(v, paperGeom().sy, fn.isCar), still = words === 'At rest';
+        $('out-pos').textContent = y.toFixed(2);
+        $('out-vel').textContent = v.toFixed(2);
+        $('out-words').textContent = words;
+        $('out-time').textContent = t.toFixed(2);
+        $('slider-time').textContent = t.toFixed(2);
+        const sp = Math.abs(v).toFixed(2), sl = v.toFixed(2);
+        let msg;
+        if (S.mode === 'trace') {
+            const ph = fn.phase(t);
+            if (t === 0) msg = 'Press "Start the car" and watch the road and both views together.';
+            else if (t >= T) msg = 'Both views have drawn the same graph. In View 1 the pen travelled across still paper. In View 2 the pen only moved up and down, and the paper did the travelling.';
+            else if (ph === 'speeding') msg = 'The car is speeding up, so in both views the graph is getting steeper. Its slope is now ' + sl + ', the same as the velocity of the car.';
+            else if (ph === 'steady') msg = 'The car holds a steady velocity of ' + sl + ', so both views draw a straight line with slope ' + sl + '.';
+            else if (ph === 'braking') msg = 'The car is braking, so in both views the graph is flattening out. Its slope is now ' + sl + '.';
+            else if (ph === 'still') msg = 'The car is standing still. Time goes on but no distance is gained, so both graphs are flat.';
+            else msg = 'The car is reversing, so its distance shrinks and both graphs slope downward. The slope is now ' + sl + '.';
+        } else {
+            if (still) msg = 'The graph is flat under the window, so the object is not moving: slope 0 means velocity 0.';
+            else if (fn.isLine) msg = 'This line has slope ' + sl + ' everywhere, so the object ' + (v > 0 ? 'climbs' : 'drops') + ' ' + sp + ' units every second, at the same steady pace the whole way.';
+            else msg = 'Under the window the graph has slope ' + sl + ', so right now the object is ' + (v > 0 ? 'climbing' : 'dropping') + ' at ' + sp + ' units per second. Watch the arrow change as the steepness changes.';
+        }
+        $('insight').textContent = msg;
+    }
+
+    /* ---------- Time and animation ---------- */
+    function setT(t) {
+        S.t = Math.max(0, Math.min(T, t));
+        $('time-slider').value = S.t;
+    }
+    function tick(now) {
+        if (!S.playing) return;
+        const dt = Math.min(0.05, (now - S.last) / 1000);
+        S.last = now;
+        setT(S.t + dt);
+        if (S.t >= T) pause();
+        draw();
+        if (S.playing) S.raf = requestAnimationFrame(tick);
+    }
+    function play() {
+        if (S.t >= T) setT(0);
+        S.playing = true; S.last = performance.now();
+        cancelAnimationFrame(S.raf); S.raf = requestAnimationFrame(tick);
+    }
+    function pause() { S.playing = false; cancelAnimationFrame(S.raf); }
+
+    /* ---------- Choosing a function ---------- */
+    const pills = [...document.querySelectorAll('.preset-pill[data-fn]')];
+    function showFormula() {
+        const el = $('fn-tex'), fn = S.sel.read.fn;
+        if (fn.tex && window.katex) {
+            try { katex.render('s(t)=' + fn.tex, el, { throwOnError: true }); return; } catch (e) { /* fall through */ }
+        }
+        el.textContent = fn.text || 's(t) = ' + (fn.src || fn.tex);
+    }
+    function useFunction(fn, key, autoplay) {
+        pause();
+        S.fn = fn; S.key = key; S.sel[S.mode] = { fn, key };
+        const yr = fn.YR || BASE_YR;
+        [S.lo, S.hi] = fn.range || [-yr, yr];
+        pills.forEach(p => p.classList.toggle('active', p.dataset.fn === key && (key !== 'line' || parseFloat(p.dataset.m) === fn.m)));
+        $('slope-row').style.display = key === 'line' ? '' : 'none';
+        showFormula();
+        setT(0);
+        if (autoplay && !reduceMotion) play(); else draw();
+    }
+    pills.forEach(p => p.addEventListener('click', () => {
+        const key = p.dataset.fn;
+        $('formula-msg').textContent = '';
+        if (key === 'line') {
+            const m = parseFloat(p.dataset.m), fn = line(m); fn.m = m;
+            $('slope').value = m; $('slope-out').textContent = m.toFixed(2);
+            useFunction(fn, 'line', true);
+        } else useFunction(CURVES[key], key, true);
+    }));
+    $('slope').addEventListener('input', e => {
+        const m = parseFloat(e.target.value), fn = line(m); fn.m = m;
+        $('slope-out').textContent = m.toFixed(2);
+        const t = S.t;
+        S.fn = fn; S.sel.read = { fn, key: 'line' };
+        pills.forEach(p => p.classList.toggle('active', p.dataset.fn === 'line' && parseFloat(p.dataset.m) === m));
+        showFormula(); setT(t); draw();
+    });
+
+    function plotFormula() {
+        const msg = $('formula-msg'), src = $('formula').value.trim().replace(/^\s*[a-z]\s*(\(\s*[tx]\s*\))?\s*=\s*/i, '');
+        msg.className = 'formula-msg error';
+        let tree;
+        try { tree = parse(src); } catch (e) { msg.textContent = e.message; return; }
+        let maxAbs = 0;
+        for (let i = 0; i <= 800; i++) {
+            const y = ev(tree, T * i / 800);
+            if (!isFinite(y)) { msg.textContent = 'That formula has no value at t = ' + (T * i / 800).toFixed(2) + '. It needs to work for every t from 0 to 8.'; return; }
+            maxAbs = Math.max(maxAbs, Math.abs(y));
+        }
+        if (maxAbs > 1e6) { msg.textContent = 'That one grows too large to fit on the paper. Try making it smaller.'; return; }
+        const f = t => ev(tree, t), h = 1e-4;
+        const fn = { f, df: t => (f(Math.min(T, t + h)) - f(Math.max(0, t - h))) / (Math.min(T, t + h) - Math.max(0, t - h)), src };
+        try { fn.tex = tex(tree); } catch (e) { /* plain text fallback */ }
+        const zoomed = maxAbs > BASE_YR * 0.94;
+        if (zoomed) fn.YR = maxAbs * 1.12;
+        msg.className = 'formula-msg ok';
+        msg.textContent = zoomed ? 'Plotted. This graph is tall, so the height scale has been zoomed out to fit it.' : 'Plotted.';
+        useFunction(fn, 'custom', true);
+    }
+    $('formula-btn').addEventListener('click', plotFormula);
+    $('formula').addEventListener('keydown', e => { if (e.key === 'Enter') plotFormula(); });
+    document.querySelectorAll('.formula-help button').forEach(b => b.addEventListener('click', () => { $('formula').value = b.dataset.ex; plotFormula(); }));
+
+    /* ---------- Controls ---------- */
+    $('play-btn').addEventListener('click', play);
+    $('pause-btn').addEventListener('click', () => { pause(); draw(); });
+    $('reset-btn').addEventListener('click', () => { pause(); setT(0); draw(); });
+    $('time-slider').addEventListener('input', e => { pause(); setT(parseFloat(e.target.value)); draw(); });
+    $('cover-btn').addEventListener('click', function () {
+        S.cover = !S.cover; this.setAttribute('aria-pressed', S.cover);
+        this.textContent = S.cover ? 'Uncover the graph' : 'Cover the graph';
+        draw();
+    });
+
+    // drag the paper through time
+    let drag = null;
+    cvPaper.addEventListener('pointerdown', e => {
+        cvPaper.setPointerCapture(e.pointerId); pause();
+        drag = { x: e.clientX, t: S.t }; cvPaper.classList.add('dragging');
+    });
+    cvPaper.addEventListener('pointermove', e => { if (drag) { setT(drag.t - (e.clientX - drag.x) / paperGeom().sx); draw(); } });
+    const endDrag = () => { drag = null; cvPaper.classList.remove('dragging'); };
+    cvPaper.addEventListener('pointerup', endDrag); cvPaper.addEventListener('pointercancel', endDrag);
+    cvPaper.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); pause(); setT(S.t + (e.key === 'ArrowRight' ? 0.1 : -0.1)); draw(); }
+        else if (e.key === ' ') { e.preventDefault(); S.playing ? pause() : play(); }
+    });
+
+    /* ---------- Tabs ---------- */
+    function setMode(mode, autoplay) {
+        pause();
+        S.mode = mode;
+        card.dataset.mode = mode;
+        const M = MODES[mode];
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            const on = b.dataset.mode === mode;
+            b.classList.toggle('active', on); b.setAttribute('aria-selected', on);
+        });
+        $('mode-title').textContent = M.title;
+        $('mode-lead').textContent = M.lead;
+        $('mode-quote').textContent = M.quote; $('mode-quote').style.display = M.quote ? '' : 'none';
+        $('paper-caption').innerHTML = M.caption; $('static-caption').innerHTML = M.staticCaption;
+        $('play-btn').textContent = M.play;
+        $('cta-btn').textContent = M.cta;
+        $('time-label').textContent = M.time;
+        $('who-label').textContent = M.who;
+        const sel = S.sel[mode];
+        useFunction(sel.fn, sel.key, autoplay);
+    }
+    document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode, false)));
+    $('cta-btn').addEventListener('click', () => {
+        setMode(S.mode === 'trace' ? 'read' : 'trace', false);
+        document.querySelector('.tabs').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    });
+
+    window.addEventListener('resize', draw);
+    window.addEventListener('load', showFormula);       // in case KaTeX finished loading late
+    setMode('trace', true);
+})();
+</script>
+</body>
+</html>
