@@ -725,6 +725,23 @@ completionEl.innerHTML = `
 `;
 content.appendChild(completionEl);
 
+// See-also cross-link
+const seeAlsoEl = document.createElement('div');
+seeAlsoEl.style.cssText = 'margin: 2rem 0 0;';
+seeAlsoEl.innerHTML = `
+    <div style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:0.6rem; text-align:center;">See also</div>
+    <a class="app-link-card" href="/maths-shorts/trigonometry/">
+        <div class="app-link-icon">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="app-link-text">
+            <strong>From Circle to Wave (Trigonometry)</strong>
+            <span>Sine and cosine are functions too — see where the wave comes from.</span>
+        </div>
+    </a>
+`;
+content.appendChild(seeAlsoEl);
+
 // Credit
 const creditEl = document.createElement('div');
 creditEl.className = 'package-credit';
