@@ -1,1 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigonometry | Maths Shorts | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --primary-dark: #115e59;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+            --card-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding-top: 60px;
+            line-height: 1.6;
+        }
 
+        /* Nav */
+        .mathswell-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .mw-link {
+            display: flex; align-items: center; gap: 0.5rem;
+            text-decoration: none; color: var(--primary);
+            font-weight: 600; letter-spacing: 1px;
+        }
+
+        .container { max-width: 720px; margin: 0 auto; padding: 0 1rem; }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 1.5rem 0 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .breadcrumb a { color: var(--primary); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* Package header */
+        .package-header {
+            text-align: center;
+            padding: 2rem 0 1.5rem;
+        }
+        .package-kicker {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.3rem 0.85rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+        }
+        .package-header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        .package-intro {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .package-meta {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .package-meta span { display: flex; align-items: center; gap: 0.35rem; }
+        .package-meta svg { width: 15px; height: 15px; fill: var(--primary); }
+
+        /* Progress bar (sticky) */
+        .progress-wrap {
+            position: sticky;
+            top: 60px;
+            z-index: 90;
+            background: rgba(247,250,249,0.95);
+            backdrop-filter: blur(8px);
+            padding: 0.75rem 0;
+            margin-bottom: 1rem;
+        }
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .progress-step {
+            flex: 1;
+            max-width: 80px;
+            height: 5px;
+            border-radius: 999px;
+            background: #d1d5db;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+        .progress-step.done { background: var(--primary-light); }
+        .progress-step.current { background: var(--primary); }
+        .progress-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Story block */
+        .story {
+            background: white;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: var(--card-shadow);
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        .story.intro-story {
+            border-left-color: var(--accent-amber);
+            background: linear-gradient(135deg, #fffbf0, white);
+        }
+        .story p { margin-bottom: 0.75rem; }
+        .story p:last-child { margin-bottom: 0; }
+
+        /* Video step */
+        .step {
+            margin: 2rem 0;
+            scroll-margin-top: 130px;
+        }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+        .step-title {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Video player area */
+        .video-frame {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1rem;
+        }
+        .video-cover {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            cursor: pointer;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        }
+        .video-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .video-cover .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.15);
+            transition: background 0.25s;
+        }
+        .video-cover:hover .play-overlay { background: rgba(0,0,0,0.05); }
+        .play-circle {
+            width: 72px; height: 72px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            transition: transform 0.25s;
+        }
+        .video-cover:hover .play-circle { transform: scale(1.08); }
+        .play-circle svg { width: 30px; height: 30px; fill: var(--primary); margin-left: 4px; }
+        .ig-badge {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: rgba(225,48,108,0.9);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+        }
+        .video-embed-container { display: none; }
+        .video-embed-container.active {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: #000;
+        }
+        /* Vertical 9:16 player */
+        .video-embed-container video {
+            width: 100%;
+            max-width: 360px;      /* keeps the 9:16 reel a sensible size on desktop */
+            aspect-ratio: 9 / 16;
+            border-radius: 10px;
+            background: #000;
+            display: block;
+        }
+
+        /* Quiz */
+        .quiz {
+            background: white;
+            border: 2px solid var(--interactive);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+        .quiz-header svg { width: 22px; height: 22px; fill: var(--primary); }
+        .quiz-header h3 { font-size: 1.1rem; color: var(--primary); }
+        .quiz-question {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.35rem;
+        }
+        .quiz-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        /* ── MCQ + multi-select option styles ── */
+        .quiz-question { font-size: 1rem; font-weight: 500; margin-bottom: 0.75rem; }
+        .quiz-hint { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .quiz-options { display: flex; flex-direction: column; gap: 0.6rem; }
+        .quiz-option {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem;
+            padding: 0.85rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px;
+            background: white; cursor: pointer; transition: all 0.2s;
+            font-size: 0.95rem; text-align: left; min-height: 44px;
+        }
+        .quiz-option:hover:not(.locked) { border-color: var(--primary-light); background: var(--interactive); }
+        .quiz-option .option-marker {
+            flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid #d1d5db; display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 700; color: var(--text-muted);
+        }
+        .quiz-option .option-check {
+            flex-shrink: 0; width: 24px; height: 24px; border-radius: 6px;
+            border: 2px solid #d1d5db; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .quiz-option .option-text { flex: 1; }
+        .quiz-option.selected { border-color: var(--primary); background: var(--interactive); }
+        .quiz-option.selected .option-check { background: var(--primary); border-color: var(--primary); }
+        .quiz-option.selected .option-check::after { content: "\2713"; color: white; font-size: 0.85rem; font-weight: 700; }
+        .quiz-option.correct { border-color: var(--success); background: #ecfdf5; }
+        .quiz-option.correct .option-marker { border-color: var(--success); background: var(--success); color: white; }
+        .quiz-option.correct .option-check { background: var(--success); border-color: var(--success); }
+        .quiz-option.correct .option-check::after { content: "\2713"; color: white; font-size: 0.85rem; font-weight: 700; }
+        .quiz-option.incorrect { border-color: var(--accent-red); background: #fef2f2; }
+        .quiz-option.incorrect .option-marker { border-color: var(--accent-red); background: var(--accent-red); color: white; }
+        .quiz-option.wrong { border-color: var(--accent-red); background: #fef2f2; }
+        .quiz-option.wrong .option-check { background: var(--accent-red); border-color: var(--accent-red); }
+        .quiz-option.wrong .option-check::after { content: "\2715"; color: white; font-size: 0.8rem; font-weight: 700; }
+        .quiz-option.locked { cursor: default; }
+        .quiz-option.dimmed { opacity: 0.55; }
+        .option-why {
+            flex-basis: 100%; font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;
+            margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed #e5e7eb; display: none;
+        }
+        .option-why.show { display: block; }
+        .quiz-actions { margin-top: 1rem; }
+        .btn-check {
+            background: var(--primary); color: white; border: none; padding: 0.6rem 1.3rem;
+            border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-check:hover { background: var(--primary-dark); }
+
+        /* Drag-to-order list */
+        .order-list { display: flex; flex-direction: column; gap: 0.6rem; }
+        .order-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            cursor: grab;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.05s;
+            min-height: 44px;
+        }
+        .order-card:active { cursor: grabbing; }
+        .order-card.dragging {
+            opacity: 0.9;
+            box-shadow: 0 8px 20px rgba(15,118,110,0.18);
+            border-color: var(--primary-light);
+        }
+        .order-card.drop-above { border-top: 3px solid var(--primary); }
+        .order-card.drop-below { border-bottom: 3px solid var(--primary); }
+        .drag-handle {
+            flex-shrink: 0;
+            width: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding-top: 4px;
+            color: #cbd5e1;
+            cursor: grab;
+        }
+        .drag-handle span { width: 16px; height: 2px; background: currentColor; border-radius: 2px; }
+        .order-card-body { flex: 1; }
+        .order-step {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+        .order-reason {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+        /* Locked-correct state */
+        .order-card.locked { cursor: default; }
+        .order-card.locked .drag-handle { visibility: hidden; }
+        .order-list.solved .order-card {
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+        .order-position {
+            flex-shrink: 0;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: var(--interactive);
+            color: var(--primary);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .order-list.solved .order-position {
+            display: flex;
+            background: var(--success);
+            color: white;
+        }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            display: none;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct {
+            background: #ecfdf5;
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+        .quiz-feedback.incorrect {
+            background: #fef2f2;
+            border: 1px solid var(--accent-red);
+            color: #991b1b;
+        }
+        .quiz-retry {
+            margin-top: 0.75rem;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            display: none;
+        }
+        .quiz-retry.show { display: inline; }
+
+        /* App link card */
+        .app-link-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, var(--interactive), white);
+            border: 2px solid var(--card-border, #d1fae5);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s;
+        }
+        .app-link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--primary-light);
+        }
+        .app-link-icon {
+            flex-shrink: 0;
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .app-link-icon svg { width: 22px; height: 22px; fill: white; }
+        .app-link-text { flex: 1; }
+        .app-link-text strong { color: var(--primary); display: block; font-size: 0.95rem; }
+        .app-link-text span { font-size: 0.82rem; color: var(--text-muted); }
+
+        /* Completion */
+        .completion {
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem 1.5rem;
+            margin: 2.5rem 0;
+            box-shadow: var(--card-shadow);
+            border: 2px solid var(--interactive);
+        }
+        .completion-emoji { font-size: 3rem; margin-bottom: 1rem; }
+        .completion h2 { color: var(--primary); margin-bottom: 0.5rem; }
+        .completion p { color: var(--text-muted); max-width: 440px; margin: 0 auto 1.5rem; }
+        .completion-score {
+            display: inline-block;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--interactive);
+            padding: 0.5rem 1.25rem;
+            border-radius: 999px;
+            margin-bottom: 1.5rem;
+        }
+        .completion-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.7rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.92rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-secondary:hover { background: var(--interactive); }
+
+        /* M.Reachable footer credit */
+        .package-credit {
+            text-align: center;
+            padding: 2rem 0 3rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .package-credit a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .package-credit a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .package-header h1 { font-size: 1.6rem; }
+            .step-title { font-size: 1.2rem; }
+            .progress-step { max-width: 60px; }
+            input, button, select { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mathswell-nav">
+    <a href="/" class="mw-link">
+        <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28" onerror="this.style.display='none'">
+        <span>MATHSWELL</span>
+    </a>
+</div>
+
+<div class="container">
+    <div class="breadcrumb">
+        <a href="/">Home</a> › <a href="/maths-shorts/">Maths Shorts</a> › Trigonometry
+    </div>
+
+    <div class="package-header">
+        <span class="package-kicker">Learning Package</span>
+        <h1>Trigonometry</h1>
+        <p class="package-intro">
+            Five short videos that grow trigonometry from the shape of a triangle all the way to the sine wave.
+            Watch them in order — each one builds on the last.
+        </p>
+        <div class="package-meta">
+            <span>
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                5 videos
+            </span>
+            <span>
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                self-paced
+            </span>
+            <span>
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                ~18 min
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Sticky progress -->
+<div class="progress-wrap">
+    <div class="progress-steps" id="progressSteps"></div>
+    <div class="progress-label" id="progressLabel">Start the journey below</div>
+</div>
+
+<div class="container" id="packageContent">
+    <!-- Generated -->
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PACKAGE DATA
+// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// R2 CONFIG — set your custom-domain base URL once.
+// Each step's `file` is appended to this. e.g.
+//   R2_BASE + "vectors-planes/vector-given-length.mp4"
+// ═══════════════════════════════════════════════════════════════
+const R2_BASE = "https://videos.mathswell.com/";
+
+// APP LINK — the Trig Circle app folder. Confirm it matches your repo.
+const APP_URL = "/trig-circle/";
+
+// ═══════════════════════════════════════════════════════════════
+// QUICK CHECKS — master switch.
+// false = videos + stories only (progress tracks videos watched).
+// true  = show each step's check (set per step via its `check` field).
+// To re-enable later: set this to true. All check content & engines
+// are kept intact below, so nothing needs rebuilding.
+// ═══════════════════════════════════════════════════════════════
+const SHOW_CHECKS = false;
+
+const package = {
+    introStory: `
+        <p>Trigonometry begins with something concrete — the shape of a right triangle — and grows,
+        step by step, into one of the most far-reaching ideas in mathematics: the functions that
+        describe every wave, rotation and oscillation in nature.</p>
+        <p>This five-part package follows that growth. We start by proving the special-triangle values
+        from pure geometry, discover an identity hiding inside Pythagoras, break free of the triangle
+        when it can no longer cope, and end by turning the whole circle into a wave.</p>
+    `,
+    steps: [
+        // ─────────── 1 ───────────
+        {
+            title: "The Special Right Triangle",
+            story: `
+                <p>Draw a right triangle where one leg is exactly half the hypotenuse, at any size you
+                like. The angles always come out $30°$ and $60°$. Is that a coincidence, or something
+                we can <em>prove</em>?</p>
+                <p>The trick is to reflect the triangle into an equilateral one — and from there the
+                exact values of sine, cosine and tangent for $30°$, $60°$ and $45°$ fall straight out
+                of the geometry.</p>
+            `,
+            file: "trigonometry/right-angle-triangle-1.mp4",
+            cover: "https://videos.mathswell.com/trigonometry/right-triangle-1.png",
+            appLink: { url: APP_URL, label: "Trig Circle Explorer", desc: "See the angles on the circle" },
+            check: "multi",
+            quiz: {
+                question: "The video gets the exact value $\\sin 30° = \\tfrac{1}{2}$ from an equilateral triangle. Which of these can you justify <strong>by that geometry</strong> (not just recall)? Select all that apply.",
+                options: [
+                    { text: "$\\sin 30° = \\tfrac{1}{2}$, because the side opposite $30°$ is half the hypotenuse", correct: true,
+                      why: "Exactly the argument in the video — reflecting into an equilateral triangle makes the opposite side half the hypotenuse." },
+                    { text: "$\\cos 30° = \\tfrac{\\sqrt{3}}{2}$, from Pythagoras on the half-triangle", correct: true,
+                      why: "Right — the height works out to $\\sqrt{3}$ when the hypotenuse is $2$, giving $\\tfrac{\\sqrt3}{2}$." },
+                    { text: "$\\sin 45° = \\cos 45°$, because the $45°$ triangle is isosceles", correct: true,
+                      why: "Yes — equal legs mean opposite and adjacent are equal, so sine and cosine match." },
+                    { text: "$\\sin 30°$ depends on how big you draw the triangle", correct: false,
+                      why: "No — the ratio is the same at every size; that's the whole point of the proof." }
+                ]
+            }
+        },
+        // ─────────── 2 ───────────
+        {
+            title: "Pythagoras in Disguise",
+            story: `
+                <p>Once we can read sine and cosine off a right triangle, a surprising identity appears:
+                $\\sin^2\\theta + \\cos^2\\theta = 1$, for <em>every</em> angle.</p>
+                <p>It looks like a new fact to memorise — but it's really Pythagoras, wearing different
+                clothes. Watch where it comes from.</p>
+            `,
+            file: "trigonometry/right-angle-triangle-2.mp4",
+            cover: "https://videos.mathswell.com/trigonometry/right-triangle-2.png",
+            appLink: { url: APP_URL, label: "Trig Circle Explorer", desc: "Check the identity on the circle" },
+            check: "mcq",
+            quiz: {
+                question: "Why is $\\sin^2\\theta + \\cos^2\\theta = 1$ called \"Pythagoras in disguise\"?",
+                options: [
+                    "Because sine and cosine are both less than 1",
+                    "Because opposite² + adjacent² = hypotenuse², and dividing through by the hypotenuse² gives it",
+                    "Because it only works for $30°$, $45°$ and $60°$",
+                    "Because Pythagoras discovered the sine function"
+                ],
+                correct: 1,
+                feedback: {
+                    correct: "Exactly — $\\text{opp}^2+\\text{adj}^2=\\text{hyp}^2$, and dividing every term by $\\text{hyp}^2$ turns it into $\\sin^2\\theta+\\cos^2\\theta=1$.",
+                    incorrect: "Think about what Pythagoras says — $\\text{opp}^2+\\text{adj}^2=\\text{hyp}^2$ — and what happens when you divide every term by the hypotenuse squared."
+                }
+            }
+        },
+        // ─────────── 3 ───────────
+        {
+            title: "Breaking Free: The Unit Circle",
+            story: `
+                <p>Type $\\sin 120°$ into a calculator and it answers happily — but $120°$ can't be an
+                angle in a right triangle. So what is the calculator even computing?</p>
+                <p>The triangle definition is simply too small. We need a bigger home for sine and
+                cosine — one that still agrees with the triangle for acute angles, but keeps working
+                for every angle. That home is the unit circle.</p>
+            `,
+            file: "trigonometry/unit-circles-1.mp4",
+            cover: "https://videos.mathswell.com/trigonometry/unit-circle-1.png",
+            appLink: { url: APP_URL, label: "Trig Circle Explorer", desc: "Swing the radius past 90°" },
+            check: "mcq",
+            quiz: {
+                question: "On the unit circle, why does the point at angle $\\theta$ have coordinates $(\\cos\\theta, \\sin\\theta)$?",
+                options: [
+                    "Because the radius is 1, so dividing by the hypotenuse does nothing — leaving adjacent = $\\cos\\theta$ as the $x$-coordinate and opposite = $\\sin\\theta$ as the $y$",
+                    "Because every circle has radius 1",
+                    "Because $\\cos$ and $\\sin$ are only defined on circles",
+                    "Because $120°$ is in the second quadrant"
+                ],
+                correct: 0,
+                feedback: {
+                    correct: "Right — with hypotenuse 1, $\\cos\\theta=\\text{adjacent}=x$ and $\\sin\\theta=\\text{opposite}=y$. The definition never mentions a triangle, so it works for any angle.",
+                    incorrect: "Look at the right triangle inside the circle: the hypotenuse is the radius, which is 1. Dividing by 1 changes nothing, so adjacent becomes $x=\\cos\\theta$ and opposite becomes $y=\\sin\\theta$."
+                }
+            }
+        },
+        // ─────────── 4 ───────────
+        {
+            title: "Using the Unit Circle",
+            story: `
+                <p>The circle tells us $\\sin 120°$ is positive and $\\cos 120°$ is negative — but how do
+                we get the <em>exact</em> values?</p>
+                <p>The recipe is always the same: find the reference angle, borrow the first-quadrant
+                value you already know, then fix the sign from the quadrant. Put those steps in order.</p>
+            `,
+            file: "trigonometry/unit-circles-2.mp4",
+            cover: "https://videos.mathswell.com/trigonometry/unit-circle-2.png",
+            appLink: { url: APP_URL, label: "Trig Circle Explorer", desc: "Find reference angles visually" },
+            check: "order",
+            orderPrompt: "Put the steps in order for finding sin and cos of <strong>any</strong> angle from the unit circle.",
+            order: [
+                { step: "Find the reference angle", reason: "The acute angle to the $x$-axis tells you which first-quadrant angle to borrow from." },
+                { step: "Take the first-quadrant value you know", reason: "e.g. the $60°$ point is $\\left(\\tfrac12, \\tfrac{\\sqrt3}{2}\\right)$ from the $30$-$60$-$90$ triangle." },
+                { step: "Fix the signs from the quadrant", reason: "$x=\\cos$, $y=\\sin$; each is positive or negative depending on where the point sits." }
+            ]
+        },
+        // ─────────── 5 ───────────
+        {
+            title: "From Circle to Wave",
+            story: `
+                <p>Sine is really a function: feed it an angle, get back a height. Graph that height as
+                the angle turns, and a wave appears — but only once we measure the angle sensibly.</p>
+                <p>Degrees make the graph awkward. Measuring the angle as a <em>distance around the
+                circle</em> — in radians — puts both axes on the same footing, and the honest sine wave
+                emerges.</p>
+            `,
+            file: "trigonometry/radians.mp4",
+            cover: "https://videos.mathswell.com/trigonometry/radians.png",
+            appLink: { url: APP_URL, label: "Trig Circle Explorer", desc: "Trace the wave from the circle" },
+            check: "mcq",
+            quiz: {
+                question: "What exactly is <strong>one radian</strong>?",
+                options: [
+                    "A 90° angle",
+                    "The angle whose arc, measured from $(1,0)$ along the unit circle, is one radius long",
+                    "Another name for 180°",
+                    "One full turn around the circle"
+                ],
+                correct: 1,
+                feedback: {
+                    correct: "Exactly — travel one radius-length of arc around the circle and the angle you've swept is one radian. A full turn is $2\\pi$ of them.",
+                    incorrect: "A radian is defined by arc length: go one radius-length along the circle from $(1,0)$, and the angle at the centre is one radian. A full turn ($2\\pi r$ of arc) is $2\\pi$ radians."
+                }
+            }
+        }
+    ]
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Render
+// ═══════════════════════════════════════════════════════════════
+const content = document.getElementById('packageContent');
+const totalSteps = package.steps.length;
+let answered = new Array(totalSteps).fill(null); // null | true | false
+let progressReady = false; // becomes true once the sticky progress bar is built
+
+// Intro story
+const introEl = document.createElement('div');
+introEl.className = 'story intro-story';
+introEl.innerHTML = package.introStory;
+content.appendChild(introEl);
+
+// Steps
+package.steps.forEach((step, i) => {
+    const stepEl = document.createElement('div');
+    stepEl.className = 'step';
+    stepEl.id = `step-${i}`;
+
+    stepEl.innerHTML = `
+        <div class="step-number">${i + 1}</div>
+        <div class="story">${step.story}</div>
+        <h2 class="step-title">${step.title}</h2>
+        <div class="video-frame">
+            <div class="video-cover" data-step="${i}">
+                <img src="${step.cover}" alt="${step.title}"
+                     onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,var(--primary),var(--primary-light))'">
+                <span class="ig-badge" style="background:rgba(15,118,110,0.9)">Video</span>
+                <div class="play-overlay">
+                    <div class="play-circle">
+                        <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="video-embed-container" id="embed-${i}"></div>
+        </div>
+        ${step.appLink ? `
+            <a class="app-link-card" href="${step.appLink.url}" target="_blank">
+                <div class="app-link-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="app-link-text">
+                    <strong>${step.appLink.label}</strong>
+                    <span>${step.appLink.desc}</span>
+                </div>
+            </a>
+        ` : ''}
+        ${SHOW_CHECKS ? `
+        <div class="quiz">
+            <div class="quiz-header">
+                <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+                <h3>${quizHeading(step)}</h3>
+            </div>
+            ${quizBodyHTML(step, i)}
+            <div class="quiz-feedback" id="feedback-${i}"></div>
+            <button class="quiz-retry" id="retry-${i}">${step.check === 'order' ? 'Shuffle &amp; try again' : 'Try again'}</button>
+        </div>` : ''}
+    `;
+    content.appendChild(stepEl);
+
+    // Build the right kind of check (only when checks are on)
+    if (SHOW_CHECKS) {
+        if (step.check === 'order') {
+            buildOrderList(i, step.order);
+            stepEl.querySelector(`#retry-${i}`).addEventListener('click', () => resetOrder(i));
+        } else if (step.check === 'multi') {
+            buildMultiOptions(i, step.quiz.options);
+            stepEl.querySelector(`#check-${i}`).addEventListener('click', () => checkMulti(i));
+            stepEl.querySelector(`#retry-${i}`).addEventListener('click', () => resetQuiz(i));
+        } else { // mcq
+            buildMcqOptions(i, step.quiz.options);
+            stepEl.querySelector(`#retry-${i}`).addEventListener('click', () => resetQuiz(i));
+        }
+    }
+
+    // Video cover click
+    stepEl.querySelector('.video-cover').addEventListener('click', () => loadVideo(i));
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Quiz heading + body by type
+// ═══════════════════════════════════════════════════════════════
+function quizHeading(step) {
+    if (step.check === 'order') return 'Quick Check — Put the steps in order';
+    if (step.check === 'multi') return 'Quick Check — Select all that apply';
+    return 'Quick Check';
+}
+function quizBodyHTML(step, i) {
+    if (step.check === 'order') {
+        return `
+            <div class="quiz-question">${step.orderPrompt || 'Drag the cards into the correct sequence.'}</div>
+            <div class="quiz-hint">Each card names a step and the reason behind it.</div>
+            <div class="order-list" id="order-${i}"></div>`;
+    }
+    if (step.check === 'multi') {
+        return `
+            <div class="quiz-question">${step.quiz.question}</div>
+            <div class="quiz-options" id="options-${i}"></div>
+            <div class="quiz-actions"><button class="btn-check" id="check-${i}">Check my answers</button></div>`;
+    }
+    // mcq
+    return `
+            <div class="quiz-question">${step.quiz.question}</div>
+            <div class="quiz-options" id="options-${i}"></div>`;
+}
+
+// Completion block
+const completionEl = document.createElement('div');
+completionEl.className = 'completion';
+completionEl.id = 'completion';
+completionEl.style.display = 'none';
+completionEl.innerHTML = `
+    <div class="completion-emoji">🎉</div>
+    <h2>Package Complete!</h2>
+    <p>You've grown trigonometry from a single triangle all the way to the sine wave. That's a big arc — well done.</p>
+    <div class="completion-score" id="completionScore"></div>
+    <div class="completion-actions">
+        <a class="btn btn-primary" href="/trig-circle/" target="_blank">Explore the Trig Circle</a>
+        <a class="btn btn-secondary" href="/maths-shorts/">More Maths Shorts</a>
+    </div>
+`;
+content.appendChild(completionEl);
+
+// See-also cross-link
+const seeAlsoEl = document.createElement('div');
+seeAlsoEl.style.cssText = 'margin: 2rem 0 0;';
+seeAlsoEl.innerHTML = `
+    <div style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:0.6rem; text-align:center;">See also</div>
+    <a class="app-link-card" href="/maths-shorts/functions/">
+        <div class="app-link-icon">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="app-link-text">
+            <strong>Equations as Functions</strong>
+            <span>The functional view that the sine wave is part of — how an equation becomes a function.</span>
+        </div>
+    </a>
+`;
+content.appendChild(seeAlsoEl);
+
+// Credit
+const creditEl = document.createElement('div');
+creditEl.className = 'package-credit';
+creditEl.innerHTML = `Videos by <a href="https://www.instagram.com/mreachable?igsh=MWMzb2wzbzZqb3g1MA==" target="_blank">M.Reachable</a> · Maths is Reachable`;
+content.appendChild(creditEl);
+
+// ═══════════════════════════════════════════════════════════════
+// Progress bar
+// ═══════════════════════════════════════════════════════════════
+const progressStepsEl = document.getElementById('progressSteps');
+progressReady = true;
+for (let i = 0; i < totalSteps; i++) {
+    const s = document.createElement('div');
+    s.className = 'progress-step';
+    s.addEventListener('click', () => {
+        document.getElementById(`step-${i}`).scrollIntoView({ behavior: 'smooth' });
+    });
+    progressStepsEl.appendChild(s);
+}
+updateProgress();
+
+function updateProgress() {
+    const steps = progressStepsEl.querySelectorAll('.progress-step');
+    const done = answered.filter(a => a === true).length;
+    steps.forEach((s, i) => {
+        s.classList.toggle('done', answered[i] === true);
+    });
+    const label = document.getElementById('progressLabel');
+    const noun = SHOW_CHECKS ? 'checks passed' : 'videos watched';
+    if (done === 0) label.textContent = 'Start the journey below';
+    else if (done < totalSteps) label.textContent = `${done} of ${totalSteps} ${noun}`;
+    else label.textContent = SHOW_CHECKS ? 'All checks passed — well done!' : 'All videos watched — well done!';
+
+    if (done === totalSteps) showCompletion();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Video loading
+// ═══════════════════════════════════════════════════════════════
+function loadVideo(i) {
+    const step = package.steps[i];
+    const cover = document.querySelector(`#step-${i} .video-cover`);
+    const embedContainer = document.getElementById(`embed-${i}`);
+
+    // Pause any other playing video (one at a time)
+    document.querySelectorAll('.video-embed-container video').forEach(v => v.pause());
+
+    cover.style.display = 'none';
+    embedContainer.classList.add('active');
+    embedContainer.innerHTML = `
+        <video
+            controls
+            playsinline
+            preload="metadata"
+            poster="${step.cover}"
+            src="${R2_BASE}${step.file}">
+            Your browser can't play this video.
+        </video>
+    `;
+    const v = embedContainer.querySelector('video');
+    v.play().catch(() => { /* autoplay may be blocked; controls are there */ });
+
+    // With checks off, watching the video marks the step complete.
+    if (!SHOW_CHECKS && answered[i] !== true) {
+        answered[i] = true;
+        updateProgress();
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Quiz logic
+// ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+// Single-answer MCQ engine
+// ═══════════════════════════════════════════════════════════════
+function buildMcqOptions(stepIndex, options) {
+    const el = document.getElementById(`options-${stepIndex}`);
+    const letters = ['A','B','C','D','E'];
+    options.forEach((opt, j) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.innerHTML = `<span class="option-marker">${letters[j]}</span><span class="option-text">${opt}</span>`;
+        btn.addEventListener('click', () => handleMcq(stepIndex, j));
+        el.appendChild(btn);
+    });
+    renderMath(el);
+}
+function handleMcq(stepIndex, optionIndex) {
+    const step = package.steps[stepIndex];
+    if (answered[stepIndex] === true) return;
+    const options = document.querySelectorAll(`#options-${stepIndex} .quiz-option`);
+    const feedback = document.getElementById(`feedback-${stepIndex}`);
+    const retry = document.getElementById(`retry-${stepIndex}`);
+    const isCorrect = optionIndex === step.quiz.correct;
+    if (isCorrect) {
+        answered[stepIndex] = true;
+        options.forEach((o, j) => {
+            o.classList.add('locked');
+            if (j === optionIndex) o.classList.add('correct');
+            else o.classList.add('dimmed');
+        });
+        feedback.className = 'quiz-feedback correct show';
+        feedback.innerHTML = step.quiz.feedback.correct;
+        retry.classList.remove('show');
+    } else {
+        answered[stepIndex] = false;
+        options[optionIndex].classList.add('incorrect');
+        feedback.className = 'quiz-feedback incorrect show';
+        feedback.innerHTML = step.quiz.feedback.incorrect;
+        retry.classList.add('show');
+    }
+    renderMath(feedback);
+    updateProgress();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Multi-select (select-all) engine — judges only chosen options
+// ═══════════════════════════════════════════════════════════════
+const selections = {};
+function buildMultiOptions(stepIndex, options) {
+    const el = document.getElementById(`options-${stepIndex}`);
+    options.forEach((opt, j) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.dataset.j = j;
+        btn.innerHTML = `<span class="option-check"></span><span class="option-text">${opt.text}</span><span class="option-why"></span>`;
+        btn.addEventListener('click', () => toggleOption(stepIndex, j));
+        el.appendChild(btn);
+    });
+    renderMath(el);
+}
+function toggleOption(stepIndex, optionIndex) {
+    if (answered[stepIndex] === true) return;
+    const card = document.querySelector(`#options-${stepIndex} .quiz-option[data-j="${optionIndex}"]`);
+    if (card.classList.contains('locked')) return;
+    if (!selections[stepIndex]) selections[stepIndex] = new Set();
+    if (selections[stepIndex].has(optionIndex)) { selections[stepIndex].delete(optionIndex); card.classList.remove('selected'); }
+    else { selections[stepIndex].add(optionIndex); card.classList.add('selected'); }
+}
+function checkMulti(stepIndex) {
+    const step = package.steps[stepIndex];
+    const opts = step.quiz.options;
+    const chosen = selections[stepIndex] || new Set();
+    const cards = document.querySelectorAll(`#options-${stepIndex} .quiz-option`);
+    const feedback = document.getElementById(`feedback-${stepIndex}`);
+    const retry = document.getElementById(`retry-${stepIndex}`);
+    if (chosen.size === 0) {
+        feedback.className = 'quiz-feedback incorrect show';
+        feedback.innerHTML = "Pick at least one option first, then check.";
+        return;
+    }
+    let allSelectedCorrect = true;
+    cards.forEach((card, j) => {
+        card.classList.remove('selected');
+        const whyEl = card.querySelector('.option-why');
+        if (!chosen.has(j)) { card.classList.add('locked'); return; }
+        whyEl.innerHTML = opts[j].why || '';
+        whyEl.classList.add('show');
+        card.classList.add('locked');
+        if (opts[j].correct) card.classList.add('correct');
+        else { card.classList.add('wrong'); allSelectedCorrect = false; }
+    });
+    const allCorrectPicked = opts.every((o, j) => !o.correct || chosen.has(j));
+    const solved = allSelectedCorrect && allCorrectPicked;
+    if (solved) {
+        answered[stepIndex] = true;
+        feedback.className = 'quiz-feedback correct show';
+        feedback.innerHTML = "Exactly right — everything you picked follows from the geometry.";
+        retry.classList.remove('show');
+    } else if (allSelectedCorrect && !allCorrectPicked) {
+        answered[stepIndex] = false;
+        feedback.className = 'quiz-feedback correct show';
+        feedback.innerHTML = "Everything you picked is right — but there's more you could justify. Try again to find the rest.";
+        retry.classList.add('show');
+    } else {
+        answered[stepIndex] = false;
+        feedback.className = 'quiz-feedback incorrect show';
+        feedback.innerHTML = "One or more of your picks doesn't hold — see the notes on them, then try again.";
+        retry.classList.add('show');
+    }
+    document.getElementById(`check-${stepIndex}`).style.display = 'none';
+    renderMath(document.getElementById(`step-${stepIndex}`));
+    updateProgress();
+}
+function resetQuiz(stepIndex) {
+    const cards = document.querySelectorAll(`#options-${stepIndex} .quiz-option`);
+    cards.forEach(card => {
+        card.classList.remove('selected','correct','incorrect','wrong','missed','faded','dimmed','locked');
+        const whyEl = card.querySelector('.option-why');
+        if (whyEl) { whyEl.classList.remove('show'); whyEl.innerHTML=''; }
+    });
+    selections[stepIndex] = new Set();
+    document.getElementById(`feedback-${stepIndex}`).className = 'quiz-feedback';
+    document.getElementById(`retry-${stepIndex}`).classList.remove('show');
+    const checkBtn = document.getElementById(`check-${stepIndex}`);
+    if (checkBtn) checkBtn.style.display = '';
+    answered[stepIndex] = null;
+    updateProgress();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Drag-to-order engine
+// ═══════════════════════════════════════════════════════════════
+// Fisher–Yates shuffle that guarantees a non-identity order (so it's never pre-solved)
+function shuffledIndices(n) {
+    if (n <= 1) return [...Array(n).keys()];
+    let idx;
+    do {
+        idx = [...Array(n).keys()];
+        for (let i = n - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [idx[i], idx[j]] = [idx[j], idx[i]];
+        }
+    } while (idx.every((v, i) => v === i)); // reshuffle if it landed already-sorted
+    return idx;
+}
+
+function buildOrderList(stepIndex, orderData) {
+    const listEl = document.getElementById(`order-${stepIndex}`);
+    listEl.classList.remove('solved');
+    listEl.innerHTML = '';
+
+    const order = shuffledIndices(orderData.length);
+    order.forEach(correctIdx => {
+        const item = orderData[correctIdx];
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.draggable = true;
+        card.dataset.correct = correctIdx;   // its correct position (0-based)
+        card.innerHTML = `
+            <div class="order-position"></div>
+            <div class="drag-handle"><span></span><span></span><span></span></div>
+            <div class="order-card-body">
+                <div class="order-step">${item.step}</div>
+                <div class="order-reason">${item.reason}</div>
+            </div>
+        `;
+        attachDrag(card, stepIndex);
+        listEl.appendChild(card);
+    });
+
+    renderMath(listEl);
+    checkOrder(stepIndex, false); // initial state — do not flag as incorrect yet
+}
+
+function attachDrag(card, stepIndex) {
+    card.addEventListener('dragstart', e => {
+        if (card.classList.contains('locked')) { e.preventDefault(); return; }
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        document.querySelectorAll(`#order-${stepIndex} .order-card`)
+            .forEach(c => c.classList.remove('drop-above','drop-below'));
+        checkOrder(stepIndex);
+    });
+    card.addEventListener('dragover', e => {
+        e.preventDefault();
+        const list = document.getElementById(`order-${stepIndex}`);
+        const dragging = list.querySelector('.dragging');
+        if (!dragging || dragging === card) return;
+        const rect = card.getBoundingClientRect();
+        const after = (e.clientY - rect.top) > rect.height / 2;
+        if (after) list.insertBefore(dragging, card.nextSibling);
+        else list.insertBefore(dragging, card);
+    });
+
+    // ── Touch support (drag events don't fire on most touchscreens) ──
+    let touchClone = null, startY = 0;
+    card.addEventListener('touchstart', e => {
+        if (card.classList.contains('locked')) return;
+        card.classList.add('dragging');
+        startY = e.touches[0].clientY;
+    }, {passive:true});
+    card.addEventListener('touchmove', e => {
+        if (!card.classList.contains('dragging')) return;
+        e.preventDefault();
+        const y = e.touches[0].clientY;
+        const list = document.getElementById(`order-${stepIndex}`);
+        const siblings = [...list.querySelectorAll('.order-card:not(.dragging)')];
+        const below = siblings.find(s => {
+            const r = s.getBoundingClientRect();
+            return y < r.top + r.height / 2;
+        });
+        if (below) list.insertBefore(card, below);
+        else list.appendChild(card);
+    }, {passive:false});
+    card.addEventListener('touchend', () => {
+        if (!card.classList.contains('dragging')) return;
+        card.classList.remove('dragging');
+        checkOrder(stepIndex);
+    });
+}
+
+function checkOrder(stepIndex, announce = true) {
+    const list = document.getElementById(`order-${stepIndex}`);
+    const cards = [...list.querySelectorAll('.order-card')];
+    const feedback = document.getElementById(`feedback-${stepIndex}`);
+    const retry = document.getElementById(`retry-${stepIndex}`);
+
+    const correct = cards.every((card, pos) => parseInt(card.dataset.correct) === pos);
+
+    if (correct) {
+        answered[stepIndex] = true;
+        list.classList.add('solved');
+        cards.forEach((card, pos) => {
+            card.classList.add('locked');
+            card.draggable = false;
+            card.querySelector('.order-position').textContent = pos + 1;
+        });
+        feedback.className = 'quiz-feedback correct show';
+        feedback.innerHTML = 'Correct — that\'s the right sequence, and each step follows from the one before.';
+        retry.classList.remove('show');
+    } else {
+        // announce=false is the silent initial build: leave state untouched, no message.
+        if (announce) {
+            answered[stepIndex] = false;   // user has interacted; count as attempted-not-yet-correct
+            feedback.className = 'quiz-feedback incorrect show';
+            feedback.innerHTML = 'Not in order yet — think about which step has to happen before the others can.';
+            retry.classList.add('show');
+        }
+    }
+    // Only touch the progress bar once it exists (it's built after the render loop),
+    // and never during the silent initial build.
+    if (announce && progressReady) {
+        updateProgress();
+    }
+}
+
+function resetOrder(stepIndex) {
+    answered[stepIndex] = null;
+    document.getElementById(`feedback-${stepIndex}`).className = 'quiz-feedback';
+    document.getElementById(`retry-${stepIndex}`).classList.remove('show');
+    buildOrderList(stepIndex, package.steps[stepIndex].order);
+}
+
+function showCompletion() {
+    const el = document.getElementById('completion');
+    el.style.display = 'block';
+    document.getElementById('completionScore').textContent =
+        `All ${totalSteps} step-sequences solved`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KaTeX rendering
+// ═══════════════════════════════════════════════════════════════
+function renderMath(el) {
+    if (window.renderMathInElement) {
+        renderMathInElement(el, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false
+        });
+    }
+}
+
+window.addEventListener('load', () => {
+    setTimeout(() => renderMath(document.body), 100);
+});
+</script>
+
+
+</body>
+</html>
