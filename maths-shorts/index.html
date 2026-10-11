@@ -602,9 +602,9 @@ const series = {
     },
     "trigonometry": {
         name: "Trigonometry",
-        description: "Short videos exploring trigonometric functions, identities, and their geometry.",
+        description: "Five videos growing trigonometry from the shape of a triangle to the sine wave itself.",
         packageUrl: "/maths-shorts/trigonometry/",
-        cover: "https://videos.mathswell.com/trigonometry/trig-cover.jpg",
+        cover: "https://videos.mathswell.com/trigonometry/trigonometry-cover.png",
         emoji: "📐",
         topics: ["Trigonometry"]
     },
@@ -615,6 +615,14 @@ const series = {
         cover: "https://videos.mathswell.com/functions/functions-cover.png",
         emoji: "📈",
         topics: ["Functions"]
+    },
+    "complex-numbers": {
+        name: "Complex Numbers",
+        description: "A graph that never crosses the axis — yet the equation has answers. Meet the number whose square is -1.",
+        packageUrl: "/maths-shorts/complex-numbers/",
+        cover: "https://videos.mathswell.com/complex-numbers/complex-numbers-cover.png",
+        emoji: "🔢",
+        topics: ["Complex Numbers"]
     },
     // Add more series as needed:
     // "series-id": { name, description, packageUrl, cover, emoji, topics: [...] }
@@ -702,21 +710,75 @@ const videos = [
         seriesOrder: 1
     },
 
-    // ── Trigonometry series (add videos as they're published) ──
-    // Uncomment and fill in embedId + thumbnail when ready:
-    /*
+    // ── Trigonometry series ──
     {
-        title: "TITLE",
-        description: "DESCRIPTION",
+        title: "The Special Right Triangle",
+        description: "Proving the exact values of sin, cos and tan for 30°, 60° and 45° — straight from geometry.",
         topics: ["Trigonometry"],
-        source: "instagram",
-        embedId: "REPLACE_WITH_POST_ID",
-        thumbnail: "https://videos.mathswell.com/vectors-planes/FILENAME.jpg",
+        source: "video",
+        embedId: "https://videos.mathswell.com/trigonometry/right-angle-triangle-1.mp4",
+        thumbnail: "https://videos.mathswell.com/trigonometry/right-triangle-1.png",
         emoji: "📐",
         seriesId: "trigonometry",
         seriesOrder: 1
     },
-    */
+    {
+        title: "Pythagoras in Disguise",
+        description: "Why sin²θ + cos²θ = 1 is really Pythagoras wearing different clothes.",
+        topics: ["Trigonometry"],
+        source: "video",
+        embedId: "https://videos.mathswell.com/trigonometry/right-angle-triangle-2.mp4",
+        thumbnail: "https://videos.mathswell.com/trigonometry/right-triangle-2.png",
+        emoji: "📐",
+        seriesId: "trigonometry",
+        seriesOrder: 2
+    },
+    {
+        title: "Breaking Free: The Unit Circle",
+        description: "120° can't fit in a right triangle — so the unit circle gives sine and cosine a bigger home.",
+        topics: ["Trigonometry"],
+        source: "video",
+        embedId: "https://videos.mathswell.com/trigonometry/unit-circles-1.mp4",
+        thumbnail: "https://videos.mathswell.com/trigonometry/unit-circle-1.png",
+        emoji: "📐",
+        seriesId: "trigonometry",
+        seriesOrder: 3
+    },
+    {
+        title: "Using the Unit Circle",
+        description: "Reference angles: find sin and cos of any angle by borrowing from the first quadrant.",
+        topics: ["Trigonometry"],
+        source: "video",
+        embedId: "https://videos.mathswell.com/trigonometry/unit-circles-2.mp4",
+        thumbnail: "https://videos.mathswell.com/trigonometry/unit-circle-2.png",
+        emoji: "📐",
+        seriesId: "trigonometry",
+        seriesOrder: 4
+    },
+    {
+        title: "From Circle to Wave",
+        description: "Radians put both axes on the same footing — and the sine wave emerges honestly.",
+        topics: ["Trigonometry"],
+        source: "video",
+        embedId: "https://videos.mathswell.com/trigonometry/radians.mp4",
+        thumbnail: "https://videos.mathswell.com/trigonometry/radians.png",
+        emoji: "📐",
+        seriesId: "trigonometry",
+        seriesOrder: 5
+    },
+
+    // ── Complex Numbers series ──
+    {
+        title: "When the Internet Disagrees with the Graph",
+        description: "A quadratic with no graph-crossing still has two solutions — the number whose square is -1.",
+        topics: ["Complex Numbers"],
+        source: "video",
+        embedId: "https://videos.mathswell.com/complex-numbers/intro-complex-numbers.mp4",
+        thumbnail: "https://videos.mathswell.com/complex-numbers/intro-complex-numbers.png",
+        emoji: "🔢",
+        seriesId: "complex-numbers",
+        seriesOrder: 1
+    },
 ];
 
 // ═══════════════════════════════════════════════════════════════
