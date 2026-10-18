@@ -1,1 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Derivative of aˣ | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
 
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+            --border: #d9e5e2;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background); color: var(--text-primary);
+            line-height: 1.6; padding-top: 60px;
+        }
+        button, input { font-family: inherit; }
+        :focus-visible { outline: 3px solid var(--accent-amber); outline-offset: 2px; }
+
+        .mathswell-nav {
+            position: fixed; top: 0; left: 0; right: 0; background: white;
+            border-bottom: 2px solid var(--primary); padding: 0.75rem 1rem; z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .mw-link { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--primary); font-weight: 600; letter-spacing: 1px; }
+
+        .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+        .hero { text-align: center; margin-bottom: 1.25rem; }
+        .hero h1 { color: var(--primary); font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.2; }
+
+        .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+
+        .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 2rem; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .legend i { display: inline-block; width: 26px; height: 0; border-top: 4px solid; vertical-align: middle; margin-right: 0.5rem; border-radius: 2px; }
+        .legend .f { color: var(--primary); }
+        .legend .d { color: #92400e; } .legend .d i { border-color: #f59e0b; }
+        .legend .k { color: #4f46e5; }
+        .legend .k i { border-top-style: dashed; }
+
+        .canvas-wrap { position: relative; height: 480px; border: 2px solid var(--border); border-radius: 12px; overflow: hidden; }
+        #graph { display: block; width: 100%; height: 100%; }
+
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+        .control-row {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem;
+            padding: 0.75rem 1rem; background: var(--interactive); border: 1px solid var(--primary); border-radius: 8px;
+        }
+        .control-row label { font-weight: 600; color: var(--primary); font-size: 1.05rem; }
+        .control-row output { font-family: 'Monaco', 'Consolas', monospace; font-weight: 700; color: var(--primary); margin-left: auto; font-size: 1.15rem; }
+        .control-row input[type=range] { flex: 1 1 100%; accent-color: var(--primary); height: 32px; }
+        .control-row .pills { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .control-row.k { background: #eef2ff; border-color: #4f46e5; }
+        .control-row.k label, .control-row.k output { color: #4f46e5; }
+        .control-row.k input[type=range] { accent-color: #4f46e5; }
+        .preset-pill {
+            padding: 0.3rem 0.9rem; min-height: 36px; border-radius: 999px; background: white;
+            border: 2px solid var(--primary); color: var(--primary); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+        }
+        .preset-pill:hover { background: var(--interactive); transform: translateY(-2px); }
+        .preset-pill.active { background: var(--primary); color: white; }
+
+        .status { margin-top: 1rem; text-align: center; font-size: 1.2rem; min-height: 2rem; color: var(--text-muted); }
+        .status strong { color: #4f46e5; }
+        .status.match { color: var(--primary); font-weight: 600; }
+
+        .question { margin-top: 1.25rem; text-align: center; }
+        .question .ask { font-size: 1.35rem; font-weight: 600; color: var(--primary); }
+        .nav-btn {
+            margin-top: 0.75rem; background: var(--primary); color: white; padding: 0.7rem 1.6rem; border-radius: 6px;
+            border: 2px solid var(--primary); font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;
+        }
+        .nav-btn:hover { transform: translateY(-2px); }
+        .reveal {
+            margin: 1rem auto 0; max-width: 560px; padding: 1.1rem 1.4rem; text-align: center;
+            background: #fff7e6; border: 2px solid var(--accent-amber); border-radius: 12px; font-size: 1.15rem;
+        }
+        .reveal .formula { font-size: 1.6rem; margin: 0.4rem 0; color: #92400e; }
+        .reveal[hidden] { display: none; }
+
+        @media (max-width: 768px) {
+            .canvas-wrap { height: 340px; }
+            .controls { grid-template-columns: 1fr; }
+            .legend { font-size: 1rem; gap: 0.4rem 1.2rem; }
+            input, button { font-size: 16px; min-height: 44px; }
+        }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    </style>
+</head>
+<body>
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>The Derivative of aˣ</h1>
+        </div>
+
+        <div class="card">
+            <div class="legend">
+                <span class="f"><i></i><span id="leg-f">f(x) = 2ˣ</span></span>
+                <span class="d"><i></i>its derivative f′(x)</span>
+                <span class="k"><i></i><span id="leg-k">k · 2ˣ</span></span>
+            </div>
+            <div class="canvas-wrap">
+                <canvas id="graph" aria-label="Graph of a to the power x, its derivative, and a scaled copy k times a to the power x"></canvas>
+            </div>
+
+            <div class="controls">
+                <div class="control-row">
+                    <label for="a-slider">Base a</label>
+                    <output id="a-out" for="a-slider">a = 2</output>
+                    <input type="range" id="a-slider" min="1.5" max="4" step="0.01" value="2" aria-label="Base a">
+                    <div class="pills" role="group" aria-label="Choose the base" id="a-pills">
+                        <button class="preset-pill active" data-a="2">2</button>
+                        <button class="preset-pill" data-a="2.5">2.5</button>
+                        <button class="preset-pill" data-a="3">3</button>
+                        <button class="preset-pill" data-a="4">4</button>
+                    </div>
+                </div>
+                <div class="control-row k">
+                    <label for="k-slider">Scale k</label>
+                    <output id="k-out" for="k-slider">k = 0.5</output>
+                    <input type="range" id="k-slider" min="0.2" max="1.6" step="0.001" value="0.5" aria-label="Scale factor k">
+                </div>
+            </div>
+
+            <div class="status" id="status" aria-live="polite"></div>
+
+            <div class="question">
+                <p class="ask">The derivative of aˣ is k · aˣ. What is k?</p>
+                <button class="nav-btn" id="reveal-btn">Reveal</button>
+                <div class="reveal" id="reveal" hidden aria-live="polite"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+(function () {
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const num = (n, d) => String(+(+n).toFixed(d === undefined ? 3 : d)).replace('-', '−');
+    const VIEW = { x0: -2.6, x1: 2.3, y0: -0.6, y1: 4.6 };
+    const COL = { f: '#0f766e', d: '#f59e0b', k: '#4f46e5' };
+
+    const canvas = $('graph'), ctx = canvas.getContext('2d');
+    const S = { a: 2, k: 0.5, revealed: false };
+
+    const f = x => Math.pow(S.a, x);
+    // the derivative is drawn from measured slopes: a tiny secant either side of each x, no formula
+    const df = x => { const h = 1e-4; return (f(x + h) - f(x - h)) / (2 * h); };
+    const trueK = () => df(0);                                   // where the derivative crosses the y-axis
+    const matched = () => Math.abs(S.k - trueK()) < 0.006;
+
+    function draw() {
+        const r = canvas.getBoundingClientRect(), w = r.width, h = r.height;
+        if (!w) return;
+        const dpr = window.devicePixelRatio || 1;
+        if (Math.round(w * dpr) !== canvas.width || Math.round(h * dpr) !== canvas.height) {
+            canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+        }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const X = x => (x - VIEW.x0) / (VIEW.x1 - VIEW.x0) * w, Y = y => h - (y - VIEW.y0) / (VIEW.y1 - VIEW.y0) * h;
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = '#eef1f3'; ctx.lineWidth = 1; ctx.beginPath();
+        for (let x = Math.ceil(VIEW.x0); x <= VIEW.x1; x++) { ctx.moveTo(X(x), 0); ctx.lineTo(X(x), h); }
+        for (let y = Math.ceil(VIEW.y0); y <= VIEW.y1; y++) { ctx.moveTo(0, Y(y)); ctx.lineTo(w, Y(y)); }
+        ctx.stroke();
+        ctx.strokeStyle = '#9ca3af'; ctx.lineWidth = 1.5; ctx.beginPath();
+        ctx.moveTo(0, Y(0)); ctx.lineTo(w, Y(0)); ctx.moveTo(X(0), 0); ctx.lineTo(X(0), h); ctx.stroke();
+        ctx.fillStyle = '#6b7280'; ctx.font = '13px -apple-system, "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        for (let x = Math.ceil(VIEW.x0); x <= VIEW.x1; x++) if (x !== 0) ctx.fillText(num(x), X(x), Y(0) + 16);
+        ctx.textAlign = 'right';
+        for (let y = 1; y <= VIEW.y1; y++) ctx.fillText(String(y), X(0) - 7, Y(y) + 4);
+        ctx.textAlign = 'right';
+        ctx.fillText('x', w - 6, Y(0) - 6); ctx.textAlign = 'left'; ctx.fillText('y', X(0) + 6, 14);
+
+        const curve = (fn, color, width, dash) => {
+            ctx.save(); ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.setLineDash(dash || []);
+            let pen = false;
+            for (let i = 0; i <= 500; i++) {
+                const x = VIEW.x0 + (VIEW.x1 - VIEW.x0) * i / 500, y = fn(x);
+                if (y > VIEW.y1 + 2) { pen = false; continue; }
+                pen ? ctx.lineTo(X(x), Y(y)) : ctx.moveTo(X(x), Y(y)); pen = true;
+            }
+            ctx.stroke(); ctx.restore();
+        };
+        curve(f, COL.f, 3.5);
+        curve(df, COL.d, 4);
+        curve(x => S.k * f(x), matched() ? '#16a34a' : COL.k, 3, [9, 7]);
+
+        // the y-intercepts, where the comparison is easiest to read
+        const mark = (y, color, text, side) => {
+            ctx.beginPath(); ctx.arc(X(0), Y(y), 6, 0, 2 * Math.PI); ctx.fillStyle = color; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.font = '700 14px -apple-system, "Segoe UI", sans-serif'; ctx.fillStyle = color; ctx.textBaseline = 'middle';
+            ctx.textAlign = side < 0 ? 'right' : 'left'; ctx.fillText(text, X(0) + side * 12, Y(y));
+            ctx.textBaseline = 'alphabetic';
+        };
+        mark(1, COL.f, '(0, 1)', 1);
+        if (S.revealed) mark(trueK(), '#92400e', 'f′(0) = ' + num(trueK()), -1);
+        else mark(S.k, matched() ? '#16a34a' : COL.k, 'k = ' + num(S.k), -1);
+    }
+
+    function label() {
+        const a = num(S.a, 2);
+        const put = (el, tex, text) => {
+            if (window.katex) { try { katex.render(tex, el, { throwOnError: true }); return; } catch (e) { /* fall through */ } }
+            el.textContent = text;
+        };
+        put($('leg-f'), 'f(x)=' + a + '^{x}', 'f(x) = ' + a + 'ˣ');
+        put($('leg-k'), 'k\\cdot ' + a + '^{x}', 'k · ' + a + 'ˣ');
+    }
+
+    function update() {
+        $('a-out').textContent = 'a = ' + num(S.a, 2);
+        $('k-out').textContent = 'k = ' + num(S.k);
+        document.querySelectorAll('#a-pills .preset-pill').forEach(p => p.classList.toggle('active', Math.abs(parseFloat(p.dataset.a) - S.a) < 1e-9));
+        const st = $('status'), a = num(S.a, 2);
+        if (matched()) {
+            st.className = 'status match';
+            st.textContent = 'Match. The derivative of ' + a + 'ˣ is ' + num(trueK()) + ' · ' + a + 'ˣ.';
+        } else {
+            st.className = 'status';
+            st.innerHTML = 'Adjust k until the dashed curve lies on the derivative. Look where the curves cross the y-axis: k is <strong>' + (S.k < trueK() ? 'too small' : 'too big') + '</strong>.';
+        }
+        const rv = $('reveal');
+        if (S.revealed) {
+            rv.innerHTML = 'k is the slope of aˣ at x = 0, and it turns out to be the natural logarithm of a:' +
+                '<div class="formula">(aˣ)′ = ln(a) · aˣ</div>' +
+                'Here a = ' + a + ' and ln(' + a + ') = ' + num(Math.log(S.a)) + ', the k you found. ' +
+                (Math.abs(trueK() - 1) < 0.002 ? '<strong>And since ln(e) = 1, eˣ is its own derivative: (eˣ)′ = eˣ.</strong>' : 'When a = e, ln(e) = 1 and eˣ is its own derivative.');
+        }
+        rv.hidden = !S.revealed;
+        draw();
+    }
+
+    $('a-slider').addEventListener('input', e => { S.a = parseFloat(e.target.value); label(); update(); });
+    document.querySelectorAll('#a-pills .preset-pill').forEach(p => p.addEventListener('click', () => { S.a = parseFloat(p.dataset.a); $('a-slider').value = S.a; label(); update(); }));
+    $('k-slider').addEventListener('input', e => { S.k = parseFloat(e.target.value); update(); });
+    $('reveal-btn').addEventListener('click', function () { S.revealed = !S.revealed; this.textContent = S.revealed ? 'Hide' : 'Reveal'; update(); });
+
+    window.addEventListener('load', label);
+    window.addEventListener('resize', draw);
+    label(); update();
+})();
+</script>
+</body>
+</html>
